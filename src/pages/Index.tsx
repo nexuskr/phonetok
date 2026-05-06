@@ -19,32 +19,63 @@ import PayoutTicker from "@/components/PayoutTicker";
 import { useOnline, useTotalPayout, useTodayPayout, useMembers } from "@/components/LiveStats";
 
 /* =========================
-   실시간 채팅 (자연형)
+   숫자 자연 증가 애니메이션
+========================= */
+function useCountUp(target: number, duration = 1200) {
+  const [value, setValue] = useState(target);
+
+  useEffect(() => {
+    let start = value;
+    let startTime = Date.now();
+
+    const tick = () => {
+      const progress = Math.min((Date.now() - startTime) / duration, 1);
+      const next = Math.floor(start + (target - start) * progress);
+      setValue(next);
+
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+
+    tick();
+  }, [target]);
+
+  return value;
+}
+
+/* =========================
+   실시간 채팅 (고급 자연형)
 ========================= */
 
 const names = ["민준", "서연", "지훈", "유진", "도윤", "하은", "태현", "지민"];
 
-const actions = ["미션 완료", "포인트 적립", "출금 완료", "VIP 달성"];
+const patterns = [
+  (n: string) => `${n}님 미션 완료 (+₩${rand()})`,
+  (n: string) => `${n}님 포인트 적립 (+₩${rand()})`,
+  (n: string) => `${n}님 출금 완료`,
+  (n: string) => `${n}님 VIP 달성 🎉`,
+  (n: string) => `${n}님: "이거 생각보다 잘됨"`,
+];
 
-function generateMessage() {
-  const name = names[Math.floor(Math.random() * names.length)];
-  const action = actions[Math.floor(Math.random() * actions.length)];
-  const amount = Math.floor(Math.random() * 50000 + 1000);
-
-  return `${name}님 ${action} (+₩${amount.toLocaleString()})`;
+function rand() {
+  return Math.floor(Math.random() * 50000 + 1000).toLocaleString();
 }
 
 function LiveChat() {
   const [messages, setMessages] = useState<string[]>([]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setMessages((prev) => {
-        const newMsg = generateMessage();
-        const next = [newMsg, ...prev];
-        return next.slice(0, 7);
-      });
-    }, 1800);
+    const interval = setInterval(
+      () => {
+        const name = names[Math.floor(Math.random() * names.length)];
+        const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+
+        setMessages((prev) => {
+          const next = [pattern(name), ...prev];
+          return next.slice(0, 7);
+        });
+      },
+      2000 + Math.random() * 1500,
+    ); // 불규칙 타이밍
 
     return () => clearInterval(interval);
   }, []);
@@ -76,24 +107,33 @@ export default function Index() {
   const today = useTodayPayout();
   const members = useMembers();
 
+  // 🔥 애니메이션 적용
+  const animatedTotal = useCountUp(total);
+  const animatedToday = useCountUp(today);
+  const animatedOnline = useCountUp(online);
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       {/* 배경 */}
       <div className="absolute inset-0 bg-grid opacity-40" />
       <Particles density={60} />
 
-      {/* 헤더 */}
+      {/* 헤더 FIXED */}
       <header className="relative z-20 border-b border-border/30">
-        <div className="max-w-6xl mx-auto flex items-center justify-between h-16 px-4">
-          <div className="font-bold text-lg">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
+          <div className="font-bold text-lg leading-none">
             <span className="text-primary">PHONE</span>MISSION
           </div>
 
-          <div className="flex gap-3">
-            <Link to="/auth" className="text-sm">
+          <div className="flex items-center gap-2">
+            <Link to="/auth" className="text-sm text-muted-foreground hover:text-white transition">
               로그인
             </Link>
-            <Link to="/auth?signup=1" className="px-4 py-2 rounded-xl bg-primary text-white text-sm">
+
+            <Link
+              to="/auth?signup=1"
+              className="px-4 py-2 rounded-full bg-primary text-white text-sm font-semibold hover:scale-105 transition"
+            >
               시작하기
             </Link>
           </div>
@@ -115,11 +155,11 @@ export default function Index() {
           <div className="glass-strong rounded-2xl p-6 w-full max-w-md">
             <div className="text-xs text-muted-foreground">누적 지급액</div>
 
-            <div className="text-3xl font-bold mt-2 text-primary">₩ {total.toLocaleString()}</div>
+            <div className="text-3xl font-bold mt-2 text-primary">₩ {animatedTotal.toLocaleString()}</div>
 
-            <div className="text-xs text-green-400 mt-1">+₩ {today.toLocaleString()} 오늘 지급</div>
+            <div className="text-xs text-green-400 mt-1">+₩ {animatedToday.toLocaleString()} 오늘 지급</div>
 
-            <div className="text-xs mt-1 text-muted-foreground">{online.toLocaleString()}명 접속 중</div>
+            <div className="text-xs mt-1 text-muted-foreground">{animatedOnline.toLocaleString()}명 접속 중</div>
           </div>
         </div>
 
@@ -127,13 +167,16 @@ export default function Index() {
         <div className="mt-8">
           <Link
             to="/auth?signup=1"
-            className="px-8 py-4 rounded-xl bg-primary text-white font-bold inline-flex items-center gap-2"
+            className="px-8 py-4 rounded-xl bg-primary text-white font-bold inline-flex items-center gap-2 hover:scale-105 transition"
           >
             <Sparkles className="w-5 h-5" />
             무료 시작하기
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
+
+        {/* 🔥 VIP 압박 UX */}
+        <div className="mt-4 text-xs text-yellow-400 animate-pulse">⚡ VIP 한정 좌석 7명 남음</div>
 
         {/* 채팅 */}
         <div className="mt-12 flex justify-center">
@@ -171,7 +214,10 @@ export default function Index() {
       <section className="text-center pb-20">
         <h2 className="text-3xl font-bold">지금 시작하세요</h2>
 
-        <Link to="/auth?signup=1" className="mt-6 inline-block px-10 py-4 bg-primary text-white rounded-xl">
+        <Link
+          to="/auth?signup=1"
+          className="mt-6 inline-block px-10 py-4 bg-primary text-white rounded-xl hover:scale-105 transition"
+        >
           무료 시작
         </Link>
       </section>
