@@ -34,6 +34,7 @@ const App = () => (
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/support" element={<Support />} />
+          <Route path="/guide" element={<Guide />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/secure-auth" element={<SecureAuth />} />
           <Route path="/secure-wallet" element={<SecureWallet />} />
