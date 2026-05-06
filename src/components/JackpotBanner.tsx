@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useDB, formatKRW, MAIN_MILESTONES, MAIN_MAX_INTERVAL_MS, MINI_MAX_INTERVAL_MS, jackpotPayoutPct, randomFakeNick, type Tier } from "@/lib/store";
+import { useDB, formatKRW, MAIN_MILESTONE_AMOUNT, MAIN_MAX_INTERVAL_MS, MINI_MAX_INTERVAL_MS, jackpotPayoutPct, jackpotResetBase, miniJackpotResetBase, miniJackpotAmount, randomFakeNick, type Tier } from "@/lib/store";
 import { Flame, Crown, Trophy, Sparkles } from "lucide-react";
 
 // Global jackpot ticker that grows every second (shared across all sessions via localStorage).
