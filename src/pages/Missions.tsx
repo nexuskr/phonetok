@@ -69,7 +69,15 @@ export default function Missions() {
           })}
         </div>
 
-        {/* Locked banner */}
+        {/* Category sub-tabs */}
+        <div className="flex gap-2 mb-5">
+          {(["전체", "게임"] as const).map(c => (
+            <button key={c} onClick={() => setCatTab(c)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition ${catTab === c ? "bg-gradient-cyber text-primary-foreground" : "glass text-muted-foreground"}`}>
+              {c === "게임" && <Gamepad2 className="w-3.5 h-3.5" />} {c}
+            </button>
+          ))}
+        </div>
         {TIER_RANK[tierTab] > userTierRank && (
           <div className="glass-strong rounded-2xl p-5 neon-border mb-5 relative overflow-hidden">
             <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-gold/40 blur-3xl" />
