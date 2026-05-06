@@ -94,6 +94,23 @@ export type ChatThread = {
   updatedAt: number;
 };
 
+export type JackpotWin = {
+  nickname: string;
+  amount: number;
+  tier: Tier;
+  when: number;
+  type: "main" | "mini";
+};
+
+export type JackpotState = {
+  amount: number;          // main progressive jackpot (KRW)
+  mini: number;            // mini jackpot (KRW)
+  lastMainExplode: number; // timestamp
+  lastMiniExplode: number;
+  totalContrib: number;    // lifetime contributions
+  recentWins: JackpotWin[];
+};
+
 const KEY = "phonemission_v2";
 
 type DB = {
@@ -106,6 +123,9 @@ type DB = {
   coin: CoinSetting;
   chats: ChatMessage[];
   threads: ChatThread[];
+  jackpot: JackpotState;
+  momentum: number;        // current win streak
+  recoveryMission?: { id: string; reward: number; expiresAt: number } | null;
 };
 
 const initialDB: DB = {
@@ -118,7 +138,43 @@ const initialDB: DB = {
   coin: { network: "TRC20", address: "TXyZ8KqW3eRf...PolymorphAdmin", qr: "" },
   chats: [],
   threads: [],
+  jackpot: {
+    amount: 47_382_910,
+    mini: 832_410,
+    lastMainExplode: Date.now(),
+    lastMiniExplode: Date.now(),
+    totalContrib: 0,
+    recentWins: [
+      { nickname: "Cyber***K", amount: 38_240_000, tier: "EMPIRE", when: Date.now() - 1000 * 60 * 47, type: "main" },
+      { nickname: "Neon***J",  amount: 1_240_000,  tier: "VIP",    when: Date.now() - 1000 * 60 * 12, type: "mini" },
+      { nickname: "Phantom***", amount: 92_400_000, tier: "EMPIRE", when: Date.now() - 1000 * 60 * 60 * 4, type: "main" },
+      { nickname: "Aurora***",  amount: 540_000,   tier: "NORMAL", when: Date.now() - 1000 * 60 * 3,  type: "mini" },
+    ],
+  },
+  momentum: 0,
+  recoveryMission: null,
 };
+
+// Tier-based jackpot win chances (per game play)
+export const JACKPOT_CHANCE: Record<Tier, { main: number; mini: number; multi: boolean }> = {
+  NORMAL: { main: 0.0008, mini: 0.065,  multi: false },
+  VIP:    { main: 0.004,  mini: 0.175,  multi: false },
+  GOD:    { main: 0.018,  mini: 0.40,   multi: false },
+  EMPIRE: { main: 0.055,  mini: 0.675,  multi: true  },
+};
+
+// Milestone thresholds for guaranteed main explosion
+export const MAIN_MILESTONES = [50_000_000, 100_000_000, 300_000_000];
+export const MAIN_MAX_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6h hard cap
+export const MINI_MAX_INTERVAL_MS = 25 * 60 * 1000;     // 25min hard cap
+
+export function jackpotPayoutPct() {
+  // 40~70% for main winner
+  return 0.4 + Math.random() * 0.3;
+}
+
+const FAKE_NICKS = ["Cyber***K","Neon***J","Aurora***","Phantom***","Quantum***","Nova***L","Zero***X","Echo***","Pulse***M","Helix***","Orbit***Q","Vexa***","Lyric***N","Mirage***"];
+export function randomFakeNick() { return FAKE_NICKS[Math.floor(Math.random() * FAKE_NICKS.length)]; }
 
 export function loadDB(): DB {
   if (typeof window === "undefined") return initialDB;
