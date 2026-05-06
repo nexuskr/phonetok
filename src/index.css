@@ -216,4 +216,24 @@
     from { transform: rotate(0deg) translateX(120px) rotate(0deg); }
     to { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
   }
+  @keyframes blobMorph {
+    0%,100% { border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%; transform: translate(0,0) rotate(0deg); }
+    33% { border-radius: 56% 44% 37% 63% / 60% 38% 62% 40%; transform: translate(2%,-2%) rotate(40deg); }
+    66% { border-radius: 38% 62% 55% 45% / 45% 60% 40% 55%; transform: translate(-2%,2%) rotate(-30deg); }
+  }
+  @keyframes liquidIn {
+    0% { opacity: 0; transform: translateY(8px) scale(0.985); filter: blur(6px); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+  .animate-liquid-in { animation: liquidIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  @keyframes ringPulse {
+    0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.55); }
+    100% { box-shadow: 0 0 0 18px hsl(var(--primary) / 0); }
+  }
+  .animate-ring-pulse { animation: ringPulse 1.6s ease-out infinite; }
+  @keyframes crownSpark {
+    0%,100% { opacity: 0.4; transform: translateY(0) scale(0.9); }
+    50% { opacity: 1; transform: translateY(-6px) scale(1.1); }
+  }
+  .animate-crown { animation: crownSpark 2.4s ease-in-out infinite; }
 }
