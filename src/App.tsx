@@ -34,6 +34,8 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/support" element={<Support />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/secure-auth" element={<SecureAuth />} />
+          <Route path="/secure-wallet" element={<SecureWallet />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
