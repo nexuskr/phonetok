@@ -34,7 +34,7 @@ export type Mission = {
   tier: MissionTier;
   duration: string;
   ugc?: boolean;
-  game?: "tap" | "lucky" | "memory"; // game mission
+  game?: "tap" | "lucky" | "memory" | "reaction"; // game mission
 };
 
 export type Pkg = {
@@ -158,13 +158,13 @@ export const WITHDRAW_LIMITS: Record<Tier, number> = {
 };
 
 export const PACKAGES: Pkg[] = [
-  { id: "free",    name: "FREE",              tagline: "지금 바로 무료로 시작",     price: 0,          dailyReturn: 0,         duration: 0,  totalReturn: 0,           tier: "FREE",    unlocksTier: "NORMAL", badge: "무료",         perks: ["하루 미션 8회", "기본 게임 3종", "출금 한도 50만원", "신규 5,000원 보너스"] },
-  { id: "starter", name: "STARTER",           tagline: "첫 사이버 수익의 시작",     price: 49_000,     dailyReturn: 3_500,     duration: 30, totalReturn: 105_000,     tier: "STARTER", unlocksTier: "NORMAL", badge: "BEST VALUE",   perks: ["하루 미션 15회", "프리미엄 게임 +2종", "출금 한도 100만원", "1.5배 정산 부스터"] },
-  { id: "pro",     name: "PRO",               tagline: "본격적인 수익 가속",       price: 159_000,    dailyReturn: 13_000,    duration: 35, totalReturn: 455_000,     tier: "PRO",     unlocksTier: "VIP",    badge: "POPULAR",      perks: ["VIP 미션 입장권", "AI 자동 추천 가속", "출금 한도 300만원", "주간 보너스"] },
-  { id: "vip",     name: "VIP",               tagline: "VIP 전용 수익 풀 입장",    price: 490_000,    dailyReturn: 42_000,    duration: 45, totalReturn: 1_890_000,   tier: "VIP",     unlocksTier: "VIP",    badge: "VIP",          fomo: "이번 주 가입자 1,284명",  perks: ["VIP 전용 미션 풀", "즉시 정산 24/7", "1:1 전담 매니저", "출금 한도 500만원"] },
-  { id: "god",     name: "GOD MODE",          tagline: "한계 없는 신모드",         price: 1_500_000,  dailyReturn: 145_000,   duration: 45, totalReturn: 6_525_000,   tier: "GOD",     unlocksTier: "GOD",    badge: "GOD MODE",     fomo: "잔여 좌석 단 87석",       seatsLeft: 87, perks: ["무제한 GOD 미션", "AI 자동 수익 봇", "월간 골드 보너스", "출금 한도 5,000만원"] },
-  { id: "empire",  name: "EMPIRE",            tagline: "제국의 일원이 되어라",     price: 9_900_000,  dailyReturn: 1_050_000, duration: 50, totalReturn: 52_500_000,  tier: "EMPIRE",  unlocksTier: "EMPIRE", badge: "EMPIRE",       fomo: "플랫폼 수익 10% 분배 · 잔여 73석", seatsLeft: 73, perks: ["플랫폼 수익 10% 분배", "전세계 무제한 출금", "프라이빗 컨퍼런스", "오너십 배지"] },
-  { id: "phantom", name: "PHANTOM SYNDICATE", tagline: "선착순 20명 · 평생 오너십", price: 35_000_000, dailyReturn: 4_200_000, duration: 50, totalReturn: 210_000_000, tier: "PHANTOM", unlocksTier: "EMPIRE", badge: "INVITE ONLY",  fomo: "Syndicate Crew · 잔여 6석",       seatsLeft: 6,  perks: ["플랫폼 수익 15% 분배", "Syndicate Crew 평생 오너십", "전용 자산 매니저", "프라이빗 제트 미팅"] },
+  { id: "free",    name: "FREE",              tagline: "압박 ZERO · 평생 무료 플랜",     price: 0,          dailyReturn: 0,         duration: 0,  totalReturn: 0,           tier: "FREE",    unlocksTier: "NORMAL", badge: "평생무료",     perks: ["💚 결제 압박 0% · 광고 없음", "하루 무료 미션 8회 + 게임 3종", "출금 한도 월 50만원", "신규가입 5,000원 즉시 지급", "광고 보고 추가 적립 가능"] },
+  { id: "starter", name: "STARTER",           tagline: "첫 사이버 수익의 시작",         price: 49_000,     dailyReturn: 3_500,     duration: 30, totalReturn: 105_000,     tier: "STARTER", unlocksTier: "NORMAL", badge: "BEST VALUE",   perks: ["하루 미션 15회 · 게임 +2종", "1.5배 정산 부스터", "출금 한도 월 100만원", "30일 후 원금+수익 회수"] },
+  { id: "pro",     name: "PRO",               tagline: "본격적인 수익 가속",           price: 159_000,    dailyReturn: 13_000,    duration: 35, totalReturn: 455_000,     tier: "PRO",     unlocksTier: "VIP",    badge: "POPULAR",      perks: ["VIP 미션 입장권", "AI 자동 추천 2배 가속", "출금 한도 월 300만원", "주간 보너스 + 추천 5%"] },
+  { id: "vip",     name: "VIP",               tagline: "VIP 전용 수익 풀 입장",        price: 490_000,    dailyReturn: 42_000,    duration: 45, totalReturn: 1_890_000,   tier: "VIP",     unlocksTier: "VIP",    badge: "VIP",          fomo: "이번 주 신규 1,284명 가입", perks: ["VIP 전용 미션 풀 (3배 보상)", "1:1 전담 매니저 24/7", "즉시 정산 (12분 이내)", "출금 한도 월 500만원"] },
+  { id: "god",     name: "GOD MODE",          tagline: "한계 없는 신모드",             price: 1_500_000,  dailyReturn: 145_000,   duration: 45, totalReturn: 6_525_000,   tier: "GOD",     unlocksTier: "GOD",    badge: "GOD MODE",     fomo: "잔여 좌석 단 87석",       seatsLeft: 87, perks: ["무제한 GOD 미션 풀", "AI 자동 수익 봇 24h", "월간 골드 보너스 100만원", "출금 한도 월 5,000만원"] },
+  { id: "empire",  name: "EMPIRE",            tagline: "선착순 20명 · 플랫폼 오너",     price: 9_900_000,  dailyReturn: 1_050_000, duration: 50, totalReturn: 52_500_000,  tier: "EMPIRE",  unlocksTier: "EMPIRE", badge: "👑 EMPIRE",    fomo: "🔥 선착순 20명 · 잔여 7석", seatsLeft: 7,  perks: ["플랫폼 수익 10% 매주 분배", "Syndicate Crew 정식 입성", "전세계 무제한 출금 (한도 ∞)", "프라이빗 컨퍼런스 + 오너십 배지", "전담 자산매니저 1:1 평생"] },
+  { id: "phantom", name: "PHANTOM SYNDICATE", tagline: "초대 전용 · 평생 오너십",       price: 35_000_000, dailyReturn: 4_200_000, duration: 50, totalReturn: 210_000_000, tier: "PHANTOM", unlocksTier: "EMPIRE", badge: "INVITE ONLY",  fomo: "Syndicate Council · 잔여 3석", seatsLeft: 3,  perks: ["플랫폼 수익 15% 평생 분배", "Syndicate Council 의결권", "프라이빗 제트 분기 미팅", "글로벌 자산 매니저 풀", "재단 의결권 + 평생 오너십"] },
 ];
 
 export const DEFAULT_MISSIONS: Mission[] = [
@@ -176,6 +176,7 @@ export const DEFAULT_MISSIONS: Mission[] = [
   { id: "g1",  title: "사이버 탭 챌린지",        desc: "10초간 빠르게 탭하기",        reward: 1_200,    category: "게임",   difficulty: "EASY",   tier: "NORMAL", duration: "10초", game: "tap" },
   { id: "g2",  title: "럭키 박스 오픈",          desc: "1일 1회 무료 럭키 박스",      reward: 2_500,    category: "게임",   difficulty: "EASY",   tier: "NORMAL", duration: "5초",  game: "lucky" },
   { id: "g3",  title: "메모리 매칭 게임",        desc: "카드 6쌍 매칭",            reward: 3_500,    category: "게임",   difficulty: "NORMAL", tier: "NORMAL", duration: "1분",  game: "memory" },
+  { id: "g6",  title: "리액션 스피드 챌린지",     desc: "녹색 신호에 0.3초 안에 탭", reward: 2_000,    category: "게임",   difficulty: "EASY",   tier: "NORMAL", duration: "20초", game: "reaction" },
   { id: "m5",  title: "프리미엄 카페 리뷰 작성",  desc: "300자 이상 + 사진 1장",     reward: 12_000,   category: "리뷰",   difficulty: "HARD",   tier: "VIP",    duration: "20분", ugc: true },
   { id: "m6",  title: "VIP 데이터 라벨링 100건", desc: "고급 이미지 라벨링",         reward: 35_000,   category: "데이터", difficulty: "VIP",    tier: "VIP",    duration: "45분" },
   { id: "m8",  title: "AI 음성 데이터 녹음",     desc: "한국어 30문장 녹음",         reward: 18_000,   category: "AI",     difficulty: "HARD",   tier: "VIP",    duration: "25분", ugc: true },
