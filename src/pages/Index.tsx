@@ -6,75 +6,101 @@ import Particles from "@/components/Particles";
 import { useOnline, useTotalPayout, useTodayPayout, useMembers } from "@/components/LiveStats";
 
 /* =========================
-   숫자 자연 증가 애니메이션
+   🔥 2026 배경 레이어
 ========================= */
-function useCountUp(target: number, duration = 1200) {
+
+function BackgroundFX() {
+  return (
+    <>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,80,0,0.15),transparent_40%),radial-gradient(circle_at_80%_30%,rgba(140,0,255,0.15),transparent_40%)]" />
+      <div className="absolute inset-0 backdrop-blur-[80px]" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.04]" />
+    </>
+  );
+}
+
+/* =========================
+   💰 숫자 증가 애니메이션
+========================= */
+
+function useCountUp(target: number) {
   const [value, setValue] = useState(target);
 
   useEffect(() => {
-    let start = value;
-    let startTime = Date.now();
-
-    const tick = () => {
-      const progress = Math.min((Date.now() - startTime) / duration, 1);
-      const next = Math.floor(start + (target - start) * progress);
-      setValue(next);
-      if (progress < 1) requestAnimationFrame(tick);
-    };
-
-    tick();
-  }, [target]);
+    const interval = setInterval(() => {
+      setValue((prev) => prev + Math.floor(Math.random() * 5000));
+    }, 1500);
+    return () => clearInterval(interval);
+  }, []);
 
   return value;
 }
 
 /* =========================
-   🔥 실시간 채팅 (유저 흐름 기반)
+   🧠 리얼 채팅 엔진 (사람처럼)
 ========================= */
+
+const users = [
+  "민준",
+  "서연",
+  "지훈",
+  "유진",
+  "도윤",
+  "하은",
+  "태현",
+  "지민",
+  "현우",
+  "수아",
+  "지영",
+  "승현",
+  "나연",
+  "재훈",
+  "은지",
+  "태리",
+];
+
+const templates = [
+  (u: string) => `${u}님 미션 완료 (+₩${rand()})`,
+  (u: string) => `${u}님 출금 완료 (+₩${rand()})`,
+  (u: string) => `${u}님 VIP 달성`,
+  (u: string) => `${u}: 이거 진짜 되네`,
+  (u: string) => `${u}: 방금 입금됨`,
+  (u: string) => `${u}: 꾸준히 하면 쌓임`,
+];
+
+function rand() {
+  return (Math.floor(Math.random() * 50000) + 1000).toLocaleString();
+}
+
 function LiveChat() {
   const [messages, setMessages] = useState<string[]>([]);
 
-  const users = Array.from({ length: 40 }).map((_, i) => ({
-    id: i,
-    name: ["민준", "서연", "지훈", "유진", "도윤", "하은"][i % 6] + i,
-    step: 0,
-  }));
-
-  const steps = [
-    (u: any) => `${u.name}님 가입 완료`,
-    (u: any) => `${u.name}님 미션 진행 중`,
-    (u: any) => `${u.name}님 포인트 적립 (+₩${rand()})`,
-    (u: any) => `${u.name}님 출금 완료`,
-  ];
-
-  function rand() {
-    return Math.floor(Math.random() * 50000 + 2000).toLocaleString();
-  }
-
   useEffect(() => {
-    const interval = setInterval(() => {
-      const user = users[Math.floor(Math.random() * users.length)];
+    const loop = () => {
+      setTimeout(
+        () => {
+          const user = users[Math.floor(Math.random() * users.length)];
+          const template = templates[Math.floor(Math.random() * templates.length)];
+          const msg = template(user);
 
-      const stepFn = steps[user.step];
-      const msg = stepFn(user);
-
-      user.step = (user.step + 1) % steps.length;
-
-      setMessages((prev) => [msg, ...prev].slice(0, 8));
-    }, 1200);
-
-    return () => clearInterval(interval);
+          setMessages((prev) => [msg, ...prev].slice(0, 8));
+          loop();
+        },
+        800 + Math.random() * 2000,
+      );
+    };
+    loop();
   }, []);
 
   return (
-    <div className="glass-strong rounded-3xl p-5 neon-border w-full max-w-md mx-auto">
-      <div className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
-        <Flame className="w-4 h-4 text-primary" /> 실시간 활동
+    <div className="rounded-2xl p-5 border border-white/10 bg-white/5 backdrop-blur-xl w-full max-w-md">
+      <div className="text-xs mb-3 flex items-center gap-2 text-orange-400">
+        <Flame className="w-4 h-4" /> 실시간 활동
       </div>
 
       <div className="space-y-2 text-sm">
         {messages.map((m, i) => (
-          <div key={i} className="px-3 py-2 rounded-lg bg-muted/40 animate-fade-in">
+          <div key={i} className="px-3 py-2 rounded-lg bg-white/5">
             {m}
           </div>
         ))}
@@ -84,7 +110,24 @@ function LiveChat() {
 }
 
 /* =========================
-   메인 페이지
+   💣 VIP 압박 UX
+========================= */
+
+function VipPressure() {
+  const [left, setLeft] = useState(7);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLeft((prev) => (prev > 1 ? prev - (Math.random() > 0.7 ? 1 : 0) : prev));
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <div className="mt-6 text-xs text-orange-400">⚠ VIP 좌석 {left}개 남음</div>;
+}
+
+/* =========================
+   🚀 MAIN
 ========================= */
 
 export default function Index() {
@@ -94,31 +137,28 @@ export default function Index() {
   const members = useMembers();
 
   const animatedTotal = useCountUp(total);
-  const animatedToday = useCountUp(today);
-  const animatedOnline = useCountUp(online);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
+    <div className="relative min-h-screen overflow-hidden bg-black text-white">
       {/* 배경 */}
-      <div className="absolute inset-0 bg-grid opacity-40" />
-      <Particles density={60} />
+      <BackgroundFX />
 
-      {/* 헤더 FIX */}
-      <header className="relative z-20 border-b border-border/30">
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-          <div className="font-bold text-lg leading-none">
-            <span className="text-primary">PHONE</span>MISSION
-          </div>
+      {/* particles → 헤더 아래만 */}
+      <div className="absolute inset-0 top-20 pointer-events-none">
+        <Particles density={40} />
+      </div>
 
-          <div className="flex items-center gap-2">
-            <Link to="/auth" className="text-sm text-muted-foreground hover:text-white transition">
+      {/* 헤더 */}
+      <header className="relative z-20">
+        <div className="max-w-6xl mx-auto flex justify-between items-center h-16 px-4">
+          <div className="font-bold text-lg text-orange-400">PHONEMISSION</div>
+
+          <div className="flex gap-3 items-center">
+            <Link to="/auth" className="text-sm opacity-70">
               로그인
             </Link>
 
-            <Link
-              to="/auth?signup=1"
-              className="px-4 py-2 rounded-full bg-primary text-white text-sm font-semibold hover:scale-105 transition"
-            >
+            <Link to="/auth?signup=1" className="px-4 py-2 rounded-full bg-orange-500 text-sm font-semibold">
               시작하기
             </Link>
           </div>
@@ -130,38 +170,37 @@ export default function Index() {
         <h1 className="text-4xl sm:text-6xl font-black leading-tight">
           폰 하나로 시작하는
           <br />
-          <span className="text-primary">스마트 수익 시스템</span>
+          <span className="text-orange-500">스마트 수익 시스템</span>
         </h1>
 
-        <p className="mt-6 text-muted-foreground">자동 미션 + 실시간 정산으로 수익을 만드세요</p>
+        <p className="mt-6 text-gray-400">자동 미션 + 실시간 정산</p>
 
-        {/* 카드 */}
+        {/* 수익 카드 */}
         <div className="mt-10 flex justify-center">
-          <div className="glass-strong rounded-2xl p-6 w-full max-w-md">
-            <div className="text-xs text-muted-foreground">누적 지급액</div>
+          <div className="rounded-2xl p-6 w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10">
+            <div className="text-xs text-gray-400">누적 지급액</div>
 
-            <div className="text-3xl font-bold mt-2 text-primary">₩ {animatedTotal.toLocaleString()}</div>
+            <div className="text-3xl font-bold mt-2 text-orange-500">₩ {animatedTotal.toLocaleString()}</div>
 
-            <div className="text-xs text-green-400 mt-1">+₩ {animatedToday.toLocaleString()} 오늘 지급</div>
+            <div className="text-xs text-green-400 mt-1">+₩ {today.toLocaleString()}</div>
 
-            <div className="text-xs mt-1 text-muted-foreground">{animatedOnline.toLocaleString()}명 접속 중</div>
+            <div className="text-xs mt-1 text-gray-400">{online.toLocaleString()}명 접속 중</div>
           </div>
         </div>
 
-        {/* 버튼 */}
+        {/* CTA */}
         <div className="mt-8">
           <Link
             to="/auth?signup=1"
-            className="px-8 py-4 rounded-xl bg-primary text-white font-bold inline-flex items-center gap-2 hover:scale-105 transition"
+            className="px-8 py-4 rounded-full bg-orange-500 font-bold inline-flex items-center gap-2"
           >
             <Sparkles className="w-5 h-5" />
             무료 시작하기
             <ArrowRight className="w-5 h-5" />
           </Link>
-        </div>
 
-        {/* VIP UX */}
-        <div className="mt-4 text-xs text-yellow-400 animate-pulse">⚡ VIP 한정 좌석 7명 남음</div>
+          <VipPressure />
+        </div>
 
         {/* 채팅 */}
         <div className="mt-12 flex justify-center">
@@ -172,17 +211,17 @@ export default function Index() {
       {/* 기능 */}
       <section className="relative z-10 max-w-6xl mx-auto px-4 pb-20">
         <div className="grid md:grid-cols-3 gap-4">
-          <div className="glass p-5 rounded-xl text-center">
+          <div className="p-5 rounded-xl bg-white/5 border border-white/10 text-center">
             <Cpu className="mx-auto mb-2" />
             AI 자동 미션
           </div>
 
-          <div className="glass p-5 rounded-xl text-center">
+          <div className="p-5 rounded-xl bg-white/5 border border-white/10 text-center">
             <TrendingUp className="mx-auto mb-2" />
             수익 증가 시스템
           </div>
 
-          <div className="glass p-5 rounded-xl text-center">
+          <div className="p-5 rounded-xl bg-white/5 border border-white/10 text-center">
             <Globe className="mx-auto mb-2" />
             실시간 글로벌 정산
           </div>
@@ -190,19 +229,16 @@ export default function Index() {
       </section>
 
       {/* 통계 */}
-      <section className="relative z-10 max-w-6xl mx-auto px-4 pb-24 text-center">
-        <div className="text-3xl font-bold text-primary">{members.toLocaleString()}</div>
-        <div className="text-sm text-muted-foreground">활성 사용자</div>
+      <section className="relative z-10 text-center pb-24">
+        <div className="text-3xl font-bold text-orange-500">{members.toLocaleString()}</div>
+        <div className="text-sm text-gray-400">활성 사용자</div>
       </section>
 
       {/* CTA */}
       <section className="text-center pb-20">
         <h2 className="text-3xl font-bold">지금 시작하세요</h2>
 
-        <Link
-          to="/auth?signup=1"
-          className="mt-6 inline-block px-10 py-4 bg-primary text-white rounded-xl hover:scale-105 transition"
-        >
+        <Link to="/auth?signup=1" className="mt-6 inline-block px-10 py-4 bg-orange-500 rounded-full">
           무료 시작
         </Link>
       </section>
