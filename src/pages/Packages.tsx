@@ -6,12 +6,13 @@ import { Crown, Check, Upload, Sparkles, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const tierStyles: Record<Pkg["tier"], { ring: string; bg: string; label: string }> = {
-  STARTER:  { ring: "from-secondary to-primary",  bg: "from-secondary/20",  label: "ENTRY" },
-  FOUNDER:  { ring: "from-primary to-accent",     bg: "from-primary/20",    label: "FOUNDER" },
-  GOD:      { ring: "from-accent to-primary",     bg: "from-accent/20",     label: "GOD MODE" },
-  AI:       { ring: "from-secondary to-accent",   bg: "from-secondary/20",  label: "AI KINGDOM" },
-  EMPIRE:   { ring: "from-gold to-primary",       bg: "from-gold/20",       label: "FACELESS" },
-  PHANTOM:  { ring: "from-accent via-gold to-primary", bg: "from-gold/30",  label: "PHANTOM" },
+  FREE:    { ring: "from-muted to-muted",                bg: "from-muted/30",      label: "FREE" },
+  STARTER: { ring: "from-secondary to-primary",          bg: "from-secondary/20",  label: "STARTER" },
+  PRO:     { ring: "from-primary to-secondary",          bg: "from-primary/20",    label: "PRO" },
+  VIP:     { ring: "from-primary to-accent",             bg: "from-primary/25",    label: "VIP" },
+  GOD:     { ring: "from-accent to-primary",             bg: "from-accent/25",     label: "GOD MODE" },
+  EMPIRE:  { ring: "from-gold to-primary",               bg: "from-gold/25",       label: "EMPIRE" },
+  PHANTOM: { ring: "from-accent via-gold to-primary",    bg: "from-gold/30",       label: "PHANTOM" },
 };
 
 export default function Packages() {
