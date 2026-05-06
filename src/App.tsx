@@ -15,9 +15,15 @@ import Guide from "./pages/Guide.tsx";
 import Admin from "./pages/Admin.tsx";
 import SecureAuth from "./pages/SecureAuth.tsx";
 import SecureWallet from "./pages/SecureWallet.tsx";
+import ForgotPassword from "./pages/ForgotPassword.tsx";
+import ResetPassword from "./pages/ResetPassword.tsx";
+import CompleteProfile from "./pages/CompleteProfile.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import { useSessionGuard } from "./hooks/use-session-guard";
 
 const queryClient = new QueryClient();
+
+function SessionWatcher() { useSessionGuard(); return null; }
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -25,6 +31,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <SessionWatcher />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
@@ -38,6 +45,9 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/secure-auth" element={<SecureAuth />} />
           <Route path="/secure-wallet" element={<SecureWallet />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/complete-profile" element={<CompleteProfile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
