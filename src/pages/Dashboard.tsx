@@ -120,10 +120,10 @@ export default function Dashboard() {
               </div>
 
               <div className="relative grid grid-cols-2 gap-2 mt-3">
-                <Link to="/wallet" className="py-3 rounded-xl bg-gradient-primary text-primary-foreground font-bold text-sm flex items-center justify-center gap-1.5 glow-primary">
+                <Link to="/wallet" className="press sheen py-3 rounded-xl bg-gradient-primary text-primary-foreground font-bold text-sm flex items-center justify-center gap-1.5 glow-primary">
                   <Wallet className="w-4 h-4" /> 출금하기
                 </Link>
-                <Link to="/packages" className="py-3 rounded-xl glass border border-border font-bold text-sm flex items-center justify-center gap-1.5">
+                <Link to="/packages" className="press sheen py-3 rounded-xl glass border border-border font-bold text-sm flex items-center justify-center gap-1.5">
                   <Crown className="w-4 h-4 text-gold" /> 패키지
                 </Link>
               </div>
