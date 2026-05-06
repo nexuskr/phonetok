@@ -56,17 +56,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Bottom nav (mobile-first) */}
       {user && (
         <nav className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-md">
-          <div className="glass-strong rounded-2xl px-2 py-2 flex items-center justify-between shadow-2xl neon-border">
+          <div className="glass-strong rounded-2xl px-2 py-2 flex items-center justify-between shadow-2xl neon-border relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-aurora opacity-[0.06] animate-gradient pointer-events-none" style={{ backgroundSize: "300% 300%" }} />
             {items.map(({ to, icon: Icon, label }) => {
               const active = loc.pathname === to;
               return (
-                <NavLink key={to} to={to} className="flex-1">
-                  <div className={`flex flex-col items-center gap-1 py-1.5 rounded-xl transition ${active ? "bg-gradient-primary/15" : ""}`}>
-                    <div className={`relative ${active ? "text-primary" : "text-muted-foreground"}`}>
+                <NavLink key={to} to={to} className="flex-1 press">
+                  <div className={`relative flex flex-col items-center gap-1 py-1.5 rounded-xl transition-all duration-500 ${active ? "bg-gradient-primary/15" : ""}`}>
+                    {active && <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-gradient-primary glow-primary" />}
+                    <div className={`relative transition-colors duration-300 ${active ? "text-primary" : "text-muted-foreground"}`}>
                       <Icon className="w-5 h-5" />
-                      {active && <div className="absolute -inset-2 rounded-full bg-primary/20 blur-md -z-10" />}
+                      {active && <div className="absolute -inset-2 rounded-full bg-primary/25 blur-md -z-10 animate-ring-pulse" />}
                     </div>
-                    <span className={`text-[10px] font-semibold ${active ? "text-foreground" : "text-muted-foreground"}`}>{label}</span>
+                    <span className={`text-[10px] font-semibold transition-colors ${active ? "text-foreground" : "text-muted-foreground"}`}>{label}</span>
                   </div>
                 </NavLink>
               );
