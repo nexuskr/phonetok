@@ -1,8 +1,13 @@
 import { Link } from "react-router-dom";
-import { ShieldCheck, Zap, Lock, Sparkles, ArrowRight, TrendingUp, Globe, Cpu } from "lucide-react";
+import { ShieldCheck, Zap, Lock, Sparkles, ArrowRight, TrendingUp, Globe, Cpu, Users, Activity } from "lucide-react";
 import Particles from "@/components/Particles";
+import { useOnline, useTotalPayout, useTodayPayout, useMembers } from "@/components/LiveStats";
 
 export default function Index() {
+  const online = useOnline();
+  const total = useTotalPayout();
+  const today = useTodayPayout();
+  const members = useMembers();
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Backdrop layers */}
