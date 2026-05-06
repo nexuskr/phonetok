@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { useDB, formatKRW, uid, gen6 } from "@/lib/store";
+import { useDB, formatKRW, uid, gen6, WITHDRAW_LIMITS } from "@/lib/store";
 import { Wallet as WalletIcon, ArrowDownToLine, ArrowUpFromLine, Clock, Coins, Banknote, Copy, ShieldCheck } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import PinPad from "@/components/PinPad";
@@ -56,6 +56,11 @@ export default function Wallet() {
     if (!a || a < 10000) { toast({ title: "최소 10,000원부터 출금 가능" }); return; }
     const balance = asset === "bank" ? u.balance : u.coinBalance;
     if (a > balance) { toast({ title: "잔고가 부족합니다" }); return; }
+    const limit = WITHDRAW_LIMITS[u.tier];
+    if (limit !== -1 && a > limit) {
+      toast({ title: `${u.tier} 등급 출금 한도 초과`, description: `현재 한도: ${formatKRW(limit)} · 패키지 업그레이드로 한도 상향` });
+      return;
+    }
     if (asset === "bank" && !account) { toast({ title: "계좌번호를 입력해주세요" }); return; }
     if (asset === "coin" && !coinAddr) { toast({ title: "코인 주소를 입력해주세요" }); return; }
     if (sentCode !== authCode) { toast({ title: "인증번호 불일치" }); return; }
