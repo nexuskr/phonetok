@@ -14,16 +14,397 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      daily_stats: {
+        Row: {
+          best_streak: number
+          current_streak: number
+          earned: number
+          losses: number
+          stat_date: string
+          user_id: string
+          wins: number
+          withdrawals_count: number
+        }
+        Insert: {
+          best_streak?: number
+          current_streak?: number
+          earned?: number
+          losses?: number
+          stat_date?: string
+          user_id: string
+          wins?: number
+          withdrawals_count?: number
+        }
+        Update: {
+          best_streak?: number
+          current_streak?: number
+          earned?: number
+          losses?: number
+          stat_date?: string
+          user_id?: string
+          wins?: number
+          withdrawals_count?: number
+        }
+        Relationships: []
+      }
+      mission_history: {
+        Row: {
+          base_reward: number
+          cap_remaining: number
+          created_at: string
+          final_reward: number
+          id: string
+          is_win: boolean
+          mission_id: string
+          multiplier: number
+          streak: number
+          tier: Database["public"]["Enums"]["user_tier"]
+          user_id: string
+        }
+        Insert: {
+          base_reward: number
+          cap_remaining: number
+          created_at?: string
+          final_reward: number
+          id?: string
+          is_win: boolean
+          mission_id: string
+          multiplier?: number
+          streak?: number
+          tier: Database["public"]["Enums"]["user_tier"]
+          user_id: string
+        }
+        Update: {
+          base_reward?: number
+          cap_remaining?: number
+          created_at?: string
+          final_reward?: number
+          id?: string
+          is_win?: boolean
+          mission_id?: string
+          multiplier?: number
+          streak?: number
+          tier?: Database["public"]["Enums"]["user_tier"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          bank_account: string | null
+          bank_name: string | null
+          coin_address: string | null
+          coin_network: string | null
+          created_at: string
+          id: string
+          nickname: string
+          tier: Database["public"]["Enums"]["user_tier"]
+          updated_at: string
+          withdraw_pin_hash: string | null
+        }
+        Insert: {
+          bank_account?: string | null
+          bank_name?: string | null
+          coin_address?: string | null
+          coin_network?: string | null
+          created_at?: string
+          id: string
+          nickname: string
+          tier?: Database["public"]["Enums"]["user_tier"]
+          updated_at?: string
+          withdraw_pin_hash?: string | null
+        }
+        Update: {
+          bank_account?: string | null
+          bank_name?: string | null
+          coin_address?: string | null
+          coin_network?: string | null
+          created_at?: string
+          id?: string
+          nickname?: string
+          tier?: Database["public"]["Enums"]["user_tier"]
+          updated_at?: string
+          withdraw_pin_hash?: string | null
+        }
+        Relationships: []
+      }
+      profit_share_distributions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          period_end: string
+          period_start: string
+          pool_total: number
+          share_pct: number
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          period_end: string
+          period_start: string
+          pool_total: number
+          share_pct: number
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          pool_total?: number
+          share_pct?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          available_after: number
+          balance_after: number
+          created_at: string
+          direction: Database["public"]["Enums"]["tx_direction"]
+          id: string
+          kind: Database["public"]["Enums"]["tx_kind"]
+          metadata: Json
+          mission_id: string | null
+          ref_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          available_after: number
+          balance_after: number
+          created_at?: string
+          direction: Database["public"]["Enums"]["tx_direction"]
+          id?: string
+          kind: Database["public"]["Enums"]["tx_kind"]
+          metadata?: Json
+          mission_id?: string | null
+          ref_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          available_after?: number
+          balance_after?: number
+          created_at?: string
+          direction?: Database["public"]["Enums"]["tx_direction"]
+          id?: string
+          kind?: Database["public"]["Enums"]["tx_kind"]
+          metadata?: Json
+          mission_id?: string | null
+          ref_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallet_balances: {
+        Row: {
+          available_balance: number
+          last_reset_date: string
+          last_reset_month: string
+          locked_balance: number
+          monthly_earned: number
+          pending_balance: number
+          profit_share_balance: number
+          today_earned: number
+          total_balance: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          available_balance?: number
+          last_reset_date?: string
+          last_reset_month?: string
+          locked_balance?: number
+          monthly_earned?: number
+          pending_balance?: number
+          profit_share_balance?: number
+          today_earned?: number
+          total_balance?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          available_balance?: number
+          last_reset_date?: string
+          last_reset_month?: string
+          locked_balance?: number
+          monthly_earned?: number
+          pending_balance?: number
+          profit_share_balance?: number
+          today_earned?: number
+          total_balance?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      withdrawal_requests: {
+        Row: {
+          admin_id: string | null
+          amount: number
+          approved_at: string | null
+          bank_account: string | null
+          bank_name: string | null
+          coin_address: string | null
+          coin_network: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          method: Database["public"]["Enums"]["withdrawal_method"]
+          process_by: string
+          rejected_reason: string | null
+          status: Database["public"]["Enums"]["withdrawal_status"]
+          tier_at_request: Database["public"]["Enums"]["user_tier"]
+          tx_code: string
+          user_id: string
+        }
+        Insert: {
+          admin_id?: string | null
+          amount: number
+          approved_at?: string | null
+          bank_account?: string | null
+          bank_name?: string | null
+          coin_address?: string | null
+          coin_network?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          method: Database["public"]["Enums"]["withdrawal_method"]
+          process_by: string
+          rejected_reason?: string | null
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          tier_at_request: Database["public"]["Enums"]["user_tier"]
+          tx_code: string
+          user_id: string
+        }
+        Update: {
+          admin_id?: string | null
+          amount?: number
+          approved_at?: string | null
+          bank_account?: string | null
+          bank_name?: string | null
+          coin_address?: string | null
+          coin_network?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          method?: Database["public"]["Enums"]["withdrawal_method"]
+          process_by?: string
+          rejected_reason?: string | null
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          tier_at_request?: Database["public"]["Enums"]["user_tier"]
+          tx_code?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      admin_resolve_withdrawal: {
+        Args: { _action: string; _reason: string; _request_id: string }
+        Returns: Json
+      }
+      distribute_profit_share: {
+        Args: {
+          _period_end: string
+          _period_start: string
+          _pool_total: number
+        }
+        Returns: Json
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      request_withdrawal: {
+        Args: {
+          _amount: number
+          _bank_account: string
+          _bank_name: string
+          _coin_address: string
+          _coin_network: string
+          _method: Database["public"]["Enums"]["withdrawal_method"]
+          _pin: string
+        }
+        Returns: Json
+      }
+      settle_mission: {
+        Args: { _base_reward: number; _is_win: boolean; _mission_id: string }
+        Returns: Json
+      }
+      tier_boost: {
+        Args: { t: Database["public"]["Enums"]["user_tier"] }
+        Returns: number
+      }
+      tier_daily_cap: {
+        Args: { t: Database["public"]["Enums"]["user_tier"] }
+        Returns: number
+      }
+      tier_process_minutes: {
+        Args: { t: Database["public"]["Enums"]["user_tier"] }
+        Returns: number
+      }
+      tier_withdraw_min: {
+        Args: { t: Database["public"]["Enums"]["user_tier"] }
+        Returns: number
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      tx_direction: "credit" | "debit"
+      tx_kind:
+        | "mission_win"
+        | "mission_loss_recovery"
+        | "profit_share"
+        | "withdrawal_lock"
+        | "withdrawal_release"
+        | "withdrawal_complete"
+        | "deposit"
+        | "admin_adjust"
+        | "jackpot_win"
+      user_tier: "normal" | "vip" | "god" | "empire"
+      withdrawal_method: "bank" | "coin"
+      withdrawal_status:
+        | "pending"
+        | "approved"
+        | "processing"
+        | "completed"
+        | "rejected"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +531,30 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      tx_direction: ["credit", "debit"],
+      tx_kind: [
+        "mission_win",
+        "mission_loss_recovery",
+        "profit_share",
+        "withdrawal_lock",
+        "withdrawal_release",
+        "withdrawal_complete",
+        "deposit",
+        "admin_adjust",
+        "jackpot_win",
+      ],
+      user_tier: ["normal", "vip", "god", "empire"],
+      withdrawal_method: ["bank", "coin"],
+      withdrawal_status: [
+        "pending",
+        "approved",
+        "processing",
+        "completed",
+        "rejected",
+        "cancelled",
+      ],
+    },
   },
 } as const
