@@ -91,37 +91,58 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age_confirmed: boolean
+          auth_provider: string | null
           bank_account: string | null
           bank_name: string | null
+          birth_date: string | null
           coin_address: string | null
           coin_network: string | null
           created_at: string
           id: string
           nickname: string
+          phone: string | null
+          profile_completed: boolean
+          real_name: string | null
+          terms_agreed_at: string | null
           tier: Database["public"]["Enums"]["user_tier"]
           updated_at: string
           withdraw_pin_hash: string | null
         }
         Insert: {
+          age_confirmed?: boolean
+          auth_provider?: string | null
           bank_account?: string | null
           bank_name?: string | null
+          birth_date?: string | null
           coin_address?: string | null
           coin_network?: string | null
           created_at?: string
           id: string
           nickname: string
+          phone?: string | null
+          profile_completed?: boolean
+          real_name?: string | null
+          terms_agreed_at?: string | null
           tier?: Database["public"]["Enums"]["user_tier"]
           updated_at?: string
           withdraw_pin_hash?: string | null
         }
         Update: {
+          age_confirmed?: boolean
+          auth_provider?: string | null
           bank_account?: string | null
           bank_name?: string | null
+          birth_date?: string | null
           coin_address?: string | null
           coin_network?: string | null
           created_at?: string
           id?: string
           nickname?: string
+          phone?: string | null
+          profile_completed?: boolean
+          real_name?: string | null
+          terms_agreed_at?: string | null
           tier?: Database["public"]["Enums"]["user_tier"]
           updated_at?: string
           withdraw_pin_hash?: string | null
