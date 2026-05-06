@@ -92,6 +92,7 @@ export default function Index() {
 
         <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-[11px] text-secondary animate-fade-up" style={{ animationDelay: "0.35s" }}>
           <Heart className="w-3.5 h-3.5 fill-secondary" /> FREE 플랜 평생 무료 · 결제 압박 0% · 광고 없음
+        </div>
 
         {/* Trust badges */}
         <div className="mt-16 grid grid-cols-3 gap-3 sm:gap-6 max-w-2xl mx-auto animate-fade-up" style={{ animationDelay: "0.4s" }}>
