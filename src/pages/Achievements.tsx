@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Layout from "@/components/Layout";
+import HubTabs from "@/components/HubTabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useDB, formatKRW } from "@/lib/store";
 import { toast } from "@/hooks/use-toast";
@@ -44,6 +45,7 @@ export default function Achievements() {
 
   return (
     <Layout>
+      <HubTabs hub="legacy" />
       <div className="space-y-6 pb-24">
         <header className="rounded-3xl bg-gradient-to-br from-primary/15 via-background to-background border border-primary/20 p-6">
           <div className="flex items-center gap-3">

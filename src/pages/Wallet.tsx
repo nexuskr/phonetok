@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import HubTabs from "@/components/HubTabs";
 import { useDB, formatKRW, uid, gen6, WITHDRAW_LIMITS } from "@/lib/store";
 import { Wallet as WalletIcon, ArrowDownToLine, ArrowUpFromLine, Clock, Coins, Banknote, Copy, ShieldCheck } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -149,6 +150,7 @@ export default function Wallet() {
 
   return (
     <Layout>
+      <HubTabs hub="treasury" />
       <div className="container pt-6 pb-10 animate-liquid-in">
         <h1 className="font-display font-black text-2xl flex items-center gap-2 mb-1">
           <WalletIcon className="w-5 h-5 text-primary" /> <span className="text-gradient-primary">사이버 지갑</span>

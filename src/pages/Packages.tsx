@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import HubTabs from "@/components/HubTabs";
 import { useDB, PACKAGES, formatKRW, type Pkg } from "@/lib/store";
 import { Crown, Check, Upload, Sparkles, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -29,6 +30,7 @@ export default function Packages() {
 
   return (
     <Layout>
+      <HubTabs hub="empire" />
       <div className="container pt-6 pb-10 animate-liquid-in">
         <div className="mb-6">
           <h1 className="font-display font-black text-2xl flex items-center gap-2">

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import HubTabs from "@/components/HubTabs";
 import JackpotBanner from "@/components/JackpotBanner";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import {
@@ -200,6 +201,7 @@ export default function Missions() {
 
   return (
     <Layout>
+      <HubTabs hub="earn" />
       <div className="container pt-6 pb-10 animate-liquid-in">
         <div className="mb-4 flex items-center justify-between">
           <div>
