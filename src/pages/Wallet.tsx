@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useDB, formatKRW, uid, gen6, WITHDRAW_LIMITS } from "@/lib/store";
@@ -18,6 +18,8 @@ export default function Wallet() {
   const user = useRequireAuth() ?? db.user;
   const [asset, setAsset] = useState<AssetTab>("bank");
   const [action, setAction] = useState<ActionTab>("withdraw");
+
+  useEffect(() => { void refreshWallet(); }, []);
 
   // shared
   const [amount, setAmount] = useState("");
