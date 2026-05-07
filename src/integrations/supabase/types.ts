@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements_catalog: {
+        Row: {
+          ap: number
+          badge_tier: string | null
+          category: string
+          created_at: string
+          description: string
+          hidden: boolean
+          key: string
+          name: string
+          reward_credit: number
+          sort_order: number
+        }
+        Insert: {
+          ap?: number
+          badge_tier?: string | null
+          category: string
+          created_at?: string
+          description: string
+          hidden?: boolean
+          key: string
+          name: string
+          reward_credit?: number
+          sort_order?: number
+        }
+        Update: {
+          ap?: number
+          badge_tier?: string | null
+          category?: string
+          created_at?: string
+          description?: string
+          hidden?: boolean
+          key?: string
+          name?: string
+          reward_credit?: number
+          sort_order?: number
+        }
+        Relationships: []
+      }
       ai_bot_runs: {
         Row: {
           claimed_at: string | null
@@ -68,6 +107,33 @@ export type Database = {
           trading_pnl_pct?: number | null
           trading_seed?: number | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      badges_catalog: {
+        Row: {
+          created_at: string
+          icon: string | null
+          key: string
+          name: string
+          season_id: string | null
+          tier: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          key: string
+          name: string
+          season_id?: string | null
+          tier: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          key?: string
+          name?: string
+          season_id?: string | null
+          tier?: string
         }
         Relationships: []
       }
@@ -461,6 +527,42 @@ export type Database = {
         }
         Relationships: []
       }
+      quests_catalog: {
+        Row: {
+          active: boolean
+          credit_reward: number
+          description: string
+          key: string
+          metric: string
+          name: string
+          period: string
+          target: number
+          xp_reward: number
+        }
+        Insert: {
+          active?: boolean
+          credit_reward?: number
+          description: string
+          key: string
+          metric: string
+          name: string
+          period: string
+          target: number
+          xp_reward?: number
+        }
+        Update: {
+          active?: boolean
+          credit_reward?: number
+          description?: string
+          key?: string
+          metric?: string
+          name?: string
+          period?: string
+          target?: number
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       referral_earnings: {
         Row: {
           base_amount: number
@@ -548,6 +650,112 @@ export type Database = {
           kind?: string
           prize_label?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      season_pass_progress: {
+        Row: {
+          free_claimed: Json
+          id: string
+          level: number
+          premium: boolean
+          premium_claimed: Json
+          season_id: string
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          free_claimed?: Json
+          id?: string
+          level?: number
+          premium?: boolean
+          premium_claimed?: Json
+          season_id: string
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          free_claimed?: Json
+          id?: string
+          level?: number
+          premium?: boolean
+          premium_claimed?: Json
+          season_id?: string
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_pass_progress_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      season_pass_rewards: {
+        Row: {
+          free_reward: Json
+          id: string
+          level: number
+          premium_reward: Json
+          season_id: string
+        }
+        Insert: {
+          free_reward?: Json
+          id?: string
+          level: number
+          premium_reward?: Json
+          season_id: string
+        }
+        Update: {
+          free_reward?: Json
+          id?: string
+          level?: number
+          premium_reward?: Json
+          season_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_pass_rewards_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seasons: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          max_level: number
+          name: string
+          premium_price: number
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id: string
+          max_level?: number
+          name: string
+          premium_price?: number
+          starts_at: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          max_level?: number
+          name?: string
+          premium_price?: number
+          starts_at?: string
         }
         Relationships: []
       }
@@ -678,6 +886,108 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_key: string
+          claimed_at: string | null
+          id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_key: string
+          claimed_at?: string | null
+          id?: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_key?: string
+          claimed_at?: string | null
+          id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_key_fkey"
+            columns: ["achievement_key"]
+            isOneToOne: false
+            referencedRelation: "achievements_catalog"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      user_badges: {
+        Row: {
+          acquired_at: string
+          badge_key: string
+          equipped_slot: number | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          acquired_at?: string
+          badge_key: string
+          equipped_slot?: number | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          acquired_at?: string
+          badge_key?: string
+          equipped_slot?: number | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_key_fkey"
+            columns: ["badge_key"]
+            isOneToOne: false
+            referencedRelation: "badges_catalog"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      user_quests: {
+        Row: {
+          claimed: boolean
+          id: string
+          period_key: string
+          progress: number
+          quest_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          claimed?: boolean
+          id?: string
+          period_key: string
+          progress?: number
+          quest_key: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          claimed?: boolean
+          id?: string
+          period_key?: string
+          progress?: number
+          quest_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_quests_quest_key_fkey"
+            columns: ["quest_key"]
+            isOneToOne: false
+            referencedRelation: "quests_catalog"
+            referencedColumns: ["key"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -823,6 +1133,7 @@ export type Database = {
         Returns: undefined
       }
       _cron_settle_package_daily: { Args: never; Returns: Json }
+      _period_key: { Args: { _period: string }; Returns: string }
       admin_adjust_balance: {
         Args: { _delta: number; _reason: string; _target: string }
         Returns: Json
@@ -858,7 +1169,12 @@ export type Database = {
         Returns: number
       }
       apply_referral_code: { Args: { _code: string }; Returns: Json }
+      award_xp: { Args: { _amount: number; _source?: Json }; Returns: Json }
       bump_jackpot: { Args: { _amount: number }; Returns: Json }
+      bump_quest_metric: {
+        Args: { _delta?: number; _metric: string }
+        Returns: undefined
+      }
       claim_ai_bot_run: { Args: { _run_id: string }; Returns: Json }
       claim_daily_attendance: {
         Args: { user_id: string }
@@ -867,12 +1183,22 @@ export type Database = {
           reward: number
         }[]
       }
+      claim_quest: { Args: { _quest_key: string }; Returns: Json }
+      claim_season_reward: {
+        Args: { _level: number; _track: string }
+        Returns: Json
+      }
+      current_season_id: { Args: never; Returns: string }
       distribute_profit_share: {
         Args: {
           _period_end: string
           _period_start: string
           _pool_total: number
         }
+        Returns: Json
+      }
+      equip_badge: {
+        Args: { _badge_key: string; _slot: number }
         Returns: Json
       }
       finalize_ai_bot_run: {
@@ -909,6 +1235,7 @@ export type Database = {
           total_reward: number
         }[]
       }
+      get_my_quests: { Args: never; Returns: Json }
       get_referral_leaderboard: {
         Args: { _limit?: number }
         Returns: {
@@ -921,6 +1248,7 @@ export type Database = {
       }
       get_referral_stats: { Args: never; Returns: Json }
       get_roulette_stats: { Args: never; Returns: Json }
+      get_season_overview: { Args: never; Returns: Json }
       get_tier_distribution: {
         Args: never
         Returns: {
@@ -947,6 +1275,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      purchase_season_pass: { Args: never; Returns: Json }
       request_withdrawal: {
         Args: {
           _amount: number
@@ -1020,6 +1349,8 @@ export type Database = {
         Args: { t: Database["public"]["Enums"]["user_tier"] }
         Returns: number
       }
+      unlock_achievement: { Args: { _key: string }; Returns: Json }
+      xp_for_level: { Args: { _level: number }; Returns: number }
     }
     Enums: {
       ai_bot_kind: "content" | "trading" | "image"
