@@ -33,6 +33,7 @@ const Achievements = lazy(() => import("./pages/Achievements.tsx"));
 const SeasonPass = lazy(() => import("./pages/SeasonPass.tsx"));
 const Quests = lazy(() => import("./pages/Quests.tsx"));
 const Empire = lazy(() => import("./pages/Empire.tsx"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -82,6 +83,7 @@ const App = () => (
               <Route path="/season-pass" element={<SeasonPass />} />
               <Route path="/quests" element={<Quests />} />
               <Route path="/empire" element={<Empire />} />
+              <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
