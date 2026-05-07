@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import {
   ShieldCheck,
   Zap,
@@ -15,8 +16,12 @@ import {
 import Particles from "@/components/Particles";
 import PayoutTicker from "@/components/PayoutTicker";
 import { useOnline, useTotalPayout, useTodayPayout, useMembers } from "@/components/LiveStats.tsx";
+import { useAuthReady } from "@/hooks/use-auth-ready";
 
 export default function Index() {
+  const nav = useNavigate();
+  const { isReady, hasSession } = useAuthReady();
+  useEffect(() => { if (isReady && hasSession) nav("/dashboard", { replace: true }); }, [isReady, hasSession, nav]);
   const online = useOnline();
   const total = useTotalPayout();
   const today = useTodayPayout();
