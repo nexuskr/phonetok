@@ -8,6 +8,7 @@ import PinPad from "@/components/PinPad";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { refreshWallet } from "@/lib/missions-rpc";
+import ServerTxList from "@/components/wallet/ServerTxList";
 
 type AssetTab = "bank" | "coin";
 type ActionTab = "withdraw" | "deposit" | "history";
@@ -270,36 +271,42 @@ export default function Wallet() {
         )}
 
         {action === "history" && (
-          <div className="space-y-2">
-            {[...db.deposits, ...db.withdraws]
-              .filter((x: any) => x.userId === u.id)
-              .sort((a, b) => b.createdAt - a.createdAt)
-              .map((x: any) => {
-                const isDep = "packageId" in x;
-                return (
-                  <div key={x.id} className="glass rounded-2xl p-4 flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-bold">
-                        {isDep ? `충전 · ${x.packageName}` : `출금 · ${x.method === "bank" ? x.bank : x.network}`}
-                        <span className="ml-2 text-[10px] text-muted-foreground">{x.method === "coin" ? "🪙 COIN" : "🏦 BANK"}</span>
+          <div className="space-y-4">
+            <div>
+              <div className="text-[10px] tracking-widest text-secondary font-black mb-2">SERVER · 실시간</div>
+              <ServerTxList />
+            </div>
+            <div>
+              <div className="text-[10px] tracking-widest text-muted-foreground font-black mb-2">LOCAL · 충전/출금 신청</div>
+              <div className="space-y-2">
+                {[...db.deposits, ...db.withdraws]
+                  .filter((x: any) => x.userId === u.id)
+                  .sort((a, b) => b.createdAt - a.createdAt)
+                  .map((x: any) => {
+                    const isDep = "packageId" in x;
+                    return (
+                      <div key={x.id} className="glass rounded-2xl p-4 flex items-center justify-between">
+                        <div>
+                          <div className="text-xs font-bold">
+                            {isDep ? `충전 · ${x.packageName}` : `출금 · ${x.method === "bank" ? x.bank : x.network}`}
+                            <span className="ml-2 text-[10px] text-muted-foreground">{x.method === "coin" ? "🪙 COIN" : "🏦 BANK"}</span>
+                          </div>
+                          <div className="text-[10px] text-muted-foreground">{new Date(x.createdAt).toLocaleString("ko-KR")}</div>
+                          {x.txCode && <div className="text-[10px] text-secondary font-mono mt-0.5">{x.txCode}</div>}
+                        </div>
+                        <div className="text-right">
+                          <div className={`font-display font-bold ${isDep ? "text-secondary" : "text-primary"}`}>
+                            {isDep ? "+" : "-"}{formatKRW(x.amount)}
+                          </div>
+                          <div className={`text-[10px] font-bold ${x.status === "pending" ? "text-gold" : x.status === "approved" ? "text-secondary" : "text-destructive"}`}>
+                            {x.status === "pending" ? "승인 대기" : x.status === "approved" ? "승인됨" : "거절됨"}
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-[10px] text-muted-foreground">{new Date(x.createdAt).toLocaleString("ko-KR")}</div>
-                      {x.txCode && <div className="text-[10px] text-secondary font-mono mt-0.5">{x.txCode}</div>}
-                    </div>
-                    <div className="text-right">
-                      <div className={`font-display font-bold ${isDep ? "text-secondary" : "text-primary"}`}>
-                        {isDep ? "+" : "-"}{formatKRW(x.amount)}
-                      </div>
-                      <div className={`text-[10px] font-bold ${x.status === "pending" ? "text-gold" : x.status === "approved" ? "text-secondary" : "text-destructive"}`}>
-                        {x.status === "pending" ? "승인 대기" : x.status === "approved" ? "승인됨" : "거절됨"}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            {[...db.deposits, ...db.withdraws].filter((x: any) => x.userId === u.id).length === 0 && (
-              <div className="glass rounded-2xl p-10 text-center text-sm text-muted-foreground">아직 거래 내역이 없습니다</div>
-            )}
+                    );
+                  })}
+              </div>
+            </div>
           </div>
         )}
       </div>
