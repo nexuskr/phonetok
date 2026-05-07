@@ -259,7 +259,7 @@ export default function Wallet() {
               <PinPad value={withdrawPw} onChange={setWithdrawPw} label={`출금비밀번호 6자리 ${u.withdrawPw ? "" : "(첫 입력 시 자동 등록)"}`} />
             </div>
 
-            <button onClick={action === "withdraw" ? submitWithdraw : submitDeposit}
+            <button onClick={() => { void (action === "withdraw" ? submitWithdraw() : submitDeposit()); }}
               className="w-full py-3.5 rounded-xl bg-gradient-primary text-primary-foreground font-bold glow-primary hover:scale-[1.02] transition">
               {action === "withdraw" ? "출금 신청" : "충전 신청"}
             </button>
