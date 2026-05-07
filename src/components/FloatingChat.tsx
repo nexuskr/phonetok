@@ -132,3 +132,51 @@ export default function FloatingChat() {
     </>
   );
 }
+
+function BotShareCard({ mine, msg, meta }: { mine: boolean; msg: string; meta: any }) {
+  const kind = meta?.bot_kind as "content" | "trading" | "image" | undefined;
+  const tier = (meta?.tier ?? "").toString().toUpperCase();
+  const reward = Number(meta?.reward ?? 0);
+  const pnl = meta?.pnl_pct;
+  const text = meta?.output_text as string | undefined;
+  const path = meta?.output_path as string | undefined;
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!path) return;
+    let alive = true;
+    supabase.storage.from("ai-outputs").createSignedUrl(path, 3600)
+      .then(({ data }) => alive && setImgUrl(data?.signedUrl ?? null));
+    return () => { alive = false; };
+  }, [path]);
+
+  const accent =
+    kind === "trading" ? "from-secondary/30 to-primary/10 border-secondary/40"
+    : kind === "image" ? "from-accent/30 to-primary/10 border-accent/40"
+    : "from-primary/30 to-accent/10 border-primary/40";
+  const icon = kind === "trading" ? "📈" : kind === "image" ? "🎨" : "🤖";
+
+  return (
+    <div className={`rounded-2xl border bg-gradient-to-br ${accent} p-3 shadow-lg ${mine ? "rounded-br-sm" : "rounded-bl-sm"}`}>
+      <div className="flex items-center gap-2 mb-1.5">
+        <span className="text-base">{icon}</span>
+        <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-gold/30 text-gold">{tier || "BOT"}</span>
+        <span className="text-[10px] text-muted-foreground ml-auto">AI 봇 정산</span>
+      </div>
+      <div className="font-display font-black text-sm leading-tight">{msg}</div>
+      {imgUrl && (
+        <div className="mt-2 rounded-lg overflow-hidden aspect-video bg-muted">
+          <img src={imgUrl} alt="bot" className="w-full h-full object-cover" loading="lazy" />
+        </div>
+      )}
+      {text && !imgUrl && (
+        <p className="mt-1.5 text-[11px] text-foreground/80 line-clamp-3 whitespace-pre-line">{text}</p>
+      )}
+      {typeof pnl === "number" && (
+        <div className={`mt-1.5 text-[10px] font-bold ${pnl >= 0 ? "text-secondary" : "text-destructive"}`}>
+          PnL {pnl >= 0 ? "+" : ""}{Number(pnl).toFixed(2)}% · 보상 +{reward.toLocaleString()}원
+        </div>
+      )}
+    </div>
+  );
+}
