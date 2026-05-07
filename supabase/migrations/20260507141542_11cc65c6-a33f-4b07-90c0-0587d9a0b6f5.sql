@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.admin_resolve_withdrawal(uuid, text, text) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.admin_resolve_deposit(uuid, text, text) FROM PUBLIC, anon, authenticated;
