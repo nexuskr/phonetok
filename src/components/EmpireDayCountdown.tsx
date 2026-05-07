@@ -23,7 +23,7 @@ export default function EmpireDayCountdown() {
   return (
     <div className={`flex items-center gap-1.5 text-[11px] font-bold ${isToday ? "text-gold animate-pulse" : "text-gold/80"}`}>
       <Calendar className="w-3.5 h-3.5" />
-      {isToday ? "🔥 오늘이 Empire Day · 일수익 +50% 자동" : `다음 Empire Day까지 D-${days}`}
+      {isToday ? "🔥 오늘 Empire Day · Day 4+ 보유자 +50% 자동" : `다음 Empire Day D-${days} · Day 4 이후 자동 적용`}
     </div>
   );
 }
