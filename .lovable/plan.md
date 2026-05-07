@@ -1,134 +1,119 @@
-## v5.1 최종 플랜 — 차등 부스트 + Easy 150 매출 강화
 
-### 변경점 (vs v5)
-1. **Day 1~3 부스트 차등화**: Easy 라인 **+30%**, Empire **+50%**
-2. **Easy 150 일수익 47,000원** (기존 42k → +5k)
+## v5.1 최종 진행 플랜 — 끝판왕 우선순위
 
----
+### 🎯 확정 결정
+- **Easy 150 부스트 +20%로 축소** → 일수익 47,000 × 1.2 = **₩56,400 (Day 1~3)**
+- 마진 회복: Easy 150 **+97k** 확보
+- 광고 카피: "오늘 시작 시 Day 1 ₩56,400" (여전히 강력)
 
-### 1. 패키지 라인 (수치 최종 확정)
+### 📊 최종 마진표
 
-| 패키지 | 가격 | 일수익 | Day1~3 부스트 | 기간 | 총지급 | 마진 |
-|---|---|---|---|---|---|---|
-| Easy Starter | 79,000 | 2,500 | +30% → 3,250 | 30일 | 77,250 | **+1,750** |
-| Easy 50 | 490,000 | 14,000 | +30% → 18,200 | 30일 | 432,600 | **+57,400** |
-| Easy 150 | 1,490,000 | **47,000** | +30% → 61,100 | 30일 | 1,452,300 | **+37,700** |
-| **Empire** | 9,900,000 | 280,000 | +50% → 420,000 | 30일 | 8,820,000 + 보너스 1,100,000 = **9,920,000** | **-20,000** (앵커) |
+| 패키지 | 일수익 | 부스트 | Day 1~3 | 30일 총지급 | 마진 |
+|---|---|---|---|---|---|
+| Easy Starter | 2,500 | ×1.3 | 3,250 | 77,250 | **+1,750** |
+| Easy 50 | 14,000 | ×1.3 | 18,200 | 432,600 | **+57,400** |
+| Easy 150 | 47,000 | **×1.2** | **56,400** | **1,297,200** | **+192,800** ✅ |
+| Empire | 280,000 | ×1.5 | 420,000 | 8,820,000 + 보너스 1,100,000 | **-20,000** (앵커) |
 
-**계산식**: 총지급 = 일수익 × 27 + 부스트일수익 × 3.
-
-⚠️ Easy 150 마진이 +37k로 줄어든 이유: 일수익 47k × 부스트 1.3 × 3일 = 부스트 가산분만 +16,500 × 3 = +49,500 추가 부담. 광고 임팩트(첫날 ₩61,100)는 강력하지만 마진은 Easy 50보다 낮아짐.
-
-→ **권고**: Easy 150 부스트만 +20%로 미세 조정하면 마진 +97k 회복 가능. 결정 보류 항목.
+→ Easy 150이 진짜 매출 머신으로 살아남.
 
 ---
 
-### 2. UX 카피 (차등 노출)
+## 🥇 P0 — 매출 직결 (지금 즉시)
 
-**Easy 카드**:
-> 🔥 오늘 시작 시 · 첫 3일 보너스 구간
-> Day 1 ₩61,100 / Day 2 ₩61,100 / Day 3 ₩61,100
+### 1. DB 수치 동기화
+- `package_purchases.boost_multiplier` 기본값/배정 로직: Easy Starter·50 = 1.3, **Easy 150 = 1.2**, Empire = 1.5
+- `admin_resolve_package` RPC 안 패키지별 분기 수정
+- `store.ts` `easy_150.boostMultiplier = 1.2` 변경
 
-**Empire 카드** (+50% 강조):
-> 🔥👑 Empire 전용 · 첫 3일 최대 가속 구간
-> Day 1 ₩420,000 / Day 2 ₩420,000 / Day 3 ₩420,000
-> "다음 Empire Day까지 D-3 · Founding 좌석 17석 남음"
+### 2. `harvest_machine` RPC 실측 검증
+- (a) 승인 직후 1일차 부스트 적용액 = 패키지별 정확값
+- (b) 부스트 만료 후 4일차 일반액 복귀
+- (c) Empire + Empire Day 중첩 시 ×1.5 (Empire Day 매칭일에만)
+- (d) 7일차 정확히 `seven_day_bonus` 1회만 (멱등성)
+- 마진표와 1원 단위 일치
 
----
+### 3. Packages 첫 화면 = "오늘 시작 시" 블록
+- `PackageBoostPreview` 카드 상단 고정
+- Easy 150 카피: "Day 1 ₩56,400 / Day 2 ₩56,400 / Day 3 ₩56,400"
+- Empire: "Day 1 ₩420,000 / +50% 전용"
+- 설명 금지, 숫자만
 
-### 3. DB 변경
-
-**`package_purchases` 추가 컬럼**:
-- `boost_until` timestamp
-- `boost_multiplier` numeric default 1.3 — Empire는 1.5
-- `seven_day_bonus_paid`, `instant_300k_paid`, `founding_bonus_paid` boolean
-- `is_empire_founding_member` boolean, `founding_seat_no` int
-
-**신규 테이블**:
-- `empire_founding_seats` (id 1~30, claimed_by, claimed_at) — `SELECT FOR UPDATE`
-- `boost_schedule` (date, multiplier) — Empire Day 사전 등록
-
-**RPC**:
-- `harvest_machine` 수정 — `now() < boost_until` 시 `daily_return × boost_multiplier`. Empire + boost_schedule 매칭 시 ×1.5.
-- `approve_package_purchase` 수정 — 승인 시 `boost_until = approved_at + 3 days`, `boost_multiplier` 패키지별 설정. Empire면 좌석 시도 + 즉시 30만 + 좌석 50만.
-- `claim_founding_seat`, `check_seven_day_challenge`, `get_empire_seats_remaining`, `get_active_boost_count`.
+### 4. Dashboard 0.5초 룰
+- 부스트 보유자: `BoostHeroCard` 최상단 + 카운트다운 (HH:MM:SS)
+- 미보유자: "지금 부스트 시작 →" CTA → `/packages`
+- 잭팟·콤보·기타 위젯 강등
 
 ---
 
-### 4. UI 파일 변경
+## 🥈 P1 — 전환율 추가 강화
 
-**신규**:
-- `src/components/BoostHeroCard.tsx` — Dashboard 상단, 부스트 카운트다운 + 수확
-- `src/components/PackageBoostPreview.tsx` — Packages 카드 "오늘 시작 시" 블록 (배수 prop)
-- `src/components/ActiveBoostCounter.tsx` — "지금 N명 부스트 중" 실시간
-- `src/pages/Empire.tsx` — Founding 라운지
-- `src/components/EmpireFoundingCounter.tsx` — 30석 실시간
-- `src/components/EmpireDayCountdown.tsx` — 다음 Empire Day D-N
-- `src/components/SevenDayChallengeCard.tsx` — 보조 카드
+### 5. Empire 카드 비합리성 3종 동시 노출
+- "+50% · 다른 등급에 없음"
+- "Founding 좌석 N석 남음" 실시간
+- "다음 Empire Day D-N"
 
-**수정**:
-- `src/lib/store.ts` — PACKAGES 4종 + 패키지별 `boostMultiplier` 필드
-- `src/pages/Packages.tsx` — Boost 미리보기(차등) + 카운터
-- `src/pages/Dashboard.tsx` — BoostHero 메인, 잭팟·콤보 강등
-- `src/pages/Wallet.tsx` — 보너스 항목 분리 표시
-- `src/App.tsx` + `src/components/Layout.tsx` — `/empire` 라우트 (Founding gate)
+### 6. ActiveBoostCounter 실시간성
+- Realtime 구독 또는 5초 polling, ±1~3 흔들림
 
-**제거/숨김**: 마일스톤 UI 미구현, Dashboard 잭팟 메인 배너 → 수확 모달 내부로.
+### 7. 가입 → Packages 직행 동선
+- `Index.tsx` "지금 시작" → 가입 → 24h 안 자동 `/packages` 진입
 
 ---
 
-### 5. UX 카피 규칙 (위반 금지)
+## 🥉 P2 — 출시 전 안정성/법적
 
-| ❌ 죽는 카피 | ✅ 살아나는 카피 |
-|---|---|
-| "Day 1~3 +30% 부스트" | "🔥 지금 초기 수익 구간 진입 · 23:14:22 남음" |
-| "Empire +50% 적용" | "👑 Empire 전용 최대 가속 · 다른 등급에 없음" |
+### 8. Founding 좌석 동시성
+- `claim_founding_seat`이 `SELECT FOR UPDATE`로 보호되는지 확인
+- 동시 31번째 좌석 발생 불가 검증
 
----
+### 9. 보너스 멱등성 가드
+- `seven_day_bonus_paid`, `instant_300k_paid`, `founding_bonus_paid`
+- 모두 `WHERE ... = false` + atomic UPDATE
+- 중복 호출 시 절대 2회 지급 X
 
-### 6. 보조 요소 (숨김)
-
-- **7일 챌린지**: Dashboard 두 번째 카드, 진행도만. 달성 시 자동 1일치 추가.
-- **Empire Day**: 월 1일/15일 자동 +50%. Empire 보유자 한정 카운트다운.
-- **잭팟**: 수확 직후 모달 연출에서만.
-- **콤보 UI**: 시각만, 금액 불변.
-
----
-
-### 7. 법적 안전장치
-
-- "30일 한정 확정 적립률 / 일별 적립 스케줄 사전 고지" 푸터
-- Day 1~3 부스트 = 사전 고지 확정 스케줄
-- Empire Day = 사전 공지 일자
-- 추천 보너스 첫 1회 15% 단발
-- 잭팟 = 무료 추첨 마케팅 리워드
-- Refund/Terms 7일 청약철회권 명시
+### 10. 약관/환불 v5.1 반영
+- "Day 1~3 부스트 = 사전 고지 확정 스케줄"
+- "Empire Day 일자(월 1·15일) 사전 공지"
+- 7일 청약철회권
+- "한정 확정 적립률" 명시
 
 ---
 
-### 8. Phase 1 실행 순서
+## ⛔ Phase 2 (지금 절대 X)
 
-1. Migration (컬럼 + 테이블 + RPC)
-2. `src/lib/store.ts` PACKAGES 재정의 (boostMultiplier 포함)
-3. `BoostHeroCard` + `harvest_machine` 부스트 로직
-4. `PackageBoostPreview` (차등) + `ActiveBoostCounter`
-5. Dashboard 재구성
-6. `Empire.tsx` 라운지 + Founding 카운터/토스트
-7. `EmpireDayCountdown` + boost_schedule seed
-8. 7일 챌린지 보조 카드
-9. Wallet 보너스 분리
-10. 약관/환불 업데이트
+777% 잭팟 / 황금 머신 / 추천 대시보드 / 시즌2 / 마일스톤 / 새 패키지.  
+**이유**: v5.1은 단일 훅 구조. 추가 훅은 메인 훅 희석 → 2주 매출 보고 결정.
 
 ---
 
-### 9. Phase 2 (제외)
-첫 수확 777% 이벤트, 황금 머신 슬롯, 추천 대시보드, 시즌2 좌석, 마일스톤.
+## 🔥 실행 순서
+
+```text
+[지금]
+1. DB·store.ts Easy 150 → 1.2 동기화
+2. harvest_machine 실측 검증
+
+[D+1]
+3. Packages 첫화면 "오늘 시작 시"
+4. Dashboard 0.5초 룰
+
+[D+2]
+5. Empire 카피 분리
+6. 카운터 실시간성
+7. 가입 동선 단축
+
+[D+3 출시 전]
+8. 동시성
+9. 멱등성
+10. 약관
+
+→ 출시 → 2주 데이터 → Phase 2 결정
+```
 
 ---
 
-### 10. 구현 전 마지막 확인 1건
-**Easy 150 부스트만 +20%로 줄여 마진 +97k 확보할까요?**
-- YES: 마진 안정. Day 1 광고는 ₩56,400 (여전히 강함).
-- NO: +30% 통일 유지. 마진 +37k지만 광고 임팩트 ₩61,100 우위.
+## 💣 한 줄 핵심
+**"코드를 더 짜는 게 아니라, 이미 짠 코드의 '첫 0.5초 노출'을 사수하는 게 남은 일이다."**
 
-이 1건 답 주시면 즉시 빌드 진입.
+승인 시 **P0-1(Easy 150 ×1.2 동기화)부터 즉시 빌드 진입**합니다.
