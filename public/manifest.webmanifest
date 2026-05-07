@@ -1,20 +1,33 @@
 {
-  "name": "Phonara — Cyber Luxury Empire",
+  "name": "Phonara — Imperial Empire",
   "short_name": "Phonara",
-  "description": "Phonara.world — 사이버 럭셔리 엠파이어. 폰 하나로 시작하는 글로벌 수익 플랫폼.",
+  "description": "Phonara — 임페리얼 골드 엠파이어. 폰 하나로 시작하는 글로벌 수익 플랫폼.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#08070f",
-  "theme_color": "#08070f",
+  "theme_color": "#d4af37",
   "lang": "ko",
+  "categories": ["finance", "productivity", "lifestyle"],
   "icons": [
     {
-      "src": "/placeholder.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

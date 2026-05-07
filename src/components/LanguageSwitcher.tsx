@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Globe, Check } from "lucide-react";
+import { track } from "@/lib/analytics";
 
 const LANGS = [
   { code: "ko", flag: "🇰🇷", name: "한국어" },
@@ -50,7 +51,9 @@ export default function LanguageSwitcher({
               <button
                 key={l.code}
                 onClick={() => {
+                  const from = current;
                   i18n.changeLanguage(l.code);
+                  track("language_change", { from, to: l.code });
                   setOpen(false);
                 }}
                 className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left text-sm transition ${

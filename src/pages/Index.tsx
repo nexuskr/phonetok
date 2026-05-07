@@ -20,12 +20,15 @@ import { useAuthReady } from "@/hooks/use-auth-ready";
 import EmpireFoundingCounter from "@/components/EmpireFoundingCounter";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import throneBg from "@/assets/command-throne-bg.jpg";
+import { track } from "@/lib/analytics";
 
 export default function Index() {
   const nav = useNavigate();
-  const { t } = useTranslation("landing");
+  const { t, i18n } = useTranslation("landing");
   const { isReady, hasSession } = useAuthReady();
   useEffect(() => { if (isReady && hasSession) nav("/dashboard", { replace: true }); }, [isReady, hasSession, nav]);
+  useEffect(() => { track("landing_view", { lang: i18n.language }); }, [i18n.language]);
+  const onCta = (location: string) => track("cta_click", { location, lang: i18n.language });
   const online = useOnline();
   const total = useTotalPayout();
   const today = useTodayPayout();
@@ -58,6 +61,7 @@ export default function Index() {
             </Link>
             <Link
               to="/secure-auth?signup=1"
+              onClick={() => onCta("nav")}
               className="px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold bg-gradient-imperial text-primary-foreground glow-imperial hover:scale-105 transition"
             >
               {t("navEnter")}
@@ -119,6 +123,7 @@ export default function Index() {
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up" style={{ animationDelay: "0.3s" }}>
           <Link
             to="/secure-auth?signup=1"
+            onClick={() => onCta("hero")}
             className="group relative px-8 py-4 rounded-2xl font-display font-bold text-base sm:text-lg bg-gradient-imperial text-primary-foreground glow-imperial animate-pulse-glow hover:scale-105 transition flex items-center gap-2"
           >
             <Crown className="w-5 h-5" />
@@ -177,6 +182,7 @@ export default function Index() {
               </div>
               <Link
                 to="/secure-auth?signup=1"
+                onClick={() => onCta("council")}
                 className="mt-5 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-imperial text-primary-foreground font-bold text-sm glow-imperial hover:scale-105 transition"
               >
                 <Crown className="w-4 h-4" /> {t("councilCta")}
@@ -261,6 +267,7 @@ export default function Index() {
         <p className="text-muted-foreground mt-3">{t("finalSub")}</p>
         <Link
           to="/secure-auth?signup=1"
+          onClick={() => onCta("final")}
           className="mt-8 inline-flex items-center gap-2 px-10 py-5 rounded-2xl font-display font-bold text-lg bg-gradient-imperial text-primary-foreground glow-imperial animate-pulse-glow hover:scale-105 transition"
         >
           <Crown className="w-5 h-5" /> {t("finalCta")}
