@@ -107,11 +107,15 @@ export default function FloatingChat() {
                 const mine = m.user_id === user.id;
                 return (
                   <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                    <div className="max-w-[78%]">
+                    <div className="max-w-[85%]">
                       {!mine && <p className="text-[10px] text-muted-foreground mb-0.5 px-1">{m.nickname || "익명"}</p>}
-                      <div className={`px-3 py-2 rounded-2xl text-sm ${mine ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-muted text-foreground rounded-bl-sm"}`}>
-                        {m.message}
-                      </div>
+                      {m.kind === "ai_bot_share" ? (
+                        <BotShareCard mine={mine} msg={m.message} meta={m.metadata} />
+                      ) : (
+                        <div className={`px-3 py-2 rounded-2xl text-sm ${mine ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-muted text-foreground rounded-bl-sm"}`}>
+                          {m.message}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
