@@ -13,7 +13,7 @@ export default function EmpireFoundingCounter({ compact }: { compact?: boolean }
     };
     void load();
     const ch = supabase
-      .channel("empire-seats")
+      .channel(`empire-seats-${Math.random().toString(36).slice(2)}`)
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "empire_founding_seats" },
