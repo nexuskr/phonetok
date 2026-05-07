@@ -1209,7 +1209,7 @@ export type Database = {
         Returns: Json
       }
       admin_resolve_package: {
-        Args: { _action: string; _purchase_id: string; _reason: string }
+        Args: { _action: string; _purchase_id: string; _reason?: string }
         Returns: Json
       }
       admin_resolve_withdrawal: {
