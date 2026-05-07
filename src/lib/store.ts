@@ -45,12 +45,12 @@ export const LEVEL_BY_TIER: Record<Tier, number> = {
   EMPIRE: 60,
 };
 
-// Realistic attendance rewards by tier (일일)
+// Realistic attendance rewards by tier (일일) — 한국 캐시앱 표준
 export const ATTENDANCE_REWARDS: Record<Tier, { base: number; weeklyBonus: number }> = {
-  NORMAL: { base: 500,   weeklyBonus: 2_000 },   // 7일 연속 시 +2,000
-  VIP:    { base: 1_500, weeklyBonus: 7_000 },
-  GOD:    { base: 4_000, weeklyBonus: 20_000 },
-  EMPIRE: { base: 12_000, weeklyBonus: 80_000 },
+  NORMAL: { base: 50,    weeklyBonus: 200 },
+  VIP:    { base: 150,   weeklyBonus: 700 },
+  GOD:    { base: 400,   weeklyBonus: 2_000 },
+  EMPIRE: { base: 1_200, weeklyBonus: 8_000 },
 };
 
 export function todayStr() {
