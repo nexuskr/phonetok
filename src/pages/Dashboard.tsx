@@ -157,6 +157,23 @@ export default function Dashboard() {
             </div>
           </Link>
 
+          {/* GAMIFICATION ENTRY — Phase 26 */}
+          <div className="grid grid-cols-3 gap-2 mt-4">
+            <Link to="/quests" className="press glass-strong rounded-2xl p-3 border border-amber-500/20 flex flex-col items-center gap-1">
+              <span className="text-2xl">⚡</span>
+              <span className="text-[11px] font-bold">퀘스트</span>
+            </Link>
+            <Link to="/season-pass" className="press glass-strong rounded-2xl p-3 border border-fuchsia-500/20 flex flex-col items-center gap-1 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/10 to-violet-600/10" />
+              <span className="text-2xl relative">✨</span>
+              <span className="text-[11px] font-bold relative">시즌 패스</span>
+            </Link>
+            <Link to="/achievements" className="press glass-strong rounded-2xl p-3 border border-primary/20 flex flex-col items-center gap-1">
+              <span className="text-2xl">🏆</span>
+              <span className="text-[11px] font-bold">업적</span>
+            </Link>
+          </div>
+
           {/* MEGA JACKPOT — primary dopamine driver */}
           <div className="mt-5">
             <JackpotBanner />
