@@ -255,24 +255,67 @@ function UserAdmin() {
   );
 }
 
+type ST = { id: string; user_id: string; nickname: string; last_message: string | null; last_message_at: string };
+type SM = { id: string; thread_id: string; user_id: string; sender: "user" | "admin"; message: string; created_at: string };
+
 function ChatAdmin() {
-  const [db, setDb] = useDB();
-  const [active, setActive] = useState<string | null>(null);
+  const [threads, setThreads] = useState<ST[]>([]);
+  const [active, setActive] = useState<ST | null>(null);
+  const [msgs, setMsgs] = useState<SM[]>([]);
   const [text, setText] = useState("");
-  const msgs = active ? db.chats.filter(c => c.threadId === active).sort((a, b) => a.createdAt - b.createdAt) : [];
-  function reply() {
-    if (!active || !text.trim()) return;
+  const [adminId, setAdminId] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setAdminId(user?.id || null);
+      const { data } = await supabase.from("support_threads").select("*").order("last_message_at", { ascending: false });
+      setThreads((data as ST[]) || []);
+    })();
+    const ch = supabase.channel("admin:threads")
+      .on("postgres_changes", { event: "*", schema: "public", table: "support_threads" }, async () => {
+        const { data } = await supabase.from("support_threads").select("*").order("last_message_at", { ascending: false });
+        setThreads((data as ST[]) || []);
+      }).subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
+
+  useEffect(() => {
+    if (!active) { setMsgs([]); return; }
+    let ch: any;
+    (async () => {
+      const { data } = await supabase.from("support_messages").select("*")
+        .eq("thread_id", active.id).order("created_at", { ascending: true });
+      setMsgs((data as SM[]) || []);
+      ch = supabase.channel(`admin:msgs:${active.id}`)
+        .on("postgres_changes",
+          { event: "INSERT", schema: "public", table: "support_messages", filter: `thread_id=eq.${active.id}` },
+          (p) => setMsgs(prev => [...prev, p.new as SM])
+        ).subscribe();
+    })();
+    return () => { if (ch) supabase.removeChannel(ch); };
+  }, [active?.id]);
+
+  async function reply() {
+    if (!active || !text.trim() || !adminId) return;
     const t = text.trim(); setText("");
-    setDb(d => ({ ...d, chats: [...d.chats, { id: uid(), threadId: active, from: "admin", text: t, createdAt: Date.now() }] }));
+    await supabase.from("support_messages").insert({
+      thread_id: active.id, user_id: active.user_id, sender: "admin", message: t,
+    });
+    await supabase.from("support_threads").update({
+      last_message: t, last_message_at: new Date().toISOString(),
+    }).eq("id", active.id);
   }
+
   return (
     <div className="grid sm:grid-cols-[200px_1fr] gap-3">
       <div className="glass rounded-2xl p-2 space-y-1 max-h-96 overflow-y-auto">
-        {db.threads.length === 0 && <div className="text-xs text-muted-foreground p-3">대화 없음</div>}
-        {db.threads.sort((a, b) => b.updatedAt - a.updatedAt).map(t => (
-          <button key={t.id} onClick={() => setActive(t.id)} className={`w-full text-left p-2 rounded-lg text-xs ${active === t.id ? "bg-gradient-primary/15" : ""}`}>
+        {threads.length === 0 && <div className="text-xs text-muted-foreground p-3">대화 없음</div>}
+        {threads.map(t => (
+          <button key={t.id} onClick={() => setActive(t)} className={`w-full text-left p-2 rounded-lg text-xs ${active?.id === t.id ? "bg-gradient-primary/15" : ""}`}>
             <div className="font-bold">{t.nickname}</div>
-            <div className="text-[10px] text-muted-foreground">{new Date(t.updatedAt).toLocaleTimeString("ko-KR")}</div>
+            <div className="text-[10px] text-muted-foreground truncate">{t.last_message || "—"}</div>
+            <div className="text-[10px] text-muted-foreground">{new Date(t.last_message_at).toLocaleTimeString("ko-KR")}</div>
           </button>
         ))}
       </div>
@@ -280,8 +323,8 @@ function ChatAdmin() {
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
           {!active && <div className="text-center text-xs text-muted-foreground mt-10">왼쪽에서 대화를 선택하세요</div>}
           {msgs.map(m => (
-            <div key={m.id} className={`flex ${m.from === "admin" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[78%] px-3 py-2 rounded-xl text-xs ${m.from === "admin" ? "bg-gradient-gold text-gold-foreground" : "glass"}`}>{m.text}</div>
+            <div key={m.id} className={`flex ${m.sender === "admin" ? "justify-end" : "justify-start"}`}>
+              <div className={`max-w-[78%] px-3 py-2 rounded-xl text-xs ${m.sender === "admin" ? "bg-gradient-gold text-gold-foreground" : "glass"}`}>{m.message}</div>
             </div>
           ))}
         </div>
