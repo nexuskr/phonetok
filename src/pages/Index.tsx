@@ -20,6 +20,7 @@ import { useAuthReady } from "@/hooks/use-auth-ready";
 import EmpireFoundingCounter from "@/components/EmpireFoundingCounter";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import throneBg from "@/assets/command-throne-bg.jpg";
+import { track } from "@/lib/analytics";
 
 export default function Index() {
   const nav = useNavigate();
