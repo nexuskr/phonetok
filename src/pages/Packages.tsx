@@ -94,9 +94,24 @@ export default function Packages() {
                         </div>
 
                         <div className="mt-3 glass rounded-xl p-3 flex items-center justify-between">
-                          <span className="text-[11px] text-muted-foreground">총 예상 수익</span>
+                          <span className="text-[11px] text-muted-foreground">30일 총 예상 (정상 구간)</span>
                           <span className="font-display font-black text-lg text-gradient-gold">{formatKRW(p.totalReturn)}</span>
                         </div>
+
+                        {/* 🔥 Day 1~3 부스트 미리보기 (메인 훅) */}
+                        <PackageBoostPreview
+                          dailyReturn={p.dailyReturn}
+                          multiplier={p.boostMultiplier ?? 1.0}
+                          isEmpire={p.tier === "EMPIRE"}
+                        />
+
+                        {/* Empire 전용: Founding 좌석 + Empire Day */}
+                        {p.tier === "EMPIRE" && (
+                          <div className="mt-3 space-y-2">
+                            <EmpireFoundingCounter />
+                            <EmpireDayCountdown />
+                          </div>
+                        )}
 
                         <ul className="mt-4 space-y-1.5">
                           {p.perks.map(perk => (
@@ -106,7 +121,7 @@ export default function Packages() {
                           ))}
                         </ul>
 
-                        {p.seatsLeft !== undefined && (
+                        {p.seatsLeft !== undefined && p.tier !== "EMPIRE" && (
                           <div className="mt-3">
                             <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
                               <span>잔여 좌석</span><span className="text-gold font-bold">{p.seatsLeft}석</span>
