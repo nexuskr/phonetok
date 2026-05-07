@@ -136,6 +136,12 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* AI MONEY MACHINE — daily harvest */}
+          <div className="mt-4 space-y-3">
+            <MachineDashboardCard />
+            <MachineFomoTicker />
+          </div>
+
           {/* DAILY ATTENDANCE — habit/streak driver */}
           <div className="mt-4">
             <AttendanceCard />
