@@ -254,31 +254,14 @@ function ChatAdmin() {
 }
 
 function CoinAdmin() {
-  const [db, setDb] = useDB();
-  const [addr, setAddr] = useState(db.coin.address);
-  const [net, setNet] = useState(db.coin.network);
-  const [qr, setQr] = useState<string | undefined>(db.coin.qr);
-  function save() {
-    setDb(d => ({ ...d, coin: { network: net, address: addr, qr } }));
-    toast({ title: "코인 입금 정보 저장됨" });
-  }
   return (
-    <div className="glass-strong rounded-2xl p-4 neon-border space-y-3">
-      <h3 className="font-display font-bold text-sm flex items-center gap-2"><Coins className="w-4 h-4 text-secondary" /> 코인 입금 주소 설정</h3>
-      <select value={net} onChange={e => setNet(e.target.value as any)} className="w-full bg-input/60 border border-border rounded-xl px-3 py-2 text-sm">
-        {["TRC20", "ERC20", "BEP20"].map(b => <option key={b}>{b}</option>)}
-      </select>
-      <input value={addr} onChange={e => setAddr(e.target.value)} className="w-full bg-input/60 border border-border rounded-xl px-3 py-2 text-sm font-mono" />
-      <label className="block">
-        <div className="glass rounded-xl p-4 text-center border-2 border-dashed border-border cursor-pointer">
-          {qr ? <img src={qr} alt="qr" className="w-32 h-32 mx-auto rounded-lg" /> : <div className="text-xs">QR 이미지 업로드</div>}
-        </div>
-        <input type="file" accept="image/*" className="hidden" onChange={e => {
-          const f = e.target.files?.[0]; if (!f) return;
-          const r = new FileReader(); r.onload = () => setQr(r.result as string); r.readAsDataURL(f);
-        }} />
-      </label>
-      <button onClick={save} className="w-full py-3 rounded-xl bg-gradient-gold text-gold-foreground font-bold glow-gold">저장</button>
+    <div className="glass-strong rounded-2xl p-6 neon-border text-center">
+      <Coins className="w-8 h-8 text-secondary mx-auto" />
+      <h3 className="font-display font-bold text-sm mt-2">코인 입금 주소 관리</h3>
+      <p className="text-xs text-muted-foreground mt-2">
+        입금 주소/네트워크는 환경변수 또는 서버 설정으로 관리됩니다.<br/>
+        변경이 필요하면 운영팀에 문의해주세요.
+      </p>
     </div>
   );
 }
