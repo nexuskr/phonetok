@@ -11,7 +11,7 @@ export const InviteEmail = ({ siteName, siteUrl, confirmationUrl }: InviteEmailP
     <Preview>{siteName} 초대장이 도착했습니다</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Text style={brandBar}>PHONETOK</Text>
+        <Text style={brandBar}>PHONARA</Text>
         <Heading style={h1}>초대장이 도착했습니다</Heading>
         <Text style={text}>
           <Link href={siteUrl} style={link}><strong>{siteName}</strong></Link>에 초대받으셨습니다. 아래 버튼을 눌러 가입을 완료해 주세요.

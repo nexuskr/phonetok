@@ -11,7 +11,7 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
     <Preview>본인 확인 코드</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Text style={brandBar}>PHONETOK</Text>
+        <Text style={brandBar}>PHONARA</Text>
         <Heading style={h1}>본인 확인 코드</Heading>
         <Text style={text}>아래 코드를 입력하여 본인 확인을 완료해 주세요.</Text>
         <Text style={codeStyle}>{token}</Text>

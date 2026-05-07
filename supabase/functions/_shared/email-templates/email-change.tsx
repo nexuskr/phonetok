@@ -17,7 +17,7 @@ export const EmailChangeEmail = ({ siteName, oldEmail, newEmail, confirmationUrl
     <Preview>{siteName} 이메일 변경 확인</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Text style={brandBar}>PHONETOK</Text>
+        <Text style={brandBar}>PHONARA</Text>
         <Heading style={h1}>이메일 변경 확인</Heading>
         <Text style={text}>
           {siteName} 계정의 이메일을{' '}

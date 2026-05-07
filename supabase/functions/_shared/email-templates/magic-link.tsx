@@ -11,7 +11,7 @@ export const MagicLinkEmail = ({ siteName, confirmationUrl }: MagicLinkEmailProp
     <Preview>{siteName} 로그인 링크</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Text style={brandBar}>PHONETOK</Text>
+        <Text style={brandBar}>PHONARA</Text>
         <Heading style={h1}>로그인 링크</Heading>
         <Text style={text}>아래 버튼을 누르면 {siteName}에 로그인됩니다. 링크는 곧 만료됩니다.</Text>
         <Button style={button} href={confirmationUrl}>로그인</Button>

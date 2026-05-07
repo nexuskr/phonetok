@@ -11,7 +11,7 @@ export const SignupEmail = ({ siteName, siteUrl, recipient, confirmationUrl }: S
     <Preview>{siteName} 이메일 인증을 완료해 주세요</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Text style={brandBar}>PHONETOK</Text>
+        <Text style={brandBar}>PHONARA</Text>
         <Heading style={h1}>이메일 인증</Heading>
         <Text style={text}>
           <Link href={siteUrl} style={link}><strong>{siteName}</strong></Link>에 가입해 주셔서 감사합니다!

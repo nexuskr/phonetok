@@ -11,7 +11,7 @@ export const RecoveryEmail = ({ siteName, confirmationUrl }: RecoveryEmailProps)
     <Preview>{siteName} 비밀번호 재설정</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Text style={brandBar}>PHONETOK</Text>
+        <Text style={brandBar}>PHONARA</Text>
         <Heading style={h1}>비밀번호 재설정</Heading>
         <Text style={text}>{siteName} 계정의 비밀번호 재설정 요청을 받았습니다. 아래 버튼을 눌러 새 비밀번호를 설정해 주세요.</Text>
         <Button style={button} href={confirmationUrl}>비밀번호 재설정</Button>
