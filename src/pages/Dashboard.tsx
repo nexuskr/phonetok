@@ -71,8 +71,13 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* 🔥 메인 훅: BoostHero — 첫 0.5초 노출 사수 */}
+          <div className="space-y-3">
+            <BoostHeroCard />
+          </div>
+
           {/* Balance hero */}
-          <div className="relative animate-fade-up">
+          <div className="relative animate-fade-up mt-4">
             <div className="absolute inset-0 bg-gradient-cyber blur-3xl opacity-50 -z-10" />
             <div className="glass-strong rounded-3xl p-7 neon-border relative overflow-hidden">
               <div className="absolute inset-0 bg-grid opacity-20" />
@@ -140,9 +145,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* 🔥 메인 훅: BoostHero (Day 1~3) */}
+          {/* 보조 훅 */}
           <div className="mt-4 space-y-3">
-            <BoostHeroCard />
             <SevenDayChallengeCard />
             <div className="flex justify-center"><EmpireDayCountdown /></div>
             <MachineFomoTicker />
