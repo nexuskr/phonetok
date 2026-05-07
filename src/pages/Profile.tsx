@@ -19,6 +19,8 @@ type BadgeDef = {
   progress?: number; // 0-100
 };
 
+import ReferralCard from "@/components/ReferralCard";
+
 export default function Profile() {
   const [db, setDb] = useDB();
   const nav = useNavigate();
