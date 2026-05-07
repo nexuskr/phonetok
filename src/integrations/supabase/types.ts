@@ -699,6 +699,17 @@ export type Database = {
         }
         Returns: Json
       }
+      get_admin_metrics: {
+        Args: { _days?: number }
+        Returns: {
+          day: string
+          deposits_total: number
+          missions_count: number
+          missions_reward: number
+          new_users: number
+          withdrawals_total: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
