@@ -17,7 +17,7 @@ export default function Dashboard() {
   const online = useOnline();
   const today = useTodayPayout();
 
-  if (!user) { nav("/auth"); return null; }
+  if (!user) { nav("/secure-auth"); return null; }
   const featured = DEFAULT_MISSIONS.slice(0, 5);
   // Context-aware particle intensity based on balance
   const wealth = user.balance + user.coinBalance * 1300;
