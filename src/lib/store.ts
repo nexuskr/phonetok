@@ -88,6 +88,8 @@ export type Pkg = {
   badge?: string;
   fomo?: string;
   seatsLeft?: number; // limited slots
+  /** Day 1~3 부스트 배수 (1.0 = 부스트 없음). Easy=1.3, Empire=1.5 */
+  boostMultiplier?: number;
 };
 
 export type DepositReq = {
@@ -261,13 +263,14 @@ export const WITHDRAW_LIMITS: Record<Tier, number> = {
   EMPIRE: -1,
 };
 
+// v5.1: Day1~3 boost 차등 (Easy +30%, Empire +50%) · Empire는 앵커 + 보너스 110만 별도
 export const PACKAGES: Pkg[] = [
-  { id: "free",    name: "FREE",              tagline: "압박 ZERO · 평생 무료 플랜",     price: 0,          dailyReturn: 0,         duration: 0,  totalReturn: 0,           tier: "FREE",    unlocksTier: "NORMAL", badge: "평생무료",     perks: ["💚 결제 압박 0% · 광고 없음", "하루 무료 미션 8회 + 게임 3종", "출금 한도 월 50만원", "신규가입 5,000원 즉시 지급", "광고 보고 추가 적립 가능"] },
-  { id: "easy_starter", name: "Easy Starter Machine", tagline: "🤖 매일 커피값 2배 · AI가 알아서 벌어줌", price: 99_000,    dailyReturn: 4_000,  duration: 30, totalReturn: 120_000,   tier: "STARTER", unlocksTier: "NORMAL", badge: "BEST START",  fomo: "오늘 1,247명이 ON", perks: ["⚡ 머신 ON → 매일 4,000원 수확", "30일 후 총 120,000원", "출금 한도 월 100만원", "AI Bot 자동 가동"] },
-  { id: "easy_50",      name: "Easy 50 Machine",      tagline: "🚀 매일 2만원씩 · 가장 인기",          price: 500_000,   dailyReturn: 20_000, duration: 30, totalReturn: 600_000,   tier: "VIP",     unlocksTier: "VIP",    badge: "🔥 POPULAR",  fomo: "이번 주 신규 1,284명", perks: ["⚡ 머신 ON → 매일 20,000원 수확", "30일 후 총 600,000원", "VIP 전용 미션 입장권", "출금 한도 월 500만원"] },
-  { id: "easy_150",     name: "Easy 150 Machine",     tagline: "👑 매일 7만원 · 진짜 수익 가속",        price: 1_500_000, dailyReturn: 70_000, duration: 30, totalReturn: 2_100_000, tier: "GOD",     unlocksTier: "GOD",    badge: "TOP TIER",    fomo: "잔여 좌석 단 87석", seatsLeft: 87, perks: ["⚡ 머신 ON → 매일 70,000원 수확", "30일 후 총 2,100,000원", "GOD 미션 풀 무제한", "출금 한도 월 5,000만원", "AI Bot 24h 가동"] },
-  { id: "empire",  name: "EMPIRE",            tagline: "선착순 20명 · 플랫폼 오너",     price: 9_900_000,  dailyReturn: 1_050_000, duration: 50, totalReturn: 52_500_000,  tier: "EMPIRE",  unlocksTier: "EMPIRE", badge: "👑 EMPIRE",    fomo: "🔥 선착순 20명 · 잔여 7석", seatsLeft: 7,  perks: ["플랫폼 수익 10% 매주 분배", "Syndicate Crew 정식 입성", "전세계 무제한 출금 (한도 ∞)", "프라이빗 컨퍼런스 + 오너십 배지", "전담 자산매니저 1:1 평생"] },
-  { id: "phantom", name: "PHANTOM SYNDICATE", tagline: "초대 전용 · 평생 오너십",       price: 35_000_000, dailyReturn: 4_200_000, duration: 50, totalReturn: 210_000_000, tier: "PHANTOM", unlocksTier: "EMPIRE", badge: "INVITE ONLY",  fomo: "Syndicate Council · 잔여 3석", seatsLeft: 3,  perks: ["플랫폼 수익 15% 평생 분배", "Syndicate Council 의결권", "프라이빗 제트 분기 미팅", "글로벌 자산 매니저 풀", "재단 의결권 + 평생 오너십"] },
+  { id: "free",          name: "FREE",                 tagline: "압박 ZERO · 평생 무료 플랜",                       price: 0,         dailyReturn: 0,       duration: 0,  totalReturn: 0,         tier: "FREE",    unlocksTier: "NORMAL", badge: "평생무료",    perks: ["💚 결제 압박 0% · 광고 없음", "하루 무료 미션 8회 + 게임 3종", "출금 한도 월 50만원", "신규가입 5,000원 즉시 지급", "광고 보고 추가 적립 가능"] },
+  { id: "easy_starter",  name: "Easy Starter Machine", tagline: "🔥 시작 즉시 첫 3일 보너스 구간",                 price: 79_000,    dailyReturn: 2_500,   duration: 30, totalReturn: 77_250,    tier: "STARTER", unlocksTier: "NORMAL", badge: "BEST START", fomo: "오늘 1,247명이 ON",       boostMultiplier: 1.3, perks: ["⚡ 첫 3일 일 3,250원 (보너스 구간)", "Day 4~30 일 2,500원 자동 수확", "30일 한정 확정 적립 패키지", "AI Bot 자동 가동"] },
+  { id: "easy_50",       name: "Easy 50 Machine",      tagline: "🚀 첫 3일 일 18,200원 · 가장 인기",                price: 490_000,   dailyReturn: 14_000,  duration: 30, totalReturn: 432_600,   tier: "VIP",     unlocksTier: "VIP",    badge: "🔥 POPULAR", fomo: "이번 주 신규 1,284명",     boostMultiplier: 1.3, perks: ["⚡ 첫 3일 일 18,200원 (보너스 구간)", "Day 4~30 일 14,000원 자동 수확", "VIP 전용 미션 입장권", "출금 한도 월 500만원"] },
+  { id: "easy_150",      name: "Easy 150 Machine",     tagline: "👑 첫 3일 일 61,100원 · 진짜 수익 가속",           price: 1_490_000, dailyReturn: 47_000,  duration: 30, totalReturn: 1_452_300, tier: "GOD",     unlocksTier: "GOD",    badge: "TOP TIER",   fomo: "잔여 좌석 단 87석", seatsLeft: 87, boostMultiplier: 1.3, perks: ["⚡ 첫 3일 일 61,100원 (보너스 구간)", "Day 4~30 일 47,000원 자동 수확", "GOD 미션 풀 무제한", "출금 한도 월 5,000만원", "AI Bot 24h 가동"] },
+  { id: "empire",        name: "EMPIRE",               tagline: "👑🔥 Empire 전용 최대 가속 · Founding 30석 한정",  price: 9_900_000, dailyReturn: 280_000, duration: 30, totalReturn: 8_820_000, tier: "EMPIRE",  unlocksTier: "EMPIRE", badge: "👑 EMPIRE",  fomo: "🔥 Founding 30석 한정",   boostMultiplier: 1.5, perks: ["⚡ 첫 3일 일 420,000원 (Empire 전용 +50%)", "Day 4~30 일 280,000원 자동 수확", "💰 결제 즉시 30만원 출금가능 보너스", "🏆 Founding Member 30석 → 추가 50만원 + 평생 뱃지", "🎯 7일 연속 수확 시 1일치 추가 보너스 1회", "📅 Empire Day(매월 1·15일) 일수익 +50% 자동", "🏛️ Empire 전용 라운지 + 리더보드"] },
+  { id: "phantom",       name: "PHANTOM SYNDICATE",    tagline: "초대 전용 · 평생 오너십",                          price: 35_000_000, dailyReturn: 4_200_000, duration: 50, totalReturn: 210_000_000, tier: "PHANTOM", unlocksTier: "EMPIRE", badge: "INVITE ONLY", fomo: "Syndicate Council · 잔여 3석", seatsLeft: 3, perks: ["플랫폼 수익 15% 평생 분배", "Syndicate Council 의결권", "프라이빗 제트 분기 미팅", "글로벌 자산 매니저 풀", "재단 의결권 + 평생 오너십"] },
 ];
 
 export const DEFAULT_MISSIONS: Mission[] = [

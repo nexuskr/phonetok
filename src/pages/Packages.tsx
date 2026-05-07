@@ -5,6 +5,10 @@ import { useDB, PACKAGES, formatKRW, type Pkg } from "@/lib/store";
 import { Crown, Check, Upload, Sparkles, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useRequireAuth } from "@/hooks/use-require-auth";
+import PackageBoostPreview from "@/components/PackageBoostPreview";
+import ActiveBoostCounter from "@/components/ActiveBoostCounter";
+import EmpireFoundingCounter from "@/components/EmpireFoundingCounter";
+import EmpireDayCountdown from "@/components/EmpireDayCountdown";
 
 const tierStyles: Record<Pkg["tier"], { ring: string; bg: string; label: string }> = {
   FREE:    { ring: "from-muted to-muted",                bg: "from-muted/30",      label: "FREE" },
@@ -28,9 +32,10 @@ export default function Packages() {
       <div className="container pt-6 pb-10 animate-liquid-in">
         <div className="mb-6">
           <h1 className="font-display font-black text-2xl flex items-center gap-2">
-            <Crown className="w-5 h-5 text-gold" /> <span className="text-gradient-gold">🤖 AI Money Machine</span>
+            <Crown className="w-5 h-5 text-gold" /> <span className="text-gradient-gold">🔥 첫 3일 보너스 구간</span>
           </h1>
-          <p className="text-xs text-muted-foreground mt-1">머신 ON → AI가 매일 알아서 벌어줌 → 수확 버튼 1번 클릭</p>
+          <p className="text-xs text-muted-foreground mt-1">지금 시작 시 첫 3일간 보너스 구간 진입 · 사전 공지 확정 적립 스케줄</p>
+          <div className="mt-2"><ActiveBoostCounter /></div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
@@ -89,9 +94,24 @@ export default function Packages() {
                         </div>
 
                         <div className="mt-3 glass rounded-xl p-3 flex items-center justify-between">
-                          <span className="text-[11px] text-muted-foreground">총 예상 수익</span>
+                          <span className="text-[11px] text-muted-foreground">30일 총 예상 (정상 구간)</span>
                           <span className="font-display font-black text-lg text-gradient-gold">{formatKRW(p.totalReturn)}</span>
                         </div>
+
+                        {/* 🔥 Day 1~3 부스트 미리보기 (메인 훅) */}
+                        <PackageBoostPreview
+                          dailyReturn={p.dailyReturn}
+                          multiplier={p.boostMultiplier ?? 1.0}
+                          isEmpire={p.tier === "EMPIRE"}
+                        />
+
+                        {/* Empire 전용: Founding 좌석 + Empire Day */}
+                        {p.tier === "EMPIRE" && (
+                          <div className="mt-3 space-y-2">
+                            <EmpireFoundingCounter />
+                            <EmpireDayCountdown />
+                          </div>
+                        )}
 
                         <ul className="mt-4 space-y-1.5">
                           {p.perks.map(perk => (
@@ -101,7 +121,7 @@ export default function Packages() {
                           ))}
                         </ul>
 
-                        {p.seatsLeft !== undefined && (
+                        {p.seatsLeft !== undefined && p.tier !== "EMPIRE" && (
                           <div className="mt-3">
                             <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
                               <span>잔여 좌석</span><span className="text-gold font-bold">{p.seatsLeft}석</span>
