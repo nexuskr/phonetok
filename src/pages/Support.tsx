@@ -32,10 +32,11 @@ export default function Support() {
 
   // bootstrap thread + load messages + subscribe
   useEffect(() => {
+    if (!user) return;
     let channel: any;
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { nav("/secure-auth"); return; }
+      if (!user) return;
       setAuthUid(user.id);
 
       // upsert thread
@@ -62,7 +63,7 @@ export default function Support() {
         ).subscribe();
     })();
     return () => { if (channel) supabase.removeChannel(channel); };
-  }, [db.user?.nickname, nav]);
+  }, [nav, user, db.user?.nickname]);
 
   async function send() {
     if (!text.trim() || !threadId || !authUid) return;
