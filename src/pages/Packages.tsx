@@ -216,6 +216,7 @@ function PurchaseModal({ pkg, onClose }: { pkg: Pkg; onClose: () => void }) {
             </div>
             <input type="file" accept="image/*" className="hidden" onChange={e => {
               const f = e.target.files?.[0]; if (!f) return;
+              setFile(f);
               const r = new FileReader(); r.onload = () => setScreenshot(r.result as string); r.readAsDataURL(f);
             }} />
           </label>
