@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_bot_runs: {
+        Row: {
+          claimed_at: string | null
+          created_at: string
+          error: string | null
+          expires_at: string | null
+          id: string
+          kind: Database["public"]["Enums"]["ai_bot_kind"]
+          output_path: string | null
+          output_text: string | null
+          prompt: string | null
+          ready_at: string | null
+          reward: number
+          started_at: string
+          status: Database["public"]["Enums"]["ai_bot_status"]
+          trading_pnl_pct: number | null
+          trading_seed: number | null
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          created_at?: string
+          error?: string | null
+          expires_at?: string | null
+          id?: string
+          kind: Database["public"]["Enums"]["ai_bot_kind"]
+          output_path?: string | null
+          output_text?: string | null
+          prompt?: string | null
+          ready_at?: string | null
+          reward?: number
+          started_at?: string
+          status?: Database["public"]["Enums"]["ai_bot_status"]
+          trading_pnl_pct?: number | null
+          trading_seed?: number | null
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string | null
+          created_at?: string
+          error?: string | null
+          expires_at?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["ai_bot_kind"]
+          output_path?: string | null
+          output_text?: string | null
+          prompt?: string | null
+          ready_at?: string | null
+          reward?: number
+          started_at?: string
+          status?: Database["public"]["Enums"]["ai_bot_status"]
+          trading_pnl_pct?: number | null
+          trading_seed?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           created_at: string | null
@@ -683,7 +740,19 @@ export type Database = {
         }
         Returns: Json
       }
+      ai_bot_base_reward: {
+        Args: { _kind: Database["public"]["Enums"]["ai_bot_kind"] }
+        Returns: number
+      }
+      ai_bot_daily_limit: {
+        Args: {
+          _kind: Database["public"]["Enums"]["ai_bot_kind"]
+          _tier: Database["public"]["Enums"]["user_tier"]
+        }
+        Returns: number
+      }
       bump_jackpot: { Args: { _amount: number }; Returns: Json }
+      claim_ai_bot_run: { Args: { _run_id: string }; Returns: Json }
       claim_daily_attendance: {
         Args: { user_id: string }
         Returns: {
@@ -696,6 +765,15 @@ export type Database = {
           _period_end: string
           _period_start: string
           _pool_total: number
+        }
+        Returns: Json
+      }
+      finalize_ai_bot_run: {
+        Args: {
+          _error: string
+          _output_path: string
+          _output_text: string
+          _run_id: string
         }
         Returns: Json
       }
@@ -739,6 +817,13 @@ export type Database = {
         Returns: Json
       }
       settle_package_daily: { Args: never; Returns: Json }
+      start_ai_bot_run: {
+        Args: {
+          _kind: Database["public"]["Enums"]["ai_bot_kind"]
+          _prompt: string
+        }
+        Returns: Json
+      }
       submit_deposit: {
         Args: {
           _amount: number
@@ -780,6 +865,8 @@ export type Database = {
       }
     }
     Enums: {
+      ai_bot_kind: "content" | "trading" | "image"
+      ai_bot_status: "running" | "ready" | "claimed" | "failed" | "expired"
       app_role: "admin" | "user"
       deposit_method: "bank" | "coin"
       deposit_status: "pending" | "approved" | "rejected" | "cancelled"
@@ -939,6 +1026,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      ai_bot_kind: ["content", "trading", "image"],
+      ai_bot_status: ["running", "ready", "claimed", "failed", "expired"],
       app_role: ["admin", "user"],
       deposit_method: ["bank", "coin"],
       deposit_status: ["pending", "approved", "rejected", "cancelled"],
