@@ -144,12 +144,18 @@ function PurchaseModal({ pkg, onClose }: { pkg: Pkg; onClose: () => void }) {
   const [, setDb] = useDB();
   const [db] = useDB();
   const [screenshot, setScreenshot] = useState<string>();
+  const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function submit() {
     if (!db.user || busy) return;
     setBusy(true);
     try {
+      let receiptUrl: string | null = null;
+      if (file) {
+        const { uploadReceipt } = await import("@/lib/deposits-rpc");
+        receiptUrl = await uploadReceipt(file);
+      }
       const { submitPackagePurchase } = await import("@/lib/packages-rpc");
       await submitPackagePurchase({
         packageId: pkg.id,
@@ -158,9 +164,8 @@ function PurchaseModal({ pkg, onClose }: { pkg: Pkg; onClose: () => void }) {
         dailyReturn: pkg.dailyReturn,
         durationDays: pkg.duration,
         totalReturn: pkg.totalReturn,
-        receiptUrl: screenshot ?? null,
+        receiptUrl,
       });
-      // 로컬 캐시도 업데이트 (UI 즉시반영)
       setDb(d => ({
         ...d,
         deposits: [{
