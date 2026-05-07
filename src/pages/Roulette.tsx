@@ -131,12 +131,16 @@ export default function Roulette() {
                     `${s.color} ${i * SEG_DEG}deg ${(i + 1) * SEG_DEG}deg`).join(",")})`,
                 }}>
                 {SEGMENTS.map((s, i) => {
-                  const angle = i * SEG_DEG + SEG_DEG / 2;
+                  // conic-gradient starts at 12 o'clock (top); CSS rotate starts at 3 o'clock (right).
+                  // Subtract 90deg to align the label coordinate system with the colored wedges.
+                  const angle = i * SEG_DEG + SEG_DEG / 2 - 90;
+                  const isWinner = !spinning && lastResult?.segment === i;
                   return (
-                    <div key={i} className="absolute top-1/2 left-1/2 origin-left"
+                    <div key={i} data-seg={i} data-label={s.label}
+                      className="absolute top-1/2 left-1/2 origin-left"
                       style={{ transform: `rotate(${angle}deg) translateX(60px)` }}>
-                      <div className="text-[10px] font-bold text-foreground whitespace-nowrap"
-                        style={{ transform: "rotate(90deg)", textShadow: "0 1px 3px rgba(0,0,0,0.6)" }}>
+                      <div className={`text-[10px] font-black whitespace-nowrap ${isWinner ? "text-gold animate-pulse scale-110" : "text-foreground"}`}
+                        style={{ transform: "rotate(90deg)", textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>
                         {s.label}
                       </div>
                     </div>
@@ -154,6 +158,7 @@ export default function Roulette() {
                 <div className="text-xs text-muted-foreground">결과</div>
                 <div className="font-display font-black text-xl text-gradient-gold">{lastResult.label}</div>
                 {lastResult.amount > 0 && <div className="text-sm text-secondary font-bold">+{formatKRW(lastResult.amount)}</div>}
+                <div className="text-[10px] text-muted-foreground mt-1">✓ 서버 검증 완료 · 지갑에 즉시 반영됨</div>
               </div>
             )}
 
