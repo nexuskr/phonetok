@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import Particles from "@/components/Particles";
@@ -8,6 +8,7 @@ import AttendanceCard from "@/components/AttendanceCard";
 import { useOnline, useTodayPayout } from "@/components/LiveStats";
 import { useDB, DEFAULT_MISSIONS, formatKRW } from "@/lib/store";
 import { useRequireAuth } from "@/hooks/use-require-auth";
+import { refreshWallet } from "@/lib/missions-rpc";
 import { Flame, Zap, Trophy, ChevronRight, TrendingUp, Sparkles, Crown, Wallet, Users, Activity } from "lucide-react";
 
 export default function Dashboard() {
@@ -16,6 +17,8 @@ export default function Dashboard() {
   const [burst, setBurst] = useState(false);
   const online = useOnline();
   const today = useTodayPayout();
+
+  useEffect(() => { void refreshWallet(); }, []);
 
   if (!user) return null;
   const featured = DEFAULT_MISSIONS.slice(0, 5);
