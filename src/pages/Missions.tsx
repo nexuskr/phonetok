@@ -365,7 +365,7 @@ export default function Missions() {
                       <div className="text-[10px] text-muted-foreground">소요 {m.duration}</div>
                     </div>
                     <button
-                      disabled={done || inProgress || locked}
+                      disabled={done || inProgress || locked || (!!m.game && limitReached)}
                       onClick={() => complete(m)}
                       className="press sheen px-4 py-2 rounded-xl bg-gradient-primary text-primary-foreground text-xs font-bold glow-primary disabled:opacity-50 disabled:cursor-not-allowed transition"
                     >
@@ -373,11 +373,13 @@ export default function Missions() {
                         ? "진행 중..."
                         : done
                           ? "완료됨"
-                          : m.game
-                            ? "🎮 플레이"
-                            : m.ugc
-                              ? "제출하기"
-                              : "시작하기"}
+                          : m.game && limitReached
+                            ? "한도 초과"
+                            : m.game
+                              ? "🎮 플레이"
+                              : m.ugc
+                                ? "제출하기"
+                                : "시작하기"}
                     </button>
                   </div>
                 </div>
