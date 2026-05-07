@@ -11,13 +11,42 @@ import PackagePurchasesAdmin from "@/components/admin/PackagePurchasesAdmin";
 import ServerUserAdmin from "@/components/admin/ServerUserAdmin";
 import DepositRequestsAdmin from "@/components/admin/DepositRequestsAdmin";
 
-type Tab = "deposits" | "server_dep" | "withdraws" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin";
+type Tab = "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin";
 
 export default function Admin() {
   const [db, setDb] = useDB();
   const nav = useNavigate();
   const user = useRequireAdmin() ?? db.user;
-  const [tab, setTab] = useState<Tab>("deposits");
+  const [tab, setTab] = useState<Tab>("server_dep");
+  const [kpi, setKpi] = useState({ users: 0, deposits: 0, pendingDep: 0, pendingWd: 0 });
+
+  useEffect(() => {
+    if (!user?.isAdmin) return;
+    let alive = true;
+    const load = async () => {
+      const [u, dApproved, dPend, wPend] = await Promise.all([
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
+        supabase.from("deposit_requests").select("amount").eq("status", "approved"),
+        supabase.from("deposit_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
+        supabase.from("withdrawal_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      ]);
+      if (!alive) return;
+      const sum = (dApproved.data ?? []).reduce((s: number, x: any) => s + Number(x.amount || 0), 0);
+      setKpi({
+        users: u.count ?? 0,
+        deposits: sum,
+        pendingDep: dPend.count ?? 0,
+        pendingWd: wPend.count ?? 0,
+      });
+    };
+    load();
+    const ch = supabase
+      .channel("admin:kpi")
+      .on("postgres_changes", { event: "*", schema: "public", table: "deposit_requests" }, load)
+      .on("postgres_changes", { event: "*", schema: "public", table: "withdrawal_requests" }, load)
+      .subscribe();
+    return () => { alive = false; supabase.removeChannel(ch); };
+  }, [user?.isAdmin]);
 
   if (!user) return null;
   if (!user.isAdmin) {
