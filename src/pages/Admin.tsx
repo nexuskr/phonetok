@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { useRequireAdmin } from "@/hooks/use-require-auth";
 import WithdrawRequestsAdmin from "@/components/admin/WithdrawRequestsAdmin";
 import PackagePurchasesAdmin from "@/components/admin/PackagePurchasesAdmin";
+import ServerUserAdmin from "@/components/admin/ServerUserAdmin";
 
 type Tab = "deposits" | "withdraws" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin";
 
@@ -169,7 +170,7 @@ export default function Admin() {
         {tab === "server_wd" && <WithdrawRequestsAdmin />}
         {tab === "packages" && <PackagePurchasesAdmin />}
         {tab === "missions" && <MissionAdmin />}
-        {tab === "users" && <UserAdmin />}
+        {tab === "users" && <ServerUserAdmin />}
         {tab === "chats" && <ChatAdmin />}
         {tab === "coin" && <CoinAdmin />}
       </div>

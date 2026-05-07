@@ -71,6 +71,87 @@ export type Database = {
         }
         Relationships: []
       }
+      deposit_requests: {
+        Row: {
+          admin_id: string | null
+          amount: number
+          approved_at: string | null
+          created_at: string
+          id: string
+          memo: string | null
+          method: Database["public"]["Enums"]["deposit_method"]
+          package_id: string | null
+          package_name: string | null
+          receipt_url: string | null
+          rejected_reason: string | null
+          status: Database["public"]["Enums"]["deposit_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_id?: string | null
+          amount: number
+          approved_at?: string | null
+          created_at?: string
+          id?: string
+          memo?: string | null
+          method?: Database["public"]["Enums"]["deposit_method"]
+          package_id?: string | null
+          package_name?: string | null
+          receipt_url?: string | null
+          rejected_reason?: string | null
+          status?: Database["public"]["Enums"]["deposit_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_id?: string | null
+          amount?: number
+          approved_at?: string | null
+          created_at?: string
+          id?: string
+          memo?: string | null
+          method?: Database["public"]["Enums"]["deposit_method"]
+          package_id?: string | null
+          package_name?: string | null
+          receipt_url?: string | null
+          rejected_reason?: string | null
+          status?: Database["public"]["Enums"]["deposit_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      jackpot_pool: {
+        Row: {
+          amount: number
+          id: number
+          last_winner: string | null
+          last_winner_nickname: string | null
+          last_won_amount: number | null
+          last_won_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          id?: number
+          last_winner?: string | null
+          last_winner_nickname?: string | null
+          last_won_amount?: number | null
+          last_won_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          id?: number
+          last_winner?: string | null
+          last_winner_nickname?: string | null
+          last_won_amount?: number | null
+          last_won_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mission_history: {
         Row: {
           base_reward: number
@@ -537,9 +618,29 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard_today: {
+        Row: {
+          best_streak: number | null
+          earned: number | null
+          nickname: string | null
+          rank: number | null
+          tier: Database["public"]["Enums"]["user_tier"] | null
+          user_id: string | null
+          wins: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      _cron_settle_package_daily: { Args: never; Returns: Json }
+      admin_adjust_balance: {
+        Args: { _delta: number; _reason: string; _target: string }
+        Returns: Json
+      }
+      admin_resolve_deposit: {
+        Args: { _action: string; _reason: string; _request_id: string }
+        Returns: Json
+      }
       admin_resolve_package: {
         Args: { _action: string; _purchase_id: string; _reason: string }
         Returns: Json
@@ -548,6 +649,14 @@ export type Database = {
         Args: { _action: string; _reason: string; _request_id: string }
         Returns: Json
       }
+      admin_set_tier: {
+        Args: {
+          _target: string
+          _tier: Database["public"]["Enums"]["user_tier"]
+        }
+        Returns: Json
+      }
+      bump_jackpot: { Args: { _amount: number }; Returns: Json }
       claim_daily_attendance: {
         Args: { user_id: string }
         Returns: {
@@ -588,6 +697,17 @@ export type Database = {
         Returns: Json
       }
       settle_package_daily: { Args: never; Returns: Json }
+      submit_deposit: {
+        Args: {
+          _amount: number
+          _memo: string
+          _method: Database["public"]["Enums"]["deposit_method"]
+          _package_id: string
+          _package_name: string
+          _receipt_url: string
+        }
+        Returns: Json
+      }
       submit_package_purchase: {
         Args: {
           _amount: number
@@ -619,6 +739,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      deposit_method: "bank" | "coin"
+      deposit_status: "pending" | "approved" | "rejected" | "cancelled"
       package_status:
         | "pending"
         | "approved"
@@ -774,6 +896,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      deposit_method: ["bank", "coin"],
+      deposit_status: ["pending", "approved", "rejected", "cancelled"],
       package_status: [
         "pending",
         "approved",

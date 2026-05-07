@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useDB, formatKRW, MAIN_MILESTONE_AMOUNT, MAIN_MAX_INTERVAL_MS, MINI_MAX_INTERVAL_MS, jackpotPayoutPct, jackpotResetBase, miniJackpotResetBase, miniJackpotAmount, randomFakeNick, type Tier, type JackpotState } from "@/lib/store";
 import { Flame, Crown, Trophy, Sparkles } from "lucide-react";
 
@@ -8,6 +9,22 @@ function useJackpotState() {
   const [j, setJ] = useState<JackpotState>(db.jackpot);
   const stateRef = useRef(j);
   stateRef.current = j;
+
+  // Sync initial pool from server (jackpot_pool singleton)
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase.from("jackpot_pool").select("amount").eq("id", 1).maybeSingle();
+      if (active && data?.amount) setJ(prev => ({ ...prev, amount: Math.max(prev.amount, Number(data.amount)) }));
+    })();
+    const ch = supabase
+      .channel("jackpot")
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "jackpot_pool" }, (p: any) => {
+        if (active && p.new?.amount) setJ(prev => ({ ...prev, amount: Math.max(prev.amount, Number(p.new.amount)) }));
+      })
+      .subscribe();
+    return () => { active = false; supabase.removeChannel(ch); };
+  }, []);
 
   useEffect(() => {
     let lastPersist = Date.now();
