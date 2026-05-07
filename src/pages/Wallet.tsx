@@ -113,25 +113,38 @@ export default function Wallet() {
     toast({ title: "💸 출금 신청 완료", description: `${u.tier} 등급 처리 시간 내 정산됩니다.` });
   }
 
-  function submitDeposit() {
+  async function submitDeposit() {
     const a = Number(amount);
     if (!a || a < 10000) { toast({ title: "최소 10,000원부터 충전 가능" }); return; }
     if (sentCode !== authCode) { toast({ title: "인증번호 불일치" }); return; }
     const pw = ensureWithdrawPw();
     if (!pw) return;
     if (pw !== withdrawPw) { toast({ title: "출금 비밀번호 불일치" }); return; }
-    const txCode = "DP-" + Math.random().toString(36).slice(2, 10).toUpperCase();
-    setDb(d => ({
-      ...d,
-      deposits: [{
-        id: uid(), userId: u.id, nickname: u.nickname,
-        packageId: "manual", packageName: asset === "bank" ? "은행 충전" : "코인 충전",
-        amount: a, method: asset, txCode, status: "pending", createdAt: Date.now(),
-      }, ...d.deposits],
-    }));
-    setResultCode(txCode);
-    setAmount(""); setSentCode(null); setAuthCode(""); setWithdrawPw("");
-    toast({ title: "충전 신청 완료", description: "송금 후 관리자 승인 시 즉시 적립됩니다." });
+    try {
+      const { submitDeposit: rpcSubmitDeposit } = await import("@/lib/deposits-rpc");
+      const r = await rpcSubmitDeposit({
+        amount: a,
+        method: asset,
+        packageId: "manual",
+        packageName: asset === "bank" ? "은행 충전" : "코인 충전",
+        receiptUrl: null,
+        memo: null,
+      });
+      const txCode = "DP-" + r.id.replace(/-/g, "").slice(0, 10).toUpperCase();
+      setDb(d => ({
+        ...d,
+        deposits: [{
+          id: uid(), userId: u.id, nickname: u.nickname,
+          packageId: "manual", packageName: asset === "bank" ? "은행 충전" : "코인 충전",
+          amount: a, method: asset, txCode, status: "pending", createdAt: Date.now(),
+        }, ...d.deposits],
+      }));
+      setResultCode(txCode);
+      setAmount(""); setSentCode(null); setAuthCode(""); setWithdrawPw("");
+      toast({ title: "충전 신청 완료", description: "송금 후 관리자 승인 시 즉시 적립됩니다." });
+    } catch (e: any) {
+      toast({ title: "충전 신청 실패", description: e.message ?? "잠시 후 다시 시도해주세요.", variant: "destructive" });
+    }
   }
 
   return (
