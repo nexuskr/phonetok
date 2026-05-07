@@ -5,17 +5,18 @@ import Layout from "@/components/Layout";
 import { useDB, formatKRW, uid, PACKAGES, type Mission, type MissionTier, type Tier, TIER_RANK, LEVEL_BY_TIER } from "@/lib/store";
 import { ShieldCheck, Users, TrendingUp, ArrowDownToLine, ArrowUpFromLine, Check, X, Plus, MessageSquare, Send, Coins, Target, Crown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useRequireAdmin } from "@/hooks/use-require-auth";
 
 type Tab = "deposits" | "withdraws" | "users" | "missions" | "chats" | "coin";
 
 export default function Admin() {
   const [db, setDb] = useDB();
   const nav = useNavigate();
+  const user = useRequireAdmin() ?? db.user;
   const [tab, setTab] = useState<Tab>("deposits");
 
-  useEffect(() => { if (!db.user) nav("/secure-auth", { replace: true }); else if (!db.user.isAdmin) nav("/dashboard", { replace: true }); }, [db.user, nav]);
-  if (!db.user) return null;
-  if (!db.user.isAdmin) {
+  if (!user) return null;
+  if (!user.isAdmin) {
     return (
       <Layout>
         <div className="container py-20 text-center">
