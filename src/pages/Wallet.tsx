@@ -247,14 +247,13 @@ export default function Wallet() {
 
             {asset === "coin" && action === "deposit" && (
               <div className="glass rounded-xl p-4 text-xs space-y-2">
-                <div className="flex justify-between"><span className="text-muted-foreground">네트워크</span><span className="font-bold">{db.coin.network}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">네트워크</span><span className="font-bold">TRC20</span></div>
                 <div className="flex flex-col gap-1">
                   <span className="text-muted-foreground">관리자 입금 주소</span>
-                  <code className="font-mono text-[10px] break-all bg-muted/40 p-2 rounded-lg">{db.coin.address}</code>
-                  <button onClick={() => { navigator.clipboard.writeText(db.coin.address); toast({ title: "주소 복사됨" }); }}
+                  <code className="font-mono text-[10px] break-all bg-muted/40 p-2 rounded-lg">TXyz1234567890ABCDEF1234567890ABCDEF12</code>
+                  <button onClick={() => { navigator.clipboard.writeText("TXyz1234567890ABCDEF1234567890ABCDEF12"); toast({ title: "주소 복사됨" }); }}
                     className="text-[11px] text-primary inline-flex items-center gap-1"><Copy className="w-3 h-3" /> 주소 복사</button>
                 </div>
-                {db.coin.qr && <img src={db.coin.qr} alt="QR" className="w-32 h-32 rounded-lg mx-auto" />}
                 <p className="text-[10px] text-muted-foreground pt-2 border-t border-border/40">송금 후 6자리 인증번호와 출금비밀번호 입력 후 거래코드를 발급받으세요.</p>
               </div>
             )}
