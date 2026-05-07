@@ -866,7 +866,48 @@ export type Database = {
           withdrawals_total: number
         }[]
       }
+      get_ai_bot_stats: {
+        Args: { _days?: number }
+        Returns: {
+          avg_pnl_pct: number
+          claimed: number
+          day: string
+          failed: number
+          kind: Database["public"]["Enums"]["ai_bot_kind"]
+          runs: number
+          total_reward: number
+        }[]
+      }
+      get_referral_leaderboard: {
+        Args: { _limit?: number }
+        Returns: {
+          invited: number
+          inviter_id: string
+          nickname: string
+          tier: Database["public"]["Enums"]["user_tier"]
+          total_commission: number
+        }[]
+      }
       get_referral_stats: { Args: never; Returns: Json }
+      get_tier_distribution: {
+        Args: never
+        Returns: {
+          tier: Database["public"]["Enums"]["user_tier"]
+          total_balance: number
+          users: number
+        }[]
+      }
+      get_top_users: {
+        Args: { _limit?: number }
+        Returns: {
+          nickname: string
+          tier: Database["public"]["Enums"]["user_tier"]
+          today_earned: number
+          total_balance: number
+          total_earned: number
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

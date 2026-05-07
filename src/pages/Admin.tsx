@@ -11,8 +11,9 @@ import PackagePurchasesAdmin from "@/components/admin/PackagePurchasesAdmin";
 import ServerUserAdmin from "@/components/admin/ServerUserAdmin";
 import DepositRequestsAdmin from "@/components/admin/DepositRequestsAdmin";
 import AdminDashboardCharts from "@/components/admin/AdminDashboardCharts";
+import AdvancedAnalytics from "@/components/admin/AdvancedAnalytics";
 
-type Tab = "dashboard" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin";
+type Tab = "dashboard" | "analytics" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin";
 
 export default function Admin() {
   const [db, setDb] = useDB();
@@ -70,6 +71,7 @@ export default function Admin() {
 
   const tabs: { id: Tab; label: string; icon: any }[] = [
     { id: "dashboard", label: "대시보드", icon: BarChart3 },
+    { id: "analytics", label: "고급 분석", icon: TrendingUp },
     { id: "server_dep", label: "충전 신청", icon: ArrowUpFromLine },
     { id: "server_wd", label: "출금 신청", icon: ArrowDownToLine },
     { id: "packages", label: "패키지", icon: Crown },
@@ -104,6 +106,7 @@ export default function Admin() {
         </div>
 
         {tab === "dashboard" && <AdminDashboardCharts />}
+        {tab === "analytics" && <AdvancedAnalytics />}
         {tab === "server_wd" && <WithdrawRequestsAdmin />}
         {tab === "server_dep" && <DepositRequestsAdmin />}
         {tab === "packages" && <PackagePurchasesAdmin />}
