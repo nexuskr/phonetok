@@ -85,6 +85,18 @@ export default function FloatingChat() {
             </button>
           </div>
 
+          {isEmpire && (
+            <Link
+              to="/missions"
+              onClick={() => setOpen(false)}
+              className="mx-3 mt-3 px-3 py-2 rounded-xl bg-gradient-to-r from-gold/20 to-primary/20 border border-gold/40 flex items-center gap-2 text-xs font-bold hover:scale-[1.02] transition"
+            >
+              <Bot className="w-4 h-4 text-gold" />
+              <span className="flex-1 text-gold">Empire AI 봇 바로가기 (3종 무제한)</span>
+              <span className="text-[10px] text-muted-foreground">→</span>
+            </Link>
+          )}
+
           <ScrollArea className="flex-1 p-4" ref={scrollRef as any}>
             <div className="space-y-3">
               {messages.map((m) => {
