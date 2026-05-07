@@ -19,9 +19,9 @@ export const text = {
   lineHeight: 1.65,
   margin: '0 0 20px',
 }
-export const link = { color: '#ff6b1f', textDecoration: 'underline' }
+export const link = { color: '#E8B923', textDecoration: 'underline' }
 export const button = {
-  background: 'linear-gradient(135deg, #ff6b1f, #f5b840)',
+  background: 'linear-gradient(135deg, #E8B923, #F5D24A)',
   color: '#0a0d1a',
   fontSize: '15px',
   fontWeight: 800 as const,
@@ -41,19 +41,19 @@ export const codeStyle = {
   fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
   fontSize: '28px',
   fontWeight: 900 as const,
-  color: '#ff6b1f',
+  color: '#E8B923',
   letterSpacing: '8px',
-  background: '#fff7ec',
+  background: '#fff8e0',
   padding: '16px 24px',
   borderRadius: '14px',
   display: 'inline-block',
   margin: '0 0 24px',
-  border: '1px solid #ffe2c4',
+  border: '1px solid #f4dca0',
 }
 export const brandBar = {
   fontSize: '12px',
   fontWeight: 900 as const,
-  color: '#ff6b1f',
+  color: '#E8B923',
   letterSpacing: '3px',
   margin: '0 0 8px',
 }
