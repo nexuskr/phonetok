@@ -20,6 +20,7 @@ import { CheckCircle2, Sparkles, Lock, Crown, Upload, Gamepad2, X, Zap, Flame, T
 import { toast } from "@/hooks/use-toast";
 import { settleMission } from "@/lib/missions-rpc";
 import { supabase } from "@/integrations/supabase/client";
+import AIBotCards from "@/components/AIBotCards";
 
 const tierFilters: { key: Tier; label: string; color: string }[] = [
   { key: "NORMAL", label: "일반", color: "text-secondary" },
