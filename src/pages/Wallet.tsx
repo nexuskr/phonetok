@@ -29,7 +29,7 @@ export default function Wallet() {
   const [withdrawPw, setWithdrawPw] = useState("");
   const [resultCode, setResultCode] = useState<string | null>(null);
 
-  if (!db.user) { nav("/auth"); return null; }
+  if (!db.user) { nav("/secure-auth"); return null; }
   const u = db.user;
 
   function sendCode() {

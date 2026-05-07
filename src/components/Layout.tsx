@@ -45,7 +45,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <LogOut className="w-3.5 h-3.5" /> 로그아웃
               </button>
             ) : (
-              <Link to="/auth" className="px-4 py-1.5 rounded-full text-xs font-semibold bg-gradient-primary text-primary-foreground glow-primary">로그인</Link>
+              <Link to="/secure-auth" className="px-4 py-1.5 rounded-full text-xs font-semibold bg-gradient-primary text-primary-foreground glow-primary">로그인</Link>
             )}
           </div>
         </div>

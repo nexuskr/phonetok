@@ -42,11 +42,11 @@ export default function Index() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground transition hidden sm:block">
+            <Link to="/secure-auth" className="text-sm text-muted-foreground hover:text-foreground transition hidden sm:block">
               로그인
             </Link>
             <Link
-              to="/auth?signup=1"
+              to="/secure-auth?signup=1"
               className="px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold bg-gradient-primary text-primary-foreground glow-primary hover:scale-105 transition"
             >
               지금 시작
@@ -108,14 +108,14 @@ export default function Index() {
           style={{ animationDelay: "0.3s" }}
         >
           <Link
-            to="/auth?signup=1"
+            to="/secure-auth?signup=1"
             className="group relative px-8 py-4 rounded-2xl font-display font-bold text-base sm:text-lg bg-gradient-primary text-primary-foreground glow-primary animate-pulse-glow hover:scale-105 transition flex items-center gap-2"
           >
             <Sparkles className="w-5 h-5" />
             시작하고 보상받기
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition" />
           </Link>
-          <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground transition">
+          <Link to="/secure-auth" className="text-sm text-muted-foreground hover:text-foreground transition">
             이미 회원이신가요? →
           </Link>
         </div>
@@ -192,7 +192,7 @@ export default function Index() {
                 </div>
               </div>
               <Link
-                to="/auth?signup=1"
+                to="/secure-auth?signup=1"
                 className="mt-5 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-gold text-gold-foreground font-bold text-sm glow-gold"
               >
                 <Sparkles className="w-4 h-4" /> EMPIRE 입성하기
@@ -328,7 +328,7 @@ export default function Index() {
         </h2>
         <p className="text-muted-foreground mt-3">단 1분이면 가입. 가입 즉시 5,000원 보너스 지급.</p>
         <Link
-          to="/auth?signup=1"
+          to="/secure-auth?signup=1"
           className="mt-8 inline-flex items-center gap-2 px-10 py-5 rounded-2xl font-display font-bold text-lg bg-gradient-primary text-primary-foreground glow-primary animate-pulse-glow hover:scale-105 transition"
         >
           <Sparkles className="w-5 h-5" /> 무료로 시작하기

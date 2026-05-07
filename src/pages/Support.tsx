@@ -25,7 +25,7 @@ export default function Support() {
   const [open, setOpen] = useState<number | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
-  if (!db.user) { nav("/auth"); return null; }
+  if (!db.user) { nav("/secure-auth"); return null; }
   const u = db.user;
   const messages = db.chats.filter(c => c.threadId === u.id).sort((a, b) => a.createdAt - b.createdAt);
 
