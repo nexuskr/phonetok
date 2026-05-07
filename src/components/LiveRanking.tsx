@@ -40,7 +40,7 @@ export default function LiveRanking() {
           <div
             key={r.n}
             style={{ transform: `translateY(${i * 44}px)` }}
-            className="absolute left-0 right-0 flex items-center justify-between py-2 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            className="absolute left-0 right-0 flex items-center justify-between py-2 transition-transform duration-700 ease-out"
           >
             <div className="flex items-center gap-3">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center font-display font-black text-xs transition-all duration-500

@@ -14,7 +14,7 @@ export default function PinPad({ value, onChange, length = 6, label }: { value: 
           return (
             <div
               key={i}
-              className={`relative aspect-square rounded-xl flex items-center justify-center font-display font-black text-2xl transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+              className={`relative aspect-square rounded-xl flex items-center justify-center font-display font-black text-2xl transition-all duration-500 ease-out
                 ${filled
                   ? "bg-gradient-to-br from-primary/30 to-accent/20 border border-primary/60 shadow-[0_0_24px_hsl(var(--primary)/0.45)] scale-[1.04]"
                   : isNext

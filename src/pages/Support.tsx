@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useDB } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import { Send, MessageSquare, ChevronDown, BookOpen } from "lucide-react";
 
 const FAQ = [
@@ -18,6 +19,7 @@ type Msg = { id: string; sender: "user" | "admin"; message: string; created_at: 
 export default function Support() {
   const [db] = useDB();
   const nav = useNavigate();
+  const user = useRequireAuth() ?? db.user;
   const [text, setText] = useState("");
   const [tab, setTab] = useState<"chat" | "faq">("chat");
   const [open, setOpen] = useState<number | null>(null);
@@ -30,10 +32,11 @@ export default function Support() {
 
   // bootstrap thread + load messages + subscribe
   useEffect(() => {
+    if (!user) return;
     let channel: any;
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { nav("/secure-auth"); return; }
+      if (!user) return;
       setAuthUid(user.id);
 
       // upsert thread
@@ -60,7 +63,7 @@ export default function Support() {
         ).subscribe();
     })();
     return () => { if (channel) supabase.removeChannel(channel); };
-  }, [db.user?.nickname, nav]);
+  }, [nav, user, db.user?.nickname]);
 
   async function send() {
     if (!text.trim() || !threadId || !authUid) return;
@@ -73,8 +76,7 @@ export default function Support() {
     }).eq("id", threadId);
   }
 
-  useEffect(() => { if (!db.user) nav("/secure-auth", { replace: true }); }, [db.user, nav]);
-  if (!db.user) return null;
+  if (!user) return null;
 
   return (
     <Layout>

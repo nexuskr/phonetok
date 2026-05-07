@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import Particles from "@/components/Particles";
 import LiveRanking from "@/components/LiveRanking";
@@ -7,17 +7,16 @@ import JackpotBanner from "@/components/JackpotBanner";
 import AttendanceCard from "@/components/AttendanceCard";
 import { useOnline, useTodayPayout } from "@/components/LiveStats";
 import { useDB, DEFAULT_MISSIONS, formatKRW } from "@/lib/store";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import { Flame, Zap, Trophy, ChevronRight, TrendingUp, Sparkles, Crown, Wallet, Users, Activity } from "lucide-react";
 
 export default function Dashboard() {
   const [db] = useDB();
-  const nav = useNavigate();
-  const user = db.user;
+  const user = useRequireAuth() ?? db.user;
   const [burst, setBurst] = useState(false);
   const online = useOnline();
   const today = useTodayPayout();
 
-  useEffect(() => { if (!user) nav("/secure-auth", { replace: true }); }, [user, nav]);
   if (!user) return null;
   const featured = DEFAULT_MISSIONS.slice(0, 5);
   // Context-aware particle intensity based on balance
