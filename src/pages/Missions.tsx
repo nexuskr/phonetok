@@ -18,6 +18,7 @@ import {
 } from "@/lib/store";
 import { CheckCircle2, Sparkles, Lock, Crown, Upload, Gamepad2, X, Zap, Flame, Trophy, Heart } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { settleMission } from "@/lib/missions-rpc";
 
 const tierFilters: { key: Tier; label: string; color: string }[] = [
   { key: "NORMAL", label: "일반", color: "text-secondary" },
@@ -144,16 +145,16 @@ export default function Missions() {
     }, 1200);
   }
 
-  function awardGame(m: Mission, won: boolean, bonus: number) {
-    // Jackpot roll happens on EVERY play (win or lose)
+  async function awardGame(m: Mission, won: boolean, bonus: number) {
+    // Jackpot roll happens on EVERY play (win or lose) — local economy
     const jp = rollJackpot();
 
-    // STRICT: rewards only granted on win. Failure = 0 KRW (no balance change).
     const boost = m.boostable ? TIER_BOOST[userTier] : 1;
     const baseReward = won ? Math.floor((m.reward + bonus) * boost) : 0;
     const jpReward = jp?.amount ?? 0;
     const totalReward = baseReward + jpReward;
 
+    // Persist play count + jackpot/momentum locally (these are local features)
     setDb((d) => {
       const newMomentum = won ? d.momentum + 1 : 0;
       const triggerRecovery = !won && d.momentum === 0;
@@ -168,7 +169,6 @@ export default function Missions() {
         user: d.user
           ? {
               ...d.user,
-              // Only credit balance/earnings on win — failure pays nothing
               balance: d.user.balance + totalReward,
               todayEarnings: d.user.todayEarnings + totalReward,
               xp: d.user.xp + (won ? Math.floor(totalReward / 100) : 0),
@@ -178,6 +178,11 @@ export default function Missions() {
           : null,
       };
     });
+
+    // Server-authoritative settlement (records mission_history, daily_stats, transactions, applies daily cap)
+    if (totalReward > 0 || won) {
+      settleMission(m.id, won, baseReward).catch(() => {});
+    }
 
     if (jp) {
       setJackpotWin(jp);
