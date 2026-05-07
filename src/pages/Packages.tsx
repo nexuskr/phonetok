@@ -39,7 +39,7 @@ export default function Packages() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          {PACKAGES.map(p => {
+          {[...PACKAGES].sort((a, b) => (a.tier === "FREE" ? 1 : b.tier === "FREE" ? -1 : 0)).map(p => {
             const t = tierStyles[p.tier];
             const isEmpire = p.tier === "EMPIRE" || p.tier === "PHANTOM";
             return (
