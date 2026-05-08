@@ -4,7 +4,8 @@ import HubTabs from "@/components/HubTabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useDB, formatKRW } from "@/lib/store";
 import { toast } from "@/hooks/use-toast";
-import { Trophy, Lock } from "lucide-react";
+import { Trophy, Lock, Crown } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type Ach = {
   key: string; name: string; description: string; category: string;
@@ -59,6 +60,20 @@ export default function Achievements() {
             <Stat label="달성률" value={catalog.length ? `${Math.round((unlockedCount / catalog.length) * 100)}%` : "0%"} />
           </div>
         </header>
+
+        <Link
+          to="/hall-of-fame"
+          className="press flex items-center justify-between rounded-2xl p-4 bg-gradient-to-r from-gold/20 via-primary/10 to-accent/15 border border-gold/30 hover:border-gold/60 transition"
+        >
+          <div className="flex items-center gap-3">
+            <Crown className="w-5 h-5 text-gold" />
+            <div>
+              <div className="font-display font-black text-sm text-gradient-gold">명예의 전당</div>
+              <div className="text-[11px] text-muted-foreground">EMPIRE 톱 수익자 실시간 랭킹</div>
+            </div>
+          </div>
+          <span className="text-[10px] font-bold text-gold tracking-widest">VIEW →</span>
+        </Link>
 
         <div className="flex gap-2 overflow-x-auto pb-1">
           {cats.map((c) => (
