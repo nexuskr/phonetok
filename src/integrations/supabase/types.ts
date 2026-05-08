@@ -332,6 +332,39 @@ export type Database = {
         }
         Relationships: []
       }
+      conversion_events: {
+        Row: {
+          anon_id: string
+          created_at: string
+          event_type: string
+          id: string
+          meta: Json
+          surface: string
+          user_id: string | null
+          variant: string
+        }
+        Insert: {
+          anon_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          meta?: Json
+          surface: string
+          user_id?: string | null
+          variant?: string
+        }
+        Update: {
+          anon_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          meta?: Json
+          surface?: string
+          user_id?: string | null
+          variant?: string
+        }
+        Relationships: []
+      }
       cron_settle_audit_log: {
         Row: {
           caller: string | null
