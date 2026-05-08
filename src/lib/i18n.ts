@@ -1382,6 +1382,8 @@ const resources = {
       boostCount: "{{n}} BOOST",
     },
     hubs: {
+      command: { title: "COMMAND", tagline: "Your daily ops · balance · boost — at a glance",
+        dashboard: "Command" },
       earn: { title: "EARN", tagline: "Every way to earn — in one place",
         missions: "Missions", quests: "Quests", roulette: "Roulette", seasonPass: "Season Pass" },
       empire: { title: "EMPIRE", tagline: "Your empire, defined by tier",
