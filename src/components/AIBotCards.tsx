@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import i18n from "@/lib/i18n";
 import { useDB, formatKRW } from "@/lib/store";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -113,8 +114,8 @@ export default function AIBotCards() {
    shared — RPC + edge call + signed URL
    ============================================================ */
 function botT(key: string, opts?: any): string {
-  // Helper to call i18n outside of a hook context (errors thrown from async fns).
-  return (require("i18next").default.getFixedT(null, "aibot") as any)(key, opts);
+  // Helper for use outside React (errors thrown from async fns).
+  return (i18n.getFixedT(null, "aibot") as any)(key, opts);
 }
 
 async function startRun(kind: Kind, prompt: string) {
