@@ -124,6 +124,7 @@ const M: Metrics = {
 // --- Quality threshold alerting ---------------------------------------------
 const ALERT_COOLDOWN_MS = 5 * 60_000;
 let lastAlertAt = 0;
+let lastAlertReason: string | null = null;
 function maybeAlert(reason: string, detail: Record<string, any> = {}) {
   const now = Date.now();
   if (now - lastAlertAt < ALERT_COOLDOWN_MS) return;
@@ -132,12 +133,32 @@ function maybeAlert(reason: string, detail: Record<string, any> = {}) {
   const lossRate = total > 0 ? M.flushed_fail / total : 0;
   if (lossRate < 0.2 && M.dropped < 25) return;
   lastAlertAt = now;
+  lastAlertReason = reason;
   try {
     void (supabase as any).rpc("ingest_span_quality_alert", {
       _reason: reason,
       _metrics: { ...M, queue_size: QUEUE.length, loss_rate: lossRate, ...detail },
     });
   } catch {}
+}
+
+export function getLastAlert() {
+  return { at: lastAlertAt || null, reason: lastAlertReason };
+}
+
+export async function getPersistedQueueSize(): Promise<number> {
+  const db = await openDB();
+  if (!db) {
+    try { return (JSON.parse(localStorage.getItem(LS_KEY) || "[]") as any[]).length; } catch { return 0; }
+  }
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(STORE, "readonly");
+      const req = tx.objectStore(STORE).count();
+      req.onsuccess = () => resolve(req.result || 0);
+      req.onerror = () => resolve(0);
+    } catch { resolve(0); }
+  });
 }
 
 function uuid() {
