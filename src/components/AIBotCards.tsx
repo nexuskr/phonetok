@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useDB, formatKRW } from "@/lib/store";
 import { toast } from "@/hooks/use-toast";
@@ -37,9 +38,10 @@ const TIER_BOOST: Record<string, number> = { NORMAL: 1, VIP: 1.35, GOD: 1.8, EMP
 const BASE_REWARD: Record<Kind, number> = { content: 3000, trading: 8000, image: 5000 };
 
 /* ============================================================
-   MAIN EXPORT — 3개 카드 묶음
+   MAIN EXPORT — bundle of 3 bot cards
    ============================================================ */
 export default function AIBotCards() {
+  const { t } = useTranslation("aibot");
   const [db] = useDB();
   const user = db.user;
   const tier = (user?.tier ?? "NORMAL").toUpperCase();
@@ -86,14 +88,14 @@ export default function AIBotCards() {
           </div>
           <div>
             <h2 className="font-display font-black text-lg leading-tight flex items-center gap-2">
-              AI AUTO BOTS
+              {t("headerTitle")}
               {isEmpire && <Crown className="w-4 h-4 text-gold animate-pulse" />}
             </h2>
-            <p className="text-[10px] text-muted-foreground">봇이 대신 일하고 당신은 수익만</p>
+            <p className="text-[10px] text-muted-foreground break-keep">{t("headerSub")}</p>
           </div>
         </div>
-        <span className="text-[10px] glass px-2 py-1 rounded-full font-bold text-gold">
-          {tier} · x{TIER_BOOST[tier]?.toFixed(2)}
+        <span className="text-[10px] glass px-2 py-1 rounded-full font-bold text-gold tabular-nums">
+          {t("tierLine", { tier, boost: (TIER_BOOST[tier] ?? 1).toFixed(2) })}
         </span>
       </div>
 
@@ -108,18 +110,23 @@ export default function AIBotCards() {
 }
 
 /* ============================================================
-   공용 — RPC + Edge 호출 + signed URL
+   shared — RPC + edge call + signed URL
    ============================================================ */
+function botT(key: string, opts?: any): string {
+  // Helper to call i18n outside of a hook context (errors thrown from async fns).
+  return (require("i18next").default.getFixedT(null, "aibot") as any)(key, opts);
+}
+
 async function startRun(kind: Kind, prompt: string) {
   const { data: started, error: e1 } = await supabase.rpc("start_ai_bot_run", { _kind: kind, _prompt: prompt });
   if (e1) {
     const m = e1.message || "";
-    if (m.includes("daily_limit")) throw new Error("오늘 한도를 모두 사용했습니다");
-    if (m.includes("prompt_too_long")) throw new Error("프롬프트가 너무 깁니다 (1000자 이내)");
+    if (m.includes("daily_limit")) throw new Error(botT("err.dailyLimit"));
+    if (m.includes("prompt_too_long")) throw new Error(botT("err.promptLong"));
     throw new Error(m);
   }
   const runId = (started as any)?.id;
-  if (!runId) throw new Error("실행 ID 누락");
+  if (!runId) throw new Error(botT("err.runIdMissing"));
 
   const { data: { session } } = await supabase.auth.getSession();
   const r = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-bot-run`, {
@@ -130,11 +137,11 @@ async function startRun(kind: Kind, prompt: string) {
     },
     body: JSON.stringify({ run_id: runId, kind, prompt }),
   });
-  if (r.status === 429) throw new Error("AI 사용량이 일시적으로 한도를 초과했습니다");
-  if (r.status === 402) throw new Error("AI 크레딧 부족 — 운영팀에 문의");
+  if (r.status === 429) throw new Error(botT("err.rate429"));
+  if (r.status === 402) throw new Error(botT("err.rate402"));
   if (!r.ok) {
-    const t = await r.text();
-    throw new Error(`AI 호출 실패: ${t.slice(0, 80)}`);
+    const txt = await r.text();
+    throw new Error(botT("err.callFail", { msg: txt.slice(0, 80) }));
   }
   return runId as string;
 }
@@ -143,8 +150,8 @@ async function claimRun(runId: string) {
   const { data, error } = await supabase.rpc("claim_ai_bot_run", { _run_id: runId });
   if (error) {
     const m = error.message || "";
-    if (m.includes("not_ready")) throw new Error("아직 준비되지 않았습니다");
-    if (m.includes("already_claimed")) throw new Error("이미 수령했습니다");
+    if (m.includes("not_ready")) throw new Error(botT("err.notReady"));
+    if (m.includes("already_claimed")) throw new Error(botT("err.already"));
     throw new Error(m);
   }
   return data as { ok: boolean; reward: number; pnl_pct: number | null };
@@ -155,14 +162,18 @@ async function shareToLounge(opts: {
   kind: Kind; reward: number; pnl_pct: number | null;
   output_text: string | null; output_path: string | null;
 }) {
-  const titles: Record<Kind, string> = {
-    content: "🤖 AI 콘텐츠 봇 정산",
-    trading: "📈 AI 트레이딩 봇 정산",
-    image:   "🎨 AI 이미지 봇 완성",
-  };
-  const msg = `${titles[opts.kind]} · +${opts.reward.toLocaleString()}원${
-    opts.pnl_pct != null ? ` (${opts.pnl_pct >= 0 ? "+" : ""}${opts.pnl_pct.toFixed(2)}%)` : ""
-  }`;
+  const titleKey = opts.kind === "content" ? "content.shareTitle"
+    : opts.kind === "trading" ? "trading.shareTitle"
+    : "image.shareTitle";
+  const title = botT(titleKey);
+  const pnlSuffix = opts.pnl_pct != null
+    ? ` (${opts.pnl_pct >= 0 ? "+" : ""}${opts.pnl_pct.toFixed(2)}%)`
+    : "";
+  const msg = botT("shareMsg", {
+    title,
+    amt: opts.reward.toLocaleString(),
+    pnl: pnlSuffix,
+  });
   await supabase.from("chat_messages").insert({
     user_id: opts.user_id,
     nickname: opts.nickname,
@@ -188,6 +199,7 @@ async function getSignedUrl(path: string) {
    1) Daily AI Content Farmer
    ============================================================ */
 function ContentFarmerCard({ tier, runs, used, loading }: { tier: string; runs: Run[]; used: number; loading: boolean }) {
+  const { t } = useTranslation("aibot");
   const limit = TIER_LIMITS[tier]?.content ?? 1;
   const reward = Math.floor(BASE_REWARD.content * (TIER_BOOST[tier] ?? 1));
   const latest = useMemo(() => runs.find(r => r.kind === "content" && r.status !== "failed"), [runs]);
@@ -203,9 +215,9 @@ function ContentFarmerCard({ tier, runs, used, loading }: { tier: string; runs: 
     setBusy(true);
     try {
       await startRun("content", topic.trim().slice(0, 200));
-      toast({ title: "🤖 봇이 콘텐츠를 생성 중..." });
+      toast({ title: t("content.toastStart") });
       setTopic("");
-    } catch (e: any) { toast({ title: "실행 실패", description: e.message, variant: "destructive" }); }
+    } catch (e: any) { toast({ title: t("err.runFail"), description: e.message, variant: "destructive" }); }
     finally { setBusy(false); }
   };
 
@@ -213,14 +225,14 @@ function ContentFarmerCard({ tier, runs, used, loading }: { tier: string; runs: 
     if (!latest) return;
     try {
       const r = await claimRun(latest.id);
-      toast({ title: "✅ 수령 완료", description: `+${formatKRW(r.reward)} · 라운지 공유됨` });
+      toast({ title: t("claimed"), description: t("claimedDesc", { val: formatKRW(r.reward) }) });
       const u = (await supabase.auth.getUser()).data.user;
       if (u) await shareToLounge({
         user_id: u.id, nickname: u.user_metadata?.nickname ?? null, tier,
         kind: "content", reward: r.reward, pnl_pct: r.pnl_pct,
         output_text: latest.output_text, output_path: latest.output_path,
       });
-    } catch (e: any) { toast({ title: "오류", description: e.message, variant: "destructive" }); }
+    } catch (e: any) { toast({ title: t("err.err"), description: e.message, variant: "destructive" }); }
   };
 
   const isReady = latest?.status === "ready";
@@ -230,8 +242,8 @@ function ContentFarmerCard({ tier, runs, used, loading }: { tier: string; runs: 
   return (
     <BotCard
       icon={<Sparkles className="w-4 h-4" />}
-      title="콘텐츠 파머"
-      subtitle="오늘의 Empire 한 줄 + 이미지"
+      title={t("content.title")}
+      subtitle={t("content.subtitle")}
       accent="primary"
       reward={reward}
       used={used}
@@ -241,11 +253,11 @@ function ContentFarmerCard({ tier, runs, used, loading }: { tier: string; runs: 
         <div className="space-y-2 animate-fade-in">
           {imgUrl && (
             <div className="relative rounded-xl overflow-hidden aspect-video bg-muted">
-              <img src={imgUrl} alt="AI 생성" className="w-full h-full object-cover" loading="lazy" />
+              <img src={imgUrl} alt={t("content.imgAlt")} className="w-full h-full object-cover" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
               {isClaimed && (
                 <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-secondary/90 text-[9px] font-black text-secondary-foreground flex items-center gap-1">
-                  <Check className="w-3 h-3" /> 수령완료
+                  <Check className="w-3 h-3" /> {t("content.claimedBadge")}
                 </div>
               )}
             </div>
@@ -256,13 +268,13 @@ function ContentFarmerCard({ tier, runs, used, loading }: { tier: string; runs: 
         </div>
       )}
 
-      {isRunning && <RunningPulse label="AI가 콘텐츠 생성 중..." />}
+      {isRunning && <RunningPulse label={t("content.running")} />}
 
       <div className="space-y-2 pt-2">
         <input
           value={topic}
           onChange={e => setTopic(e.target.value)}
-          placeholder="주제 힌트 (선택, 예: 부업 동기부여)"
+          placeholder={t("content.topicPh")}
           maxLength={200}
           disabled={busy || isRunning}
           className="w-full px-3 py-2 text-xs rounded-lg bg-input/60 border border-border focus:border-primary outline-none"
@@ -273,7 +285,7 @@ function ContentFarmerCard({ tier, runs, used, loading }: { tier: string; runs: 
             disabled={busy || isRunning || used >= limit}
             onClick={run}
             icon={busy || isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
-            label={used >= limit ? "오늘 한도 소진" : isRunning ? "생성 중" : "봇 돌리기"}
+            label={used >= limit ? t("limitOver") : isRunning ? t("generating") : t("runBot")}
           />
           {isReady && (
             <ActionButton variant="gold" onClick={claim} icon={<Wallet className="w-3.5 h-3.5" />} label={`+${formatKRW(reward)}`} />
@@ -288,6 +300,7 @@ function ContentFarmerCard({ tier, runs, used, loading }: { tier: string; runs: 
    2) AI Trading Simulator Bot (8h)
    ============================================================ */
 function TradingBotCard({ tier, runs, used, loading }: { tier: string; runs: Run[]; used: number; loading: boolean }) {
+  const { t } = useTranslation("aibot");
   const limit = TIER_LIMITS[tier]?.trading ?? 1;
   const baseReward = Math.floor(BASE_REWARD.trading * (TIER_BOOST[tier] ?? 1));
   const latest = useMemo(() => runs.find(r => r.kind === "trading" && r.status !== "failed" && r.status !== "claimed"), [runs]);
@@ -323,9 +336,9 @@ function TradingBotCard({ tier, runs, used, loading }: { tier: string; runs: Run
     setBusy(true);
     try {
       await startRun("trading", hint.trim().slice(0, 200));
-      toast({ title: "📈 봇 가동 시작 — 8시간 후 정산" });
+      toast({ title: t("trading.toastStart") });
       setHint("");
-    } catch (e: any) { toast({ title: "실행 실패", description: e.message, variant: "destructive" }); }
+    } catch (e: any) { toast({ title: t("err.runFail"), description: e.message, variant: "destructive" }); }
     finally { setBusy(false); }
   };
 
@@ -334,14 +347,17 @@ function TradingBotCard({ tier, runs, used, loading }: { tier: string; runs: Run
     try {
       const r = await claimRun(latest.id);
       const sign = (r.pnl_pct ?? 0) >= 0 ? "+" : "";
-      toast({ title: `🎉 정산 완료 (${sign}${r.pnl_pct?.toFixed(2)}%)`, description: `+${formatKRW(r.reward)} · 라운지 공유됨` });
+      toast({
+        title: t("trading.toastClaim", { sign, pnl: r.pnl_pct?.toFixed(2) }),
+        description: t("claimedDesc", { val: formatKRW(r.reward) }),
+      });
       const u = (await supabase.auth.getUser()).data.user;
       if (u) await shareToLounge({
         user_id: u.id, nickname: u.user_metadata?.nickname ?? null, tier,
         kind: "trading", reward: r.reward, pnl_pct: r.pnl_pct,
         output_text: latest.output_text, output_path: latest.output_path,
       });
-    } catch (e: any) { toast({ title: "오류", description: e.message, variant: "destructive" }); }
+    } catch (e: any) { toast({ title: t("err.err"), description: e.message, variant: "destructive" }); }
   };
 
   const isReady = !!latest && progress >= 100;
@@ -350,8 +366,8 @@ function TradingBotCard({ tier, runs, used, loading }: { tier: string; runs: Run
   return (
     <BotCard
       icon={<TrendingUp className="w-4 h-4" />}
-      title="트레이딩 봇"
-      subtitle="8시간 자동 매매 시뮬"
+      title={t("trading.title")}
+      subtitle={t("trading.subtitle")}
       accent="secondary"
       reward={baseReward}
       used={used}
@@ -361,9 +377,9 @@ function TradingBotCard({ tier, runs, used, loading }: { tier: string; runs: Run
         <div className="space-y-2 animate-fade-in">
           <div className="flex items-center justify-between text-[10px]">
             <span className="text-secondary font-bold flex items-center gap-1">
-              <Flame className="w-3 h-3 animate-pulse" /> 가동 중
+              <Flame className="w-3 h-3 animate-pulse" /> {t("trading.running")}
             </span>
-            <span className="font-mono font-black text-foreground">{remaining}</span>
+            <span className="font-mono font-black text-foreground tabular-nums">{remaining}</span>
           </div>
           <div className="h-2 rounded-full bg-muted/50 overflow-hidden relative">
             <div
@@ -374,7 +390,7 @@ function TradingBotCard({ tier, runs, used, loading }: { tier: string; runs: Run
             </div>
           </div>
           <p className="text-[10px] text-muted-foreground line-clamp-2 whitespace-pre-line">
-            {latest?.output_text || "포지션 분석 중..."}
+            {latest?.output_text || t("trading.positionAnalyzing")}
           </p>
         </div>
       )}
@@ -382,15 +398,15 @@ function TradingBotCard({ tier, runs, used, loading }: { tier: string; runs: Run
       {isReady && latest && (
         <div className="space-y-2 animate-scale-in">
           <div className="rounded-xl glass-strong p-3 border border-secondary/40">
-            <div className="text-[9px] text-muted-foreground">시뮬 결과 준비됨</div>
+            <div className="text-[9px] text-muted-foreground">{t("trading.ready")}</div>
             <p className="text-[11px] mt-1 line-clamp-3 whitespace-pre-line">{latest.output_text}</p>
           </div>
         </div>
       )}
 
       {!latest && lastClaimed && (
-        <div className="text-[10px] text-muted-foreground glass rounded-lg p-2">
-          마지막 정산: {(lastClaimed.trading_pnl_pct ?? 0).toFixed(2)}% · +{formatKRW(lastClaimed.reward)}
+        <div className="text-[10px] text-muted-foreground glass rounded-lg p-2 tabular-nums">
+          {t("trading.last")}: {(lastClaimed.trading_pnl_pct ?? 0).toFixed(2)}% · +{formatKRW(lastClaimed.reward)}
         </div>
       )}
 
@@ -399,7 +415,7 @@ function TradingBotCard({ tier, runs, used, loading }: { tier: string; runs: Run
           <input
             value={hint}
             onChange={e => setHint(e.target.value)}
-            placeholder="전략 힌트 (선택, 예: 공격형)"
+            placeholder={t("trading.hintPh")}
             maxLength={200}
             disabled={busy}
             className="w-full px-3 py-2 text-xs rounded-lg bg-input/60 border border-border focus:border-secondary outline-none"
@@ -412,11 +428,11 @@ function TradingBotCard({ tier, runs, used, loading }: { tier: string; runs: Run
               disabled={busy || isRunning || used >= limit}
               onClick={run}
               icon={busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : isRunning ? <Clock className="w-3.5 h-3.5" /> : <TrendingUp className="w-3.5 h-3.5" />}
-              label={used >= limit ? "오늘 한도 소진" : isRunning ? "8시간 가동 중" : "8시간 봇 돌리기"}
+              label={used >= limit ? t("limitOver") : isRunning ? t("trading.runningLabel") : t("trading.runLabel")}
             />
           )}
           {isReady && (
-            <ActionButton variant="gold" onClick={claim} icon={<Wallet className="w-3.5 h-3.5" />} label="결과 + 보상 수령" />
+            <ActionButton variant="gold" onClick={claim} icon={<Wallet className="w-3.5 h-3.5" />} label={t("trading.claimLabel")} />
           )}
         </div>
       </div>
@@ -428,6 +444,7 @@ function TradingBotCard({ tier, runs, used, loading }: { tier: string; runs: Run
    3) AI Image Empire Maker
    ============================================================ */
 function ImageMakerCard({ tier, runs, used, loading }: { tier: string; runs: Run[]; used: number; loading: boolean }) {
+  const { t } = useTranslation("aibot");
   const limit = TIER_LIMITS[tier]?.image ?? 1;
   const reward = Math.floor(BASE_REWARD.image * (TIER_BOOST[tier] ?? 1));
   const latest = useMemo(() => runs.find(r => r.kind === "image" && r.status !== "failed"), [runs]);
@@ -436,10 +453,10 @@ function ImageMakerCard({ tier, runs, used, loading }: { tier: string; runs: Run
   const [imgUrl, setImgUrl] = useState<string | null>(null);
 
   const presets = [
-    "Cyber Empire CEO 스타일의 나",
-    "미래의 내 람보르기니 + 네온 도시",
-    "Empire Lounge 파티의 주인공",
-    "황금 옥상 펜트하우스 야경",
+    t("image.preset1"),
+    t("image.preset2"),
+    t("image.preset3"),
+    t("image.preset4"),
   ];
 
   useEffect(() => {
@@ -447,13 +464,13 @@ function ImageMakerCard({ tier, runs, used, loading }: { tier: string; runs: Run
   }, [latest?.output_path]);
 
   const run = async () => {
-    if (!prompt.trim()) { toast({ title: "프롬프트 입력", variant: "destructive" }); return; }
+    if (!prompt.trim()) { toast({ title: t("image.promptReq"), variant: "destructive" }); return; }
     setBusy(true);
     try {
       await startRun("image", prompt.trim().slice(0, 500));
-      toast({ title: "🎨 이미지 생성 중..." });
+      toast({ title: t("image.toastStart") });
       setPrompt("");
-    } catch (e: any) { toast({ title: "실행 실패", description: e.message, variant: "destructive" }); }
+    } catch (e: any) { toast({ title: t("err.runFail"), description: e.message, variant: "destructive" }); }
     finally { setBusy(false); }
   };
 
@@ -461,14 +478,14 @@ function ImageMakerCard({ tier, runs, used, loading }: { tier: string; runs: Run
     if (!latest) return;
     try {
       const r = await claimRun(latest.id);
-      toast({ title: "✅ 수령 완료", description: `+${formatKRW(r.reward)} · 라운지 공유됨` });
+      toast({ title: t("claimed"), description: t("claimedDesc", { val: formatKRW(r.reward) }) });
       const u = (await supabase.auth.getUser()).data.user;
       if (u) await shareToLounge({
         user_id: u.id, nickname: u.user_metadata?.nickname ?? null, tier,
         kind: "image", reward: r.reward, pnl_pct: r.pnl_pct,
         output_text: latest.output_text, output_path: latest.output_path,
       });
-    } catch (e: any) { toast({ title: "오류", description: e.message, variant: "destructive" }); }
+    } catch (e: any) { toast({ title: t("err.err"), description: e.message, variant: "destructive" }); }
   };
 
   const isReady = latest?.status === "ready";
@@ -478,8 +495,8 @@ function ImageMakerCard({ tier, runs, used, loading }: { tier: string; runs: Run
   return (
     <BotCard
       icon={<ImageIcon className="w-4 h-4" />}
-      title="이미지 메이커"
-      subtitle="나를 Empire CEO로 만들기"
+      title={t("image.title")}
+      subtitle={t("image.subtitle")}
       accent="accent"
       reward={reward}
       used={used}
@@ -487,22 +504,22 @@ function ImageMakerCard({ tier, runs, used, loading }: { tier: string; runs: Run
     >
       {(isReady || isClaimed) && imgUrl && (
         <div className="relative rounded-xl overflow-hidden aspect-square bg-muted animate-scale-in">
-          <img src={imgUrl} alt="AI 생성" className="w-full h-full object-cover" loading="lazy" />
+          <img src={imgUrl} alt={t("image.imgAlt")} className="w-full h-full object-cover" loading="lazy" />
           {isClaimed && (
             <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-secondary/90 text-[9px] font-black flex items-center gap-1">
-              <Check className="w-3 h-3" /> 완료
+              <Check className="w-3 h-3" /> {t("image.doneBadge")}
             </div>
           )}
         </div>
       )}
 
-      {isRunning && <RunningPulse label="Nano Banana로 이미지 생성 중..." />}
+      {isRunning && <RunningPulse label={t("image.running")} />}
 
       <div className="space-y-2 pt-2">
         <textarea
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
-          placeholder="원하는 이미지를 한국어로..."
+          placeholder={t("image.promptPh")}
           rows={2}
           maxLength={500}
           disabled={busy || isRunning}
@@ -522,7 +539,7 @@ function ImageMakerCard({ tier, runs, used, loading }: { tier: string; runs: Run
             disabled={busy || isRunning || used >= limit}
             onClick={run}
             icon={busy || isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-            label={used >= limit ? "오늘 한도 소진" : isRunning ? "생성 중" : "AI 이미지 생성"}
+            label={used >= limit ? t("limitOver") : isRunning ? t("generating") : t("image.runLabel")}
           />
           {isReady && (
             <ActionButton variant="gold" onClick={claim} icon={<Wallet className="w-3.5 h-3.5" />} label={`+${formatKRW(reward)}`} />
@@ -534,13 +551,14 @@ function ImageMakerCard({ tier, runs, used, loading }: { tier: string; runs: Run
 }
 
 /* ============================================================
-   공용 UI 컴포넌트들
+   shared UI primitives
    ============================================================ */
 function BotCard({ icon, title, subtitle, accent, reward, used, limit, children }: {
   icon: React.ReactNode; title: string; subtitle: string;
   accent: "primary" | "secondary" | "accent"; reward: number; used: number; limit: number;
   children: React.ReactNode;
 }) {
+  const { t } = useTranslation("aibot");
   const accentRing = {
     primary: "hover:shadow-[0_0_30px_-5px_hsl(var(--primary)/0.5)] from-primary/20",
     secondary: "hover:shadow-[0_0_30px_-5px_hsl(var(--secondary)/0.5)] from-secondary/20",
@@ -562,19 +580,19 @@ function BotCard({ icon, title, subtitle, accent, reward, used, limit, children 
               {icon}
             </div>
             <div>
-              <h3 className="font-display font-black text-sm leading-tight">{title}</h3>
-              <p className="text-[10px] text-muted-foreground">{subtitle}</p>
+              <h3 className="font-display font-black text-sm leading-tight break-keep">{title}</h3>
+              <p className="text-[10px] text-muted-foreground break-keep">{subtitle}</p>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-[9px] text-muted-foreground">기본 보상</div>
-            <div className="font-display font-black text-xs text-gold">+{formatKRW(reward)}</div>
+            <div className="text-[9px] text-muted-foreground">{t("baseReward")}</div>
+            <div className="font-display font-black text-xs text-gold tabular-nums">+{formatKRW(reward)}</div>
           </div>
         </div>
 
         <div className="flex items-center justify-between text-[10px]">
-          <span className="text-muted-foreground">오늘 사용</span>
-          <span className={`font-bold ${exhausted ? "text-destructive" : "text-foreground"}`}>{used}/{limit}</span>
+          <span className="text-muted-foreground">{t("todayUsed")}</span>
+          <span className={`font-bold tabular-nums ${exhausted ? "text-destructive" : "text-foreground"}`}>{used}/{limit}</span>
         </div>
         <div className="h-1 rounded-full bg-muted/40 overflow-hidden">
           <div className={`h-full transition-all ${exhausted ? "bg-destructive" : "bg-gradient-to-r from-primary via-accent to-secondary"}`}
@@ -599,7 +617,7 @@ function ActionButton({ variant, disabled, onClick, icon, label }: {
   }[variant];
   return (
     <button onClick={onClick} disabled={disabled}
-      className={`flex-1 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 ${cls}`}>
+      className={`flex-1 min-h-[44px] py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 break-keep ${cls}`}>
       {icon}{label}
     </button>
   );
@@ -609,15 +627,16 @@ function RunningPulse({ label }: { label: string }) {
   return (
     <div className="rounded-xl glass p-3 flex items-center gap-3 animate-pulse">
       <Loader2 className="w-4 h-4 animate-spin text-primary" />
-      <span className="text-[11px] text-muted-foreground">{label}</span>
+      <span className="text-[11px] text-muted-foreground break-keep">{label}</span>
     </div>
   );
 }
 
 /* ============================================================
-   대시보드용 미니 요약
+   compact dashboard summary
    ============================================================ */
 export function ActiveBotsMini() {
+  const { t } = useTranslation("aibot");
   const [db] = useDB();
   const [count, setCount] = useState({ running: 0, ready: 0 });
 
@@ -653,9 +672,9 @@ export function ActiveBotsMini() {
           <Bot className="w-5 h-5 text-primary-foreground" />
         </div>
         <div className="flex-1">
-          <div className="text-[10px] text-muted-foreground">AI 봇 활동 중</div>
-          <div className="text-sm font-display font-black">
-            가동 {count.running} · <span className="text-secondary">수령대기 {count.ready}</span>
+          <div className="text-[10px] text-muted-foreground">{t("mini.active")}</div>
+          <div className="text-sm font-display font-black tabular-nums">
+            {t("mini.running", { n: count.running })} · <span className="text-secondary">{t("mini.ready", { n: count.ready })}</span>
           </div>
         </div>
         <RefreshCw className="w-4 h-4 text-muted-foreground" />
