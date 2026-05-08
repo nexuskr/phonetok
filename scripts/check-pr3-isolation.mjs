@@ -160,13 +160,21 @@ function main() {
     const raw = fs.readFileSync(file, "utf8");
     const stripped = isSql(file) ? stripSqlComments(raw) : stripJsComments(raw);
 
-    // GLOBAL
-    for (const rule of GLOBAL_RULES) {
+    // GLOBAL — universal (every file)
+    for (const rule of GLOBAL_RULES_UNIVERSAL) {
       const hit = locate(stripped, rule.re);
       if (hit) flag(path.relative(ROOT, file), rule.name, hit);
     }
 
-    // PR3-scoped
+    // GLOBAL — non-migration only
+    if (!isMigration(file)) {
+      for (const rule of GLOBAL_RULES_NON_MIGRATION) {
+        const hit = locate(stripped, rule.re);
+        if (hit) flag(path.relative(ROOT, file), rule.name, hit);
+      }
+    }
+
+    // PR3-scoped (verification firewall code path)
     if (isPr3Scoped(file)) {
       for (const rule of [...PR3_TOKEN_RULES, ...PR3_TABLE_RULES]) {
         const hit = locate(stripped, rule.re);
