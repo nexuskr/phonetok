@@ -186,7 +186,59 @@ export default function Trust() {
           </div>
         </section>
 
-        <section className="mt-12 glass-strong rounded-3xl p-6 border border-primary/20 text-xs text-muted-foreground leading-relaxed">
+        {/* 90-day heatmap + Chaos */}
+        <section className="mt-6 grid md:grid-cols-3 gap-4">
+          <div className="md:col-span-2 glass-strong rounded-3xl p-6 border border-primary/20">
+            <div className="flex items-center justify-between mb-3">
+              <div className="font-display font-black text-base">90일 가동률 히트맵</div>
+              <div className="text-[10px] text-muted-foreground">하루당 1셀 · 외부 핑 기준</div>
+            </div>
+            <div className="grid grid-cols-[repeat(30,minmax(0,1fr))] sm:grid-cols-[repeat(45,minmax(0,1fr))] md:grid-cols-[repeat(90,minmax(0,1fr))] gap-[2px]">
+              {heat.map((d) => {
+                const r = d.success_rate;
+                const cls = d.samples === 0 ? "bg-muted/30"
+                  : r === null ? "bg-muted/30"
+                  : r >= 99.5 ? "bg-secondary/80"
+                  : r >= 95 ? "bg-secondary/40"
+                  : r >= 80 ? "bg-gold/60"
+                  : "bg-destructive/70";
+                return (
+                  <div key={d.date} className={`aspect-square rounded-[2px] ${cls}`}
+                    title={`${d.date} · ${d.samples} 샘플 · ${r === null ? "—" : `${r.toFixed(1)}%`}`}
+                  />
+                );
+              })}
+            </div>
+            <div className="mt-3 flex items-center gap-3 text-[10px] text-muted-foreground">
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-secondary/80" /> ≥99.5%</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-secondary/40" /> ≥95%</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-gold/60" /> ≥80%</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-destructive/70" /> &lt;80%</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-muted/30" /> 데이터 없음</span>
+            </div>
+          </div>
+
+          <div className="glass-strong rounded-3xl p-6 border border-gold/20">
+            <div className="font-display font-black text-base mb-2">최근 카오스 드릴</div>
+            {!chaos ? (
+              <div className="text-xs text-muted-foreground">아직 기록된 드릴이 없습니다.</div>
+            ) : (
+              <>
+                <div className={`text-3xl font-display font-black tabular-nums ${chaos.failed === 0 ? "text-secondary" : "text-destructive"}`}>
+                  {chaos.passed}/{chaos.total_probes}
+                </div>
+                <div className="text-[10px] text-muted-foreground mt-1">
+                  {chaos.pass_rate?.toFixed(1) ?? "—"}% PASS · {Math.round((chaos.duration_ms ?? 0) / 1000)}s
+                </div>
+                <div className="mt-3 text-xs">
+                  실행: {new Date(chaos.ran_at).toLocaleString("ko-KR")}
+                </div>
+                <div className="mt-1 text-[10px] text-muted-foreground">소스: {chaos.source}</div>
+              </>
+            )}
+          </div>
+        </section>
+
           <div className="font-display font-black text-base text-foreground mb-2">우리의 약속</div>
           <ul className="space-y-1 list-disc list-inside">
             <li>모든 정산은 자동화된 cron이 매일 실행하며, 실패 시 자동 복구가 시도됩니다.</li>
