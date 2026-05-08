@@ -68,20 +68,22 @@ export default function Trust() {
     setError(null);
     try {
       const sb: any = supabase;
-      const [{ data: md }, { data: ud }, { data: hd }, { data: cd }, { data: histD }, { data: asD }] = await Promise.all([
+      const [{ data: md }, { data: ud }, { data: hd }, { data: cd }, { data: histD }] = await Promise.all([
         sb.rpc("public_trust_metrics"),
         sb.rpc("public_uptime_summary"),
         sb.rpc("public_uptime_heatmap_90d"),
         sb.rpc("latest_chaos_run"),
         sb.rpc("public_trust_history", { _days: historyDays }),
-        sb.rpc("policy_assertions_status"),
       ]);
       setM((md as Metrics) ?? null);
       setU((ud as unknown as UptimeSummary) ?? null);
       setHeat(((hd as any)?.days ?? []) as HeatmapDay[]);
       setChaos((cd as ChaosLatest) ?? null);
       setHistory((histD as HistoryRow[]) ?? []);
-      setAssertStatus((asD as AssertionStatus) ?? null);
+      // admin 전용 — 실패는 조용히 무시
+      sb.rpc("policy_assertions_status").then(({ data, error: e }: any) => {
+        if (!e) setAssertStatus((data as AssertionStatus) ?? null);
+      });
     } catch (e: any) {
       setError(e?.message ?? "데이터 로드 실패");
     } finally {
