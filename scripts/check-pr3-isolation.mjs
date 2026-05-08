@@ -84,8 +84,8 @@ function isMigration(file) {
 }
 
 // GLOBAL rules — apply to non-migration files only.
-// `signals_initial_locked` is the one rule that stays universal:
-// the column was deliberately removed and must never resurface anywhere.
+// Catches both SQL syntax (UPDATE foo) and Supabase JS client syntax
+// (.from('foo').update(...) / .delete() / .insert()).
 const GLOBAL_RULES_NON_MIGRATION = [
   {
     name: "no-update-verification-log",
@@ -106,6 +106,15 @@ const GLOBAL_RULES_NON_MIGRATION = [
   {
     name: "no-direct-circuit-delete",
     re: /\bDELETE\s+FROM\s+(?:public\.)?viral_ai_circuit_state\b/i,
+  },
+  // Supabase JS client mutations
+  {
+    name: "js-mutate-verification-log",
+    re: /\.from\(\s*['"`]viral_verification_log['"`]\s*\)[\s\S]{0,200}?\.(update|delete|upsert)\s*\(/i,
+  },
+  {
+    name: "js-mutate-circuit-state",
+    re: /\.from\(\s*['"`]viral_ai_circuit_state['"`]\s*\)[\s\S]{0,200}?\.(update|delete|insert|upsert)\s*\(/i,
   },
 ];
 const GLOBAL_RULES_UNIVERSAL = [
