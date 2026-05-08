@@ -1309,7 +1309,7 @@ const resources = {
       treasury: { title: "TREASURY", tagline: "Balance · Deposit · Withdraw · History",
         wallet: "Wallet", deposit: "Deposit", withdraw: "Withdraw", history: "History", settlements: "Settlements" },
       legacy: { title: "LEGACY", tagline: "What you build — stays forever",
-        ranking: "Ranking", achievements: "Achievements", referral: "Referral" },
+        ranking: "Ranking", achievements: "Achievements", referral: "Referral", ugc: "UGC stats" },
     },
     auth: {
       secureV3: "SECURE • V3",
