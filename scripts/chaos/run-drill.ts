@@ -27,6 +27,7 @@ if (!SUPABASE_URL || !ANON_KEY) {
 
 type Result = { name: string; pass: boolean; detail: string };
 const results: Result[] = [];
+(globalThis as any).__chaosStartMs = Date.now();
 
 function add(name: string, pass: boolean, detail: string) {
   results.push({ name, pass, detail });
