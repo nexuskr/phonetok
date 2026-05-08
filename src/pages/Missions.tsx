@@ -188,11 +188,11 @@ export default function Missions() {
     if (jp) {
       setJackpotWin(jp);
     } else if (won) {
-      const momentumBadge = db.momentum >= 2 ? ` · 🔥 ${db.momentum + 1}연승!` : "";
+      const momentumBadge = db.momentum >= 2 ? ` · ${t("streakBadge", { n: db.momentum + 1 })}` : "";
       emitEarned(baseReward);
       toast({ title: `🎉 +${formatKRW(baseReward)}${momentumBadge}`, description: m.title });
     } else {
-      toast({ title: "아쉬워요! (보상 없음)", description: FAIL_MSGS[Math.floor(Math.random() * FAIL_MSGS.length)] });
+      toast({ title: t("failTitle"), description: FAIL_MSGS[Math.floor(Math.random() * FAIL_MSGS.length)] });
     }
     setGameOpen(null);
   }
