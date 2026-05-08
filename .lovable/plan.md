@@ -1,133 +1,290 @@
+## PR3 v6 — One-Shot Forensic Migration Bundle
 
-# Phonara Viral Pack v3.3 — PR1 최종 LOCK
-
-v3.2 → v3.3 변경: UX 문구 5%만 잠금. 구조는 동결.
-
----
-
-## 0. v3.3 LOCK 수정 (2개)
-
-### LOCK-1. RRM OFF 시 사용자 문구 (구조 외재화)
-
-**문구 원칙**: "정책 때문에 막힘" 해석 차단 → "원래 구조적으로 포함되지 않음"
-
-| 위치 | ❌ 폐기 | ✅ 채택 |
-|------|--------|---------|
-| `FinancialEventStatus` (RRM OFF) | "현재 정책에서는 M2 단계가 인센티브 대상이 아닙니다" | **"M2 단계는 현재 인센티브 프로그램에 포함되지 않습니다"** |
-| 보조 표현 | — | "M2 단계는 인센티브 대상이 아닌 이벤트입니다" |
-| 어드민 toggle 영향 안내 | "사용자에게 보류로 표시됨" | "사용자에게는 프로그램 비포함 이벤트로 표시됨" |
-
-**공통 금지어** (사용자 표면 전체): 정책 때문에 / 막힘 / 보류 / 잠금 / 차단 / 미지급 / 지연 / 큐 / 대기 / 예약
-
-i18n 등록 + `scripts/check-forbidden-phrases.mjs`에 위 단어 추가.
-
-### LOCK-2. Activity Index 라벨 → "내 활동"
-
-**Index/Score 어휘 전면 제거** (점수·평가·성과 해석 차단).
-
-| 항목 | ❌ 폐기 | ✅ 채택 |
-|------|--------|---------|
-| 사용자 라벨 | "내 활동 지수 / Activity Index" | **"내 활동 (7일)"** 또는 **"최근 추천 활동"** |
-| 컴포넌트명 (코드) | `ActivityIndexCard` | `RecentReferralActivityCard` |
-| Edge function | `recompute-activity-index` | `recompute-recent-activity` |
-| DB 컬럼/메트릭 키 | `activity_index` | `recent_activity_count_7d` |
-
-표시는 단순 정수 (예: "최근 7일 활동 3건"). 진행률 바·등급·티어 결합 절대 금지.
+단일 atomic migration + edge patch + CI 갱신. 부분 실행 금지.
 
 ---
 
-## 1. 최종 스키마 (v3.3, 변경분만)
+### STEP 1 — `viral_verification_log` 이중 권위 제거 (Fix 1)
 
-```text
-viral_settings
-├─ revenue_recognition_enabled  bool default true
-├─ rrm_no_retroactive_payout    bool default true   [DB 잠금]
-├─ rrm_disabled_reason          text
-├─ rrm_last_toggled_at/by
+```sql
+-- legacy dual authority 제거
+ALTER TABLE viral_verification_log
+  DROP CONSTRAINT IF EXISTS signals_initial_locked_chk;
+ALTER TABLE viral_verification_log
+  DROP COLUMN IF EXISTS signals_initial_locked;
 
-viral_attribution_chain
-├─ depth  smallint  CHECK (depth = 1)
-├─ status text  ('clicked'|'signed_up'|'activated'|'paying'|'churned')
-└─ window_expires_at  timestamptz (created_at + 90d)
+-- shape guard (INSERT only)
+CREATE OR REPLACE FUNCTION guard_signals_initial_shape()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  allowed_keys text[] := ARRAY['rules_fired','risk_score','model_version','decided_at'];
+  k text;
+BEGIN
+  IF NEW.signals_initial IS NULL OR jsonb_typeof(NEW.signals_initial) <> 'object' THEN
+    RAISE EXCEPTION 'signals_initial must be jsonb object';
+  END IF;
+  FOR k IN SELECT jsonb_object_keys(NEW.signals_initial) LOOP
+    IF NOT (k = ANY(allowed_keys)) THEN
+      RAISE EXCEPTION 'invalid key in signals_initial: %', k;
+    END IF;
+  END LOOP;
+  RETURN NEW;
+END $$;
 
-viral_mission_catalog
-├─ milestone_bonuses           jsonb
-└─ lifetime_cap_per_invitee    bigint default 30000
+-- absolute immutability (UPDATE/DELETE 차단)
+CREATE OR REPLACE FUNCTION guard_verification_log_immutable()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  RAISE EXCEPTION 'viral_verification_log is write-once immutable';
+END $$;
 
-viral_mission_submissions
-├─ entitlement_status          text  ('not_eligible'|'eligible'|'paid')
-├─ milestones_paid             jsonb
-└─ total_bonus_paid            bigint default 0
+DROP TRIGGER IF EXISTS trg_vvl_immutable ON viral_verification_log;
+CREATE TRIGGER trg_vvl_immutable
+  BEFORE UPDATE OR DELETE ON viral_verification_log
+  FOR EACH ROW EXECUTE FUNCTION guard_verification_log_immutable();
 
-viral_proof_dedupe              [proof_hash UNIQUE]
-admin_attribution_internal      [admin-only CAC/LTV/Quality]
+DROP TRIGGER IF EXISTS trg_vvl_signals_initial ON viral_verification_log;
+CREATE TRIGGER trg_vvl_signals_initial
+  BEFORE INSERT ON viral_verification_log
+  FOR EACH ROW EXECUTE FUNCTION guard_signals_initial_shape();
 ```
 
-## 2. Edge Functions
+---
 
+### STEP 2 — AI Circuit 직렬화 상태 머신 (Fix 2)
+
+```sql
+CREATE TABLE IF NOT EXISTS viral_ai_circuit_state (
+  id smallint PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+  state text NOT NULL DEFAULT 'closed'
+    CHECK (state IN ('closed','open','half_open')),
+  opened_at timestamptz,
+  last_evaluated_at timestamptz DEFAULT now(),
+  reason text
+);
+INSERT INTO viral_ai_circuit_state (id) VALUES (1) ON CONFLICT DO NOTHING;
+ALTER TABLE viral_ai_circuit_state ENABLE ROW LEVEL SECURITY;
+
+-- 유일한 write 진입점 (advisory lock + FOR UPDATE + 유효 전이 그래프)
+CREATE OR REPLACE FUNCTION transition_ai_circuit(
+  _new_state text, _reason text, _meta jsonb DEFAULT '{}'::jsonb
+) RETURNS viral_ai_circuit_state
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE rec viral_ai_circuit_state;
+BEGIN
+  PERFORM set_config('app.circuit_rpc','on', true);
+  PERFORM pg_advisory_xact_lock(8821736401);
+
+  SELECT * INTO rec FROM viral_ai_circuit_state WHERE id = 1 FOR UPDATE;
+
+  IF NOT (
+    (rec.state = 'closed'    AND _new_state = 'open')
+ OR (rec.state = 'open'      AND _new_state = 'half_open')
+ OR (rec.state = 'half_open' AND _new_state IN ('closed','open'))
+ OR (rec.state = _new_state)
+  ) THEN
+    RAISE EXCEPTION 'invalid circuit transition % -> %', rec.state, _new_state;
+  END IF;
+
+  UPDATE viral_ai_circuit_state
+     SET state = _new_state,
+         opened_at = CASE WHEN _new_state='open' THEN now() ELSE opened_at END,
+         last_evaluated_at = now(),
+         reason = _reason
+   WHERE id = 1
+   RETURNING * INTO rec;
+
+  INSERT INTO viral_verification_events (submission_id, event_type, signals_raw)
+  VALUES (NULL, 'ai_circuit_transition',
+          jsonb_build_object('to', _new_state, 'reason', _reason, 'meta', _meta));
+  RETURN rec;
+END $$;
+
+REVOKE ALL ON FUNCTION transition_ai_circuit(text,text,jsonb) FROM public, authenticated, anon;
+GRANT EXECUTE ON FUNCTION transition_ai_circuit(text,text,jsonb) TO service_role;
+
+-- 직접 write 차단 (RPC 진입 시 session var로 우회)
+CREATE OR REPLACE FUNCTION guard_no_direct_circuit_write()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF current_setting('app.circuit_rpc', true) IS DISTINCT FROM 'on' THEN
+    RAISE EXCEPTION 'direct circuit mutation forbidden — use transition_ai_circuit()';
+  END IF;
+  RETURN COALESCE(NEW, OLD);
+END $$;
+
+DROP TRIGGER IF EXISTS trg_circuit_block ON viral_ai_circuit_state;
+CREATE TRIGGER trg_circuit_block
+  BEFORE INSERT OR UPDATE OR DELETE ON viral_ai_circuit_state
+  FOR EACH ROW EXECUTE FUNCTION guard_no_direct_circuit_write();
 ```
-attribute-click             공개, anon_id + depth=1 chain 생성
-settle-milestone-bonus      M1·M4 항상; M2·M3 RRM=ON일 때만 entitlement
-                            RRM=OFF 시 entitlement_status='not_eligible'로 기록만 (채무 X)
-recompute-recent-activity   cron 1h, 사용자 노출 "최근 7일 활동" 카운트
-recompute-economics         cron 1h, admin-only CAC/LTV/Quality
-verify-viral-proof          플랫폼별 증빙
-generate-viral-copy         Lovable AI Gateway + 금지문구 필터
-toggle-rrm                  admin-only + audit log
+
+---
+
+### STEP 3 — Audit dual-write (Fix 3, Phase A+B+C)
+
+```sql
+-- v2 partitioned canonical
+CREATE TABLE viral_settlement_audit_v2 (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  submission_id uuid NOT NULL,
+  event_type text NOT NULL,
+  actor text NOT NULL,
+  details jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (id, created_at)
+) PARTITION BY RANGE (created_at);
+
+CREATE TABLE viral_settlement_audit_v2_2026_05
+  PARTITION OF viral_settlement_audit_v2
+  FOR VALUES FROM ('2026-05-01') TO ('2026-06-01');
+CREATE TABLE viral_settlement_audit_v2_2026_06
+  PARTITION OF viral_settlement_audit_v2
+  FOR VALUES FROM ('2026-06-01') TO ('2026-07-01');
+
+ALTER TABLE viral_settlement_audit_v2 ENABLE ROW LEVEL SECURITY;
+
+-- 미래 파티션 자동 보장
+CREATE OR REPLACE FUNCTION ensure_settlement_audit_partition(_when timestamptz DEFAULT now())
+RETURNS void LANGUAGE plpgsql AS $$
+DECLARE
+  start_d date := date_trunc('month', _when)::date;
+  end_d   date := (date_trunc('month', _when) + interval '1 month')::date;
+  pname text := format('viral_settlement_audit_v2_%s', to_char(start_d,'YYYY_MM'));
+BEGIN
+  EXECUTE format(
+    'CREATE TABLE IF NOT EXISTS %I PARTITION OF viral_settlement_audit_v2 FOR VALUES FROM (%L) TO (%L)',
+    pname, start_d, end_d);
+END $$;
+
+-- dual-write trigger
+CREATE OR REPLACE FUNCTION audit_dualwrite()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  INSERT INTO viral_settlement_audit_v2
+    (id, submission_id, event_type, actor, details, created_at)
+  VALUES
+    (NEW.id, NEW.submission_id, NEW.event_type, NEW.actor, NEW.details, NEW.created_at)
+  ON CONFLICT DO NOTHING;
+  RETURN NEW;
+END $$;
+
+DROP TRIGGER IF EXISTS trg_audit_dualwrite ON viral_settlement_audit;
+CREATE TRIGGER trg_audit_dualwrite
+  AFTER INSERT ON viral_settlement_audit
+  FOR EACH ROW EXECUTE FUNCTION audit_dualwrite();
+
+-- backfill (idempotent)
+INSERT INTO viral_settlement_audit_v2 (id, submission_id, event_type, actor, details, created_at)
+SELECT id, submission_id, event_type, actor, details, created_at
+FROM viral_settlement_audit
+ON CONFLICT DO NOTHING;
+
+-- diff assertion
+CREATE OR REPLACE FUNCTION assert_audit_sync()
+RETURNS void LANGUAGE plpgsql AS $$
+DECLARE diff int;
+BEGIN
+  SELECT abs(
+    (SELECT count(*) FROM viral_settlement_audit) -
+    (SELECT count(*) FROM viral_settlement_audit_v2)
+  ) INTO diff;
+  IF diff <> 0 THEN
+    RAISE EXCEPTION 'audit mismatch (diff=%)', diff;
+  END IF;
+END $$;
 ```
 
-## 3. 사용자 UX (`/viral`)
+> **Note**: cutover (legacy → v2 rename)는 별도 운영 윈도우에서 `LOCK TABLE ACCESS EXCLUSIVE` + `assert_audit_sync()` + RENAME 으로 수행. 본 번들에는 cutover 자동화는 포함하지 않는다 (수동 컨트롤 유지).
 
+---
+
+### STEP 4 — `verify-submission` edge function 패치
+
+```ts
+// supabase/functions/verify-submission/index.ts (요점)
+const { data: circuit } = await admin
+  .from('viral_ai_circuit_state').select('*').eq('id', 1).single();
+
+// 1. RULE FIRST — 항상 deterministic
+const { data: rule } = await admin.rpc('rule_verify_submission', { p_submission_id: submissionId });
+
+// 2. AI OPTIONAL — circuit open이면 skip
+let ai_outcome: 'observed' | 'fallback_rule_only' | 'circuit_open' | 'skipped' = 'skipped';
+if (circuit.state === 'open') {
+  ai_outcome = 'circuit_open';
+} else {
+  try {
+    const ai = await callBoundedAI(payload); // strict enum + range guard
+    if (ai.drift) {
+      await admin.from('viral_verification_events').insert({
+        submission_id: submissionId, event_type: 'ai_drift_alert',
+        signals_raw: { reason: ai.driftReason }
+      });
+      ai_outcome = 'fallback_rule_only';
+    } else {
+      await admin.from('viral_verification_events').insert({
+        submission_id: submissionId, event_type: 'ai_signal',
+        signals_raw: ai.raw
+      });
+      ai_outcome = 'observed';
+    }
+  } catch (e) {
+    await admin.from('viral_verification_events').insert({
+      submission_id: submissionId, event_type: 'ai_error',
+      signals_raw: { message: String(e).slice(0, 500) }
+    });
+    ai_outcome = 'fallback_rule_only';
+  }
+}
+
+// verdict는 100% rule
+return new Response(JSON.stringify({
+  verdict: rule.status,        // VALID | INVALID | SUSPECT
+  ai_outcome,
+}), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 ```
-IncentiveSummary           누적 인센티브, 가입 인원
-RecentReferralActivityCard "최근 7일 활동 N건"  (정수만, 등급·진행률 X)
-─ 행동 기반 인센티브 ─
-BehaviorMilestones         M1 (가입 활성화) · M4 (30일 유지)
-─ 금융 이벤트 상태 ─
-FinancialEventStatus       M2 / M3 — 상태 표시만, 금액 X
-                           RRM ON:  "이 이벤트는 인센티브 프로그램에 포함됩니다"
-                           RRM OFF: "M2 단계는 현재 인센티브 프로그램에 포함되지 않습니다"
-PlatformGrid · MissionDeck · ProofUploader · ViralComposer
-IncentiveDisclosure        1단계 한정 고지 (항시)
-```
 
-## 4. 어드민 UX (`/admin/viral`)
+`evaluate-ai-circuit` 와 half_open trial 경로는 모두 `admin.rpc('transition_ai_circuit', ...)` 호출만 사용. 직접 UPDATE 금지.
 
-- `RRMToggle` (사유 필수, audit log)
-- `EconomicsBoard` — CAC/LTV/Quality/funnel
-- `AttributionInspector`
-- `MLMShield` — depth>1 시도 로그
-- `NoEntitlementLedger` — RRM OFF 동안 발생한 M2·M3 회계 기록 (지급 큐 아님, 소급 지급 버튼 없음)
+---
 
-## 5. PR 순서 (5개, 변경 없음)
+### STEP 5 — CI 차단 룰 추가 (`scripts/check-pr3-isolation.mjs`)
 
-1. **PR1 — Compliance Foundation**
-   `viral_settings`(RRM 잠금), `viral_attribution_chain`(depth CHECK + 트리거),
-   `viral_proof_dedupe`, RLS, `IncentiveDisclosure`, 금지어 사전 확장
-2. **PR2 — Milestone Engine + RRM**
-   catalog/submissions(`entitlement_status`), `attribute-click`,
-   `settle-milestone-bonus`(소급 지급 금지), `toggle-rrm`, 40개 시드
-3. **PR3 — Verification + AI**
-   `verify-viral-proof`, `generate-viral-copy`(금지문구 필터)
-4. **PR4 — User Surface**
-   `IncentiveSummary` · `RecentReferralActivityCard` · `BehaviorMilestones` ·
-   `FinancialEventStatus` · `PlatformGrid` · `MissionDeck` · `ProofUploader` ·
-   `ViralComposer`, `recompute-recent-activity` cron
-5. **PR5 — Admin Economics + MLM Shield**
-   `RRMToggle` · `EconomicsBoard` · `AttributionInspector` · `MLMShield` ·
-   `NoEntitlementLedger`, `recompute-economics` cron
+차단 패턴:
+- `UPDATE\s+viral_verification_log` / `DELETE\s+FROM\s+viral_verification_log`
+- migration/edge에서 `viral_ai_circuit_state` 직접 `INSERT|UPDATE|DELETE` (단, `transition_ai_circuit` 정의부 예외)
+- `verify-submission` 내 `viral_mission_catalog` SELECT
+- AI prompt 문자열에 `reward|value|credit|ltv|revenue|payout|amount` 토큰 등장
+- `signals_initial_locked` 컬럼 재도입
+- `viral_verification_context_v` 의 `CREATE VIEW` SQL에 JOIN 포함
 
-## 6. 잠금 원칙 (4개)
+GitHub Action: PR마다 SQL/TS AST 파싱 후 위반 시 fail.
 
-1. **권리 미생성**: RRM OFF 시 entitlement *애초에 미생성*. 채무/보류/큐 어휘 금지.
-2. **소급 금지**: `rrm_no_retroactive_payout=true` DB 잠금. 어드민 토글 불가.
-3. **활동 카운트 한정**: 최근 7일 활동은 *정수 카운트*일 뿐. 점수/등급/경제 계산 결합 금지.
-4. **이벤트 분리**: 금융 이벤트(M2·M3) UI는 상태 표시만. 보상 어휘·금액·진행률 노출 금지.
+---
 
-## 7. 본질 정의 (최종 LOCK)
+### 최종 시스템 상태
 
-> "조건 미충족 상태를 명시적으로 기록하는, 행동 기반 예산 고정 인센티브 엔진"
+| Layer | 상태 |
+|---|---|
+| `viral_verification_log` | write-once ledger (trigger-only authority) |
+| `viral_verification_events` | append-only raw telemetry |
+| AI circuit | serialized FSM, 단일 RPC 진입점 |
+| `viral_settlement_log` | idempotency PK |
+| `viral_settlement_audit` → v2 | dual-write + 월별 파티션 |
+| verdict | 100% deterministic rule |
+| AI | observation only, circuit-bounded |
 
-**상태**: ✅ 기술 안정 / ✅ 데이터 안정 / ✅ UX 분리 / ✅ 규제 표현 잠금 — PR1 진입 가능.
+### Out of scope (재확인)
+보상 재계산 / LTV·ARPU / RRM 정책 / user-facing risk_score / AI verdict 권한 / PR2 reward logic / cutover 자동화 / 콜드 스토리지 export.
 
-PR1부터 시작할까요?
+### 적용 순서
+1. STEP 1~3 단일 migration 번들로 실행 (atomic)
+2. STEP 4 edge function 배포 (자동)
+3. STEP 5 CI 룰 머지
+4. 운영 윈도우에서 audit cutover 수동 수행
+
+### 한 줄 정의
+> **mutationless, AI-bounded, circuit-controlled forensic substrate — verification은 deterministic, AI는 observational, settlement는 strictly idempotent.**
+
+승인하면 STEP 1~3 단일 migration부터 실행한다.
