@@ -24,9 +24,10 @@ import AMLAdmin from "@/components/admin/AMLAdmin";
 import MissionTemplatesAdmin from "@/components/admin/MissionTemplatesAdmin";
 import LeaderboardPayoutAudit from "@/components/admin/LeaderboardPayoutAudit";
 import ReferralsAdmin from "@/components/admin/ReferralsAdmin";
-import { Activity, Lock, Bot } from "lucide-react";
+import ViralForensics from "@/components/admin/ViralForensics";
+import { Activity, Lock, Bot, Flame } from "lucide-react";
 
-type Tab = "dashboard" | "funnel" | "analytics" | "errors" | "security" | "ops" | "perms" | "aml" | "ai_missions" | "payout_audit" | "referrals" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin" | "ugc";
+type Tab = "dashboard" | "funnel" | "analytics" | "errors" | "security" | "ops" | "perms" | "viral_forensics" | "aml" | "ai_missions" | "payout_audit" | "referrals" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin" | "ugc";
 
 export default function Admin() {
   const [db, setDb] = useDB();
