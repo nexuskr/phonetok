@@ -51,6 +51,11 @@ export default function Packages() {
           </h1>
           <p className="text-xs text-muted-foreground mt-1">지금 시작 시 첫 3일간 보너스 구간 진입 · 사전 공지 확정 적립 스케줄</p>
           <div className="mt-2"><ActiveBoostCounter /></div>
+          <div className="mt-3 flex items-center gap-2 text-[11px] glass rounded-xl px-3 py-2 border border-destructive/30">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
+            <span className="font-bold text-destructive">실시간</span>
+            <span className="text-muted-foreground">최근 24h 신규 결제 <span className="font-black text-foreground tabular-nums">1,284</span>건 · 첫 3일 보너스 잔여 카운트다운 진행 중</span>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
