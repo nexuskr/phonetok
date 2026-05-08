@@ -2094,7 +2094,7 @@ const resources = {
       },
       trust: {
         todayBonus: "Bonuses paid today",
-        feeFreeWithdraw: "Fee-free withdrawals (lifetime)",
+        feeFreeWithdraw: "Fee-free withdrawals (ongoing)",
         cases: " cases",
         feeFreeNote: "0% withdrawal fee",
         fallbackFresh: "First bonus of the day pending",
