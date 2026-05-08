@@ -12,6 +12,7 @@ import {
   Wallet as WalletIcon, ShieldCheck, ArrowDownToLine, ArrowUpFromLine,
   Clock, Sparkles, Zap, LogOut, Banknote, Coins, Flame, Crown, TrendingUp,
 } from "lucide-react";
+import WithdrawIntentInterceptor from "@/components/conversion/WithdrawIntentInterceptor";
 
 type ActionTab = "play" | "withdraw" | "history";
 
