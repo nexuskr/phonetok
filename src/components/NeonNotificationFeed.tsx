@@ -24,6 +24,15 @@ interface NotificationRow {
   created_at: string;
 }
 
+// kinds that also trigger a browser/system push notification when permission granted
+const PUSH_KINDS = new Set(["rank_change", "weekly_payout", "weekly_pass_claim", "ai_mission_approved", "achievement"]);
+
+function tryBrowserPush(title: string, body: string, tag: string) {
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+  try { new Notification(title, { body, tag }); } catch {}
+}
+
 export default function NeonNotificationFeed() {
   const seen = useRef<Set<string>>(new Set());
 
@@ -34,6 +43,11 @@ export default function NeonNotificationFeed() {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user || !mounted) return;
+
+      // Ask for browser push permission once (silent if denied)
+      if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
+        try { Notification.requestPermission(); } catch {}
+      }
 
       // Mark recent ones as seen so we don't replay history on every mount
       const { data: recent } = await supabase
@@ -73,6 +87,20 @@ export default function NeonNotificationFeed() {
               ),
               { duration: 6000, position: "top-right" },
             );
+
+            // Also fire a system push for high-priority kinds
+            if (PUSH_KINDS.has(n.kind)) {
+              tryBrowserPush(n.title, n.body ?? "", n.id);
+            }
+            // Surface a custom DOM event so any banner/audio component can react
+            if (typeof window !== "undefined") {
+              window.dispatchEvent(new CustomEvent("neon:notification", { detail: n }));
+            }
+            // dev debug log
+            if (import.meta.env.DEV) {
+              // eslint-disable-next-line no-console
+              console.debug("[neon]", n.kind, n.title, n.payload);
+            }
           },
         )
         .subscribe();
