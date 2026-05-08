@@ -12,6 +12,7 @@ import ReciprocityBonus from "./patterns/ReciprocityBonus";
 import RiskReversal from "./patterns/RiskReversal";
 import ProgressLockIn from "./patterns/ProgressLockIn";
 import ExitIntentModal from "./ExitIntentModal";
+import { useTranslation, Trans } from "react-i18next";
 
 /**
  * 풀-스택 STARTER paywall — 10패턴 동시 가동.
