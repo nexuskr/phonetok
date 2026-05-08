@@ -12,6 +12,7 @@ import {
   Wallet as WalletIcon, ShieldCheck, ArrowDownToLine, ArrowUpFromLine,
   Clock, Sparkles, Zap, LogOut, Banknote, Coins, Flame, Crown, TrendingUp,
 } from "lucide-react";
+import WithdrawIntentInterceptor from "@/components/conversion/WithdrawIntentInterceptor";
 
 type ActionTab = "play" | "withdraw" | "history";
 
@@ -247,10 +248,16 @@ export default function SecureWallet() {
               <PinPad value={pin} onChange={setPin} label={profile?.withdraw_pin_hash ? "" : "(첫 입력 시 자동 등록)"} />
             </div>
 
-            <button onClick={submitWithdraw} disabled={busy}
-              className="w-full py-3.5 rounded-xl bg-gradient-primary text-primary-foreground font-bold glow-primary hover:scale-[1.02] transition disabled:opacity-50">
-              {busy ? "처리 중..." : "출금 신청"}
-            </button>
+            <WithdrawIntentInterceptor amount={Number(amount) || 0}>
+              {(handle) => (
+                <button
+                  onClick={(e) => { handle(e); if (!e.defaultPrevented) void submitWithdraw(); }}
+                  disabled={busy}
+                  className="w-full py-3.5 rounded-xl bg-gradient-primary text-primary-foreground font-bold glow-primary hover:scale-[1.02] transition disabled:opacity-50">
+                  {busy ? "처리 중..." : "출금 신청"}
+                </button>
+              )}
+            </WithdrawIntentInterceptor>
             <p className="text-[10px] text-muted-foreground text-center">
               {tier === "normal" && "1일 최대 3회 · "}처리 시간: {cfg.process_h < 1 ? `${cfg.process_h*60}분` : `${cfg.process_h}시간`} 이내
             </p>
