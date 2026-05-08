@@ -43,6 +43,7 @@ export default function AttendanceCard() {
           },
         };
       });
+      emitEarned(serverReward);
       toast({
         title: `🗓️ 출석 완료 +${formatKRW(serverReward)}`,
         description: isWeekly ? `7일 연속! 보너스 포함` : `${newStreakSrv}일 연속 출석`,
@@ -53,6 +54,18 @@ export default function AttendanceCard() {
       setBusy(false);
     }
   }
+
+  // streak loss aversion countdown
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000 * 30);
+    return () => clearInterval(t);
+  }, []);
+  const midnight = new Date(); midnight.setHours(24, 0, 0, 0);
+  const msLeft = midnight.getTime() - now;
+  const hLeft = Math.max(0, Math.floor(msLeft / 3_600_000));
+  const mLeft = Math.max(0, Math.floor((msLeft % 3_600_000) / 60_000));
+  const atRisk = isFlagOn("streakLossAversion") && !claimed && streak >= 2;
 
   return (
     <div className="glass-strong rounded-2xl p-4 neon-border relative overflow-hidden">
