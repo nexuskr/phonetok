@@ -168,15 +168,15 @@ export default function Index() {
 
         {/* 즉시 가치 + 사회적 증거 */}
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2 animate-fade-up" style={{ animationDelay: "0.32s" }}>
-          <span className="px-3 py-1.5 rounded-full glass border border-primary/30 text-[11px] font-bold text-primary inline-flex items-center gap-1.5">
-            <Sparkles className="w-3 h-3" /> 가입 즉시 ₩5,000 지급
+          <span className="px-3 py-1.5 rounded-full glass border border-primary/30 text-[11px] font-bold text-primary inline-flex items-center gap-1.5 break-keep">
+            <Sparkles className="w-3 h-3" /> {t("bonusBadge")}
           </span>
-          <span className="px-3 py-1.5 rounded-full glass border border-primary/20 text-[11px] text-muted-foreground inline-flex items-center gap-1.5">
+          <span className="px-3 py-1.5 rounded-full glass border border-primary/20 text-[11px] text-muted-foreground inline-flex items-center gap-1.5 break-keep">
             <span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
-            오늘 신규 가입 <span key={todaySignups} className="font-black text-foreground tabular-nums animate-fade-up">{todaySignups.toLocaleString()}</span>명
+            <span>{(i18n.language || "ko").startsWith("en") ? "New signups today" : "오늘 신규 가입"} <span key={todaySignups} className="font-black text-foreground tabular-nums animate-fade-up">{todaySignups.toLocaleString()}</span>{(i18n.language || "ko").startsWith("en") ? "" : "명"}</span>
           </span>
-          <span className="px-3 py-1.5 rounded-full glass border border-primary/20 text-[11px] text-muted-foreground inline-flex items-center gap-1.5">
-            <Zap className="w-3 h-3 text-secondary" /> 60초 안에 첫 적립
+          <span className="px-3 py-1.5 rounded-full glass border border-primary/20 text-[11px] text-muted-foreground inline-flex items-center gap-1.5 break-keep">
+            <Zap className="w-3 h-3 text-secondary" /> {t("firstEarn")}
           </span>
         </div>
 
@@ -322,7 +322,7 @@ export default function Index() {
             onMouseEnter={() => import("@/lib/trustPrefetch").then(m => m.prefetchTrust(30))}
             onFocus={() => import("@/lib/trustPrefetch").then(m => m.prefetchTrust(30))}
             className="hover:text-primary inline-flex items-center gap-1">
-            <ShieldCheck className="w-3 h-3" /> Trust 지표
+            <ShieldCheck className="w-3 h-3" /> {t("trustLink")}
           </Link>
           <span>·</span>
           <span>© 2026 Phonara. All Rights Reserved.</span>
