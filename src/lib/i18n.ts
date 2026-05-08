@@ -222,6 +222,13 @@ const resources = {
       missionCreate: "미션 생성",
       missionAdded: "미션 추가됨",
     },
+    lang: {
+      ko: "한국어",
+      en: "English",
+      label: "언어",
+    },
+  },
+  en: {
     common: {
       cancel: "Cancel",
       confirm: "Confirm",
