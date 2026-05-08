@@ -272,53 +272,45 @@ export default function Profile() {
   );
 }
 
-function Card({ icon: Icon, label, v }: any) {
+function Card({ icon: Icon, label, v, money }: any) {
   return (
     <div className="glass rounded-xl p-3 text-center">
       <Icon className="w-4 h-4 mx-auto text-primary" />
-      <div className="text-[10px] text-muted-foreground mt-1">{label}</div>
-      <div className="font-display font-bold text-xs">{v}</div>
+      <div className="text-[10px] text-muted-foreground mt-1 break-keep">{label}</div>
+      <div className={`font-imperial font-bold text-xs tabular-nums ${money ? "text-money-strong" : ""}`}>{v}</div>
     </div>
   );
 }
 
-function Row({ icon: Icon, label, sub, onClick, statusGood }: any) {
+function Row({ icon: Icon, label, sub, onClick, statusGood, statusActive, statusInactive }: any) {
   return (
-    <button onClick={onClick} className="w-full glass rounded-2xl p-4 flex items-center gap-3 hover:bg-muted/30 transition text-left">
-      <div className="w-10 h-10 rounded-xl bg-gradient-primary/20 flex items-center justify-center"><Icon className="w-4 h-4 text-primary" /></div>
+    <button onClick={onClick} className="w-full glass rounded-2xl p-4 flex items-center gap-3 hover:bg-muted/30 transition text-left min-h-[64px]">
+      <div className="w-10 h-10 rounded-xl bg-gradient-primary/20 flex items-center justify-center shrink-0"><Icon className="w-4 h-4 text-primary" /></div>
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-bold">{label}</div>
+        <div className="text-sm font-bold break-keep">{label}</div>
         <div className="text-[10px] text-muted-foreground truncate">{sub}</div>
       </div>
       {statusGood !== undefined && (
-        <span className={`text-[10px] font-bold ${statusGood ? "text-secondary" : "text-gold"}`}>{statusGood ? "활성" : "미설정"}</span>
+        <span className={`text-[10px] font-bold ${statusGood ? "text-secondary" : "text-gold"}`}>{statusGood ? (statusActive ?? "") : (statusInactive ?? "")}</span>
       )}
     </button>
   );
 }
 
 function SectionTitle({ children }: any) {
-  return <div className="text-[10px] tracking-widest text-muted-foreground font-bold mt-4 mb-1 px-1">{children}</div>;
+  return <div className="text-[10px] tracking-widest text-muted-foreground font-bold mt-4 mb-1 px-1 uppercase">{children}</div>;
 }
 
 function Label({ children }: any) {
   return <div className="text-[11px] text-muted-foreground font-bold mt-2 px-1">{children}</div>;
 }
 
-function PrimaryButton({ children, onClick, disabled }: any) {
-  return (
-    <button onClick={onClick} disabled={disabled} className="w-full mt-2 py-3 rounded-xl bg-gradient-primary text-primary-foreground font-bold glow-primary disabled:opacity-50">
-      {children}
-    </button>
-  );
-}
-
 function Modal({ title, onClose, icon, children }: any) {
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
-      <div className="w-full max-w-md glass-strong rounded-3xl p-6 neon-border relative animate-fade-up space-y-3">
-        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted/40 flex items-center justify-center"><X className="w-4 h-4" /></button>
-        <h2 className="font-display font-black text-lg flex items-center gap-2">{icon} {title}</h2>
+      <div className="w-full max-w-md glass-strong rounded-3xl p-5 sm:p-6 neon-border relative animate-fade-up space-y-3">
+        <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 w-10 h-10 rounded-full bg-muted/40 flex items-center justify-center"><X className="w-4 h-4" /></button>
+        <h2 className="font-imperial font-black text-lg sm:text-xl flex items-center gap-2 tracking-[0.04em]">{icon} {title}</h2>
         {children}
       </div>
     </div>
