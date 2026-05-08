@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useDB, formatKRW, uid, type Mission, type MissionTier } from "@/lib/store";
-import { ShieldCheck, Users, TrendingUp, ArrowDownToLine, ArrowUpFromLine, X, Plus, MessageSquare, Send, Coins, Target, Crown, BarChart3, ShieldAlert, Funnel } from "lucide-react";
+import { ShieldCheck, Users, TrendingUp, ArrowDownToLine, ArrowUpFromLine, X, Plus, MessageSquare, Send, Coins, Target, Crown, BarChart3, ShieldAlert, GitBranch } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useRequireAdmin } from "@/hooks/use-require-auth";
 import WithdrawRequestsAdmin from "@/components/admin/WithdrawRequestsAdmin";
@@ -77,7 +77,7 @@ export default function Admin() {
 
   const tabs: { id: Tab; label: string; icon: any }[] = [
     { id: "dashboard", label: "대시보드", icon: BarChart3 },
-    { id: "funnel", label: "전환 깔때기", icon: Funnel },
+    { id: "funnel", label: "전환 깔때기", icon: GitBranch },
     { id: "analytics", label: "고급 분석", icon: TrendingUp },
     { id: "errors", label: "에러 로그", icon: ShieldAlert },
     { id: "security", label: "보안 감사", icon: ShieldCheck },
