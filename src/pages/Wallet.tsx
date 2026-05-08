@@ -299,11 +299,81 @@ export default function Wallet() {
             )}
 
             {asset === "bank" && action === "deposit" && (
-              <div className="glass rounded-xl p-4 text-xs space-y-2 border border-border/40">
-                <div className="flex justify-between"><span className="text-muted-foreground">{t("depositBankInfo")}</span><span className="font-bold tabular-nums">{BANK_LABEL["KB"][lng]} 123-456-78901234</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">{t("depositOwner")}</span><span className="font-bold">{lng === "en" ? "Phonara Inc." : "(주)Phonara"}</span></div>
-                <p className="text-[10px] text-muted-foreground pt-2 border-t border-border/40">{t("depositMemo")}</p>
-              </div>
+              <>
+                {/* Channel switcher: bank vs voucher */}
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    { k: "bank" as const, label: t("channelBank"), badge: t("channelBankBonus") },
+                    { k: "voucher" as const, label: t("channelVoucher"), badge: t("channelVoucherBonus") },
+                  ]).map(({ k, label, badge }) => {
+                    const active = depositChannel === k;
+                    return (
+                      <button
+                        key={k}
+                        onClick={() => setDepositChannel(k)}
+                        className={`min-h-[64px] p-3 rounded-xl text-left transition press border ${
+                          active
+                            ? "border-primary/60 bg-primary/[0.06] glow-imperial"
+                            : "border-border/40 glass hover:border-primary/30"
+                        }`}
+                      >
+                        <div className="text-xs font-black">{label}</div>
+                        <div className={`text-[10px] tracking-wider mt-0.5 ${k === "voucher" ? "text-primary font-bold" : "text-muted-foreground"}`}>{badge}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {depositChannel === "bank" && (
+                  <div className="glass rounded-xl p-4 text-xs space-y-2 border border-border/40">
+                    <div className="flex justify-between"><span className="text-muted-foreground">{t("depositBankInfo")}</span><span className="font-bold tabular-nums">{BANK_LABEL["KB"][lng]} 123-456-78901234</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">{t("depositOwner")}</span><span className="font-bold">{lng === "en" ? "Phonara Inc." : "(주)Phonara"}</span></div>
+                    <p className="text-[10px] text-muted-foreground pt-2 border-t border-border/40">{t("depositMemo")}</p>
+                  </div>
+                )}
+
+                {depositChannel === "voucher" && (
+                  <>
+                    <Field label={t("voucherBrand")}>
+                      <select
+                        value={voucherBrand}
+                        onChange={e => setVoucherBrand(e.target.value as VoucherBrand)}
+                        className="w-full min-h-[52px] bg-input/60 border border-border rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-primary"
+                      >
+                        <option value="culture">{t("voucherCulture")}</option>
+                        <option value="happy">{t("voucherHappy")}</option>
+                        <option value="cultureland">{t("voucherCultureland")}</option>
+                      </select>
+                    </Field>
+                    <Field label={t("voucherPin")}>
+                      <input
+                        value={voucherPin}
+                        onChange={e => setVoucherPin(e.target.value.replace(/[^0-9A-Za-z-]/g, "").slice(0, 24))}
+                        placeholder={t("voucherPinPh")}
+                        className="w-full min-h-[52px] bg-input/60 border border-border rounded-xl px-4 py-3.5 text-sm font-mono tracking-wider focus:outline-none focus:border-primary"
+                      />
+                    </Field>
+                    <p className="text-[10px] text-muted-foreground">{t("voucherNotice")}</p>
+                  </>
+                )}
+
+                {/* Bonus preview */}
+                {Number(amount) > 0 && (() => {
+                  const a = Number(amount);
+                  const pct = depositChannel === "voucher" ? 3 : 0;
+                  const bonus = Math.floor(a * pct / 100);
+                  if (bonus <= 0) return null;
+                  return (
+                    <div className="rounded-xl p-3.5 border border-primary/40 bg-gradient-imperial/10">
+                      <div className="text-[10px] tracking-[0.2em] text-primary font-bold uppercase">{t("bonusPreview")}</div>
+                      <div className="text-money-strong text-xl font-black mt-1">{formatKRW(a + bonus)}</div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">
+                        {t("bonusBreakdown", { amount: formatKRW(a), bonus: formatKRW(bonus), pct })}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </>
             )}
 
             {asset === "coin" && action === "withdraw" && (
