@@ -32,19 +32,31 @@ type UptimeSummary = {
   generated_at: string;
 };
 
+type HeatmapDay = { date: string; samples: number; success_rate: number | null };
+type ChaosLatest = {
+  ran_at: string; total_probes: number; passed: number; failed: number;
+  duration_ms: number; pass_rate: number | null; source: string;
+} | null;
+
 export default function Trust() {
   const [m, setM] = useState<Metrics | null>(null);
   const [u, setU] = useState<UptimeSummary | null>(null);
+  const [heat, setHeat] = useState<HeatmapDay[]>([]);
+  const [chaos, setChaos] = useState<ChaosLatest>(null);
   const [loading, setLoading] = useState(true);
 
   async function load() {
     setLoading(true);
-    const [{ data: md }, { data: ud }] = await Promise.all([
+    const [{ data: md }, { data: ud }, { data: hd }, { data: cd }] = await Promise.all([
       supabase.rpc("public_trust_metrics"),
       supabase.rpc("public_uptime_summary"),
+      supabase.rpc("public_uptime_heatmap_90d"),
+      supabase.rpc("latest_chaos_run"),
     ]);
     setM((md as Metrics) ?? null);
     setU((ud as unknown as UptimeSummary) ?? null);
+    setHeat(((hd as any)?.days ?? []) as HeatmapDay[]);
+    setChaos((cd as ChaosLatest) ?? null);
     setLoading(false);
   }
   useEffect(() => { void load(); }, []);
