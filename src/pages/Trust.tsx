@@ -47,11 +47,12 @@ export default function Trust() {
 
   async function load() {
     setLoading(true);
+    const sb: any = supabase;
     const [{ data: md }, { data: ud }, { data: hd }, { data: cd }] = await Promise.all([
-      supabase.rpc("public_trust_metrics"),
-      supabase.rpc("public_uptime_summary"),
-      supabase.rpc("public_uptime_heatmap_90d"),
-      supabase.rpc("latest_chaos_run"),
+      sb.rpc("public_trust_metrics"),
+      sb.rpc("public_uptime_summary"),
+      sb.rpc("public_uptime_heatmap_90d"),
+      sb.rpc("latest_chaos_run"),
     ]);
     setM((md as Metrics) ?? null);
     setU((ud as unknown as UptimeSummary) ?? null);
