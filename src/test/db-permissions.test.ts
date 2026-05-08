@@ -23,8 +23,9 @@ d("DB permissions — SECURITY DEFINER baseline drift", () => {
   it("check_permission_drift reports no critical drift", async () => {
     const { data, error } = await admin.rpc("check_permission_drift" as any);
     expect(error, error?.message).toBeNull();
-    const rows = (data ?? []) as Array<{ severity?: string; function_name?: string }>;
-    const critical = rows.filter((r) => r.severity === "critical");
+    const raw = data ?? [];
+    const rows = (Array.isArray(raw) ? raw : [raw]) as Array<{ severity?: string; function_name?: string }>;
+    const critical = rows.filter((r) => r && r.severity === "critical");
     expect(critical, `critical drift detected: ${JSON.stringify(critical)}`).toHaveLength(0);
   });
 });
