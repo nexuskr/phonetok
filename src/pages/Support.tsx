@@ -44,7 +44,7 @@ export default function Support() {
       setAuthUid(user.id);
 
       // upsert thread
-      const nickname = db.user?.nickname || user.email?.split("@")[0] || "회원";
+      const nickname = db.user?.nickname || user.email?.split("@")[0] || t("memberFallback");
       const { data: existing } = await supabase
         .from("support_threads").select("*").eq("user_id", user.id).maybeSingle();
       let tid = existing?.id;
