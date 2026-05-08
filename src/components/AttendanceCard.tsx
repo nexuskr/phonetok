@@ -94,6 +94,16 @@ export default function AttendanceCard() {
           {claimed ? "완료" : busy ? "..." : "출석"}
         </button>
       </div>
+      {atRisk && (
+        <div className="relative mt-3 flex items-center gap-2 rounded-xl bg-destructive/10 border border-destructive/30 px-3 py-2">
+          <Flame className="w-4 h-4 text-destructive shrink-0" />
+          <div className="text-[11px] leading-tight">
+            <span className="font-black text-destructive">🔥 {streak}일 연속 스트릭 소실 위험</span>
+            <span className="text-muted-foreground"> · 오늘 자정까지 {hLeft}시간 {mLeft}분 남음</span>
+          </div>
+          <AlertTriangle className="w-3.5 h-3.5 text-destructive ml-auto animate-pulse shrink-0" />
+        </div>
+      )}
     </div>
   );
 }
