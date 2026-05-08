@@ -105,7 +105,8 @@ const App = () => (
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/trust" element={<Trust />} />
               <Route path="/status" element={<Status />} />
-              <Route path="/hall-of-fame" element={<HallOfFame />} />
+             <Route path="/hall-of-fame" element={<HallOfFame />} />
+              <Route path="/referral" element={<Referral />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
