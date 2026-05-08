@@ -19,3 +19,5 @@ project_id = "ketlqzfaplppmupaiwft"
     verify_jwt = false
   [functions.webhook-dispatcher]
     verify_jwt = true
+  [functions.chaos-probe]
+    verify_jwt = false
