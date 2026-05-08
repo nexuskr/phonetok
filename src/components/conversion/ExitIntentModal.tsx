@@ -69,7 +69,7 @@ export default function ExitIntentModal({
         <button
           onClick={close}
           className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-muted/40 text-muted-foreground"
-          aria-label="닫기"
+          aria-label={t("close")}
         >
           <X className="w-4 h-4" />
         </button>
@@ -79,25 +79,25 @@ export default function ExitIntentModal({
             <Gift className="w-8 h-8 text-gold-foreground" />
           </div>
           <div className="text-[10px] tracking-[0.3em] text-secondary font-black mt-3">
-            기다려요!
+            {t("exitWait")}
           </div>
-          <h3 className="font-imperial text-2xl text-gradient-gold mt-1">
-            +{formatKRW(bonus)} 보너스
+          <h3 className="font-imperial text-2xl text-gradient-gold mt-1 tabular-nums">
+            {t("exitBonus", { val: formatKRW(bonus) })}
           </h3>
-          <p className="text-xs text-muted-foreground mt-2">
-            지금 결제 시 추가 보너스 1회 한정
+          <p className="text-xs text-muted-foreground mt-2 break-keep">
+            {t("exitDesc")}
           </p>
           <button
             onClick={accept}
-            className="press mt-5 w-full py-3 rounded-xl bg-gradient-imperial text-primary-foreground font-bold text-sm glow-imperial"
+            className="press mt-5 w-full min-h-[56px] py-3 rounded-xl bg-gradient-imperial text-primary-foreground font-bold text-sm glow-imperial"
           >
-            보너스 받고 결제하기
+            {t("exitClaim")}
           </button>
           <button
             onClick={close}
-            className="mt-2 w-full py-2 text-[11px] text-muted-foreground hover:text-foreground"
+            className="mt-2 w-full min-h-[44px] py-2 text-[11px] text-muted-foreground hover:text-foreground"
           >
-            괜찮아요
+            {t("exitDecline")}
           </button>
         </div>
       </div>
