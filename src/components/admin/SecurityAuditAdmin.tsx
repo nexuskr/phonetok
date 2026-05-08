@@ -256,6 +256,16 @@ export default function SecurityAuditAdmin() {
     });
   }, [audits, from, to, okFilter, minIssues]);
 
+  const filteredAnomalies = useMemo(() => {
+    return anomalies.filter((a) => {
+      if (!showAckOnly && a.acknowledged) return false;
+      if (ruleFilter && !a.rule.toLowerCase().includes(ruleFilter.toLowerCase())) return false;
+      if (userFilter && !(a.user_id ?? "").includes(userFilter)) return false;
+      if (sevFilter !== "all" && a.severity !== sevFilter) return false;
+      return true;
+    });
+  }, [anomalies, showAckOnly, ruleFilter, userFilter, sevFilter]);
+
   function resetFilters() {
     setFrom(""); setTo(""); setOkFilter("all"); setMinIssues("");
   }
