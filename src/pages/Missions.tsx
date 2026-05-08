@@ -114,15 +114,15 @@ export default function Missions() {
 
   function complete(m: Mission) {
     if (db.completedMissions.includes(m.id) && !m.game) {
-      toast({ title: "이미 완료한 미션입니다" });
+      toast({ title: t("alreadyDone") });
       return;
     }
     if (TIER_RANK[m.tier] > userTierRank) {
-      toast({ title: "잠긴 미션", description: "패키지 업그레이드 필요" });
+      toast({ title: t("lockedTitle"), description: t("lockedDesc") });
       return;
     }
     if (m.game && limitReached) {
-      toast({ title: "오늘의 플레이 한도 도달", description: `${userTier} 등급 일일 ${playLimit}회를 모두 사용했습니다. 패키지 업그레이드 시 즉시 추가 횟수 해제!`, variant: "destructive" });
+      toast({ title: t("capReached"), description: t("capDesc", { tier: userTier, n: playLimit }), variant: "destructive" });
       return;
     }
     if (m.game) {
