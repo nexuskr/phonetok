@@ -117,9 +117,16 @@ export default function MissionTemplatesAdmin() {
 
       {/* ── Pending AI missions ── */}
       <section className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
-        <h3 className="font-bold text-sm flex items-center gap-2 mb-3">
-          <ShieldAlert className="w-4 h-4 text-amber-500" />
-          AI 미션 결재 대기 ({pending.length})
+        <h3 className="font-bold text-sm flex items-center justify-between gap-2 mb-3">
+          <span className="flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-amber-500" />
+            AI 미션 결재 대기 ({pending.length})
+          </span>
+          {pending.length > 0 && (
+            <button onClick={bulkAutoApprove} className="text-[11px] px-2 py-1 rounded-lg bg-amber-500 text-amber-950 font-black">
+              자동 일괄 승인
+            </button>
+          )}
         </h3>
         {pending.length === 0 ? (
           <div className="text-xs text-muted-foreground">대기 중인 미션이 없습니다.</div>
