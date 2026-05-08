@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, Webhook, Snowflake, FlaskConical, RefreshCw, Gauge } from "lucide-react";
+import { Activity, Webhook, Snowflake, FlaskConical, RefreshCw, Gauge, ListTree } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getSpanMetrics, getLastAlert, getPersistedQueueSize } from "@/lib/spans";
+import RecentActivity from "./RecentActivity";
 
-type Sub = "slow" | "spanq" | "webhook" | "freeze" | "chaos";
+type Sub = "activity" | "slow" | "spanq" | "webhook" | "freeze" | "chaos";
 
 export default function ObservabilityCockpit() {
-  const [sub, setSub] = useState<Sub>("slow");
+  const [sub, setSub] = useState<Sub>("activity");
   const subs: { id: Sub; label: string; icon: any }[] = [
+    { id: "activity", label: "활동 로그", icon: ListTree },
     { id: "slow", label: "Slow Top 20", icon: Activity },
     { id: "spanq", label: "Span 품질", icon: Gauge },
     { id: "webhook", label: "Webhooks", icon: Webhook },
