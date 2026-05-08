@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { refreshWallet } from "@/lib/missions-rpc";
 import ServerTxList from "@/components/wallet/ServerTxList";
 import WithdrawIntentInterceptor from "@/components/conversion/WithdrawIntentInterceptor";
+import AMLGate from "@/components/wallet/AMLGate";
 
 type AssetTab = "bank" | "coin";
 type ActionTab = "withdraw" | "deposit" | "history";
