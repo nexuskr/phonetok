@@ -1442,6 +1442,54 @@ export type Database = {
         }
         Relationships: []
       }
+      trust_snapshots: {
+        Row: {
+          active_members_30d: number
+          audit_pass_30d: number
+          cron_uptime_7d: number
+          id: string
+          paid_30d: number
+          policy_pass_7d: number
+          taken_at: string
+          total_members: number
+          total_paid: number
+          unack_anomalies: number
+          uptime_p95_ms_24h: number
+          uptime_success_24h: number
+          uptime_success_7d: number
+        }
+        Insert: {
+          active_members_30d?: number
+          audit_pass_30d?: number
+          cron_uptime_7d?: number
+          id?: string
+          paid_30d?: number
+          policy_pass_7d?: number
+          taken_at?: string
+          total_members?: number
+          total_paid?: number
+          unack_anomalies?: number
+          uptime_p95_ms_24h?: number
+          uptime_success_24h?: number
+          uptime_success_7d?: number
+        }
+        Update: {
+          active_members_30d?: number
+          audit_pass_30d?: number
+          cron_uptime_7d?: number
+          id?: string
+          paid_30d?: number
+          policy_pass_7d?: number
+          taken_at?: string
+          total_members?: number
+          total_paid?: number
+          unack_anomalies?: number
+          uptime_p95_ms_24h?: number
+          uptime_success_24h?: number
+          uptime_success_7d?: number
+        }
+        Relationships: []
+      }
       uptime_pings: {
         Row: {
           checked_at: string
@@ -1895,6 +1943,10 @@ export type Database = {
       apply_referral_code: { Args: { _code: string }; Returns: Json }
       auto_freeze_critical_anomalies: { Args: never; Returns: Json }
       award_xp: { Args: { _amount: number; _source?: Json }; Returns: Json }
+      bulk_acknowledge_anomalies: {
+        Args: { _ids: string[]; _note?: string }
+        Returns: number
+      }
       bump_jackpot: { Args: { _amount: number }; Returns: Json }
       bump_quest_metric: {
         Args: { _delta?: number; _metric: string }
@@ -2043,7 +2095,6 @@ export type Database = {
         Returns: boolean
       }
       is_account_frozen: { Args: { _user_id: string }; Returns: boolean }
-      latest_chaos_run: { Args: never; Returns: Json }
       log_client_error: {
         Args: {
           _context?: Json
@@ -2086,9 +2137,31 @@ export type Database = {
           source: string
         }[]
       }
-      public_trust_metrics: { Args: never; Returns: Json }
-      public_uptime_heatmap_90d: { Args: never; Returns: Json }
-      public_uptime_summary: { Args: never; Returns: Json }
+      policy_assertions_status: { Args: never; Returns: Json }
+      public_trust_history: {
+        Args: { _days?: number }
+        Returns: {
+          active_members_30d: number
+          audit_pass_30d: number
+          cron_uptime_7d: number
+          id: string
+          paid_30d: number
+          policy_pass_7d: number
+          taken_at: string
+          total_members: number
+          total_paid: number
+          unack_anomalies: number
+          uptime_p95_ms_24h: number
+          uptime_success_24h: number
+          uptime_success_7d: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "trust_snapshots"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       purchase_season_pass: { Args: never; Returns: Json }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
@@ -2134,6 +2207,7 @@ export type Database = {
         Returns: string
       }
       recover_stuck_settlements: { Args: never; Returns: Json }
+      redetect_anomaly: { Args: { _id: string }; Returns: Json }
       request_withdrawal: {
         Args: {
           _amount: number
@@ -2221,6 +2295,7 @@ export type Database = {
         Args: { t: Database["public"]["Enums"]["user_tier"] }
         Returns: number
       }
+      trust_record_snapshot: { Args: never; Returns: string }
       unfreeze_expired: { Args: never; Returns: Json }
       unlock_achievement: { Args: { _key: string }; Returns: Json }
       xp_for_level: { Args: { _level: number }; Returns: number }
