@@ -485,6 +485,7 @@ export default function Wallet() {
           </div>
         )}
       </div>
+      <AMLGate open={amlOpen} level={amlLevel} onClose={() => setAmlOpen(false)} onApproved={() => setAmlOpen(false)} />
     </Layout>
   );
 }
