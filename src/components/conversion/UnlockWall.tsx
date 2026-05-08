@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { X, Crown, Users, Phone, Sparkles, Check, Lock } from "lucide-react";
 import { formatKRW } from "@/lib/store";
 import { track } from "@/lib/analytics";
+import { useTrackView, trackClick, trackDismiss } from "@/lib/telemetry";
 
 /**
  * 출금 직전 3-Path 화면.
@@ -16,11 +17,12 @@ export default function UnlockWall({
   amount: number;
   onClose: () => void;
 }) {
+  useTrackView("unlock_wall", "v1", { amount });
   return (
     <div className="fixed inset-0 z-[75] bg-background/90 backdrop-blur-xl flex items-end sm:items-center justify-center p-4">
       <div className="w-full max-w-md glass-strong rounded-3xl p-6 neon-border relative overflow-hidden animate-fade-up">
         <button
-          onClick={onClose}
+          onClick={() => { void trackDismiss("unlock_wall", "v1", { amount }); onClose(); }}
           className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted/40 flex items-center justify-center"
           aria-label="닫기"
         >
@@ -42,7 +44,7 @@ export default function UnlockWall({
           {/* Path A — 강조 */}
           <Link
             to="/packages"
-            onClick={() => track("unlock_wall_path_a_click")}
+            onClick={() => { track("unlock_wall_path_a_click"); void trackClick("unlock_wall", "path_a", { amount }); }}
             className="press relative mt-4 block glass-strong rounded-2xl p-4 border-2 border-gold/60 overflow-hidden"
           >
             <span className="absolute top-2 right-2 text-[9px] font-black px-2 py-0.5 rounded-full bg-gradient-gold text-gold-foreground">
@@ -70,7 +72,7 @@ export default function UnlockWall({
           {/* Path B */}
           <Link
             to="/profile"
-            onClick={() => track("unlock_wall_path_b_click")}
+            onClick={() => { track("unlock_wall_path_b_click"); void trackClick("unlock_wall", "path_b", { amount }); }}
             className="press relative mt-3 block glass rounded-2xl p-3 border border-border/40"
           >
             <div className="flex items-center gap-3">
@@ -91,6 +93,7 @@ export default function UnlockWall({
           <button
             onClick={() => {
               track("unlock_wall_path_c_click");
+              void trackClick("unlock_wall", "path_c", { amount });
               onClose();
             }}
             className="press relative mt-2 block w-full glass rounded-2xl p-3 border border-border/30 opacity-70 text-left"

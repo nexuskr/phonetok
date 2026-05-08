@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { isFlagOn } from "@/lib/conversion-flags";
+import { trackClick } from "@/lib/telemetry";
 
 type Item = {
   id: string;
@@ -93,10 +94,11 @@ export default function LivePurchaseTicker() {
   if (!it) return null;
 
   return (
-    <div className="fixed bottom-24 md:bottom-6 left-3 z-30 pointer-events-none">
+    <div className="fixed bottom-24 md:bottom-6 left-3 z-30">
       <div
         key={it.id + idx}
-        className="glass-strong rounded-full px-3 py-2 flex items-center gap-2 shadow-2xl border border-gold/30 animate-fade-up max-w-[260px]"
+        onClick={() => void trackClick("live_purchase_ticker", "default", { pkg: it.pkg })}
+        className="glass-strong rounded-full px-3 py-2 flex items-center gap-2 shadow-2xl border border-gold/30 animate-fade-up max-w-[260px] cursor-pointer"
       >
         <Crown className="w-3.5 h-3.5 text-gold shrink-0" />
         <div className="text-[11px] truncate">

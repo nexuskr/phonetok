@@ -2,6 +2,7 @@ import { useState, type ReactNode, type MouseEvent } from "react";
 import { useDB } from "@/lib/store";
 import { isFlagOn } from "@/lib/conversion-flags";
 import { track } from "@/lib/analytics";
+import { track as trackTelemetry } from "@/lib/telemetry";
 import UnlockWall from "./UnlockWall";
 
 /**
@@ -37,6 +38,7 @@ export default function WithdrawIntentInterceptor({
     e.preventDefault();
     e.stopPropagation();
     track("funnel_unlock_wall_shown", { tier, amount });
+    void trackTelemetry("view", { surface: "withdraw_intent", meta: { tier, amount } });
     setOpen(true);
   }
 
