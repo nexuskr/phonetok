@@ -1,8 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ShieldCheck, TrendingUp, Activity, Crown, Clock, Users, FileCheck2, Radar, ArrowLeft, RefreshCw } from "lucide-react";
+import { ShieldCheck, TrendingUp, Activity, Crown, Clock, Users, FileCheck2, Radar, ArrowLeft, RefreshCw, History } from "lucide-react";
 import Particles from "@/components/Particles";
+import { ResponsiveContainer, AreaChart, Area, LineChart, Line, XAxis, YAxis, Tooltip as RTooltip, CartesianGrid } from "recharts";
+
+type HistoryRow = {
+  taken_at: string;
+  total_paid: number;
+  paid_30d: number;
+  cron_uptime_7d: number;
+  audit_pass_30d: number;
+  policy_pass_7d: number;
+  uptime_success_24h: number;
+  uptime_p95_ms_24h: number;
+  unack_anomalies: number;
+};
+type AssertionStatus = { last_run_at: string | null; next_run_at: string | null; last_passed: number | null; last_failed: number | null } | null;
 
 type Metrics = {
   total_paid: number;
