@@ -36,7 +36,7 @@ export default function ScarcityBar({
     <div className="glass rounded-xl p-3">
       <div className="flex items-center justify-between text-[10px] mb-1.5">
         <span className="flex items-center gap-1 text-muted-foreground">
-          <Users className="w-3 h-3" /> {label}
+          <Users className="w-3 h-3" /> {labelText}
         </span>
         <span
           key={liveUsed}
