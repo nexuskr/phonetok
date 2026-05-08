@@ -20,6 +20,7 @@ import {
 import { CheckCircle2, Sparkles, Lock, Crown, Upload, Gamepad2, X, Zap, Flame, Trophy, Heart } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { settleMission } from "@/lib/missions-rpc";
+import { emitEarned } from "@/components/onboarding/EarnedToast";
 import { supabase } from "@/integrations/supabase/client";
 import AIBotCards from "@/components/AIBotCards";
 
@@ -145,6 +146,7 @@ export default function Missions() {
           : null,
       }));
       setCompleting(null);
+      emitEarned(m.reward);
       toast({ title: `🎉 +${formatKRW(m.reward)} 적립`, description: `${m.title} 완료!` });
     }, 1200);
   }
@@ -192,6 +194,7 @@ export default function Missions() {
       setJackpotWin(jp);
     } else if (won) {
       const momentumBadge = db.momentum >= 2 ? ` · 🔥 ${db.momentum + 1}연승!` : "";
+      emitEarned(baseReward);
       toast({ title: `🎉 +${formatKRW(baseReward)}${momentumBadge}`, description: m.title });
     } else {
       toast({ title: "아쉬워요! (보상 없음)", description: FAIL_MSGS[Math.floor(Math.random() * FAIL_MSGS.length)] });
