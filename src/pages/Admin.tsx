@@ -15,9 +15,10 @@ import AdvancedAnalytics from "@/components/admin/AdvancedAnalytics";
 import ErrorMonitorAdmin from "@/components/admin/ErrorMonitorAdmin";
 import SecurityAuditAdmin from "@/components/admin/SecurityAuditAdmin";
 import ObservabilityCockpit from "@/components/admin/ObservabilityCockpit";
-import { Activity } from "lucide-react";
+import PermissionsAudit from "@/components/admin/PermissionsAudit";
+import { Activity, Lock } from "lucide-react";
 
-type Tab = "dashboard" | "analytics" | "errors" | "security" | "ops" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin";
+type Tab = "dashboard" | "analytics" | "errors" | "security" | "ops" | "perms" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin";
 
 export default function Admin() {
   const [db, setDb] = useDB();
@@ -79,6 +80,7 @@ export default function Admin() {
     { id: "errors", label: "에러 로그", icon: ShieldAlert },
     { id: "security", label: "보안 감사", icon: ShieldCheck },
     { id: "ops", label: "관제 콕핏", icon: Activity },
+    { id: "perms", label: "권한 감사", icon: Lock },
     { id: "server_dep", label: "충전 신청", icon: ArrowUpFromLine },
     { id: "server_wd", label: "출금 신청", icon: ArrowDownToLine },
     { id: "packages", label: "패키지", icon: Crown },
@@ -117,6 +119,7 @@ export default function Admin() {
         {tab === "errors" && <ErrorMonitorAdmin />}
         {tab === "security" && <SecurityAuditAdmin />}
         {tab === "ops" && <ObservabilityCockpit />}
+        {tab === "perms" && <PermissionsAudit />}
         {tab === "server_wd" && <WithdrawRequestsAdmin />}
         {tab === "server_dep" && <DepositRequestsAdmin />}
         {tab === "packages" && <PackagePurchasesAdmin />}
