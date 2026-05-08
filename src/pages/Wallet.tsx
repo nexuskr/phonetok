@@ -15,6 +15,10 @@ import WithdrawalHistoryList from "@/components/wallet/WithdrawalHistoryList";
 import WithdrawIntentInterceptor from "@/components/conversion/WithdrawIntentInterceptor";
 import AMLGate from "@/components/wallet/AMLGate";
 import WithdrawQueueStatus from "@/components/wallet/WithdrawQueueStatus";
+import WithdrawReceiptUpload from "@/components/wallet/WithdrawReceiptUpload";
+import WithdrawETABadge from "@/components/wallet/WithdrawETABadge";
+import NotificationPreferencesPanel from "@/components/wallet/NotificationPreferencesPanel";
+import { z } from "zod";
 
 type AssetTab = "bank" | "coin";
 type ActionTab = "withdraw" | "deposit" | "history";
@@ -65,6 +69,7 @@ export default function Wallet() {
   // P2: AML gate
   const [amlOpen, setAmlOpen] = useState(false);
   const [amlLevel, setAmlLevel] = useState<1 | 2 | 3>(2);
+  const [receiptPath, setReceiptPath] = useState<string | null>(null);
 
   if (!user) return null;
   const u = user;
@@ -98,8 +103,30 @@ export default function Wallet() {
       toast({ title: tw("limitOver", { tier: u.tier }), description: tw("limitOverDesc", { limit: formatKRW(limit) }) });
       return;
     }
-    if (asset === "bank" && !account) { toast({ title: tw("accountReq") }); return; }
-    if (asset === "coin" && !coinAddr) { toast({ title: tw("coinReq") }); return; }
+
+    // Zod validation: structured field-level checks
+    const schema = asset === "bank"
+      ? z.object({
+          amount: z.number().int().min(10000, "최소 출금액은 10,000원").max(50_000_000, "최대 5천만원"),
+          bank: z.string().min(1, "은행을 선택해주세요"),
+          account: z.string().regex(/^[0-9-]{10,20}$/, "올바른 계좌번호를 입력해주세요 (10-20자리)"),
+        })
+      : z.object({
+          amount: z.number().int().min(10000),
+          coinAddr: z.string().min(20, "지갑 주소를 정확히 입력해주세요").max(80),
+          network: z.enum(["TRC20", "ERC20", "BEP20"]),
+        });
+    const parsed = schema.safeParse(
+      asset === "bank"
+        ? { amount: a, bank, account: account.replace(/\s/g, "") }
+        : { amount: a, coinAddr: coinAddr.trim(), network }
+    );
+    if (!parsed.success) {
+      const first = parsed.error.errors[0];
+      toast({ title: "입력 오류", description: first.message, variant: "destructive" });
+      return;
+    }
+
     if (sentCode !== authCode) { toast({ title: tw("codeMismatch") }); return; }
     if (!/^\d{6}$/.test(withdrawPw)) { toast({ title: tw("pinMismatch") }); return; }
 
@@ -135,6 +162,16 @@ export default function Wallet() {
     const r = data as any;
     setResultCode(r?.tx_code ?? null);
 
+    // Attach receipt screenshot to the new withdrawal_requests row (if uploaded)
+    if (receiptPath && r?.tx_code) {
+      const { error: upErr } = await supabase
+        .from("withdrawal_requests")
+        .update({ receipt_url: receiptPath })
+        .eq("user_id", u.id)
+        .eq("tx_code", r.tx_code);
+      if (upErr) console.warn("[withdraw] receipt attach failed:", upErr.message);
+    }
+
     setDb(d => ({
       ...d,
       withdraws: [{
@@ -145,7 +182,7 @@ export default function Wallet() {
       }, ...d.withdraws],
     }));
     await refreshWallet();
-    setAmount(""); setAccount(""); setCoinAddr(""); setSentCode(null); setAuthCode(""); setWithdrawPw("");
+    setAmount(""); setAccount(""); setCoinAddr(""); setSentCode(null); setAuthCode(""); setWithdrawPw(""); setReceiptPath(null);
     toast({ title: tw("withdrawDone"), description: tw("withdrawDoneDesc", { tier: u.tier }) });
   }
 
@@ -443,6 +480,14 @@ export default function Wallet() {
               </>
             )}
 
+            {/* ETA + Receipt (withdraw only) */}
+            {action === "withdraw" && Number(amount) >= 10000 && (
+              <WithdrawETABadge tier={u.tier} amount={Number(amount)} />
+            )}
+            {action === "withdraw" && (
+              <WithdrawReceiptUpload userId={u.id} onUploaded={setReceiptPath} />
+            )}
+
             {/* Verification block */}
             <div className="rounded-xl p-4 space-y-3 border border-primary/20 bg-primary/[0.03]">
               <div className="flex items-center gap-2">
@@ -488,6 +533,7 @@ export default function Wallet() {
               <div className="text-[10px] tracking-[0.25em] text-primary font-black mb-3 uppercase">출금 이력</div>
               <WithdrawalHistoryList />
             </div>
+            <NotificationPreferencesPanel userId={u.id} />
             <div>
               <div className="text-[10px] tracking-[0.25em] text-primary font-black mb-3 uppercase">{t("historyTitle")}</div>
               <ServerTxList />
