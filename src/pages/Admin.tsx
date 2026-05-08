@@ -139,6 +139,7 @@ export default function Admin() {
         {tab === "aml" && <AMLAdmin />}
         {tab === "ai_missions" && <MissionTemplatesAdmin />}
         {tab === "payout_audit" && <LeaderboardPayoutAudit />}
+        {tab === "referrals" && <ReferralsAdmin />}
         {tab === "server_wd" && <WithdrawRequestsAdmin />}
         {tab === "server_dep" && <DepositRequestsAdmin />}
         {tab === "packages" && <PackagePurchasesAdmin />}
