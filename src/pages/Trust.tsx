@@ -169,7 +169,7 @@ export default function Trust() {
         <Link to="/" className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
           <ArrowLeft className="w-3.5 h-3.5" /> 홈으로
         </Link>
-        <button onClick={load} disabled={loading} className="text-xs text-primary inline-flex items-center gap-1">
+        <button onClick={() => load(true)} disabled={loading} className="text-xs text-primary inline-flex items-center gap-1">
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> 새로고침
         </button>
       </header>
@@ -223,7 +223,7 @@ export default function Trust() {
         {error && (
           <div className="mt-6 glass-strong rounded-2xl p-4 border border-destructive/40 text-destructive text-xs flex items-center justify-between">
             <span>⚠ {error}</span>
-            <button onClick={load} className="px-3 py-1.5 rounded-lg bg-destructive/20 font-bold">재시도</button>
+            <button onClick={() => load(true)} className="px-3 py-1.5 rounded-lg bg-destructive/20 font-bold">재시도</button>
           </div>
         )}
 
