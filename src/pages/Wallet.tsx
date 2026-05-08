@@ -19,6 +19,7 @@ type ActionTab = "withdraw" | "deposit" | "history";
 export default function Wallet() {
   const [db, setDb] = useDB();
   const nav = useNavigate();
+  const { t } = useTranslation("wallet");
   const user = useRequireAuth() ?? db.user;
   const [asset, setAsset] = useState<AssetTab>("bank");
   const [action, setAction] = useState<ActionTab>("withdraw");
