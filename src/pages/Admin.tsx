@@ -144,6 +144,7 @@ export default function Admin() {
         {tab === "users" && <ServerUserAdmin />}
         {tab === "chats" && <ChatAdmin />}
         {tab === "coin" && <CoinAdmin />}
+        {tab === "ugc" && <AdminUgc />}
       </div>
     </Layout>
   );
