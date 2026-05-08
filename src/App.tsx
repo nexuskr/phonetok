@@ -35,6 +35,7 @@ const Quests = lazy(() => import("./pages/Quests.tsx"));
 const Empire = lazy(() => import("./pages/Empire.tsx"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe.tsx"));
 const Settlements = lazy(() => import("./pages/Settlements.tsx"));
+const Trust = lazy(() => import("./pages/Trust.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
