@@ -2157,7 +2157,7 @@ const resources = {
       s6b: "Avg. 1–12h processing, max 24h",
       s6c: "All history transparent in your profile",
       s7: "7. Empire Ownership",
-      s7p: "Empire is not a paid plan — it is co-ownership of the platform. Lifetime share of revenue, exclusive high-stakes games and special perks.",
+      s7p: "Empire is not a paid plan — it is co-ownership of the platform. Long-term share of reward simulations, exclusive high-stakes games and special perks (subject to change).",
       promiseTitle: "Our Last Promise",
       promise: "Phonara aims for long-term growth alongside our users — not short-term gains. Your enjoyment and safety always come first.",
       promiseSign: "— Phonara Team",
