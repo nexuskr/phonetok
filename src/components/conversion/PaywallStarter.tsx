@@ -15,8 +15,8 @@ import ExitIntentModal from "./ExitIntentModal";
 import { useTranslation, Trans } from "react-i18next";
 
 /**
- * 풀-스택 STARTER paywall — 10패턴 동시 가동.
- * 외부에서 `<PaywallStarter pkg={pkg} onClose={...} />` 호출.
+ * Full-stack STARTER paywall — 10 conversion patterns running in parallel.
+ * Usage: `<PaywallStarter pkg={pkg} onClose={...} />`
  */
 export default function PaywallStarter({
   pkg,
@@ -30,7 +30,7 @@ export default function PaywallStarter({
   const { t } = useTranslation("convert");
   const [db] = useDB();
   const [busy, setBusy] = useState(false);
-  const original = Math.round(pkg.price * 1.4); // anchor (40% 더 비쌌다고 표시)
+  const original = Math.round(pkg.price * 1.4); // anchor price (shown as +40% more expensive)
   const seatsTotal = pkg.seatsLeft ? Math.max(100, pkg.seatsLeft + 23) : 100;
   const seatsUsed = seatsTotal - (pkg.seatsLeft ?? 77);
 
@@ -64,7 +64,7 @@ export default function PaywallStarter({
       <div className="w-full max-w-md glass-strong rounded-3xl p-6 neon-border relative overflow-hidden animate-fade-up">
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted/40 flex items-center justify-center"
+          className="absolute top-3 right-3 min-h-[44px] min-w-[44px] rounded-full bg-muted/40 flex items-center justify-center"
           aria-label={t("close")}
         >
           <X className="w-4 h-4" />

@@ -9,10 +9,10 @@ import { useTranslation } from "react-i18next";
 const KEY = "phonara_exit_intent_v1";
 
 /**
- * Exit-intent modal — 결제 페이지 이탈 시도 시 1회 한정 +₩2,000 보너스 제안.
- * 트리거 조건:
- *   - 마우스가 화면 상단 밖으로 빠져나갈 때 (desktop)
- *   - 뒤로가기 history popstate (mobile)
+ * Exit-intent modal — one-time +₩2,000 bonus offer when user tries to leave the paywall.
+ * Triggers:
+ *   - Mouse leaves the viewport from the top edge (desktop)
+ *   - History popstate / back button (mobile)
  */
 export default function ExitIntentModal({
   bonus = 2_000,
@@ -68,7 +68,7 @@ export default function ExitIntentModal({
       <div className="relative w-full max-w-sm glass-strong neon-border rounded-3xl p-6 overflow-hidden">
         <button
           onClick={close}
-          className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-muted/40 text-muted-foreground"
+          className="absolute top-2 right-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-muted/40 text-muted-foreground"
           aria-label={t("close")}
         >
           <X className="w-4 h-4" />

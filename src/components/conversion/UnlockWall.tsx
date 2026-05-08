@@ -19,7 +19,7 @@ export default function UnlockWall({
       <div className="w-full max-w-md glass-strong rounded-3xl p-6 neon-border relative overflow-hidden animate-fade-up">
         <button
           onClick={() => { void trackDismiss("unlock_wall", "v1", { amount }); onClose(); }}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted/40 flex items-center justify-center"
+          className="absolute top-3 right-3 min-h-[44px] min-w-[44px] rounded-full bg-muted/40 flex items-center justify-center"
           aria-label={t("close")}
         >
           <X className="w-4 h-4" />
