@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { TrendingUp, ChevronRight } from "lucide-react";
-import { useDB, formatKRW } from "@/lib/store";
+import { useDB, formatKRW, type Tier } from "@/lib/store";
 import TierBadge from "./TierBadge";
 
-const TIER_AVG_DAILY: Record<string, number> = {
+const TIER_AVG_DAILY: Record<Tier, number> = {
   NORMAL: 1_200,
   VIP: 14_000,
   GOD: 47_000,
@@ -18,7 +18,7 @@ export default function TierComparisonCard() {
   const myDaily = u.todayEarnings;
   const myTier = u.tier;
 
-  const tiers: Array<{ tier: keyof typeof TIER_AVG_DAILY; label: string }> = [
+  const tiers: Array<{ tier: Tier; label: string }> = [
     { tier: "NORMAL", label: "FREE" },
     { tier: "VIP", label: "VIP" },
     { tier: "GOD", label: "GOD" },
