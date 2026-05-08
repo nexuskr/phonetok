@@ -160,6 +160,20 @@ export default function Trust() {
           <Tile icon={Clock} label="마지막 정산 실행" value={loading ? "—" : (m?.last_cron_at ? new Date(m.last_cron_at).toLocaleString("ko-KR") : "—")} ok={!!m?.last_cron_at} small />
         </section>
 
+        {/* Synthetic uptime canary */}
+        <section className="mt-6 glass-strong rounded-3xl p-6 border border-secondary/20">
+          <div className="flex items-center justify-between mb-3">
+            <div className="font-display font-black text-base">합성 가동률 카나리</div>
+            <div className="text-[10px] text-muted-foreground">5분마다 외부 핑</div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Tile icon={Activity} label="성공률 (24h)" value={loading ? "—" : fmtPct(u?.success_rate_24h ?? 0)} ok={(u?.success_rate_24h ?? 0) >= 99} />
+            <Tile icon={Activity} label="성공률 (7d)" value={loading ? "—" : fmtPct(u?.success_rate_7d ?? 0)} ok={(u?.success_rate_7d ?? 0) >= 99} />
+            <Tile icon={Clock} label="p95 지연 (24h)" value={loading ? "—" : `${u?.p95_latency_ms_24h ?? 0}ms`} ok={(u?.p95_latency_ms_24h ?? 0) <= 1500} />
+            <Tile icon={Clock} label="마지막 핑" value={loading ? "—" : (u?.last_ping_at ? new Date(u.last_ping_at).toLocaleTimeString("ko-KR") : "—")} ok={!!u?.last_ok} small />
+          </div>
+        </section>
+
         <section className="mt-12 glass-strong rounded-3xl p-6 border border-primary/20 text-xs text-muted-foreground leading-relaxed">
           <div className="font-display font-black text-base text-foreground mb-2">우리의 약속</div>
           <ul className="space-y-1 list-disc list-inside">
