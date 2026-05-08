@@ -392,21 +392,46 @@ export default function SecurityAuditAdmin() {
               );
             })()}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <label className="text-[10px] text-muted-foreground flex items-center gap-1">
               <input type="checkbox" checked={showAckOnly} onChange={(e) => setShowAckOnly(e.target.checked)} /> 처리 포함
             </label>
+            <button onClick={() => exportAnomalies("json")} className="px-2 py-1 rounded-lg glass text-[10px] font-bold">JSON</button>
+            <button onClick={() => exportAnomalies("csv")} className="px-2 py-1 rounded-lg glass text-[10px] font-bold">CSV</button>
             <button onClick={scanAnomalies} disabled={scanningAnom}
               className="px-3 py-2 rounded-xl bg-destructive/20 text-destructive text-xs font-bold flex items-center gap-1.5 press">
               <Radar className={`w-3.5 h-3.5 ${scanningAnom ? "animate-spin" : ""}`} /> 즉시 스캔
             </button>
           </div>
         </div>
+        <div className="grid grid-cols-3 gap-2 mb-2">
+          <input value={ruleFilter} onChange={(e) => setRuleFilter(e.target.value)} placeholder="룰 검색"
+            className="rounded-lg bg-background/40 border border-border px-2 py-1.5 text-[11px]" />
+          <input value={userFilter} onChange={(e) => setUserFilter(e.target.value)} placeholder="user_id"
+            className="rounded-lg bg-background/40 border border-border px-2 py-1.5 text-[11px] font-mono" />
+          <select value={sevFilter} onChange={(e) => setSevFilter(e.target.value)}
+            className="rounded-lg bg-background/40 border border-border px-2 py-1.5 text-[11px]">
+            <option value="all">전체 심각도</option>
+            <option value="low">low</option>
+            <option value="medium">medium</option>
+            <option value="high">high</option>
+            <option value="critical">critical</option>
+          </select>
+        </div>
+        {selected.size > 0 && (
+          <div className="mb-2 flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-secondary/10 border border-secondary/30">
+            <span className="text-[11px] font-bold">{selected.size}건 선택됨</span>
+            <div className="flex gap-2">
+              <button onClick={() => setSelected(new Set())} className="text-[10px] text-muted-foreground underline">해제</button>
+              <button onClick={bulkAck} className="px-2 py-1 rounded bg-secondary/30 text-secondary text-[10px] font-bold">일괄 확인 처리</button>
+            </div>
+          </div>
+        )}
         <div className="space-y-2 max-h-72 overflow-y-auto">
-          {anomalies.filter(a => showAckOnly || !a.acknowledged).length === 0 && (
-            <div className="text-xs text-muted-foreground text-center py-4">탐지된 이상치 없음</div>
+          {filteredAnomalies.length === 0 && (
+            <div className="text-xs text-muted-foreground text-center py-4">조건에 맞는 이상치 없음</div>
           )}
-          {anomalies.filter(a => showAckOnly || !a.acknowledged).map((a) => {
+          {filteredAnomalies.map((a) => {
             const sevTone = a.severity === "critical" || a.severity === "high"
               ? "text-destructive bg-destructive/15 border-destructive/30"
               : a.severity === "medium" ? "text-gold bg-gold/15 border-gold/30"
@@ -415,6 +440,9 @@ export default function SecurityAuditAdmin() {
               <div key={a.id} className="glass rounded-2xl p-3">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2 min-w-0">
+                    {!a.acknowledged && (
+                      <input type="checkbox" checked={selected.has(a.id)} onChange={() => toggleSel(a.id)} className="shrink-0" />
+                    )}
                     <BellRing className={`w-4 h-4 ${a.acknowledged ? "text-muted-foreground" : "text-destructive"}`} />
                     <span className="text-xs font-bold truncate">{a.rule}</span>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold border ${sevTone}`}>{a.severity}</span>
@@ -423,6 +451,7 @@ export default function SecurityAuditAdmin() {
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-[10px] text-muted-foreground">{new Date(a.created_at).toLocaleString("ko-KR")}</span>
                     <button onClick={() => setAnomalyDetail(a)} className="p-1 rounded hover:bg-accent/20"><Eye className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => redetect(a.id)} className="px-2 py-1 rounded glass text-[10px] font-bold">재탐지</button>
                     {!a.acknowledged && (
                       <button onClick={() => ackAnomaly(a.id)} className="px-2 py-1 rounded bg-secondary/20 text-secondary text-[10px] font-bold flex items-center gap-1">
                         <Check className="w-3 h-3" /> 확인
