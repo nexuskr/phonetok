@@ -69,13 +69,12 @@ export default function SecurityAuditAdmin() {
 
   async function load() {
     setLoading(true);
-    const sb = supabase as any;
     const [a, s, sl, ar, an] = await Promise.all([
-      sb.from("security_audit_log").select("*").order("created_at", { ascending: false }).limit(200),
-      sb.from("cron_settle_audit_log").select("*").order("created_at", { ascending: false }).limit(50),
-      sb.rpc("settlement_slo"),
-      sb.from("policy_assertion_runs").select("*").order("created_at", { ascending: false }).limit(100),
-      sb.from("anomaly_events").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("security_audit_log").select("*").order("created_at", { ascending: false }).limit(200),
+      supabase.from("cron_settle_audit_log").select("*").order("created_at", { ascending: false }).limit(50),
+      supabase.rpc("settlement_slo"),
+      supabase.from("policy_assertion_runs").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("anomaly_events").select("*").order("created_at", { ascending: false }).limit(100),
     ]);
     setAudits((a.data ?? []) as AuditRow[]);
     setSettles((s.data ?? []) as SettleRow[]);
