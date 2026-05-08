@@ -483,7 +483,7 @@ const resources = {
       promise3: "정책 단언은 anon 사용자가 민감 데이터에 접근할 수 없음을 매일 실증합니다.",
       promise4: "이상 행위(출금 버스트·정산 직후 출금 등)는 5분마다 자동 탐지됩니다.",
       generated: "데이터 생성: {{val}}",
-    publicApi: "공개 상상태 API:",
+    publicApi: "공개 상태 API:",
       shieldsBadge: "Shields.io 배지",
       loadFail: "데이터 로드 실패",
       seoTitle: "Phonara Trust — 공개 신뢰 지표",
