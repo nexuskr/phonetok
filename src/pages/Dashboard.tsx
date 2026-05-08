@@ -110,15 +110,15 @@ export default function Dashboard() {
 
               <div className="relative">
                 <div className="flex items-center justify-between">
-                  <div className="text-xs text-muted-foreground tracking-widest">현재 잔고</div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold/20 text-gold font-bold">{user.tier}</span>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground tracking-[0.2em] uppercase">{t("currentBalance")}</div>
+                  <span className="lux-chip lux-chip-gold">{user.tier}</span>
                 </div>
                 <button onClick={() => { setBurst(true); setTimeout(() => setBurst(false), 1600); }}
-                  className="font-display font-black text-4xl sm:text-5xl mt-2 text-gradient-gold block sm:hover:scale-105 transition">
+                  className="font-display font-black text-4xl sm:text-5xl mt-2 text-money-strong block sm:hover:scale-105 transition tabular-nums">
                   {formatKRW(user.balance)}
                 </button>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  코인 잔고 <span className="text-secondary font-bold">{user.coinBalance.toLocaleString()} USDT</span>
+                  {t("coinBalance")} <span className="text-money font-black tabular-nums">{user.coinBalance.toLocaleString()} USDT</span>
                 </div>
                 <div className="mt-1 flex items-center gap-2 text-xs text-secondary">
                   <TrendingUp className="w-3.5 h-3.5" /> 오늘 +{formatKRW(user.todayEarnings)} 적립됨
