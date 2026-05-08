@@ -56,20 +56,26 @@
   html, body, #root { @apply min-h-screen; }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Pretendard', -apple-system, system-ui, sans-serif;
+    font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Apple SD Gothic Neo', sans-serif;
+    font-feature-settings: "ss01", "ss02", "cv11", "tnum";
+    letter-spacing: -0.005em;
     background: var(--gradient-bg);
     background-attachment: fixed;
     overflow-x: hidden;
     word-break: keep-all;
     overflow-wrap: break-word;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   /* Latin-only text (numbers, codes, brand wordmarks) should not keep-all */
   .font-hud, .tabular-nums, .font-imperial, [lang="en"] {
     word-break: normal;
   }
-  .font-display { font-family: 'Fraunces', 'Pretendard', serif; letter-spacing: -0.01em; font-optical-sizing: auto; }
-  .font-imperial { font-family: 'Italiana', 'Fraunces', serif; letter-spacing: 0.18em; }
-  .font-hud { font-family: 'Orbitron', 'Pretendard', sans-serif; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+  .font-display { font-family: 'Cormorant Garamond', 'Fraunces', 'Pretendard Variable', serif; letter-spacing: -0.005em; font-optical-sizing: auto; }
+  .font-imperial { font-family: 'Italiana', 'Cormorant Garamond', 'Pretendard Variable', serif; letter-spacing: 0.16em; }
+  .font-hud { font-family: 'Space Grotesk', 'Pretendard Variable', system-ui, sans-serif; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+  .tabular-nums { font-feature-settings: "tnum"; font-variant-numeric: tabular-nums; }
   .text-gradient-imperial {
     background: var(--gradient-imperial);
     -webkit-background-clip: text; background-clip: text; color: transparent;

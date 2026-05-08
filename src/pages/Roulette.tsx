@@ -50,6 +50,10 @@ export default function Roulette() {
 
   async function spin(kind: "standard" | "golden") {
     if (spinning || !user) return;
+    if ((stats?.remaining ?? 0) <= 0) {
+      toast({ title: t("todayDone"), description: t("tomorrow") });
+      return;
+    }
     setSpinning(true); setLastResult(null);
     const { data, error } = await supabase.rpc("spin_roulette" as any, { _kind: kind });
     if (error) {
@@ -160,12 +164,12 @@ export default function Roulette() {
             )}
 
             <div className="flex gap-2 mt-5 w-full">
-              <LuxButton variant="primary" size="lg" block disabled={spinning || (stats?.remaining ?? 0) <= 0} onClick={() => spin("standard")}>
-                {spinning ? t("spinning") : t("spinStandard")}
+              <LuxButton variant="primary" size="md" className="flex-1 min-w-0 px-3 text-sm" disabled={spinning} onClick={() => spin("standard")}>
+                <span className="truncate">{spinning ? t("spinning") : t("spinStandard")}</span>
               </LuxButton>
               {isEmpire && (
-                <LuxButton variant="gold" size="lg" block disabled={spinning || (stats?.remaining ?? 0) <= 0} onClick={() => spin("golden")}>
-                  {t("spinGolden")}
+                <LuxButton variant="gold" size="md" className="flex-1 min-w-0 px-3 text-sm" disabled={spinning} onClick={() => spin("golden")}>
+                  <span className="truncate">{t("spinGolden")}</span>
                 </LuxButton>
               )}
             </div>

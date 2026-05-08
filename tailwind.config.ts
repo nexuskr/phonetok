@@ -95,11 +95,11 @@ export default {
       },
 
       fontFamily: {
-        display: ["Fraunces", "Pretendard", "serif"],
-        imperial: ["Italiana", "Fraunces", "serif"],
-        sans: ["Pretendard", "system-ui", "sans-serif"],
-        title: ["Fraunces", "Pretendard", "serif"],
-        hud: ["Orbitron", "Pretendard", "sans-serif"],
+        display: ["Cormorant Garamond", "Fraunces", "Pretendard Variable", "serif"],
+        imperial: ["Italiana", "Cormorant Garamond", "Pretendard Variable", "serif"],
+        sans: ["Pretendard Variable", "Pretendard", "-apple-system", "BlinkMacSystemFont", "system-ui", "sans-serif"],
+        title: ["Cormorant Garamond", "Fraunces", "Pretendard Variable", "serif"],
+        hud: ["Space Grotesk", "Pretendard Variable", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
 
