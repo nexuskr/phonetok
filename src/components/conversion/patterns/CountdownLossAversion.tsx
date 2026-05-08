@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import { Clock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-/**
- * 손실 회피 카운트다운 — 보너스 소멸까지.
- * sessionStorage 기반 지속 — 모달 재오픈/페이지 이동에도 같은 타이머 유지(진짜 압박).
- */
 export default function CountdownLossAversion({
   minutes = 15,
-  label = "보너스 소멸까지",
+  label,
   storageKey = "phonara_paywall_deadline",
 }: {
   minutes?: number;
   label?: string;
   storageKey?: string;
 }) {
+  const { t } = useTranslation("convert");
+  const labelText = label ?? t("bonusExpire");
   const [left, setLeft] = useState(() => {
     if (typeof window === "undefined") return minutes * 60;
     const raw = sessionStorage.getItem(storageKey);
