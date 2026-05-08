@@ -60,6 +60,9 @@ export default function Wallet() {
   const [authCode, setAuthCode] = useState("");
   const [withdrawPw, setWithdrawPw] = useState("");
   const [resultCode, setResultCode] = useState<string | null>(null);
+  // P2: AML gate
+  const [amlOpen, setAmlOpen] = useState(false);
+  const [amlLevel, setAmlLevel] = useState<1 | 2 | 3>(2);
 
   if (!user) return null;
   const u = user;
