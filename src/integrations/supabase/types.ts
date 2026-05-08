@@ -1266,6 +1266,7 @@ export type Database = {
         Row: {
           code_used: string
           created_at: string
+          first_deposit_bonus_paid: boolean
           id: string
           invitee_id: string
           inviter_id: string
@@ -1275,6 +1276,7 @@ export type Database = {
         Insert: {
           code_used: string
           created_at?: string
+          first_deposit_bonus_paid?: boolean
           id?: string
           invitee_id: string
           inviter_id: string
@@ -1284,6 +1286,7 @@ export type Database = {
         Update: {
           code_used?: string
           created_at?: string
+          first_deposit_bonus_paid?: boolean
           id?: string
           invitee_id?: string
           inviter_id?: string
@@ -2152,10 +2155,25 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_referral_leaderboard: {
+        Row: {
+          commission_7d: number | null
+          invited_7d: number | null
+          inviter_id: string | null
+          nickname: string | null
+          rank: number | null
+          tier: Database["public"]["Enums"]["user_tier"] | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       _credit_referral_commission: {
         Args: { _base: number; _invitee: string; _source: string }
+        Returns: undefined
+      }
+      _credit_referral_first_deposit: {
+        Args: { _invitee: string }
         Returns: undefined
       }
       _cron_security_self_audit: { Args: never; Returns: undefined }
@@ -2173,6 +2191,10 @@ export type Database = {
       admin_release_freeze: {
         Args: { _freeze_id: string; _note?: string }
         Returns: undefined
+      }
+      admin_resolve_aml: {
+        Args: { _action: string; _id: string; _reason?: string }
+        Returns: Json
       }
       admin_resolve_deposit: {
         Args: { _action: string; _reason: string; _request_id: string }
@@ -2220,6 +2242,7 @@ export type Database = {
         Args: { _delta?: number; _metric: string }
         Returns: undefined
       }
+      check_achievements: { Args: { _user_id?: string }; Returns: Json }
       check_permission_drift: { Args: never; Returns: Json }
       check_rls_integrity: { Args: never; Returns: Json }
       claim_ai_bot_run: { Args: { _run_id: string }; Returns: Json }
@@ -2331,6 +2354,7 @@ export type Database = {
         }[]
       }
       get_my_quests: { Args: never; Returns: Json }
+      get_my_weekly_referral_rank: { Args: never; Returns: Json }
       get_next_empire_day: { Args: never; Returns: string }
       get_permission_change_log: {
         Args: { _limit?: number }
@@ -2401,6 +2425,17 @@ export type Database = {
           total_balance: number
           total_earned: number
           user_id: string
+        }[]
+      }
+      get_weekly_referral_leaderboard: {
+        Args: { _limit?: number }
+        Returns: {
+          commission_7d: number
+          invited_7d: number
+          inviter_id: string
+          nickname: string
+          rank: number
+          tier: Database["public"]["Enums"]["user_tier"]
         }[]
       }
       harvest_machine: { Args: { _purchase_id: string }; Returns: Json }
@@ -2579,6 +2614,15 @@ export type Database = {
         Args: {
           _kind: Database["public"]["Enums"]["ai_bot_kind"]
           _prompt: string
+        }
+        Returns: Json
+      }
+      submit_aml_verification: {
+        Args: {
+          _doc_signed?: boolean
+          _level: number
+          _metadata?: Json
+          _selfie_path?: string
         }
         Returns: Json
       }
