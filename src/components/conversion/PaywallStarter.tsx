@@ -124,6 +124,7 @@ export default function PaywallStarter({
               {formatKRW(pkg.totalReturn)}
             </span>
           </div>
+          <p className="mt-1 text-[9px] text-muted-foreground leading-tight">{t("thirtyDayDisclaimer")}</p>
 
           <button
             onClick={pay}

@@ -28,12 +28,12 @@ function compute(amount: number, pkg: Pkg) {
   return { daily, weekly, thirty, roi, empireBonus };
 }
 
-const STEPS = [100_000, 300_000, 500_000, 1_000_000, 3_000_000, 5_000_000, 10_000_000];
+const STEPS = [29_000, 100_000, 300_000, 500_000, 1_000_000, 3_000_000, 10_000_000];
 
 export default function EarningsSimulator() {
   const { t } = useTranslation("guide");
-  const [amount, setAmount] = useState(1_000_000);
-  const [pkg, setPkg] = useState<Pkg>("empire");
+  const [amount, setAmount] = useState(29_000);
+  const [pkg, setPkg] = useState<Pkg>("easy");
 
   const r = useMemo(() => compute(amount, pkg), [amount, pkg]);
 
@@ -111,7 +111,7 @@ export default function EarningsSimulator() {
           <Stat label={t("simulator.weekly")} value={`+${formatKRW(r.weekly)}`} />
           <Stat
             label={t("simulator.thirtyDay")}
-            value={`최대 +${formatKRW(r.thirty)}`}
+            value={`${formatKRW(r.thirty)}*`}
             big
           />
           <Stat
