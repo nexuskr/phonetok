@@ -1325,6 +1325,36 @@ export type Database = {
         }
         Relationships: []
       }
+      uptime_pings: {
+        Row: {
+          checked_at: string
+          error: string | null
+          http_status: number | null
+          id: string
+          indicator: string | null
+          latency_ms: number | null
+          ok: boolean
+        }
+        Insert: {
+          checked_at?: string
+          error?: string | null
+          http_status?: number | null
+          id?: string
+          indicator?: string | null
+          latency_ms?: number | null
+          ok: boolean
+        }
+        Update: {
+          checked_at?: string
+          error?: string | null
+          http_status?: number | null
+          id?: string
+          indicator?: string | null
+          latency_ms?: number | null
+          ok?: boolean
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_key: string
@@ -1856,6 +1886,7 @@ export type Database = {
         Returns: number
       }
       public_trust_metrics: { Args: never; Returns: Json }
+      public_uptime_summary: { Args: never; Returns: Json }
       purchase_season_pass: { Args: never; Returns: Json }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
@@ -1889,6 +1920,7 @@ export type Database = {
       }
       run_policy_assertions: { Args: never; Returns: Json }
       run_security_self_audit: { Args: { _source?: string }; Returns: Json }
+      run_uptime_canary: { Args: never; Returns: undefined }
       settle_mission: {
         Args: { _base_reward: number; _is_win: boolean; _mission_id: string }
         Returns: Json

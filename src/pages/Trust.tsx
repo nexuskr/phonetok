@@ -21,14 +21,30 @@ type Metrics = {
 const fmtKRW = (n: number) => `₩ ${Number(n || 0).toLocaleString()}`;
 const fmtPct = (n: number) => `${Number(n ?? 0).toFixed(2)}%`;
 
+type UptimeSummary = {
+  samples_24h: number;
+  success_rate_24h: number;
+  success_rate_7d: number;
+  p95_latency_ms_24h: number;
+  avg_latency_ms_24h: number;
+  last_ping_at: string | null;
+  last_ok: boolean | null;
+  generated_at: string;
+};
+
 export default function Trust() {
   const [m, setM] = useState<Metrics | null>(null);
+  const [u, setU] = useState<UptimeSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function load() {
     setLoading(true);
-    const { data } = await supabase.rpc("public_trust_metrics");
-    setM((data as Metrics) ?? null);
+    const [{ data: md }, { data: ud }] = await Promise.all([
+      supabase.rpc("public_trust_metrics"),
+      supabase.rpc("public_uptime_summary"),
+    ]);
+    setM((md as Metrics) ?? null);
+    setU((ud as unknown as UptimeSummary) ?? null);
     setLoading(false);
   }
   useEffect(() => { void load(); }, []);
@@ -142,6 +158,20 @@ export default function Trust() {
           <Tile icon={FileCheck2} label="정책 단언 통과 (7d)" value={loading ? "—" : fmtPct(m?.policy_pass_7d ?? 0)} ok={(m?.policy_pass_7d ?? 0) >= 99} />
           <Tile icon={Radar} label="미확인 이상치" value={loading ? "—" : String(m?.unack_anomalies ?? 0)} ok={(m?.unack_anomalies ?? 0) === 0} />
           <Tile icon={Clock} label="마지막 정산 실행" value={loading ? "—" : (m?.last_cron_at ? new Date(m.last_cron_at).toLocaleString("ko-KR") : "—")} ok={!!m?.last_cron_at} small />
+        </section>
+
+        {/* Synthetic uptime canary */}
+        <section className="mt-6 glass-strong rounded-3xl p-6 border border-secondary/20">
+          <div className="flex items-center justify-between mb-3">
+            <div className="font-display font-black text-base">합성 가동률 카나리</div>
+            <div className="text-[10px] text-muted-foreground">5분마다 외부 핑</div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Tile icon={Activity} label="성공률 (24h)" value={loading ? "—" : fmtPct(u?.success_rate_24h ?? 0)} ok={(u?.success_rate_24h ?? 0) >= 99} />
+            <Tile icon={Activity} label="성공률 (7d)" value={loading ? "—" : fmtPct(u?.success_rate_7d ?? 0)} ok={(u?.success_rate_7d ?? 0) >= 99} />
+            <Tile icon={Clock} label="p95 지연 (24h)" value={loading ? "—" : `${u?.p95_latency_ms_24h ?? 0}ms`} ok={(u?.p95_latency_ms_24h ?? 0) <= 1500} />
+            <Tile icon={Clock} label="마지막 핑" value={loading ? "—" : (u?.last_ping_at ? new Date(u.last_ping_at).toLocaleTimeString("ko-KR") : "—")} ok={!!u?.last_ok} small />
+          </div>
         </section>
 
         <section className="mt-12 glass-strong rounded-3xl p-6 border border-primary/20 text-xs text-muted-foreground leading-relaxed">
