@@ -24,6 +24,15 @@ interface NotificationRow {
   created_at: string;
 }
 
+// kinds that also trigger a browser/system push notification when permission granted
+const PUSH_KINDS = new Set(["rank_change", "weekly_payout", "weekly_pass_claim", "ai_mission_approved", "achievement"]);
+
+function tryBrowserPush(title: string, body: string, tag: string) {
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+  try { new Notification(title, { body, tag }); } catch {}
+}
+
 export default function NeonNotificationFeed() {
   const seen = useRef<Set<string>>(new Set());
 
