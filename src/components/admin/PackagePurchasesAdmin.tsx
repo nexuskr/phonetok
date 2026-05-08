@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { adminResolvePackage, settlePackagesNow } from "@/lib/packages-rpc";
 import { toast } from "@/hooks/use-toast";
 import { formatKRW } from "@/lib/store";
-import { Check, X, Zap } from "lucide-react";
+import { Check, X, Zap, RefreshCw, AlertTriangle, Clock, TrendingUp, CheckCircle2, XCircle, Wrench } from "lucide-react";
 
 type Row = {
   id: string;
@@ -18,6 +18,14 @@ type Row = {
   receipt_url: string | null;
   created_at: string;
   next_settle_at: string | null;
+};
+
+const STATUS_META: Record<string, { label: string; tone: string; icon: any }> = {
+  pending: { label: "대기", tone: "text-gold bg-gold/15 border-gold/30", icon: Clock },
+  active: { label: "승인/정산중", tone: "text-secondary bg-secondary/15 border-secondary/30", icon: TrendingUp },
+  completed: { label: "정산 완료", tone: "text-muted-foreground bg-muted/30 border-muted", icon: CheckCircle2 },
+  rejected: { label: "거절", tone: "text-destructive bg-destructive/15 border-destructive/30", icon: XCircle },
+  failed: { label: "실패", tone: "text-destructive bg-destructive/15 border-destructive/30", icon: AlertTriangle },
 };
 
 export default function PackagePurchasesAdmin() {
