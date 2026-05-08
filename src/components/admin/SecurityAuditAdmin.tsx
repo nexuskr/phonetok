@@ -324,3 +324,12 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: "ok
     </div>
   );
 }
+
+function Mini({ label, value, tone }: { label: string; value: string; tone?: "ok" | "fail" }) {
+  return (
+    <div className="glass rounded-lg p-2">
+      <div className="text-[9px] text-muted-foreground">{label}</div>
+      <div className={`font-bold mt-0.5 truncate ${tone === "ok" ? "text-secondary" : tone === "fail" ? "text-destructive" : ""}`}>{value}</div>
+    </div>
+  );
+}
