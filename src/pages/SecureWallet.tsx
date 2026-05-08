@@ -287,7 +287,7 @@ export default function SecureWallet() {
                 <div>
                   <div className="text-xs font-bold">{w.method === "bank" ? `${w.bank_name} ${w.bank_account}` : `${w.coin_network} ${w.coin_address?.slice(0,12)}...`}</div>
                   <div className="text-[10px] text-muted-foreground font-mono">{w.tx_code}</div>
-                  <div className="text-[10px] text-muted-foreground">{new Date(w.created_at).toLocaleString("ko-KR")}</div>
+                  <div className="text-[10px] text-muted-foreground tabular-nums">{new Date(w.created_at).toLocaleString(dtLocale)}</div>
                 </div>
                 <div className="text-right">
                   <div className="font-display font-bold text-primary">-{fmtKRW(w.amount)}</div>
@@ -296,12 +296,12 @@ export default function SecureWallet() {
               </div>
             ))}
 
-            <div className="text-[10px] tracking-[0.3em] text-muted-foreground font-bold mb-2 mt-5">트랜잭션 원장</div>
+            <div className="text-[10px] tracking-[0.3em] text-muted-foreground font-bold mb-2 mt-5">{t("txLedger")}</div>
             {txs.map(t => (
               <div key={t.id} className="glass rounded-xl p-3 flex items-center justify-between">
                 <div>
                   <div className="text-xs font-bold">{t.kind}</div>
-                  <div className="text-[10px] text-muted-foreground">{new Date(t.created_at).toLocaleString("ko-KR")}</div>
+                  <div className="text-[10px] text-muted-foreground tabular-nums">{new Date(t.created_at).toLocaleString(dtLocale)}</div>
                 </div>
                 <div className={`font-display font-bold tabular-nums ${t.direction==="credit"?"text-secondary":"text-primary"}`}>
                   {t.direction==="credit"?"+":"-"}{fmtKRW(t.amount)}
