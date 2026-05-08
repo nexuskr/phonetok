@@ -109,6 +109,18 @@ export default function Trust() {
   }
   useEffect(() => { void load(); /* eslint-disable-next-line */ }, [historyDays]);
 
+  // Re-load Trust data on auth state change (sign-in/out) — cache is also invalidated upstream.
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "TOKEN_REFRESHED") {
+        invalidateTrustCache();
+        void load(true);
+      }
+    });
+    return () => sub.subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     document.title = "Phonara Trust — 공개 신뢰 지표";
     const meta = document.querySelector('meta[name="description"]');
