@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatKRW } from "@/lib/store";
 import TierBadge from "@/components/status/TierBadge";
 import { toast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
+import { Money } from "@/components/ui/lux";
 
 type Row = {
   user_id: string;
@@ -29,6 +31,7 @@ const FALLBACK: Row[] = [
 ];
 
 export default function HallOfFame() {
+  const { t } = useTranslation("hof");
   const [list, setList] = useState<Row[]>(FALLBACK);
 
   useEffect(() => {
@@ -48,15 +51,15 @@ export default function HallOfFame() {
   }, []);
 
   function share(row: Row) {
-    const text = `🏆 명예의 전당 #${row.rank} ${row.nickname} - ${formatKRW(row.earned)} | Phonara`;
+    const text = t("shareText", { rank: row.rank, name: row.nickname, amount: formatKRW(row.earned) });
     const url = typeof window !== "undefined" ? window.location.origin : "";
     if (typeof navigator !== "undefined" && navigator.share) {
-      navigator.share({ title: "Phonara 명예의 전당", text, url }).catch(() => {});
+      navigator.share({ title: t("shareTitle"), text, url }).catch(() => {});
       return;
     }
     try {
       navigator.clipboard.writeText(`${text} ${url}`);
-      toast({ title: "📋 공유 링크 복사됨", description: "X·카카오톡에 붙여넣기" });
+      toast({ title: t("shareCopy"), description: t("shareDesc") });
     } catch { /* noop */ }
   }
 
@@ -66,12 +69,12 @@ export default function HallOfFame() {
       <div className="container pt-6 pb-10 animate-liquid-in">
         <div className="flex items-center gap-2 mb-1">
           <Trophy className="w-6 h-6 text-gold" />
-          <h1 className="font-imperial text-2xl text-gradient-gold tracking-[0.18em]">
-            HALL OF FAME
+          <h1 className="font-imperial text-2xl text-gradient-gold tracking-[0.18em] break-keep">
+            {t("title")}
           </h1>
         </div>
-        <p className="text-xs text-muted-foreground mb-5">
-          오늘의 황제 · 월간 TOP 10 · 영구 등재
+        <p className="text-xs text-muted-foreground mb-5 break-keep">
+          {t("subtitle")}
         </p>
 
         <div className="space-y-2">
@@ -81,9 +84,7 @@ export default function HallOfFame() {
             return (
               <div
                 key={r.user_id}
-                className={`relative glass-strong rounded-2xl p-4 flex items-center gap-3 ${
-                  isTop ? "neon-border" : ""
-                }`}
+                className={`relative glass-strong rounded-2xl p-4 flex items-center gap-3 ${isTop ? "neon-border" : ""}`}
               >
                 {isTop && (
                   <div className="absolute -top-2 -right-2 text-2xl animate-crown">
@@ -91,33 +92,28 @@ export default function HallOfFame() {
                   </div>
                 )}
                 <div
-                  className={`w-12 h-12 rounded-2xl flex items-center justify-center font-display font-black text-lg shrink-0 ${
-                    i === 0
-                      ? "bg-gradient-gold text-gold-foreground glow-imperial"
-                      : i === 1
-                      ? "bg-secondary/30 text-secondary"
-                      : i === 2
-                      ? "bg-accent/30 text-accent"
-                      : "bg-muted text-muted-foreground"
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center font-display font-black text-lg shrink-0 tabular-nums ${
+                    i === 0 ? "bg-gradient-gold text-gold-foreground glow-imperial"
+                    : i === 1 ? "bg-secondary/30 text-secondary"
+                    : i === 2 ? "bg-accent/30 text-accent"
+                    : "bg-muted text-muted-foreground"
                   }`}
                 >
                   #{r.rank}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-display font-bold text-sm truncate">
-                      {r.nickname}
-                    </span>
+                    <span className="font-display font-bold text-sm truncate">{r.nickname}</span>
                     <TierBadge tier={tier} size="xs" />
                   </div>
-                  <div className="font-display font-black text-base text-money-strong tabular-nums mt-0.5">
+                  <Money strong className="font-display font-black text-base mt-0.5 block">
                     {formatKRW(r.earned)}
-                  </div>
+                  </Money>
                 </div>
                 <button
                   onClick={() => share(r)}
-                  className="press shrink-0 w-9 h-9 rounded-xl glass flex items-center justify-center"
-                  aria-label="공유"
+                  className="press shrink-0 w-11 h-11 min-w-[44px] rounded-xl glass flex items-center justify-center"
+                  aria-label={t("shareLabel")}
                 >
                   <Share2 className="w-4 h-4 text-primary" />
                 </button>
@@ -128,8 +124,8 @@ export default function HallOfFame() {
 
         <div className="mt-6 glass rounded-2xl p-4 text-center">
           <Crown className="w-6 h-6 text-gold mx-auto" />
-          <div className="font-imperial text-sm text-gradient-gold mt-2">
-            오늘의 황제는 24시간 동안 EMPIRE 배지를 획득합니다
+          <div className="font-imperial text-sm text-gradient-gold mt-2 break-keep">
+            {t("footer")}
           </div>
         </div>
       </div>

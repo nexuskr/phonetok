@@ -7,6 +7,8 @@ import EmpireFoundingCounter from "@/components/EmpireFoundingCounter";
 import EmpireDayCountdown from "@/components/EmpireDayCountdown";
 import { Crown, Trophy, Lock } from "lucide-react";
 import { formatKRW } from "@/lib/store";
+import { useTranslation } from "react-i18next";
+import { LuxButton, Money } from "@/components/ui/lux";
 
 type Founding = {
   id: string;
@@ -18,9 +20,9 @@ type Founding = {
 export default function Empire() {
   const user = useRequireAuth();
   const nav = useNavigate();
+  const { t } = useTranslation("empire");
   const [me, setMe] = useState<Founding | null>(null);
   const [loading, setLoading] = useState(true);
-  const [board, setBoard] = useState<{ seat_no: number; nickname: string | null }[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -45,43 +47,40 @@ export default function Empire() {
     <Layout>
       <div className="container pt-6 pb-10 animate-liquid-in">
         <div className="mb-6">
-          <h1 className="font-display font-black text-2xl flex items-center gap-2">
+          <h1 className="font-imperial font-black text-2xl flex items-center gap-2 break-keep">
             <Crown className="w-6 h-6 text-gold" />
-            <span className="text-gradient-gold">Empire Lounge</span>
+            <span className="text-gradient-gold">{t("title")}</span>
           </h1>
-          <p className="text-xs text-muted-foreground mt-1">Founding Member 30석 한정 · Empire Day(매월 1·15일) Day 4+ 보유자 +50%</p>
+          <p className="text-xs text-muted-foreground mt-1 break-keep">{t("subtitle")}</p>
         </div>
 
         {loading ? null : !me ? (
           <div className="glass-strong rounded-3xl p-8 text-center neon-border">
             <Lock className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <h2 className="font-display font-black text-lg mb-1">Founding Member 전용 공간</h2>
-            <p className="text-xs text-muted-foreground mb-4">
-              Empire 패키지를 구매하시면 Founding 좌석(30석 한정) 자동 시도 + 라운지가 열립니다.
-            </p>
+            <h2 className="font-imperial font-black text-lg mb-1 break-keep">{t("gateTitle")}</h2>
+            <p className="text-xs text-muted-foreground mb-4 break-keep">{t("gateDesc")}</p>
             <div className="space-y-3 max-w-sm mx-auto">
               <EmpireFoundingCounter />
               <EmpireDayCountdown />
             </div>
-            <button onClick={() => nav("/packages")}
-              className="mt-5 px-6 py-3 rounded-xl bg-gradient-to-r from-gold via-primary to-gold font-display font-black text-sm text-background">
-              Empire 보기
-            </button>
+            <LuxButton variant="gold" size="lg" block onClick={() => nav("/packages")} className="mt-5 max-w-sm mx-auto">
+              <Crown className="w-4 h-4" /> {t("goPackages")}
+            </LuxButton>
           </div>
         ) : (
           <div className="space-y-4">
             <div className="glass-strong rounded-3xl p-6 neon-border relative overflow-hidden">
               <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-gold/30 blur-3xl" />
               <div className="relative">
-                <div className="flex items-center gap-2 text-xs text-gold font-bold mb-1">
-                  <Crown className="w-4 h-4" /> Founding Seat #{me.founding_seat_no}
+                <div className="flex items-center gap-2 text-xs text-gold font-bold mb-1 tabular-nums">
+                  <Crown className="w-4 h-4" /> {t("seat", { n: me.founding_seat_no })}
                 </div>
-                <h2 className="font-display font-black text-xl">{me.package_name}</h2>
-                <p className="text-[11px] text-muted-foreground mt-1">평생 Founding 뱃지 · Day 4+ Empire Day 자동 +50%</p>
+                <h2 className="font-imperial font-black text-xl break-keep">{me.package_name}</h2>
+                <p className="text-[11px] text-muted-foreground mt-1 break-keep">{t("foreverBadge")}</p>
                 <div className="mt-4 grid grid-cols-2 gap-2">
                   <div className="glass rounded-xl p-3">
-                    <div className="text-[10px] text-muted-foreground">누적 수확</div>
-                    <div className="font-display font-black text-base text-gradient-gold">{formatKRW(me.total_settled)}</div>
+                    <div className="text-[10px] text-muted-foreground">{t("totalHarvest")}</div>
+                    <Money strong className="font-display font-black text-base block">{formatKRW(me.total_settled)}</Money>
                   </div>
                   <div className="glass rounded-xl p-3 flex items-center justify-center">
                     <EmpireDayCountdown />
@@ -94,11 +93,9 @@ export default function Empire() {
 
             <div className="glass rounded-2xl p-4">
               <div className="flex items-center gap-2 text-xs font-bold mb-3">
-                <Trophy className="w-4 h-4 text-gold" /> Founding 좌석 현황
+                <Trophy className="w-4 h-4 text-gold" /> {t("seatsTitle")}
               </div>
-              <p className="text-[10px] text-muted-foreground">
-                ※ 좌석 1~30 · 본인 외 다른 Founding 멤버 정보는 비공개
-              </p>
+              <p className="text-[10px] text-muted-foreground break-keep">{t("seatsNote")}</p>
             </div>
           </div>
         )}
