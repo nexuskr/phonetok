@@ -123,8 +123,9 @@ export default function Packages() {
 
                         <div className="mt-3 glass rounded-2xl p-3 flex items-center justify-between gap-2 flex-wrap">
                           <span className="text-[11px] text-muted-foreground break-keep">{t("total30d")}</span>
-                          <span className="font-imperial font-black text-lg text-money-strong tabular-nums">{formatKRW(p.totalReturn)}</span>
+                          <span className="font-imperial font-black text-lg text-money-strong tabular-nums">{formatKRW(p.totalReturn)}*</span>
                         </div>
+                        <p className="mt-1.5 text-[9px] text-muted-foreground leading-tight break-keep">{t("disclaimer")}</p>
 
                         <PackageBoostPreview
                           dailyReturn={p.dailyReturn}
