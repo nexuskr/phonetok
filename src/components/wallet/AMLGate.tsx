@@ -11,9 +11,11 @@ interface Props {
   level: 1 | 2 | 3;
   onClose: () => void;
   onApproved?: () => void;
+  /** Preview-only mode: shows the verification UI but never submits. */
+  mode?: "live" | "preview";
 }
 
-export default function AMLGate({ open, level, onClose, onApproved }: Props) {
+export default function AMLGate({ open, level, onClose, onApproved, mode = "live" }: Props) {
   const { t } = useTranslation("wallet");
   const [uploading, setUploading] = useState(false);
   const [selfiePath, setSelfiePath] = useState<string | null>(null);
@@ -43,6 +45,11 @@ export default function AMLGate({ open, level, onClose, onApproved }: Props) {
   }
 
   async function submit() {
+    if (mode === "preview") {
+      toast({ title: "✓ 연습 완료", description: "실제 출금이 아닙니다 — 단계 안내만 둘러봤습니다." });
+      onClose();
+      return;
+    }
     if (level >= 2 && !selfiePath) {
       toast({ title: "셀카가 필요합니다", variant: "destructive" }); return;
     }

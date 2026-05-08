@@ -99,7 +99,7 @@ export function useUserNotifications(userId: string | null | undefined) {
     };
 
     const ch = supabase
-      .channel(`user-notify:${userId}`)
+      .channel(`user-notify:${userId}:${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes",
         { event: "INSERT", schema: "public", table: "transactions", filter: `user_id=eq.${userId}` },
         (p) => {

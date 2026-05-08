@@ -61,7 +61,7 @@ export default function Support() {
         .select("id,sender,message,created_at").eq("thread_id", tid).order("created_at", { ascending: true });
       setMessages((msgs as Msg[]) || []);
 
-      channel = supabase.channel(`support:${tid}`)
+      channel = supabase.channel(`support:${tid}:${Math.random().toString(36).slice(2)}`)
         .on("postgres_changes",
           { event: "INSERT", schema: "public", table: "support_messages", filter: `thread_id=eq.${tid}` },
           (payload) => setMessages(prev => [...prev, payload.new as Msg])
