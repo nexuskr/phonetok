@@ -1,40 +1,92 @@
-# 전체 진행상황 1000% 검증 보고서
+# Admin 통합 활동 로그 — 가벼운 1단계 플랜
 
-## ✅ 실증 결과 (DB·UI 동시 확인)
+## 목표
+DB 구조·뷰·RPC·ESLint 룰 같은 **무거운 인프라는 만들지 않는다.** 대신 Admin 화면에서 mission · roulette · package · settlement · anomaly 활동을 **한 화면에서 보기**만 추가한다. 코드는 React 레벨, DB는 손대지 않음.
 
-| 영역 | 검증 항목 | 실측치 | 상태 |
-|---|---|---|---|
-| Cron 잡 | 활성 스케줄 | **10개** | ✅ |
-| 정책 어서션 | active 어서션 수 | **15개** (신규 7 + 기존 8) | ✅ |
-| 신규 RPC 함수 | 7종 모두 등록 | **8/8** (보너스 1) | ✅ |
-| Chaos runs | 누적 실행 | 1건 (13/13 PASS) | ✅ |
-| Account freezes | 활성 freeze | 0건 (정상) | ✅ |
-| Webhook 구독 | 등록된 구독 | 0건 (UI 준비됨, 사용자 등록 대기) | 🟡 |
-| FreezeBanner | Layout 통합 | import + 렌더 OK | ✅ |
-| 관제 콕핏 | Admin 탭 추가 | 4개 서브탭 동작 | ✅ |
+---
 
-## 🎯 A~H 모든 트랙 = **완료**
+## 무엇을 하는가 (1단계 only)
 
-- **A** 자동 freeze 루프 ✅
-- **B** 빌드 성능 (brotli/gzip/modulePreload) ✅
-- **C** 외부 트러스트 (webhook + 90일 히트맵) ✅
-- **D** Observability (spans + slow_requests_top) ✅
-- **E** Chaos 자동화 (daily probe + 자가치유 anomaly 연결) ✅
-- **F** Admin 관제 콕핏 (Slow Top 20 / Webhooks / Freezes / Chaos History 4탭) ✅
-- **G** End-to-end 자가치유 회로 + FreezeBanner 카운트다운 ✅
-- **H** 신규 7개 테이블 RLS 회귀 어서션 ✅
+### Admin → Observability Cockpit에 새 탭 1개 추가
+**탭 이름**: "활동 로그" (또는 "Recent Activity")
 
-## 🟡 남은 "운영 활성화" (코드 작업이 아닌 사용자의 액션)
+**기능**:
+- 최근 활동을 시간순 통합 리스트로 표시
+- 출처(kind) 필터: 미션 / 룰렛 / 패키지 / 정산 / 이상치
+- 기간 필터: 최근 24시간 / 7일 / 30일
+- 항목 클릭 시 원본 row 정보 펼침 (JSON)
 
-1. **Webhook URL 등록** — `/admin → 관제 콕핏 → Webhooks` 탭에서 외부 endpoint(예: Slack/Discord webhook) 1개 등록하면 anomaly·freeze·chaos 실패가 실시간으로 외부에 통보됨
-2. **Span 인스트루먼트 시드** — `record_span()` RPC가 만들어져 있지만 실제 호출 코드가 라우팅 곳곳에 깔리기 전엔 Slow Top 20이 비어 있음 → 다음 작업으로 자동 인스트루먼트 미들웨어 추가 가능
+---
 
-## 🔮 그 다음 단계 (선택, I~K)
+## 무엇을 안 하는가 (의식적으로 보류)
 
-- **I. Span 자동 인스트루먼트** — React Router 라우트 변경/Supabase RPC 호출 wrapping → spans 자동 기록 → Slow Top 20에 실데이터 흐름
-- **J. Lighthouse 100×4 실측** — hero AVIF, font-display:swap, route lazy split, 측정 리포트 자동 저장
-- **K. SEO 끝판왕** — 동적 sitemap 엣지, 페이지별 OG 이미지 자동 생성, 구조화 데이터 3종 (Organization/WebSite/Breadcrumb)
+- ❌ `v_executions` view
+- ❌ `get_executions()` RPC + SECURITY DEFINER
+- ❌ `execution_lifecycle` enum
+- ❌ `execution_access_log` 감사 테이블
+- ❌ ESLint custom rule
+- ❌ i18n 5컨텍스트 분리
+- ❌ DB 마이그레이션 일체
 
-## 결론
+→ 위 항목은 **3단계**에서 필요해질 때 다시 꺼낸다. 지금은 봉인.
 
-**A~H 8개 트랙 100% 적용 완료.** 인프라·자가치유·관제·정책 회귀 모두 실측으로 검증됨. 추가로 한 단계 더 가려면 위 I/J/K 중 선택해 주시면 됩니다 — 가장 큰 ROI는 **I (Span 자동 인스트루먼트)** 입니다 (관제 콕핏의 Slow Top 20이 즉시 살아나며 D 트랙이 완전체가 됨).
+---
+
+## 구현 방식 (가장 단순한 길)
+
+### 1) 새 컴포넌트
+`src/components/admin/RecentActivity.tsx`
+
+### 2) 데이터 가져오기 — 클라이언트 측 병렬 조회
+이미 존재하는 RLS(admin은 모든 행 조회 가능)를 그대로 활용:
+```text
+Promise.all([
+  supabase.from('mission_history').select(...).order('created_at', desc).limit(50),
+  supabase.from('package_purchases').select(...).order('created_at', desc).limit(50),
+  supabase.from('roulette_spins').select(...).order('created_at', desc).limit(50),
+  supabase.from('transactions').select(...).eq('kind','settlement').limit(50),
+  supabase.from('anomaly_events').select(...).order('created_at', desc).limit(50),
+])
+```
+→ 클라이언트에서 병합·정렬·필터. **DB 변경 0.**
+
+### 3) 렌더링
+- 각 row를 `{ kind, ts, actor, summary, raw }` 형태로 정규화 (TS 타입만, DB enum 아님)
+- Tailwind + 기존 `glass` 스타일 재사용
+- kind별 아이콘·컬러 토큰 (이미 있는 디자인 시스템 활용)
+
+### 4) 통합 위치
+`src/components/admin/ObservabilityCockpit.tsx`에 탭 1개 추가 (기존 패턴 그대로).
+
+---
+
+## "Execution" 어휘는 — 도입만, 강제는 안 함
+- 컴포넌트 내부 변수명에서만 `executions: ActivityItem[]` 같이 사용
+- DB·라우트·i18n에는 영향 없음
+- 사용자에게 보이는 라벨은 그대로 "미션", "룰렛", "패키지"
+
+---
+
+## 검증 (간단)
+- [ ] /admin 접근 시 비-admin은 거부 (기존 가드 그대로 작동)
+- [ ] 탭 진입 → 5개 도메인 데이터가 시간순으로 보임
+- [ ] kind 필터 토글 시 즉시 반영
+- [ ] 로딩 스켈레톤 / 에러 상태 표시
+- [ ] 모바일(889px) 가로 스크롤 없이 가독성 OK
+
+---
+
+## 향후 단계 (지금은 보류)
+
+**2단계** (체감 후 필요해지면)
+- 코드 내부에서만 "execution" 개념 일관 적용 (DB는 그대로)
+
+**3단계** (트래픽·감사 요구가 실제로 생기면)
+- 그때 가서 `v_executions` + `get_executions()` + 감사 로그 인프라 도입
+
+---
+
+## 한 줄 결론
+> **"통합처럼 보이게 UX만 정리한다. 인프라는 필요해진 다음에 만든다."**
+
+작업 범위: 새 컴포넌트 1개, 기존 탭 영역에 끼우기. DB·마이그레이션·lint·i18n 변경 0.
