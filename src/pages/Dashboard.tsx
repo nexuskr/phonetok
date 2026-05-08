@@ -29,7 +29,6 @@ import { useTranslation } from "react-i18next";
 export default function Dashboard() {
   const [db] = useDB();
   const { t } = useTranslation("dashboard");
-  const { t: tn } = useTranslation("nav");
   const user = useRequireAuth() ?? db.user;
   const [burst, setBurst] = useState(false);
   const online = useOnline();
