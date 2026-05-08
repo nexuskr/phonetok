@@ -181,7 +181,7 @@ export default function SecurityAuditAdmin() {
 
   useEffect(() => { void load(); }, []);
 
-  // Realtime subscription with admin verification + auto-resubscribe + presence indicator
+  // Realtime subscription with admin verification + auto-resubscribe + auth-change re-validation
   const [rtStatus, setRtStatus] = useState<"connecting" | "live" | "down">("connecting");
   useEffect(() => {
     let channel: ReturnType<typeof supabase.channel> | null = null;
@@ -189,10 +189,20 @@ export default function SecurityAuditAdmin() {
     let retryTimer: ReturnType<typeof setTimeout> | null = null;
     let attempts = 0;
 
+    function teardown() {
+      if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
+      if (channel) { supabase.removeChannel(channel); channel = null; }
+    }
+
     async function connect() {
-      // Verify admin role server-side; only authenticated admins receive events
+      teardown();
+      if (cancelled) return;
+      setRtStatus("connecting");
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) { if (!cancelled) setRtStatus("down"); return; }
       const { data: isAdmin, error: roleErr } = await (supabase as any)
-        .rpc("has_role", { _user_id: (await supabase.auth.getUser()).data.user?.id, _role: "admin" });
+        .rpc("has_role", { _user_id: uid, _role: "admin" });
       if (roleErr || !isAdmin) {
         if (!cancelled) setRtStatus("down");
         return;
@@ -200,7 +210,7 @@ export default function SecurityAuditAdmin() {
       if (cancelled) return;
 
       channel = supabase
-        .channel(`anomaly_events_admin_${Date.now()}`)
+        .channel(`anomaly_events_admin_${uid}_${Date.now()}`)
         .on("postgres_changes",
           { event: "INSERT", schema: "public", table: "anomaly_events" },
           (payload) => {
@@ -235,18 +245,31 @@ export default function SecurityAuditAdmin() {
           else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
             setRtStatus("down");
             const backoff = Math.min(30_000, 1000 * Math.pow(2, attempts++));
-            retryTimer = setTimeout(() => { if (channel) supabase.removeChannel(channel); void connect(); }, backoff);
+            retryTimer = setTimeout(() => { void connect(); }, backoff);
           }
         });
     }
     void connect();
 
+    // Re-verify subscription on any auth change (sign-in/out, role refresh)
+    const { data: authSub } = supabase.auth.onAuthStateChange((_event, _session) => {
+      attempts = 0;
+      void connect();
+    });
+
+    // Refresh on tab focus to recover from stale connections
+    const onFocus = () => { if (rtStatusRef.current !== "live") void connect(); };
+    window.addEventListener("focus", onFocus);
+
     return () => {
       cancelled = true;
-      if (retryTimer) clearTimeout(retryTimer);
-      if (channel) supabase.removeChannel(channel);
+      window.removeEventListener("focus", onFocus);
+      authSub.subscription.unsubscribe();
+      teardown();
     };
   }, []);
+  const rtStatusRef = useRef<"connecting" | "live" | "down">("connecting");
+  useEffect(() => { rtStatusRef.current = rtStatus; }, [rtStatus]);
 
 
 
