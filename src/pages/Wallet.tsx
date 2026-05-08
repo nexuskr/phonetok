@@ -142,28 +142,38 @@ export default function Wallet() {
     const pw = ensureWithdrawPw();
     if (!pw) return;
     if (pw !== withdrawPw) { toast({ title: tw("pinMismatchAlt") }); return; }
+    const channel: DepositChannel = asset === "coin" ? "coin" : depositChannel;
+    if (channel === "voucher") {
+      if (!voucherPin || voucherPin.length < 12) { toast({ title: t("voucherPinPh") as string }); return; }
+    }
     try {
       const { submitDeposit: rpcSubmitDeposit } = await import("@/lib/deposits-rpc");
       const r = await rpcSubmitDeposit({
         amount: a,
-        method: asset,
+        method: channel,
         packageId: "manual",
-        packageName: asset === "bank" ? tw("bankDeposit") : tw("coinDeposit"),
+        packageName: channel === "voucher"
+          ? t(`voucher${voucherBrand === "culture" ? "Culture" : voucherBrand === "happy" ? "Happy" : "Cultureland"}`) as string
+          : channel === "bank" ? tw("bankDeposit") : tw("coinDeposit"),
         receiptUrl: null,
         memo: null,
+        voucherBrand: channel === "voucher" ? voucherBrand : null,
+        voucherPin: channel === "voucher" ? voucherPin : null,
       });
       const txCode = "DP-" + r.id.replace(/-/g, "").slice(0, 10).toUpperCase();
       setDb(d => ({
         ...d,
         deposits: [{
           id: uid(), userId: u.id, nickname: u.nickname,
-          packageId: "manual", packageName: asset === "bank" ? tw("bankDeposit") : tw("coinDeposit"),
+          packageId: "manual",
+          packageName: channel === "voucher" ? "상품권" : channel === "bank" ? tw("bankDeposit") : tw("coinDeposit"),
           amount: a, method: asset, txCode, status: "pending", createdAt: Date.now(),
         }, ...d.deposits],
       }));
       setResultCode(txCode);
-      setAmount(""); setSentCode(null); setAuthCode(""); setWithdrawPw("");
-      toast({ title: tw("depositDone"), description: tw("depositDoneDesc") });
+      setAmount(""); setVoucherPin(""); setSentCode(null); setAuthCode(""); setWithdrawPw("");
+      const bonusMsg = r.bonus_amount > 0 ? ` +${formatKRW(r.bonus_amount)} 보너스` : "";
+      toast({ title: tw("depositDone"), description: tw("depositDoneDesc") + bonusMsg });
     } catch (e: any) {
       toast({ title: tw("depositFail"), description: e.message ?? tw("depositFailDesc"), variant: "destructive" });
     }
