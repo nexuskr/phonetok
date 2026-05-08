@@ -22,6 +22,18 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import throneBg from "@/assets/command-throne-bg.jpg";
 import { track } from "@/lib/analytics";
 
+// KST 자정 기준 경과 비율로 오늘 신규 가입자 추정 (베이스 1,180 + 시간대별 가중)
+function computeTodaySignups(): number {
+  const now = new Date();
+  const kstNow = new Date(now.getTime() + (9 * 60 - now.getTimezoneOffset()) * 60_000);
+  const startKST = new Date(kstNow); startKST.setUTCHours(0, 0, 0, 0);
+  const elapsedMin = (kstNow.getTime() - startKST.getTime()) / 60_000;
+  const dayFraction = Math.min(1, elapsedMin / (24 * 60));
+  const seedBase = 980 + Math.floor(Math.sin(kstNow.getUTCDate() * 1.7) * 80) + 80;
+  const projected = Math.floor(seedBase * dayFraction + 60);
+  return Math.max(120, projected);
+}
+
 export default function Index() {
   const nav = useNavigate();
   const { t, i18n } = useTranslation("landing");
