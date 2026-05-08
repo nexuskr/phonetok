@@ -22,6 +22,7 @@ import TopHUD, { TopHUDCompact } from "./TopHUD";
 import LanguageSwitcher from "./LanguageSwitcher";
 import FreezeBanner from "./FreezeBanner";
 import { useAchievementWatcher } from "@/hooks/use-achievement-watcher";
+import NeonNotificationFeed from "./NeonNotificationFeed";
 
 /**
  * Phonara — Empire 5축 IA
@@ -179,6 +180,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </header>
 
       <main className="relative">{children}</main>
+      <NeonNotificationFeed />
 
       {/* Mobile bottom nav — 5 tabs with center FAB */}
       {user && (
