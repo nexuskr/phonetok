@@ -57,24 +57,38 @@ export default function Trust() {
   const [u, setU] = useState<UptimeSummary | null>(null);
   const [heat, setHeat] = useState<HeatmapDay[]>([]);
   const [chaos, setChaos] = useState<ChaosLatest>(null);
+  const [history, setHistory] = useState<HistoryRow[]>([]);
+  const [historyDays, setHistoryDays] = useState<7 | 30>(30);
+  const [assertStatus, setAssertStatus] = useState<AssertionStatus>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
-    const sb: any = supabase;
-    const [{ data: md }, { data: ud }, { data: hd }, { data: cd }] = await Promise.all([
-      sb.rpc("public_trust_metrics"),
-      sb.rpc("public_uptime_summary"),
-      sb.rpc("public_uptime_heatmap_90d"),
-      sb.rpc("latest_chaos_run"),
-    ]);
-    setM((md as Metrics) ?? null);
-    setU((ud as unknown as UptimeSummary) ?? null);
-    setHeat(((hd as any)?.days ?? []) as HeatmapDay[]);
-    setChaos((cd as ChaosLatest) ?? null);
-    setLoading(false);
+    setError(null);
+    try {
+      const sb: any = supabase;
+      const [{ data: md }, { data: ud }, { data: hd }, { data: cd }, { data: histD }, { data: asD }] = await Promise.all([
+        sb.rpc("public_trust_metrics"),
+        sb.rpc("public_uptime_summary"),
+        sb.rpc("public_uptime_heatmap_90d"),
+        sb.rpc("latest_chaos_run"),
+        sb.rpc("public_trust_history", { _days: historyDays }),
+        sb.rpc("policy_assertions_status"),
+      ]);
+      setM((md as Metrics) ?? null);
+      setU((ud as unknown as UptimeSummary) ?? null);
+      setHeat(((hd as any)?.days ?? []) as HeatmapDay[]);
+      setChaos((cd as ChaosLatest) ?? null);
+      setHistory((histD as HistoryRow[]) ?? []);
+      setAssertStatus((asD as AssertionStatus) ?? null);
+    } catch (e: any) {
+      setError(e?.message ?? "데이터 로드 실패");
+    } finally {
+      setLoading(false);
+    }
   }
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { void load(); /* eslint-disable-next-line */ }, [historyDays]);
 
   useEffect(() => {
     document.title = "Phonara Trust — 공개 신뢰 지표";
