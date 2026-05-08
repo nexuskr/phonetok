@@ -86,10 +86,22 @@ export default function MissionTemplatesAdmin() {
     load();
   }
 
-  async function resolve(id: string, action: "approve" | "reject") {
+  async function resolve(id: string, action: "approve" | "reject" | "partial") {
     const { error } = await supabase.rpc("admin_resolve_ai_mission", { _id: id, _action: action });
     if (error) { toast({ title: "처리 실패", description: error.message, variant: "destructive" }); return; }
-    toast({ title: action === "approve" ? "✓ 승인" : "✕ 거절" });
+    toast({ title: action === "approve" ? "✓ 승인" : action === "partial" ? "⚖ 부분 승인 (50%)" : "✕ 거절" });
+    load();
+  }
+
+  async function bulkAutoApprove() {
+    const auto = templates.filter(t => t.auto_approve).map(t => t.key);
+    if (auto.length === 0) { toast({ title: "auto_approve 템플릿 없음" }); return; }
+    const targets = pending.filter(p => auto.includes((p as any).template_key ?? ""));
+    if (targets.length === 0) { toast({ title: "대상 없음 (이미 자동 승인되었거나 수동 템플릿)" }); return; }
+    for (const m of targets) {
+      await supabase.rpc("admin_resolve_ai_mission", { _id: m.id, _action: "approve" });
+    }
+    toast({ title: `✓ ${targets.length}건 자동 승인` });
     load();
   }
 
