@@ -38,6 +38,12 @@ export default function TopHUD() {
 
   return (
     <div className="hidden md:flex items-center gap-2">
+      {/* Tier Badge — 우월감 엔진 */}
+      {isFlagOn("tierBadge") && (
+        <Link to="/empire" className="press">
+          <TierBadge tier={(user.tier as any) ?? "NORMAL"} size="sm" />
+        </Link>
+      )}
       {/* Balance */}
       <Link
         to="/treasury"
