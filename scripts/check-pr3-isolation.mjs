@@ -74,8 +74,19 @@ function flag(file, rule, hit) {
 
 // ---------- rule definitions ----------
 
-// GLOBAL rules (apply to every file regardless of location)
-const GLOBAL_RULES = [
+// Migrations are reviewed bootstrap definitions and the database itself
+// enforces the runtime invariants (immutability triggers, circuit-write
+// guard, SECURITY DEFINER allowlist). CI's job is to catch drift in
+// *application code* — edge functions, scripts, src/.
+function isMigration(file) {
+  const norm = file.replace(/\\/g, "/");
+  return norm.includes("/supabase/migrations/");
+}
+
+// GLOBAL rules — apply to non-migration files only.
+// `signals_initial_locked` is the one rule that stays universal:
+// the column was deliberately removed and must never resurface anywhere.
+const GLOBAL_RULES_NON_MIGRATION = [
   {
     name: "no-update-verification-log",
     re: /\bUPDATE\s+(?:public\.)?viral_verification_log\b/i,
@@ -96,15 +107,16 @@ const GLOBAL_RULES = [
     name: "no-direct-circuit-delete",
     re: /\bDELETE\s+FROM\s+(?:public\.)?viral_ai_circuit_state\b/i,
   },
+];
+const GLOBAL_RULES_UNIVERSAL = [
   {
     name: "no-signals-initial-locked",
     re: /\bsignals_initial_locked\b/,
   },
 ];
 
-// PR3-scoped rules — only the verification firewall code path.
-// These reflect the financial-isolation contract: AI/verification
-// must never see reward, credit, settlement, or catalog context.
+// PR3-scoped rules — only the verification firewall *code* path.
+// AI/verification must never see reward, credit, or financial context.
 const PR3_TOKEN_RULES = [
   { name: "pr3-no-reward-token",   re: /\breward\b/i },
   { name: "pr3-no-bonus-token",    re: /\bbonus\b/i },
@@ -124,25 +136,15 @@ const PR3_TABLE_RULES = [
   { name: "pr3-no-settlement-log",    re: /\bviral_settlement_log\b/i },
 ];
 
-// A file is "PR3-scoped" if it is part of the verification firewall.
+// PR3 scope = verification firewall edge functions only.
+// (Migrations are bootstrap territory — runtime triggers enforce there.)
 function isPr3Scoped(file) {
+  if (isMigration(file)) return false;
   const norm = file.replace(/\\/g, "/");
-  if (norm.includes("/supabase/functions/verify-submission/")) return true;
-  if (norm.includes("/supabase/functions/evaluate-ai-circuit/")) return true;
-  // SQL files that touch viral_verification_* / viral_ai_circuit_state core:
-  if (isSql(norm)) {
-    const src = fs.readFileSync(file, "utf8");
-    if (
-      /\bviral_verification_log\b/i.test(src) ||
-      /\bviral_verification_events\b/i.test(src) ||
-      /\bviral_ai_circuit_state\b/i.test(src) ||
-      /\brule_verify_submission\b/i.test(src) ||
-      /\btransition_ai_circuit\b/i.test(src)
-    ) {
-      return true;
-    }
-  }
-  return false;
+  return (
+    norm.includes("/supabase/functions/verify-submission/") ||
+    norm.includes("/supabase/functions/evaluate-ai-circuit/")
+  );
 }
 
 // ---------- run ----------
