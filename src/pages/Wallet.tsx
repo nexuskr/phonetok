@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { refreshWallet } from "@/lib/missions-rpc";
 import ServerTxList from "@/components/wallet/ServerTxList";
 import WithdrawIntentInterceptor from "@/components/conversion/WithdrawIntentInterceptor";
+import AMLGate from "@/components/wallet/AMLGate";
 
 type AssetTab = "bank" | "coin";
 type ActionTab = "withdraw" | "deposit" | "history";
@@ -59,6 +60,9 @@ export default function Wallet() {
   const [authCode, setAuthCode] = useState("");
   const [withdrawPw, setWithdrawPw] = useState("");
   const [resultCode, setResultCode] = useState<string | null>(null);
+  // P2: AML gate
+  const [amlOpen, setAmlOpen] = useState(false);
+  const [amlLevel, setAmlLevel] = useState<1 | 2 | 3>(2);
 
   if (!user) return null;
   const u = user;
@@ -109,6 +113,14 @@ export default function Wallet() {
 
     if (error) {
       const msg = error.message || "";
+      const amlMatch = msg.match(/aml_required:(\d)/);
+      if (amlMatch) {
+        const lvl = Math.min(3, Math.max(1, Number(amlMatch[1]))) as 1 | 2 | 3;
+        setAmlLevel(lvl);
+        setAmlOpen(true);
+        toast({ title: tw("withdrawFail"), description: t("amlBlocked", { level: lvl }) as string, variant: "destructive" });
+        return;
+      }
       const friendly = msg.includes("pin mismatch") ? tw("pinError")
         : msg.includes("below_min") ? tw("belowMin")
         : msg.includes("insufficient_funds") ? tw("insufficient")
@@ -473,6 +485,7 @@ export default function Wallet() {
           </div>
         )}
       </div>
+      <AMLGate open={amlOpen} level={amlLevel} onClose={() => setAmlOpen(false)} onApproved={() => setAmlOpen(false)} />
     </Layout>
   );
 }

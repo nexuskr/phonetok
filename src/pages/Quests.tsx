@@ -6,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import { CheckCircle2, Clock, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LuxButton } from "@/components/ui/lux";
+import ReferralLeaderboard from "@/components/ReferralLeaderboard";
 
 type Q = {
   key: string; name: string; description: string; period: "daily" | "weekly";
@@ -51,6 +52,7 @@ export default function Quests() {
 
         <Section title={t("daily")} icon={<Clock size={18} />} quests={daily} onClaim={claim} loading={loading} t={t} />
         <Section title={t("weekly")} icon={<Clock size={18} />} quests={weekly} onClaim={claim} loading={loading} t={t} />
+        <ReferralLeaderboard />
       </div>
     </Layout>
   );

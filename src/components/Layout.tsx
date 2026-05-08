@@ -21,6 +21,7 @@ import { useUserNotifications } from "@/hooks/use-user-notifications";
 import TopHUD, { TopHUDCompact } from "./TopHUD";
 import LanguageSwitcher from "./LanguageSwitcher";
 import FreezeBanner from "./FreezeBanner";
+import { useAchievementWatcher } from "@/hooks/use-achievement-watcher";
 
 /**
  * Phonara — Empire 5축 IA
@@ -63,6 +64,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const loc = useLocation();
   const user = db.user;
   const { t } = useTranslation("nav");
+  useAchievementWatcher(loc.pathname);
 
   useUserNotifications(user?.id);
   useAdminNotifications(!!user?.isAdmin);
