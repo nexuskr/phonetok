@@ -37,6 +37,7 @@ const TIER_BOOST: Record<Tier, number> = { NORMAL: 1, VIP: 1.5, GOD: 2.5, EMPIRE
 
 export default function Missions() {
   const { t } = useTranslation("missions");
+  const FAIL_MSGS = [t("failMsg1"), t("failMsg2"), t("failMsg3"), t("failMsg4")];
   const [db, setDb] = useDB();
   const nav = useNavigate();
   const user = useRequireAuth() ?? db.user;
@@ -44,7 +45,7 @@ export default function Missions() {
   const [completing, setCompleting] = useState<string | null>(null);
   const [ugcOpen, setUgcOpen] = useState<Mission | null>(null);
   const [gameOpen, setGameOpen] = useState<Mission | null>(null);
-  const [catTab, setCatTab] = useState<"전체" | "게임">("게임");
+  const [catTab, setCatTab] = useState<"all" | "game">("game");
   const [jackpotWin, setJackpotWin] = useState<{ amount: number; type: "main" | "mini" } | null>(null);
 
   if (!user) return null;
