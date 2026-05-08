@@ -8,6 +8,7 @@ import {
   Crown, Copy, Share2, Rocket, Users, Sparkles, TrendingUp,
   Trophy, ChevronDown, MessageCircle, Instagram, Music2, Youtube, Globe, Send,
 } from "lucide-react";
+import DMComposer from "@/components/guide/DMComposer";
 
 type Stats = {
   code: string | null;
@@ -268,6 +269,9 @@ export default function Referral() {
           </div>
           <p className="text-[10px] text-muted-foreground mt-3 break-keep">{t("shareKit.compliance")}</p>
         </section>
+
+        {/* AI DM COMPOSER */}
+        <DMComposer referralLink={link || undefined} />
 
         {/* FAQ */}
         <section>
