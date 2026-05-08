@@ -83,18 +83,33 @@ function StarterGuide({ t }: any) {
   const [bonusPaid, setBonusPaid] = useState(false);
   const [claiming, setClaiming] = useState(false);
 
+  // STEP5: AML 현재 인증 레벨
+  const [amlLevel, setAmlLevel] = useState<number>(0);
+  const [previewLevel, setPreviewLevel] = useState<1 | 2 | 3 | null>(null);
+
+  // STEP6: 추천인 정보 (0유저 → Founding Inviter 분기)
+  const [referral, setReferral] = useState<{ code: string | null; invited: number } | null>(null);
+
+  // 6/6 완료 confetti & auto-claim guard
+  const [confetti, setConfetti] = useState(false);
+  const autoClaimTried = useRef(false);
+
   useEffect(() => {
     if (!isLoggedIn) return;
     let alive = true;
     (async () => {
-      const { data } = await supabase
-        .from("handbook_progress")
-        .select("steps_completed, bonus_paid")
-        .eq("user_id", db.user!.id)
-        .maybeSingle();
+      const [{ data: hb }, { data: amlRows }, { data: ref }] = await Promise.all([
+        supabase.from("handbook_progress").select("steps_completed, bonus_paid").eq("user_id", db.user!.id).maybeSingle(),
+        supabase.from("aml_verifications").select("level, status").eq("user_id", db.user!.id).eq("status", "approved"),
+        supabase.rpc("get_referral_stats"),
+      ]);
       if (!alive) return;
-      setSteps((data?.steps_completed as Record<string, boolean>) ?? {});
-      setBonusPaid(!!data?.bonus_paid);
+      setSteps((hb?.steps_completed as Record<string, boolean>) ?? {});
+      setBonusPaid(!!hb?.bonus_paid);
+      const maxLv = (amlRows ?? []).reduce((m: number, r: any) => Math.max(m, r.level ?? 0), 0);
+      setAmlLevel(maxLv);
+      const r = ref as any;
+      setReferral({ code: r?.code ?? null, invited: Number(r?.invited ?? 0) });
     })();
     return () => { alive = false; };
   }, [isLoggedIn, db.user?.id]);
@@ -110,13 +125,12 @@ function StarterGuide({ t }: any) {
     setSteps((p) => ({ ...p, [k]: true }));
     const { error } = await supabase.rpc("mark_handbook_step", { _step: k });
     if (error) {
-      // revert
       setSteps((p) => ({ ...p, [k]: false }));
       toast({ title: error.message, variant: "destructive" });
     }
   }
 
-  async function claim() {
+  async function claim(silent = false) {
     if (!isLoggedIn || bonusPaid || !allDone || claiming) return;
     setClaiming(true);
     try {
@@ -125,16 +139,27 @@ function StarterGuide({ t }: any) {
       const r = data as { ok: boolean; amount?: number; error?: string };
       if (r.ok) {
         setBonusPaid(true);
+        setConfetti(true);
+        window.setTimeout(() => setConfetti(false), 2400);
         toast({ title: t("starter.bonusPaidTitle"), description: t("starter.bonusPaidDesc") });
-      } else {
+      } else if (!silent) {
         toast({ title: r.error ?? "error", variant: "destructive" });
       }
     } catch (e: any) {
-      toast({ title: e.message ?? "error", variant: "destructive" });
+      if (!silent) toast({ title: e.message ?? "error", variant: "destructive" });
     } finally {
       setClaiming(false);
     }
   }
+
+  // 6/6 도달 시 자동 핸드북 보너스 청구 + confetti
+  useEffect(() => {
+    if (allDone && !bonusPaid && !autoClaimTried.current && isLoggedIn) {
+      autoClaimTried.current = true;
+      claim(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allDone, bonusPaid, isLoggedIn]);
 
   const stepDefs: { k: StepKey; titleKey: string; descKey: string; ctaKey: string; href: string }[] = [
     { k: "step1", titleKey: "starter.step1Title", descKey: "starter.step1Desc", ctaKey: "starter.step1Cta", href: "/auth" },
@@ -145,8 +170,49 @@ function StarterGuide({ t }: any) {
     { k: "step6", titleKey: "starter.step6Title", descKey: "starter.step6Desc", ctaKey: "starter.step6Cta", href: "/profile" },
   ];
 
+  const myTier = currentTierByVerificationLevel(amlLevel || 1);
+  const isFoundingCandidate = isLoggedIn && referral && referral.invited === 0;
+  const referralLink = referral?.code ? `${window.location.origin}/?ref=${referral.code}` : "";
+
+  async function shareReferral() {
+    if (!referralLink) {
+      toast({ title: t("starter.loginRequired") });
+      return;
+    }
+    const text = isFoundingCandidate ? t("starter.step6FoundingPitch") : "";
+    if ((navigator as any).share) {
+      try { await (navigator as any).share({ title: "Phonara", text, url: referralLink }); markStep("step6"); return; } catch {}
+    }
+    try {
+      await navigator.clipboard.writeText(`${text}\n${referralLink}`.trim());
+      toast({ title: "추천 링크가 복사되었습니다" });
+      markStep("step6");
+    } catch {
+      toast({ title: "복사 실패", variant: "destructive" });
+    }
+  }
+
   return (
-    <div>
+    <div className="relative">
+      {/* Confetti overlay */}
+      {confetti && (
+        <div aria-hidden className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+          {Array.from({ length: 28 }).map((_, i) => (
+            <span
+              key={i}
+              className="absolute top-[-10px] block w-2 h-3 rounded-sm animate-confetti"
+              style={{
+                left: `${(i * 97) % 100}%`,
+                background: i % 3 === 0 ? "hsl(var(--gold))" : i % 3 === 1 ? "hsl(var(--primary))" : "hsl(var(--secondary))",
+                animationDelay: `${(i % 10) * 80}ms`,
+                animationDuration: `${1400 + (i % 5) * 180}ms`,
+                transform: `rotate(${(i * 37) % 360}deg)`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Hero */}
       <div className="glass-strong rounded-3xl p-5 mb-4 neon-border relative overflow-hidden">
         <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-gradient-imperial blur-3xl opacity-40 pointer-events-none" />
@@ -165,10 +231,7 @@ function StarterGuide({ t }: any) {
               <span className="font-display font-black tabular-nums">{completedCount}/6</span>
             </div>
             <div className="h-2 rounded-full bg-muted/40 overflow-hidden">
-              <div
-                className="h-full bg-gradient-gold transition-all duration-500"
-                style={{ width: `${(completedCount / 6) * 100}%` }}
-              />
+              <div className="h-full bg-gradient-gold transition-all duration-500" style={{ width: `${(completedCount / 6) * 100}%` }} />
             </div>
           </div>
 
@@ -179,43 +242,110 @@ function StarterGuide({ t }: any) {
       {/* Earnings simulator */}
       <EarningsSimulator />
 
-      {/* 6 steps */}
+      {/* 6 steps with inline extras for step5 / step6 */}
       <div className="space-y-2.5">
         {stepDefs.map((s, i) => {
           const done = !!steps[s.k];
           return (
-            <div
-              key={s.k}
-              className={`glass-strong rounded-2xl p-4 relative overflow-hidden transition ${done ? "border border-secondary/40" : ""}`}
-            >
+            <div key={s.k} className={`glass-strong rounded-2xl p-4 relative overflow-hidden transition ${done ? "border border-secondary/40" : ""}`}>
               <div className="flex items-start gap-3">
-                <div
-                  className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center font-display font-black ${
-                    done ? "bg-secondary/20 text-secondary" : "bg-gradient-primary text-primary-foreground"
-                  }`}
-                >
+                <div className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center font-display font-black ${done ? "bg-secondary/20 text-secondary" : "bg-gradient-primary text-primary-foreground"}`}>
                   {done ? <CheckCircle2 className="w-5 h-5" /> : i + 1}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-display font-black text-sm break-keep">{t(s.titleKey)}</h3>
                   <p className="text-[11px] text-muted-foreground mt-1 break-keep">{t(s.descKey)}</p>
 
+                  {/* STEP5 — AML 3단 가로 스크롤 카드 + 연습 출금 모달 */}
+                  {s.k === "step5" && (
+                    <div className="mt-3">
+                      <div className="text-[10px] font-bold text-muted-foreground mb-1.5">{t("starter.amlCardsTitle", { defaultValue: "출금 단계별 인증" })}</div>
+                      <div className="-mx-1 flex gap-2 overflow-x-auto snap-x pb-1.5">
+                        {AML_TIERS.map((tier) => {
+                          const isMine = isLoggedIn && tier.level === Math.max(1, amlLevel || 1);
+                          return (
+                            <button
+                              key={tier.level}
+                              onClick={() => { setPreviewLevel(tier.level); markStep("step5"); }}
+                              className={`snap-start shrink-0 w-[78%] sm:w-[42%] text-left rounded-2xl p-3 border transition ${isMine ? "border-gold bg-gold/10 glow-gold" : "border-border/50 glass hover:border-primary/40"}`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className={`text-[10px] font-black tracking-[0.18em] ${isMine ? "text-gold" : "text-primary"}`}>LV{tier.level} · {tier.labelKo}</span>
+                                {isMine && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-gold/20 text-gold font-bold">{t("starter.amlCurrent", { defaultValue: "내 단계" })}</span>}
+                              </div>
+                              <div className="mt-1.5 font-display font-black text-sm tabular-nums">
+                                {tier.maxCumulativeKRW === null ? "₩ 1,000만+" : `~ ₩ ${(tier.maxCumulativeKRW / 10000).toLocaleString()}만`}
+                              </div>
+                              <div className="text-[10px] text-muted-foreground mt-0.5 break-keep">{tier.descKo}</div>
+                              <div className="mt-2 inline-flex items-center gap-1 text-[10px] text-secondary font-bold">
+                                <ShieldCheck className="w-3 h-3" /> 출금 수수료 0%
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-1 break-keep">{t("starter.amlPreviewNote", { defaultValue: "카드를 누르면 실제 출금 없이 인증 단계만 미리 둘러볼 수 있어요." })}</p>
+                    </div>
+                  )}
+
+                  {/* STEP6 — 0유저 Founding Inviter 분기 */}
+                  {s.k === "step6" && (
+                    <div className="mt-3">
+                      {isFoundingCandidate ? (
+                        <div className="rounded-xl p-3 border border-gold/40 bg-gradient-to-br from-gold/15 via-transparent to-primary/10">
+                          <div className="flex items-center gap-1.5 text-[10px] font-black tracking-[0.18em] text-gold">
+                            <Crown className="w-3 h-3" /> FOUNDING INVITER
+                          </div>
+                          <p className="text-[11px] mt-1 break-keep">{t("starter.step6FoundingPitch")}</p>
+                        </div>
+                      ) : referral && referral.invited > 0 ? (
+                        <div className="rounded-xl p-3 glass border border-secondary/30 text-[11px] flex items-center gap-2 break-keep">
+                          <Sparkles className="w-3.5 h-3.5 text-secondary" />
+                          <span>이미 <b className="tabular-nums">{referral.invited}</b>명을 초대했어요 — 계속 키워볼까요?</span>
+                        </div>
+                      ) : null}
+                      {referralLink && (
+                        <div className="mt-2 flex items-center gap-1.5">
+                          <code className="flex-1 min-w-0 truncate text-[10px] px-2 py-1.5 rounded-lg glass">{referralLink}</code>
+                          <button
+                            onClick={() => { navigator.clipboard.writeText(referralLink).then(() => toast({ title: "복사됨" })); }}
+                            className="press min-h-[32px] px-2 rounded-lg glass text-[10px] font-bold inline-flex items-center gap-1"
+                          >
+                            <Copy className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-2 mt-3">
-                    <Link
-                      to={s.href}
-                      onClick={() => markStep(s.k)}
-                      className="press flex-1 min-h-[44px] px-3 rounded-xl bg-gradient-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 glow-primary"
-                    >
-                      {t(s.ctaKey)} <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    {s.k === "step5" ? (
+                      <button
+                        onClick={() => { setPreviewLevel((Math.max(1, amlLevel || 1) as 1|2|3)); markStep("step5"); }}
+                        className="press flex-1 min-h-[44px] px-3 rounded-xl bg-gradient-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 glow-primary"
+                      >
+                        {t(s.ctaKey)} <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    ) : s.k === "step6" ? (
+                      <button
+                        onClick={shareReferral}
+                        className="press flex-1 min-h-[44px] px-3 rounded-xl bg-gradient-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 glow-primary"
+                      >
+                        <Share2 className="w-3.5 h-3.5" /> {t(s.ctaKey)}
+                      </button>
+                    ) : (
+                      <Link
+                        to={s.href}
+                        onClick={() => markStep(s.k)}
+                        className="press flex-1 min-h-[44px] px-3 rounded-xl bg-gradient-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 glow-primary"
+                      >
+                        {t(s.ctaKey)} <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    )}
                     <button
                       onClick={() => markStep(s.k)}
                       disabled={done}
-                      className={`min-h-[44px] px-3 rounded-xl text-[11px] font-bold transition ${
-                        done
-                          ? "bg-secondary/20 text-secondary cursor-default"
-                          : "glass text-muted-foreground hover:text-foreground"
-                      }`}
+                      className={`min-h-[44px] px-3 rounded-xl text-[11px] font-bold transition ${done ? "bg-secondary/20 text-secondary cursor-default" : "glass text-muted-foreground hover:text-foreground"}`}
                     >
                       {done ? t("starter.markedDone") : t("starter.markDone")}
                     </button>
@@ -228,11 +358,7 @@ function StarterGuide({ t }: any) {
       </div>
 
       {/* Bonus claim */}
-      <div
-        className={`glass-strong rounded-3xl p-5 mt-4 relative overflow-hidden ${
-          allDone && !bonusPaid ? "neon-border" : ""
-        }`}
-      >
+      <div className={`glass-strong rounded-3xl p-5 mt-4 relative overflow-hidden ${allDone && !bonusPaid ? "neon-border" : ""}`}>
         <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-gradient-gold blur-3xl opacity-40 pointer-events-none" />
         <div className="relative">
           <div className="flex items-center gap-2">
@@ -244,27 +370,27 @@ function StarterGuide({ t }: any) {
           <p className="text-[11px] text-muted-foreground mt-1 break-keep">{t("starter.bonusCardDesc")}</p>
 
           <button
-            onClick={claim}
+            onClick={() => claim(false)}
             disabled={!allDone || bonusPaid || claiming}
             className={`press mt-4 w-full min-h-[56px] rounded-xl font-display font-black flex items-center justify-center gap-2 transition ${
-              bonusPaid
-                ? "bg-secondary/20 text-secondary"
-                : allDone
-                ? "bg-gradient-gold text-gold-foreground glow-gold"
-                : "glass text-muted-foreground"
+              bonusPaid ? "bg-secondary/20 text-secondary" : allDone ? "bg-gradient-gold text-gold-foreground glow-gold" : "glass text-muted-foreground"
             }`}
           >
             <Sparkles className="w-4 h-4" />
-            {bonusPaid
-              ? t("starter.bonusAlreadyPaid")
-              : claiming
-              ? t("starter.bonusClaiming")
-              : allDone
-              ? t("starter.bonusClaim")
-              : t("starter.bonusIncomplete")}
+            {bonusPaid ? t("starter.bonusAlreadyPaid") : claiming ? t("starter.bonusClaiming") : allDone ? t("starter.bonusClaim") : t("starter.bonusIncomplete")}
           </button>
         </div>
       </div>
+
+      {/* AML Preview Dialog */}
+      {previewLevel !== null && (
+        <AMLGate
+          open={previewLevel !== null}
+          level={previewLevel}
+          mode="preview"
+          onClose={() => setPreviewLevel(null)}
+        />
+      )}
     </div>
   );
 }
