@@ -593,6 +593,36 @@ export type Database = {
         }
         Relationships: []
       }
+      function_permissions_baseline: {
+        Row: {
+          allowed_roles: string[]
+          category: string
+          function_args: string
+          function_name: string
+          id: string
+          note: string | null
+          updated_at: string
+        }
+        Insert: {
+          allowed_roles?: string[]
+          category: string
+          function_args?: string
+          function_name: string
+          id?: string
+          note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          allowed_roles?: string[]
+          category?: string
+          function_args?: string
+          function_name?: string
+          id?: string
+          note?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       idempotency_keys: {
         Row: {
           created_at: string
@@ -782,6 +812,39 @@ export type Database = {
           total_settled?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      permission_change_log: {
+        Row: {
+          change_type: string
+          detected_at: string
+          expected_roles: string[]
+          function_args: string
+          function_name: string
+          id: string
+          metadata: Json
+          observed_roles: string[]
+        }
+        Insert: {
+          change_type: string
+          detected_at?: string
+          expected_roles: string[]
+          function_args: string
+          function_name: string
+          id?: string
+          metadata?: Json
+          observed_roles: string[]
+        }
+        Update: {
+          change_type?: string
+          detected_at?: string
+          expected_roles?: string[]
+          function_args?: string
+          function_name?: string
+          id?: string
+          metadata?: Json
+          observed_roles?: string[]
         }
         Relationships: []
       }
@@ -2009,6 +2072,7 @@ export type Database = {
         Args: { _delta?: number; _metric: string }
         Returns: undefined
       }
+      check_permission_drift: { Args: never; Returns: Json }
       check_rls_integrity: { Args: never; Returns: Json }
       claim_ai_bot_run: { Args: { _run_id: string }; Returns: Json }
       claim_daily_attendance: {
@@ -2057,6 +2121,18 @@ export type Database = {
       gacha_pull: { Args: never; Returns: Json }
       gen_referral_code: { Args: never; Returns: string }
       get_active_boost_count: { Args: never; Returns: number }
+      get_admin_audit_recent: {
+        Args: { _limit?: number }
+        Returns: {
+          action: string
+          admin_id: string
+          created_at: string
+          id: string
+          metadata: Json
+          target_id: string
+          target_type: string
+        }[]
+      }
       get_admin_metrics: {
         Args: { _days?: number }
         Returns: {
@@ -2089,8 +2165,39 @@ export type Database = {
           level: string
         }[]
       }
+      get_function_permissions_overview: {
+        Args: never
+        Returns: {
+          category: string
+          expected_roles: string[]
+          function_args: string
+          function_name: string
+          in_drift: boolean
+          note: string
+          observed_roles: string[]
+        }[]
+      }
       get_my_quests: { Args: never; Returns: Json }
       get_next_empire_day: { Args: never; Returns: string }
+      get_permission_change_log: {
+        Args: { _limit?: number }
+        Returns: {
+          change_type: string
+          detected_at: string
+          expected_roles: string[]
+          function_args: string
+          function_name: string
+          id: string
+          metadata: Json
+          observed_roles: string[]
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "permission_change_log"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_recent_errors: {
         Args: { _limit?: number }
         Returns: {
