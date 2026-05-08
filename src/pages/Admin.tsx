@@ -21,9 +21,10 @@ import PermissionsAudit from "@/components/admin/PermissionsAudit";
 import FunnelAnalytics from "@/components/admin/FunnelAnalytics";
 import AMLAdmin from "@/components/admin/AMLAdmin";
 import MissionTemplatesAdmin from "@/components/admin/MissionTemplatesAdmin";
+import LeaderboardPayoutAudit from "@/components/admin/LeaderboardPayoutAudit";
 import { Activity, Lock, Bot } from "lucide-react";
 
-type Tab = "dashboard" | "funnel" | "analytics" | "errors" | "security" | "ops" | "perms" | "aml" | "ai_missions" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin";
+type Tab = "dashboard" | "funnel" | "analytics" | "errors" | "security" | "ops" | "perms" | "aml" | "ai_missions" | "payout_audit" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin";
 
 export default function Admin() {
   const [db, setDb] = useDB();
