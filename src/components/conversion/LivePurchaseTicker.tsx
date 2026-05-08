@@ -61,7 +61,7 @@ export default function LivePurchaseTicker() {
           nickname: FALLBACK_NICKS[i % FALLBACK_NICKS.length],
           pkg: FALLBACK_PKGS[i % FALLBACK_PKGS.length],
           tier: i % 4 === 3 ? "EMPIRE" : "VIP",
-          ago: `${(i + 1) * 2}분 전`,
+          ago: i18n.getFixedT(null, "convert")("minAgo", { n: (i + 1) * 2 }),
         })),
       );
     }
