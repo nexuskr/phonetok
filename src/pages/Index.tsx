@@ -38,7 +38,18 @@ export default function Index() {
   const nav = useNavigate();
   const { t, i18n } = useTranslation("landing");
   const { isReady, hasSession } = useAuthReady();
-  useEffect(() => { if (isReady && hasSession) nav("/dashboard", { replace: true }); }, [isReady, hasSession, nav]);
+  useEffect(() => {
+    if (!isReady) return;
+    if (hasSession) {
+      nav("/dashboard", { replace: true });
+      return;
+    }
+    // 0유저/비로그인 → Starter 가이드로 자연스럽게 유도 (?landing=1 이면 마케팅 랜딩 유지)
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("landing") === "1") return;
+    const ref = url.searchParams.get("ref");
+    nav(`/guide?tab=starter${ref ? `&ref=${encodeURIComponent(ref)}` : ""}`, { replace: true });
+  }, [isReady, hasSession, nav]);
   useEffect(() => { track("landing_view", { lang: i18n.language }); }, [i18n.language]);
   const onCta = (location: string) => track("cta_click", { location, lang: i18n.language });
   const online = useOnline();
