@@ -117,7 +117,7 @@ const resources = {
       h1Line1: "왕좌는 클릭 한 번으로",
       h1Line2: "시작된다",
       h1Sub: "Your Empire Begins Here",
-      sub: "임페리얼 미션과 골드 정산. 창립 멤버 30석 한정 — 평생 골드 등급으로 입성하세요.",
+      sub: "임페리얼 미션과 골드 정산. 창립 멤버 100석 한정 — 장기 골드 등급으로 입성하세요.",
       liveLabel: "실시간 황실 금고",
       todaySuffix: "오늘 정산됨",
       onlineSuffix: "명 접속중",
