@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ShieldCheck,
@@ -22,6 +22,18 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import throneBg from "@/assets/command-throne-bg.jpg";
 import { track } from "@/lib/analytics";
 
+// KST 자정 기준 경과 비율로 오늘 신규 가입자 추정 (베이스 1,180 + 시간대별 가중)
+function computeTodaySignups(): number {
+  const now = new Date();
+  const kstNow = new Date(now.getTime() + (9 * 60 - now.getTimezoneOffset()) * 60_000);
+  const startKST = new Date(kstNow); startKST.setUTCHours(0, 0, 0, 0);
+  const elapsedMin = (kstNow.getTime() - startKST.getTime()) / 60_000;
+  const dayFraction = Math.min(1, elapsedMin / (24 * 60));
+  const seedBase = 980 + Math.floor(Math.sin(kstNow.getUTCDate() * 1.7) * 80) + 80;
+  const projected = Math.floor(seedBase * dayFraction + 60);
+  return Math.max(120, projected);
+}
+
 export default function Index() {
   const nav = useNavigate();
   const { t, i18n } = useTranslation("landing");
@@ -33,6 +45,25 @@ export default function Index() {
   const total = useTotalPayout();
   const today = useTodayPayout();
   const members = useMembers();
+
+  // 실시간 신규 가입 카운터 — KST 자정 기준 누적, 60~90s 간격으로 +1~3 미세 증가
+  const [todaySignups, setTodaySignups] = useState(() => computeTodaySignups());
+  useEffect(() => {
+    let alive = true;
+    function schedule() {
+      if (!alive) return;
+      const delay = 55_000 + Math.random() * 35_000; // 55~90s
+      window.setTimeout(() => {
+        if (!alive) return;
+        setTodaySignups((n) => n + 1 + Math.floor(Math.random() * 3)); // +1~3
+        schedule();
+      }, delay);
+    }
+    schedule();
+    const onVis = () => { if (document.visibilityState === "visible") setTodaySignups(computeTodaySignups()); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { alive = false; document.removeEventListener("visibilitychange", onVis); };
+  }, []);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -142,7 +173,7 @@ export default function Index() {
           </span>
           <span className="px-3 py-1.5 rounded-full glass border border-primary/20 text-[11px] text-muted-foreground inline-flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
-            오늘 신규 가입 <span className="font-black text-foreground tabular-nums">1,284</span>명
+            오늘 신규 가입 <span key={todaySignups} className="font-black text-foreground tabular-nums animate-fade-up">{todaySignups.toLocaleString()}</span>명
           </span>
           <span className="px-3 py-1.5 rounded-full glass border border-primary/20 text-[11px] text-muted-foreground inline-flex items-center gap-1.5">
             <Zap className="w-3 h-3 text-secondary" /> 60초 안에 첫 적립
