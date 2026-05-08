@@ -3,7 +3,7 @@ import { Flame } from "lucide-react";
 
 /**
  * Packages 페이지 카드 하단에 노출되는 "오늘 시작 시" 블록.
- * 사전 공지 확정 스케줄 — 변동 없음.
+ * 사전 공지 30일 스케줄 — 첫 3일 가속 구간 시각화.
  */
 export default function PackageBoostPreview({
   dailyReturn,
@@ -21,7 +21,7 @@ export default function PackageBoostPreview({
       <div className="flex items-center gap-1.5 text-[11px] font-bold mb-2">
         <Flame className={`w-3.5 h-3.5 ${isEmpire ? "text-gold" : "text-primary"}`} />
         <span className={isEmpire ? "text-gold" : "text-primary"}>
-          {isEmpire ? "👑 Empire 전용 · 첫 3일 최대 가속 구간" : "오늘 시작 시 · 첫 3일 보너스 구간"}
+          {isEmpire ? "👑 Empire · 첫 3일 사전 공지 가속 구간" : "오늘 시작 시 · 첫 3일 사전 공지 가속"}
         </span>
       </div>
       <div className="space-y-1">
@@ -37,7 +37,7 @@ export default function PackageBoostPreview({
         </div>
       </div>
       <p className="text-[9px] text-muted-foreground mt-2 leading-tight">
-        ※ 사전 공지된 확정 적립 스케줄 · 30일 한정, 만기 자동 종료
+        ※ 사전 공지된 30일 스케줄 · 만기 자동 종료 · 시뮬레이션, 수익 보장 아님
       </p>
     </div>
   );
