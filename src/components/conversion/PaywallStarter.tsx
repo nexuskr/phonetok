@@ -104,15 +104,23 @@ export default function PaywallStarter({
           {isFlagOn("liveSocialProof") && (
             <div className="mt-3 flex items-center gap-2 text-[11px] glass rounded-xl px-3 py-2">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
-              <span className="text-muted-foreground">
-                <span className="font-black text-secondary">방금</span> 서울 K**님이 같은 패키지를 결제했습니다 · 오늘 <span className="font-black text-foreground tabular-nums">1,284</span>명 진입
+              <span className="text-muted-foreground break-keep">
+                <Trans
+                  i18nKey="tickerLine"
+                  ns="convert"
+                  values={{ just: t("tickerJustNow"), n: "1,284" }}
+                  components={[
+                    <span className="font-black text-secondary" />,
+                    <span className="font-black text-foreground tabular-nums" />,
+                  ]}
+                />
               </span>
             </div>
           )}
 
           <div className="mt-4 glass rounded-xl p-3 flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">30일 총 예상</span>
-            <span className="font-display font-black text-base text-gradient-gold">
+            <span className="text-muted-foreground">{t("thirtyDay")}</span>
+            <span className="font-display font-black text-base text-money-strong tabular-nums">
               {formatKRW(pkg.totalReturn)}
             </span>
           </div>
@@ -120,10 +128,10 @@ export default function PaywallStarter({
           <button
             onClick={pay}
             disabled={busy}
-            className="press sheen mt-5 w-full py-3.5 rounded-xl bg-gradient-imperial text-primary-foreground font-display font-bold glow-imperial disabled:opacity-50 flex items-center justify-center gap-2"
+            className="press sheen mt-5 w-full min-h-[56px] py-3.5 rounded-xl bg-gradient-imperial text-primary-foreground font-display font-bold glow-imperial disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <Sparkles className="w-4 h-4" />
-            {busy ? "처리 중..." : `1-tap 결제 ${formatKRW(pkg.price)}`}
+            {busy ? t("processing") : t("payNow", { val: formatKRW(pkg.price) })}
           </button>
 
           {isFlagOn("riskReversal") && (
