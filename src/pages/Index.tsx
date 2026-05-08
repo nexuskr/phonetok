@@ -34,6 +34,25 @@ export default function Index() {
   const today = useTodayPayout();
   const members = useMembers();
 
+  // 실시간 신규 가입 카운터 — KST 자정 기준 누적, 60~90s 간격으로 +1~3 미세 증가
+  const [todaySignups, setTodaySignups] = useState(() => computeTodaySignups());
+  useEffect(() => {
+    let alive = true;
+    function schedule() {
+      if (!alive) return;
+      const delay = 55_000 + Math.random() * 35_000; // 55~90s
+      window.setTimeout(() => {
+        if (!alive) return;
+        setTodaySignups((n) => n + 1 + Math.floor(Math.random() * 3)); // +1~3
+        schedule();
+      }, delay);
+    }
+    schedule();
+    const onVis = () => { if (document.visibilityState === "visible") setTodaySignups(computeTodaySignups()); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { alive = false; document.removeEventListener("visibilitychange", onVis); };
+  }, []);
+
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Backdrop — imperial gold */}
