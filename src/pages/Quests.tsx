@@ -54,6 +54,8 @@ export default function Quests() {
 
         <Section title={t("daily")} icon={<Clock size={18} />} quests={daily} onClaim={claim} loading={loading} t={t} />
         <Section title={t("weekly")} icon={<Clock size={18} />} quests={weekly} onClaim={claim} loading={loading} t={t} />
+        <AIMissionCard />
+        <WeeklyPassSection />
         <ReferralLeaderboard />
       </div>
     </Layout>
