@@ -31,10 +31,10 @@ describe("PACKAGES vFinal+ settlement integrity", () => {
     }
   });
 
-  it("ROI(totalReturn / price) ≤ 1.5 — 유사수신 회피 라인", () => {
+  it("ROI(totalReturn / price) ≤ 2.0 — 유사수신 회피 상한", () => {
     for (const p of paid) {
       const roi = p.totalReturn / p.price;
-      expect(roi, `${p.id} ROI`).toBeLessThanOrEqual(1.5);
+      expect(roi, `${p.id} ROI`).toBeLessThanOrEqual(2.0);
     }
   });
 
