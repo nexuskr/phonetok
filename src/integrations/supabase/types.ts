@@ -215,6 +215,39 @@ export type Database = {
         }
         Relationships: []
       }
+      cron_settle_audit_log: {
+        Row: {
+          caller: string | null
+          created_at: string
+          duration_ms: number | null
+          error: string | null
+          id: string
+          metadata: Json
+          ok: boolean
+          settled_count: number
+        }
+        Insert: {
+          caller?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          id?: string
+          metadata?: Json
+          ok: boolean
+          settled_count?: number
+        }
+        Update: {
+          caller?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          id?: string
+          metadata?: Json
+          ok?: boolean
+          settled_count?: number
+        }
+        Relationships: []
+      }
       daily_stats: {
         Row: {
           best_streak: number
@@ -978,6 +1011,33 @@ export type Database = {
         }
         Relationships: []
       }
+      security_audit_log: {
+        Row: {
+          created_at: string
+          id: string
+          issue_count: number
+          issues: Json
+          ok: boolean
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          issue_count?: number
+          issues?: Json
+          ok: boolean
+          source?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          issue_count?: number
+          issues?: Json
+          ok?: boolean
+          source?: string
+        }
+        Relationships: []
+      }
       support_messages: {
         Row: {
           created_at: string
@@ -1438,6 +1498,7 @@ export type Database = {
         Args: { _base: number; _invitee: string; _source: string }
         Returns: undefined
       }
+      _cron_security_self_audit: { Args: never; Returns: undefined }
       _cron_settle_package_daily: { Args: never; Returns: Json }
       _period_key: { Args: { _period: string }; Returns: string }
       admin_adjust_balance: {
@@ -1482,6 +1543,7 @@ export type Database = {
         Args: { _delta?: number; _metric: string }
         Returns: undefined
       }
+      check_rls_integrity: { Args: never; Returns: Json }
       claim_ai_bot_run: { Args: { _run_id: string }; Returns: Json }
       claim_daily_attendance: {
         Args: { user_id: string }
@@ -1633,6 +1695,17 @@ export type Database = {
         }
         Returns: string
       }
+      log_cron_settle: {
+        Args: {
+          _caller: string
+          _duration_ms: number
+          _error: string
+          _metadata?: Json
+          _ok: boolean
+          _settled_count: number
+        }
+        Returns: undefined
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -1672,6 +1745,7 @@ export type Database = {
         Args: { _tier: Database["public"]["Enums"]["user_tier"] }
         Returns: number
       }
+      run_security_self_audit: { Args: { _source?: string }; Returns: Json }
       settle_mission: {
         Args: { _base_reward: number; _is_win: boolean; _mission_id: string }
         Returns: Json
