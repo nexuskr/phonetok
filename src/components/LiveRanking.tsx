@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Trophy } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { formatKRW } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -8,6 +9,7 @@ type Row = { user_id: string; nickname: string; tier: string | null; earned: num
 const TIER_EMOJI: Record<string, string> = { empire: "👑", god: "💎", vip: "⚡", normal: "🚀" };
 
 export default function LiveRanking() {
+  const { t } = useTranslation("live");
   const [list, setList] = useState<Row[]>([]);
 
   async function load() {
@@ -33,14 +35,14 @@ export default function LiveRanking() {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Trophy className="w-4 h-4 text-gold" />
-          <span className="font-display font-bold text-sm">실시간 랭킹</span>
+          <span className="font-display font-bold text-sm break-keep">{t("ranking")}</span>
         </div>
         <span className="text-[10px] text-secondary flex items-center gap-1">
           <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" /> LIVE
         </span>
       </div>
       {list.length === 0 ? (
-        <div className="text-center text-xs text-muted-foreground py-8">아직 오늘 수익자가 없습니다</div>
+        <div className="text-center text-xs text-muted-foreground py-8 break-keep">{t("empty")}</div>
       ) : (
         <div className="space-y-2">
           {list.map((r, i) => (

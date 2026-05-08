@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useDB, formatKRW, MAIN_MILESTONE_AMOUNT, MAIN_MAX_INTERVAL_MS, MINI_MAX_INTERVAL_MS, jackpotPayoutPct, jackpotResetBase, miniJackpotResetBase, miniJackpotAmount, randomFakeNick, type Tier, type JackpotState } from "@/lib/store";
 import { Flame, Crown, Trophy, Sparkles } from "lucide-react";
@@ -69,6 +70,7 @@ function useJackpotState() {
 export function useJackpotEngine() {}
 
 export default function JackpotBanner({ compact = false }: { compact?: boolean }) {
+  const { t } = useTranslation("jackpot");
   const j = useJackpotState();
   const [pulse, setPulse] = useState(false);
   const prev = useRef(j.amount);
@@ -128,13 +130,13 @@ export default function JackpotBanner({ compact = false }: { compact?: boolean }
             {formatKRW(j.amount)}
           </div>
         </div>
-        <div className="text-[10px] text-muted-foreground mt-1">
-          미니 잭팟 <span className="text-secondary font-bold tabular-nums">{formatKRW(j.mini)}</span> · 다음 자동 폭발 <span className="text-primary font-bold">{h}h {m}m</span>
+        <div className="text-[10px] text-muted-foreground mt-1 break-keep">
+          {t("mini")} <span className="text-secondary font-bold tabular-nums">{formatKRW(j.mini)}</span> · {t("nextExplode")} <span className="text-primary font-bold tabular-nums">{h}h {m}m</span>
         </div>
 
         <div className="mt-3">
           <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
-            <span>다음 마일스톤</span>
+            <span className="break-keep">{t("nextMilestone")}</span>
             <span className="tabular-nums">{formatKRW(nextMile)}</span>
           </div>
           <div className="h-2 bg-muted rounded-full overflow-hidden relative">
