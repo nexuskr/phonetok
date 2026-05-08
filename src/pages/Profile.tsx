@@ -24,6 +24,7 @@ type BadgeDef = {
 import ReferralCard from "@/components/ReferralCard";
 
 export default function Profile() {
+  const { t } = useTranslation("profile");
   const [db, setDb] = useDB();
   const nav = useNavigate();
   const user = useRequireAuth() ?? db.user;
