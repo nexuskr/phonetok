@@ -16,6 +16,16 @@ const BAD = [
   /\blifetime\b/i,
   /\bguaranteed\b/i,
   /\bprofit\s*share\b/i,
+  // PR1 v3.3 — viral 컨텍스트 "권리 미생성/소급 금지" 잠금 어휘
+  /보류\s*(된|중)\s*(보상|인센티브|지급)/,
+  /지연\s*지급/,
+  /미지급\s*(보상|인센티브)/,
+  /지급\s*예약/,
+  /나중에\s*지급/,
+  /소급\s*(지급|적용)/,
+  /\baccrued\s+reward\b/i,
+  /\bdeferred\s+payout\b/i,
+  /\bretroactive\s+payout\b/i,
 ];
 
 const NEGATION = /(아닙|아님|아닌|not\s+(a\s+)?guaranteed|not\s+investment|not\s+a\s+guarantee|simulation)/i;
