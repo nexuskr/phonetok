@@ -2093,6 +2093,33 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_leaderboard_snapshots: {
+        Row: {
+          id: string
+          iso_week: string
+          rank: number
+          score: number
+          taken_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          iso_week: string
+          rank: number
+          score?: number
+          taken_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          iso_week?: string
+          rank?: number
+          score?: number
+          taken_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       weekly_pass_progress: {
         Row: {
           claimed_levels: Json
@@ -2544,6 +2571,7 @@ export type Database = {
         }
         Returns: Json
       }
+      finalize_weekly_pass: { Args: never; Returns: Json }
       gacha_pull: { Args: never; Returns: Json }
       gen_referral_code: { Args: never; Returns: string }
       get_active_boost_count: { Args: never; Returns: number }
@@ -2925,6 +2953,7 @@ export type Database = {
         }
         Returns: Json
       }
+      tick_weekly_leaderboard_ranks: { Args: never; Returns: Json }
       tier_boost: {
         Args: { t: Database["public"]["Enums"]["user_tier"] }
         Returns: number
