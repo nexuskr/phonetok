@@ -120,6 +120,31 @@ const total = results.length;
 const passed = results.filter((r) => r.pass).length;
 const failed = total - passed;
 const ts = new Date().toISOString();
+const startMs = (globalThis as any).__chaosStartMs ?? Date.now();
+const durationMs = Date.now() - startMs;
+
+// Persist run via service role (if SERVICE_ROLE_KEY provided)
+const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+if (SERVICE) {
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/record_chaos_run`, {
+      method: "POST",
+      headers: {
+        apikey: SERVICE,
+        Authorization: `Bearer ${SERVICE}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        _total: total, _passed: passed, _failed: failed, _duration_ms: durationMs,
+        _results: results, _source: Deno.env.get("CHAOS_SOURCE") ?? "manual",
+      }),
+    });
+    if (r.ok) console.log("📝 chaos_runs row recorded");
+    else console.warn("record_chaos_run failed:", r.status, await r.text());
+  } catch (e) {
+    console.warn("record_chaos_run error:", (e as Error).message);
+  }
+}
 
 const md = `# Phonara Chaos Drill Report
 
