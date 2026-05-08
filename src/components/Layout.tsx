@@ -21,6 +21,7 @@ import { useUserNotifications } from "@/hooks/use-user-notifications";
 import TopHUD, { TopHUDCompact } from "./TopHUD";
 import LanguageSwitcher from "./LanguageSwitcher";
 import FreezeBanner from "./FreezeBanner";
+import { useAchievementWatcher } from "@/hooks/use-achievement-watcher";
 
 /**
  * Phonara — Empire 5축 IA
