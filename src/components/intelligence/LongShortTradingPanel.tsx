@@ -41,6 +41,10 @@ export default function LongShortTradingPanel({ prefilled }: { prefilled?: Prefi
 
   const price = prices[symbol] ?? 0;
   const marginNum = Math.max(0, parseFloat(margin) || 0);
+  const setMarginPct = (pct: number) => {
+    const v = Math.max(0, Math.floor(credit * pct * 100) / 100);
+    setMargin(v.toString());
+  };
   const size = useMemo(() => computeSize(marginNum, leverage, price), [marginNum, leverage, price]);
   const liqLong = useMemo(() => liquidationPrice("long", price, leverage), [price, leverage]);
   const liqShort = useMemo(() => liquidationPrice("short", price, leverage), [price, leverage]);
@@ -60,6 +64,19 @@ export default function LongShortTradingPanel({ prefilled }: { prefilled?: Prefi
       meta: { symbol, side, leverage, margin: marginNum, entry: price },
     });
   };
+
+  // Keyboard shortcuts: L = long, S = short, ESC = clear margin focus
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (e.key === "l" || e.key === "L") { e.preventDefault(); submit("long"); }
+      else if (e.key === "s" || e.key === "S") { e.preventDefault(); submit("short"); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [symbol, leverage, marginNum, price, credit]);
 
   return (
     <section className="glass-strong rounded-3xl border border-primary/30 p-4 sm:p-6 space-y-4">
@@ -99,7 +116,21 @@ export default function LongShortTradingPanel({ prefilled }: { prefilled?: Prefi
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
-          <label className="text-xs text-muted-foreground">마진 (USDT, Paper)</label>
+          <div className="flex items-baseline justify-between">
+            <label className="text-xs text-muted-foreground">마진 (USDT, Paper)</label>
+            <div className="flex gap-1">
+              {[0.25, 0.5, 0.75, 1].map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setMarginPct(p)}
+                  className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-border/50 bg-background/60 hover:border-primary/50 hover:text-primary transition press"
+                >
+                  {p === 1 ? "MAX" : `${p * 100}%`}
+                </button>
+              ))}
+            </div>
+          </div>
           <Input
             type="number" inputMode="decimal" min={0}
             value={margin} onChange={(e) => setMargin(e.target.value)}
@@ -145,9 +176,15 @@ export default function LongShortTradingPanel({ prefilled }: { prefilled?: Prefi
         </Button>
       </div>
 
-      <p className="text-[10px] text-muted-foreground/80 leading-relaxed">
-        ⚠️ Paper Trading은 학습용 시뮬레이션입니다. 실제 잔액에 영향을 주지 않습니다.
-      </p>
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <p className="text-[10px] text-muted-foreground/80 leading-relaxed">
+          ⚠️ Paper Trading은 학습용 시뮬레이션입니다. 실제 잔액에 영향을 주지 않습니다.
+        </p>
+        <p className="text-[10px] text-muted-foreground/70 hidden sm:block">
+          단축키: <kbd className="px-1 rounded bg-background/60 border border-border/50">L</kbd> Long ·{" "}
+          <kbd className="px-1 rounded bg-background/60 border border-border/50">S</kbd> Short
+        </p>
+      </div>
     </section>
   );
 }
