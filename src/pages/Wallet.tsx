@@ -568,6 +568,10 @@ export default function Wallet() {
               <div className="text-[10px] tracking-[0.25em] text-primary font-black mb-3 uppercase">출금 이력</div>
               <WithdrawalHistoryList />
             </div>
+            <div>
+              <div className="text-[10px] tracking-[0.25em] text-primary font-black mb-3 uppercase">충전 이력</div>
+              <DepositHistoryList />
+            </div>
             <NotificationPreferencesPanel userId={u.id} />
             <div>
               <div className="text-[10px] tracking-[0.25em] text-primary font-black mb-3 uppercase">{t("historyTitle")}</div>
