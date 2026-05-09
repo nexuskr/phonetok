@@ -1,15 +1,20 @@
 import { useMemo, useState } from "react";
 import { format } from "date-fns";
-import { Download, Search, Trophy } from "lucide-react";
+import { Download, RotateCcw, Search, Trophy } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { usePaperStore } from "@/lib/paper-trading/store";
 import { computePnl } from "@/lib/paper-trading/engine";
 import { useBybitTicker } from "@/hooks/use-bybit-ticker";
 import { toCSV, downloadCSV } from "@/lib/csv";
+import { notify } from "@/lib/notify";
 import { track } from "@/lib/telemetry";
 import type { Position } from "@/lib/paper-trading/types";
 
