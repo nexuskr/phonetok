@@ -575,6 +575,7 @@ function ImageMakerCard({ tier, runs, used, loading, dailyCap }: { tier: string;
   const isClaimed = latest?.status === "claimed";
 
   return (
+    <>
     <BotCard
       icon={<ImageIcon className="w-4 h-4" />}
       title={t("image.title")}
@@ -629,6 +630,19 @@ function ImageMakerCard({ tier, runs, used, loading, dailyCap }: { tier: string;
         </div>
       </div>
     </BotCard>
+    <ClaimResultModal
+      open={claimFlow.modal.open}
+      onClose={claimFlow.closeModal}
+      outcome={claimFlow.modal.outcome}
+      expected={claimFlow.modal.expected}
+      actual={claimFlow.modal.actual}
+      pnlPct={claimFlow.modal.pnl_pct}
+      capRemaining={claimFlow.modal.capRemaining}
+      onShare={doShare}
+      shared={claimFlow.modal.shared}
+      botKindLabel={t("image.title")}
+    />
+    </>
   );
 }
 
