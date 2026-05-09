@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { TrendingUp, ArrowDownToLine, Package as PackageIcon, Coins, Loader2 } from "lucide-react";
+import { TrendingUp, ArrowDownToLine, Package as PackageIcon, Coins } from "lucide-react";
 import { LoadingKpiGrid } from "@/components/ui/loading-state";
 
 type Snap = {
