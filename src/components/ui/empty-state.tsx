@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
  * EmptyState — unified empty/no-data placeholder
  * Uses lux design tokens. Variants: default | gold | muted | error
  */
-export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface EmptyStateProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   icon?: React.ReactNode;
   title: React.ReactNode;
   description?: React.ReactNode;
