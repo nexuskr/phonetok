@@ -41,6 +41,10 @@ const resources = {
       admin: "관리자",
       logout: "로그아웃",
       enter: "입장",
+      tradingArena: "Trading Arena",
+      intelligenceLoop: "Intelligence Loop",
+      infrastructure: "Infrastructure",
+      vision: "Vision",
     },
     topbar: {
       balance: "잔고",
