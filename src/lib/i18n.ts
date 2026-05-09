@@ -165,6 +165,10 @@ const resources = {
     },
     wallet: {
       title: "황실 지갑",
+      dailyCap: "오늘 수익 한도",
+      dailyCapRemaining: "남은 한도",
+      dailyCapReached: "오늘 한도 도달",
+      dailyCapNote: "내일 자정에 자동 초기화됩니다.",
       tierLimit: "{{tier}} 등급 출금 한도",
       unlimited: "무제한 ∞",
       bankBalance: "원화 잔고",
