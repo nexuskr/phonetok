@@ -139,35 +139,46 @@ export default function PackagePurchasesAdmin() {
             {r.receipt_url && (
               <a href={r.receipt_url} target="_blank" rel="noreferrer" className="text-[10px] text-primary underline mt-2 block truncate">영수증 보기</a>
             )}
-            {r.status === "pending" && (
-              <div className="flex gap-2 mt-2">
-                <button onClick={() => act(r.id, "approve")} disabled={busy}
-                  className="flex-1 py-2 rounded-xl bg-secondary/20 text-secondary text-xs font-bold flex items-center justify-center gap-1">
-                  <Check className="w-3.5 h-3.5" /> 승인
-                </button>
-                <button onClick={() => act(r.id, "reject")} disabled={busy}
-                  className="flex-1 py-2 rounded-xl bg-destructive/20 text-destructive text-xs font-bold flex items-center justify-center gap-1">
-                  <X className="w-3.5 h-3.5" /> 거절
-                </button>
-              </div>
-            )}
-            {(r.status === "active" || r.status === "failed") && (
-              <div className="flex gap-2 mt-2">
-                <button onClick={() => retryOne(r)} disabled={busy}
-                  className="flex-1 py-2 rounded-xl bg-gold/20 text-gold text-xs font-bold flex items-center justify-center gap-1">
-                  <RefreshCw className="w-3.5 h-3.5" /> 정산 재시도
-                </button>
+            <div className="flex gap-2 mt-2">
+              {r.status === "pending" && (
+                <>
+                  <button onClick={() => setModal({ id: r.id, action: "approve" })} disabled={busy}
+                    className="flex-1 py-2 rounded-xl bg-secondary/20 text-secondary text-xs font-bold flex items-center justify-center gap-1">
+                    <Check className="w-3.5 h-3.5" /> 포렌식 승인
+                  </button>
+                  <button onClick={() => setModal({ id: r.id, action: "reject" })} disabled={busy}
+                    className="flex-1 py-2 rounded-xl bg-destructive/20 text-destructive text-xs font-bold flex items-center justify-center gap-1">
+                    <X className="w-3.5 h-3.5" /> 거절
+                  </button>
+                </>
+              )}
+              {(r.status === "active" || r.status === "failed") && (
+                <>
+                  <button onClick={() => retryOne(r)} disabled={busy}
+                    className="flex-1 py-2 rounded-xl bg-gold/20 text-gold text-xs font-bold flex items-center justify-center gap-1">
+                    <RefreshCw className="w-3.5 h-3.5" /> 정산 재시도
+                  </button>
+                  <button onClick={() => markResolve(r)} disabled={busy}
+                    className="flex-1 py-2 rounded-xl bg-primary/20 text-primary text-xs font-bold flex items-center justify-center gap-1">
+                    <Wrench className="w-3.5 h-3.5" /> 해결 요청
+                  </button>
+                </>
+              )}
+              {r.status === "rejected" && (
                 <button onClick={() => markResolve(r)} disabled={busy}
                   className="flex-1 py-2 rounded-xl bg-primary/20 text-primary text-xs font-bold flex items-center justify-center gap-1">
-                  <Wrench className="w-3.5 h-3.5" /> 해결 요청
+                  <Wrench className="w-3.5 h-3.5" /> 해결 요청 기록
                 </button>
-              </div>
-            )}
-            {r.status === "rejected" && (
-              <button onClick={() => markResolve(r)} disabled={busy}
-                className="w-full mt-2 py-2 rounded-xl bg-primary/20 text-primary text-xs font-bold flex items-center justify-center gap-1">
-                <Wrench className="w-3.5 h-3.5" /> 해결 요청 기록
+              )}
+              <button onClick={() => setOpenTimeline(openTimeline === r.id ? null : r.id)}
+                className="px-3 py-2 rounded-xl glass text-xs font-bold flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" />
               </button>
+            </div>
+            {openTimeline === r.id && (
+              <div className="mt-3">
+                <RequestTimeline kind="package" requestId={r.id} />
+              </div>
             )}
           </div>
           );
