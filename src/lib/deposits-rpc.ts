@@ -59,14 +59,46 @@ export async function amlRequiredLevel(userId: string, amount: number) {
   };
 }
 
-export async function adminResolveDeposit(id: string, action: "approve" | "reject", reason?: string) {
+export async function adminResolveDeposit(
+  id: string,
+  action: "approve" | "reject",
+  reason?: string,
+  memo?: string,
+  checklist?: Record<string, boolean>,
+) {
   const { data, error } = await supabase.rpc("admin_resolve_deposit", {
     _request_id: id,
     _action: action,
     _reason: reason ?? null,
-  });
+    _memo: memo ?? null,
+    _checklist: checklist ?? {},
+  } as any);
   if (error) throw error;
   return data;
+}
+
+/** Validate deposit form input (format / duplicate / network mismatch). */
+export async function validateDepositInput(args: {
+  method: DepositMethod;
+  coinAddress?: string | null;
+  coinNetwork?: string | null;
+  voucherBrand?: VoucherBrand | null;
+  voucherPin?: string | null;
+  bankAccount?: string | null;
+}) {
+  const { data, error } = await supabase.rpc("validate_deposit_input", {
+    _method: args.method,
+    _coin_address: args.coinAddress ?? null,
+    _coin_network: args.coinNetwork ?? null,
+    _voucher_brand: args.voucherBrand ?? null,
+    _voucher_pin: args.voucherPin ?? null,
+    _bank_account: args.bankAccount ?? null,
+  } as any);
+  if (error) throw error;
+  return data as {
+    warnings: Array<{ code: string; severity: "low" | "medium" | "high"; message: string }>;
+    count: number;
+  };
 }
 
 export async function adminSetTier(targetId: string, tier: "normal" | "vip" | "god" | "empire") {
