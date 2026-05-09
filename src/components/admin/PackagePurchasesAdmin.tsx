@@ -33,6 +33,8 @@ const STATUS_META: Record<string, { label: string; tone: string; icon: any }> = 
 export default function PackagePurchasesAdmin() {
   const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);
+  const [modal, setModal] = useState<{ id: string; action: "approve" | "reject" } | null>(null);
+  const [openTimeline, setOpenTimeline] = useState<string | null>(null);
 
   async function load() {
     const { data, error } = await supabase
