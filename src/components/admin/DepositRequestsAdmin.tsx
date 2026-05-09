@@ -22,7 +22,8 @@ type Row = {
 
 export default function DepositRequestsAdmin() {
   const [rows, setRows] = useState<Row[]>([]);
-  const [busy, setBusy] = useState(false);
+  const [modal, setModal] = useState<{ id: string; action: "approve" | "reject" } | null>(null);
+  const [openTimeline, setOpenTimeline] = useState<string | null>(null);
 
   async function load() {
     const { data, error } = await supabase
@@ -42,29 +43,6 @@ export default function DepositRequestsAdmin() {
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, []);
-
-  async function act(id: string, action: "approve" | "reject") {
-    setBusy(true);
-    try {
-      const reason = action === "reject" ? prompt("거절 사유") ?? "rejected" : undefined;
-      await adminResolveDeposit(id, action, reason);
-      const row = rows.find(r => r.id === id);
-      if (row) {
-        await sendAdminNotification({
-          userId: row.user_id,
-          template: action === "approve" ? "deposit-approved" : "deposit-rejected",
-          idempotencyKey: `dep-${action}-${id}`,
-          data: { amount: row.amount, method: row.method, reason },
-        });
-      }
-      toast({ title: action === "approve" ? "승인 + 잔액 적립 + 메일 전송" : "거절 + 메일 전송" });
-      await load();
-    } catch (e: any) {
-      toast({ title: "실패", description: e.message });
-    } finally {
-      setBusy(false);
-    }
-  }
 
   return (
     <div className="space-y-3">
@@ -96,20 +74,41 @@ export default function DepositRequestsAdmin() {
             <a href={r.receipt_url} target="_blank" rel="noreferrer" className="text-[10px] text-primary underline mt-2 block truncate">영수증 보기</a>
           )}
           {r.memo && <div className="text-[11px] text-muted-foreground mt-1">메모: {r.memo}</div>}
-          {r.status === "pending" && (
-            <div className="flex gap-2 mt-2">
-              <button onClick={() => act(r.id, "approve")} disabled={busy}
-                className="flex-1 py-2 rounded-xl bg-secondary/20 text-secondary text-xs font-bold flex items-center justify-center gap-1">
-                <Check className="w-3.5 h-3.5" /> 승인 (자동 적립)
-              </button>
-              <button onClick={() => act(r.id, "reject")} disabled={busy}
-                className="flex-1 py-2 rounded-xl bg-destructive/20 text-destructive text-xs font-bold flex items-center justify-center gap-1">
-                <X className="w-3.5 h-3.5" /> 거절
-              </button>
+          <div className="flex gap-2 mt-2">
+            {r.status === "pending" && (
+              <>
+                <button onClick={() => setModal({ id: r.id, action: "approve" })}
+                  className="flex-1 py-2 rounded-xl bg-secondary/20 text-secondary text-xs font-bold flex items-center justify-center gap-1">
+                  <Check className="w-3.5 h-3.5" /> 포렌식 승인
+                </button>
+                <button onClick={() => setModal({ id: r.id, action: "reject" })}
+                  className="flex-1 py-2 rounded-xl bg-destructive/20 text-destructive text-xs font-bold flex items-center justify-center gap-1">
+                  <X className="w-3.5 h-3.5" /> 거절
+                </button>
+              </>
+            )}
+            <button onClick={() => setOpenTimeline(openTimeline === r.id ? null : r.id)}
+              className="px-3 py-2 rounded-xl glass text-xs font-bold flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" /> 타임라인
+            </button>
+          </div>
+          {openTimeline === r.id && (
+            <div className="mt-3">
+              <RequestTimeline kind="deposit" requestId={r.id} />
             </div>
           )}
         </div>
       ))}
+      {modal && (
+        <AdminReviewModal
+          open
+          kind="deposit"
+          requestId={modal.id}
+          defaultAction={modal.action}
+          onClose={() => setModal(null)}
+          onResolved={() => void load()}
+        />
+      )}
     </div>
   );
 }
