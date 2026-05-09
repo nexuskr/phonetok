@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Trophy, Crown, Medal } from "lucide-react";
+import { LoadingList } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface Row {
   rank: number;
@@ -45,11 +47,15 @@ export default function ReferralLeaderboard() {
       </header>
 
       {loading ? (
-        <div className="text-sm text-muted-foreground py-6 text-center">로딩 중…</div>
+        <LoadingList rows={3} rowHeight="sm" />
       ) : rows.length === 0 ? (
-        <div className="text-sm text-muted-foreground py-6 text-center">
-          이번 주 첫 추천자가 되어 보세요 — 1위 보너스 ₩50,000
-        </div>
+        <EmptyState
+          icon={<Trophy className="w-5 h-5" />}
+          title="이번 주 첫 추천자가 되어 보세요"
+          description="1위 보너스 ₩50,000 — 친구를 초대하면 즉시 순위에 반영됩니다."
+          variant="gold"
+          size="sm"
+        />
       ) : (
         <ol className="space-y-1.5">
           {rows.map((r) => (

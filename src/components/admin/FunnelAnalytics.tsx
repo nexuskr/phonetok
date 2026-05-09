@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Activity, MousePointerClick, Eye, X, CheckCircle2, Filter } from "lucide-react";
+import { LoadingList } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from "recharts";
 
 type EventRow = {
@@ -154,7 +156,7 @@ export default function FunnelAnalytics() {
       <div className="glass-strong rounded-2xl p-4 neon-border">
         <h3 className="font-display font-bold text-sm mb-3">Surface 별 분포</h3>
         {bySurface.length === 0 ? (
-          <div className="text-center text-xs text-muted-foreground py-10">{loading ? "로딩 중..." : "아직 이벤트가 없습니다"}</div>
+          {loading ? <LoadingList rows={3} rowHeight="sm" /> : <EmptyState title="아직 이벤트가 없습니다" variant="muted" size="sm" />}
         ) : (
           <div className="h-72">
             <ResponsiveContainer>

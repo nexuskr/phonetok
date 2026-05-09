@@ -6,6 +6,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from "recharts";
 import { TrendingUp, Users, Target, ArrowUpFromLine, ArrowDownToLine } from "lucide-react";
+import { LoadingPage } from "@/components/ui/loading-state";
 
 type Row = {
   day: string;
@@ -84,7 +85,7 @@ export default function AdminDashboardCharts() {
         <Mini icon={TrendingUp} label="미션 보상" v={formatKRW(totals.mr)} />
       </div>
 
-      {loading && <div className="glass rounded-2xl p-6 text-center text-xs text-muted-foreground">로딩 중...</div>}
+      {loading && <LoadingPage />}
 
       {!loading && rows.length > 0 && (
         <>

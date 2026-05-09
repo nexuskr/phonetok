@@ -6,6 +6,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from "recharts";
 import { Bot, Crown, Trophy, UserPlus, TrendingUp } from "lucide-react";
+import { LoadingPage } from "@/components/ui/loading-state";
 
 type BotRow = { day: string; kind: "content"|"trading"|"image"; runs: number; claimed: number; failed: number; total_reward: number; avg_pnl_pct: number };
 type TierRow = { tier: string; users: number; total_balance: number };
@@ -90,7 +91,7 @@ export default function AdvancedAnalytics() {
         </div>
       </div>
 
-      {loading && <div className="glass rounded-2xl p-6 text-center text-xs text-muted-foreground">로딩 중...</div>}
+      {loading && <LoadingPage />}
 
       {!loading && (
         <>
