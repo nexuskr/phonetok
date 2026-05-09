@@ -60,7 +60,7 @@ export function useClaimFlow(opts: {
         if (m.includes("already_claimed")) throw new Error("already_claimed");
         throw error;
       }
-      const r = data as ClaimFlowResult;
+      const r = data as unknown as ClaimFlowResult;
       const outcome = classifyClaim({
         expected: ctx.expected,
         actual: r?.reward ?? 0,
