@@ -13,8 +13,13 @@ class BybitFeed {
   private restTimer: number | null = null;
   private alive = true;
   private restMode = false;
+  private started = false;
+  private emitTimer: number | null = null;
+  private dirty = false;
 
   start() {
+    if (this.started) return;
+    this.started = true;
     this.alive = true;
     this.connect();
   }
