@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Clock, CheckCircle2, XCircle, Loader2, AlertCircle } from "lucide-react";
+import { LoadingList } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type RequestKind = "deposit" | "package" | "withdrawal";
 

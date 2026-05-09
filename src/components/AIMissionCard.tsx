@@ -69,7 +69,7 @@ export default function AIMissionCard() {
       if (r.status === 402) { notify.error("AI 크레딧이 소진되었습니다 — 워크스페이스 충전 필요"); return; }
       if (!r.ok) { notify.error("AI 미션 생성 실패"); return; }
       const j = await r.json();
-      if (j.skipped) toast("⏳ 진행 중인 AI 미션이 이미 있습니다");
+      if (j.skipped) notify.message("⏳ 진행 중인 AI 미션이 이미 있습니다");
       load();
     } finally {
       setGenerating(false);
