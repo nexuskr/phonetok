@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Sparkles, Zap, Loader2, Bot, Clock } from "lucide-react";
+import { Sparkles, Zap, Loader2, Bot, Clock, Inbox } from "lucide-react";
 import { notify } from "@/lib/notify";
+import { LoadingList } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface AIMission {
   id: string;
@@ -108,11 +110,15 @@ export default function AIMissionCard() {
         </header>
 
         {loading ? (
-          <div className="text-sm text-muted-foreground py-4 text-center">로딩 중…</div>
+          <LoadingList rows={3} rowHeight="md" />
         ) : missions.length === 0 ? (
-          <div className="text-sm text-muted-foreground py-4 text-center break-keep">
-            AI가 당신의 활동을 분석해 맞춤형 미션을 만들어 드립니다. 위 버튼을 눌러 시작하세요.
-          </div>
+          <EmptyState
+            icon={<Inbox className="w-5 h-5" />}
+            title="아직 AI 미션이 없습니다"
+            description="AI가 당신의 활동을 분석해 맞춤형 미션을 만들어 드립니다. 위 버튼을 눌러 시작하세요."
+            variant="muted"
+            size="sm"
+          />
         ) : (
           <div className="space-y-2">
             {missions.map((m) => {
