@@ -6,6 +6,8 @@ import { useBybitTicker } from "@/hooks/use-bybit-ticker";
 import { notify } from "@/lib/notify";
 import { track } from "@/lib/telemetry";
 import { Activity } from "lucide-react";
+import { celebrateWin, levelFromPnl, playLossThud } from "@/lib/paper-trading/celebrate";
+import { pushWinMoment } from "./WinMomentOverlay";
 
 export default function PaperPositionList() {
   const { prices } = useBybitTicker();
