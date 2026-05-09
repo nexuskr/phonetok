@@ -55,6 +55,8 @@ export default function AIBotCards() {
   const user = db.user;
   const tier = (user?.tier ?? "NORMAL").toUpperCase();
   const isEmpire = tier === "EMPIRE";
+  const dbTier = (user?.tier ?? "normal").toLowerCase() as DbTier;
+  const dailyCap = useDailyCap(user?.id, dbTier);
 
   const [runs, setRuns] = useState<Run[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,11 +110,20 @@ export default function AIBotCards() {
         </span>
       </div>
 
+      {/* Daily cap meter */}
+      <DailyCapMeter
+        cap={dailyCap.cap}
+        used={dailyCap.used}
+        remaining={dailyCap.remaining}
+        pct={dailyCap.pct}
+        loading={dailyCap.loading}
+      />
+
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <ContentFarmerCard tier={tier} runs={runs} used={usedToday("content")} loading={loading} />
-        <TradingBotCard    tier={tier} runs={runs} used={usedToday("trading")} loading={loading} />
-        <ImageMakerCard    tier={tier} runs={runs} used={usedToday("image")} loading={loading} />
+        <ContentFarmerCard tier={tier} runs={runs} used={usedToday("content")} loading={loading} dailyCap={dailyCap} />
+        <TradingBotCard    tier={tier} runs={runs} used={usedToday("trading")} loading={loading} dailyCap={dailyCap} />
+        <ImageMakerCard    tier={tier} runs={runs} used={usedToday("image")} loading={loading} dailyCap={dailyCap} />
       </div>
     </section>
   );
