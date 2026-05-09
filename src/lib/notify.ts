@@ -23,7 +23,7 @@ const variantClass = {
   default: "",
 } as const;
 
-function fmt(message: React.ReactNode, variant: keyof typeof variantClass, opts?: Opts) {
+function fmt(message: ReactNode, variant: keyof typeof variantClass, opts?: Opts) {
   return {
     ...opts,
     className: [baseClass, variantClass[variant], opts?.className ?? ""].filter(Boolean).join(" "),
@@ -43,16 +43,16 @@ export function describeError(err: unknown, fallback = "잠시 후 다시 시도
 }
 
 export const notify = {
-  success: (message: React.ReactNode, opts?: Opts) =>
+  success: (message: ReactNode, opts?: Opts) =>
     sonner.success(message, fmt(message, "success", opts)),
-  error: (message: React.ReactNode, opts?: Opts) =>
+  error: (message: ReactNode, opts?: Opts) =>
     sonner.error(message, fmt(message, "error", opts)),
-  info: (message: React.ReactNode, opts?: Opts) =>
+  info: (message: ReactNode, opts?: Opts) =>
     sonner.info?.(message, fmt(message, "info", opts)) ?? sonner(message, fmt(message, "info", opts)),
-  warning: (message: React.ReactNode, opts?: Opts) =>
+  warning: (message: ReactNode, opts?: Opts) =>
     sonner.warning?.(message, fmt(message, "warning", opts)) ??
     sonner(message, fmt(message, "warning", opts)),
-  message: (message: React.ReactNode, opts?: Opts) => sonner(message, fmt(message, "default", opts)),
+  message: (message: ReactNode, opts?: Opts) => sonner(message, fmt(message, "default", opts)),
   /** Convenience: report an unknown error with a Korean fallback. */
   fail: (title: string, err?: unknown, opts?: Opts) =>
     sonner.error(title, fmt(title, "error", { description: describeError(err), ...opts })),
