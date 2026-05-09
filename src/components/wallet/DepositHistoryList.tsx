@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Clock, CheckCircle2, XCircle, Loader2, ArrowUpRight, X, Banknote, Coins, Ticket, Shield, FileText } from "lucide-react";
+import { Clock, CheckCircle2, XCircle, ArrowUpRight, X, Banknote, Coins, Ticket, Shield, FileText, Inbox } from "lucide-react";
 import RequestTimeline from "@/components/RequestTimeline";
+import { LoadingList } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type Status = "pending" | "approved" | "rejected" | "cancelled";
 type Method = "bank" | "coin" | "voucher";
@@ -89,14 +91,17 @@ export default function DepositHistoryList() {
   const lastPage = Math.max(0, Math.ceil(total / PAGE_SIZE) - 1);
 
   if (loading) {
-    return (
-      <div className="glass rounded-2xl p-6 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
-        <Loader2 className="w-3.5 h-3.5 animate-spin" /> 불러오는 중…
-      </div>
-    );
+    return <LoadingList rows={4} rowHeight="md" />;
   }
   if (rows.length === 0) {
-    return <div className="glass rounded-2xl p-10 text-center text-xs text-muted-foreground">충전 신청 내역이 없습니다</div>;
+    return (
+      <EmptyState
+        icon={<Inbox className="w-5 h-5" />}
+        title="충전 신청 내역이 없습니다"
+        description="첫 충전을 진행하면 이곳에 검수 진행 상황이 실시간으로 표시됩니다."
+        variant="muted"
+      />
+    );
   }
 
   return (
