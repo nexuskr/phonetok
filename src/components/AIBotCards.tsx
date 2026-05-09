@@ -351,6 +351,10 @@ function TradingBotCard({ tier, runs, used, loading }: { tier: string; runs: Run
     if (!latest) return;
     try {
       const r = await claimRun(latest.id);
+      if (!r.reward || r.reward <= 0) {
+        toast({ title: t("capReached"), description: t("capReachedDesc"), variant: "destructive" });
+        return;
+      }
       const sign = (r.pnl_pct ?? 0) >= 0 ? "+" : "";
       toast({
         title: t("trading.toastClaim", { sign, pnl: r.pnl_pct?.toFixed(2) }),
