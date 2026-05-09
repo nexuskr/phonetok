@@ -156,7 +156,7 @@ export default function FunnelAnalytics() {
       <div className="glass-strong rounded-2xl p-4 neon-border">
         <h3 className="font-display font-bold text-sm mb-3">Surface 별 분포</h3>
         {bySurface.length === 0 ? (
-          {loading ? <LoadingList rows={3} rowHeight="sm" /> : <EmptyState title="아직 이벤트가 없습니다" variant="muted" size="sm" />}
+          loading ? <LoadingList rows={3} rowHeight="sm" /> : <EmptyState title="아직 이벤트가 없습니다" variant="muted" size="sm" />
         ) : (
           <div className="h-72">
             <ResponsiveContainer>
