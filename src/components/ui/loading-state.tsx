@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -57,19 +58,22 @@ export const LoadingCard: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   </div>
 );
 
-export const LoadingPage: React.FC<{ label?: string }> = ({ label = "불러오는 중…" }) => (
-  <div
-    role="status"
-    aria-busy="true"
-    className="flex min-h-[40vh] flex-col items-center justify-center gap-4"
-  >
-    <div className="relative h-12 w-12">
-      <div className="absolute inset-0 rounded-full border-2 border-primary/20" />
-      <div className="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+export const LoadingPage: React.FC<{ label?: string }> = ({ label }) => {
+  const { t } = useTranslation();
+  return (
+    <div
+      role="status"
+      aria-busy="true"
+      className="flex min-h-[40vh] flex-col items-center justify-center gap-4"
+    >
+      <div className="relative h-12 w-12">
+        <div className="absolute inset-0 rounded-full border-2 border-primary/20" />
+        <div className="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      </div>
+      <p className="text-xs text-muted-foreground tracking-wide">{label ?? t("common.loadingPage")}</p>
     </div>
-    <p className="text-xs text-muted-foreground tracking-wide">{label}</p>
-  </div>
-);
+  );
+};
 
 export const LoadingKpiGrid: React.FC<{ count?: number }> = ({ count = 4 }) => (
   <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { notify } from "@/lib/notify";
 
 /**
  * Calls check_achievements after key user actions and toasts any newly
@@ -21,7 +21,7 @@ export function useAchievementWatcher(trigger?: unknown) {
       for (const key of unlocked) {
         if (seen.current.has(key)) continue;
         seen.current.add(key);
-        toast.success("🏆 업적 달성!", {
+        notify.success("🏆 업적 달성!", {
           description: key,
           duration: 5000,
         });

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Clock, ArrowUpRight, ArrowDownLeft, Coins, Trophy, Banknote } from "lucide-react";
+import { Clock, ArrowUpRight, ArrowDownLeft, Coins, Trophy, Banknote, Inbox } from "lucide-react";
+import { LoadingList } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type Tx = {
   id: string;
@@ -57,8 +59,15 @@ export default function ServerTxList() {
     return () => { mounted = false; supabase.removeChannel(ch); };
   }, []);
 
-  if (loading) return <div className="glass rounded-2xl p-6 text-center text-xs text-muted-foreground">불러오는 중...</div>;
-  if (list.length === 0) return <div className="glass rounded-2xl p-10 text-center text-sm text-muted-foreground">서버 거래내역이 없습니다</div>;
+  if (loading) return <LoadingList rows={4} rowHeight="md" />;
+  if (list.length === 0) return (
+    <EmptyState
+      icon={<Inbox className="w-5 h-5" />}
+      title="서버 거래내역이 없습니다"
+      description="입출금/보상 등의 활동이 기록되면 이곳에 표시됩니다."
+      variant="muted"
+    />
+  );
 
   return (
     <div className="space-y-2">

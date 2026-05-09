@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Clock, CheckCircle2, XCircle, Loader2, AlertCircle } from "lucide-react";
+import { LoadingList } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type RequestKind = "deposit" | "package" | "withdrawal";
 
@@ -87,12 +89,10 @@ export default function RequestTimeline({
   }, [kind, requestId]);
 
   if (loading) {
-    return (
-      <div className={`text-xs text-muted-foreground ${className}`}>타임라인 불러오는 중…</div>
-    );
+    return <LoadingList rows={3} rowHeight="sm" className={className} />;
   }
   if (rows.length === 0) {
-    return <div className={`text-xs text-muted-foreground ${className}`}>아직 기록이 없습니다.</div>;
+    return <EmptyState title="아직 기록이 없습니다" description="처리 진행 단계가 발생하면 여기에 표시됩니다." variant="muted" size="sm" className={className} />;
   }
 
   return (

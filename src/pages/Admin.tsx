@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { useRequireAdmin } from "@/hooks/use-require-auth";
 import { useTranslation } from "react-i18next";
 import { LuxButton, LuxInput, Money } from "@/components/ui/lux";
+import { EmptyState } from "@/components/ui/empty-state";
 import WithdrawRequestsAdmin from "@/components/admin/WithdrawRequestsAdmin";
 import PackagePurchasesAdmin from "@/components/admin/PackagePurchasesAdmin";
 import ServerUserAdmin from "@/components/admin/ServerUserAdmin";
@@ -322,4 +323,4 @@ function KPI({ icon: Icon, label, v, hot, money }: any) {
     </div>
   );
 }
-function Empty() { return <div className="glass rounded-2xl p-10 text-center text-sm text-muted-foreground">데이터가 없습니다</div>; }
+function Empty() { return <EmptyState size="sm" variant="muted" />; }

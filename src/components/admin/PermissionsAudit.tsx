@@ -207,7 +207,7 @@ export default function PermissionsAudit() {
                   </tr>
                 ))}
                 {filteredPerms.length === 0 && (
-                  <tr><td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">표시할 항목이 없습니다.</td></tr>
+                  <tr><td colSpan={5} className="px-3 py-8 text-center text-muted-foreground text-xs">표시할 항목이 없습니다.</td></tr>
                 )}
               </tbody>
             </table>

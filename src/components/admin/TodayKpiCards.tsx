@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { TrendingUp, ArrowDownToLine, Package as PackageIcon, Coins, Loader2 } from "lucide-react";
+import { TrendingUp, ArrowDownToLine, Package as PackageIcon, Coins } from "lucide-react";
+import { LoadingKpiGrid } from "@/components/ui/loading-state";
 
 type Snap = {
   deposits_today: number;
@@ -51,11 +52,7 @@ export default function TodayKpiCards() {
   }, []);
 
   if (loading || !s) {
-    return (
-      <div className="glass rounded-2xl p-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-        <Loader2 className="w-3.5 h-3.5 animate-spin" /> 오늘 스냅샷 불러오는 중…
-      </div>
-    );
+    return <LoadingKpiGrid count={4} />;
   }
 
   const cards = [

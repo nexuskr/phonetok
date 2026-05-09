@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ShieldCheck, ShieldAlert, ShieldQuestion, Activity, FileText } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type SubTab = "verifications" | "events" | "audit";
 
@@ -351,5 +352,5 @@ function AuditLog() {
 }
 
 function Empty() {
-  return <div className="glass rounded-2xl p-10 text-center text-sm text-muted-foreground">데이터가 없습니다</div>;
+  return <EmptyState size="md" variant="muted" />;
 }

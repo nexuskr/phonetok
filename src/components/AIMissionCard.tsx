@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Sparkles, Zap, Loader2, Bot, Clock } from "lucide-react";
-import { toast } from "sonner";
+import { Sparkles, Zap, Loader2, Bot, Clock, Inbox } from "lucide-react";
+import { notify } from "@/lib/notify";
+import { LoadingList } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface AIMission {
   id: string;
@@ -65,11 +67,11 @@ export default function AIMissionCard() {
           Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
       });
-      if (r.status === 429) { toast.error("AI 호출이 일시적으로 제한되었습니다 (429)"); return; }
-      if (r.status === 402) { toast.error("AI 크레딧이 소진되었습니다 — 워크스페이스 충전 필요"); return; }
-      if (!r.ok) { toast.error("AI 미션 생성 실패"); return; }
+      if (r.status === 429) { notify.error("AI 호출이 일시적으로 제한되었습니다 (429)"); return; }
+      if (r.status === 402) { notify.error("AI 크레딧이 소진되었습니다 — 워크스페이스 충전 필요"); return; }
+      if (!r.ok) { notify.error("AI 미션 생성 실패"); return; }
       const j = await r.json();
-      if (j.skipped) toast("⏳ 진행 중인 AI 미션이 이미 있습니다");
+      if (j.skipped) notify.message("⏳ 진행 중인 AI 미션이 이미 있습니다");
       load();
     } finally {
       setGenerating(false);
@@ -81,7 +83,7 @@ export default function AIMissionCard() {
     const { error } = await supabase.rpc("claim_ai_mission", { _mission_id: id });
     setClaiming(null);
     if (error) {
-      toast.error("청구 실패", { description: error.message });
+      notify.error("청구 실패", { description: error.message });
       return;
     }
     load();
@@ -108,11 +110,15 @@ export default function AIMissionCard() {
         </header>
 
         {loading ? (
-          <div className="text-sm text-muted-foreground py-4 text-center">로딩 중…</div>
+          <LoadingList rows={3} rowHeight="md" />
         ) : missions.length === 0 ? (
-          <div className="text-sm text-muted-foreground py-4 text-center break-keep">
-            AI가 당신의 활동을 분석해 맞춤형 미션을 만들어 드립니다. 위 버튼을 눌러 시작하세요.
-          </div>
+          <EmptyState
+            icon={<Inbox className="w-5 h-5" />}
+            title="아직 AI 미션이 없습니다"
+            description="AI가 당신의 활동을 분석해 맞춤형 미션을 만들어 드립니다. 위 버튼을 눌러 시작하세요."
+            variant="muted"
+            size="sm"
+          />
         ) : (
           <div className="space-y-2">
             {missions.map((m) => {

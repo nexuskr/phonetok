@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { ShieldCheck, ShieldAlert, RefreshCw, Activity, AlertTriangle, CheckCircle2, Filter, Eye, Wrench, Gauge, FileCheck2, Radar, BellRing, Check } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { LoadingList } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type AuditRow = {
   id: string;
@@ -591,9 +593,9 @@ export default function SecurityAuditAdmin() {
           <ShieldAlert className="w-4 h-4 text-gold" /> RLS 무결성 감사 이력
         </h3>
         <div className="space-y-2">
-          {loading && <div className="glass rounded-2xl p-6 text-center text-xs text-muted-foreground">불러오는 중…</div>}
+          {loading && <LoadingList rows={4} rowHeight="md" />}
           {!loading && filtered.length === 0 && (
-            <div className="glass rounded-2xl p-6 text-center text-xs text-muted-foreground">조건에 맞는 기록 없음</div>
+            <EmptyState title="조건에 맞는 기록 없음" variant="muted" size="sm" />
           )}
           {filtered.map((a) => (
             <button
