@@ -108,10 +108,19 @@ function OpenPositionsLiveImpl({
           mark={prices[p.symbol] ?? p.entry}
           busy={!!busy}
           unit={unit}
-          onClose={onClose}
+          onClose={async (id, mark) => {
+            const r = await onClose(id, mark);
+            if (!("error" in r)) {
+              const reason: ReplayPayload["reason"] = r.roi <= -0.99 ? "liquidation" : "manual";
+              setReplay(buildReplay(p, r.exit ?? mark, r.pnl, r.roi, reason));
+            }
+            return r;
+          }}
         />
       ))}
     </div>
+    <LiquidationReplayModal payload={replay} onClose={() => setReplay(null)} />
+    </>
   );
 }
 
