@@ -199,7 +199,7 @@ export default function Lounge() {
         </motion.div>
 
         {loading ? (
-          <LoadingList count={4} />
+          <LoadingList rows={4} />
         ) : (
           <div className="grid gap-6 lg:grid-cols-3">
             {/* My Guild + Chat */}
