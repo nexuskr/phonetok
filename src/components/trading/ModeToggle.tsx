@@ -17,6 +17,7 @@ export default function ModeToggle({
   const [agreed, setAgreed] = useState(false);
 
   const fmt = (n: number) => n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  const fmtKrw = (n: number) => `₩${Math.floor(n).toLocaleString()}`;
 
   return (
     <>
