@@ -4,7 +4,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ARENA_SYMBOLS, MAX_LEVERAGE, type Mode } from "@/lib/trading/types";
+import { ARENA_SYMBOLS, MAX_LEVERAGE, FEE_RATE, type Mode } from "@/lib/trading/types";
 import { applySlippage, computeSize, liquidationPrice, openFee } from "@/lib/trading/engine";
 import { sfx } from "@/lib/trading/sounds";
 import { unitForMode, fmtMoney, approxCross } from "@/lib/trading/currency";
