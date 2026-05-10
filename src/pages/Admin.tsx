@@ -30,7 +30,7 @@ import ViralForensics from "@/components/admin/ViralForensics";
 import InsuranceFundDashboard from "@/components/InsuranceFundDashboard";
 import { Activity, Lock, Bot, Flame } from "lucide-react";
 
-type Tab = "dashboard" | "funnel" | "analytics" | "errors" | "security" | "ops" | "perms" | "viral_forensics" | "aml" | "ai_missions" | "payout_audit" | "referrals" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin" | "ugc";
+type Tab = "dashboard" | "funnel" | "analytics" | "errors" | "security" | "ops" | "perms" | "viral_forensics" | "aml" | "ai_missions" | "payout_audit" | "referrals" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin" | "ugc" | "insurance";
 
 export default function Admin() {
   const [db, setDb] = useDB();
@@ -108,6 +108,7 @@ export default function Admin() {
     { id: "chats", label: t("tabChats"), icon: MessageSquare },
     { id: "coin", label: t("tabCoin"), icon: Coins },
     { id: "ugc", label: "UGC 성과", icon: BarChart3 },
+    { id: "insurance", label: "보험펀드", icon: ShieldCheck },
   ];
 
   return (
@@ -154,6 +155,7 @@ export default function Admin() {
         {tab === "chats" && <ChatAdmin />}
         {tab === "coin" && <CoinAdmin />}
         {tab === "ugc" && <AdminUgc />}
+        {tab === "insurance" && <InsuranceFundDashboard variant="admin" />}
       </div>
     </Layout>
   );
