@@ -108,6 +108,7 @@ const App = () => (
               <Route path="/guide" element={<Guide />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/cockpit" element={<AdminCockpit />} />
+              <Route path="/admin/ops-report" element={<AdminOpsReport />} />
               <Route path="/secure-auth" element={<SecureAuth />} />
               <Route path="/secure-wallet" element={<SecureWallet />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
