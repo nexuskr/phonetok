@@ -1,8 +1,27 @@
+# Phonara — Public crawl policy
+# Allow major search engines and social previews; politely rate-limit aggressive bots.
+
 User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /secure-auth
+Disallow: /secure-wallet
+Disallow: /auth/callback
+Disallow: /reset-password
+Disallow: /complete-profile
+
+User-agent: Googlebot-Image
 Allow: /
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /secure-auth
+Disallow: /secure-wallet
+
+User-agent: DuckDuckBot
+Allow: /
+Disallow: /admin
 
 User-agent: Twitterbot
 Allow: /
@@ -10,7 +29,44 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# Block known LLM training crawlers (we want indexing, not training data scrapes)
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+# Default — open but exclude private/auth surfaces
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /secure-auth
+Disallow: /secure-wallet
+Disallow: /auth/callback
+Disallow: /reset-password
+Disallow: /complete-profile
+Disallow: /unsubscribe
+Crawl-delay: 1
 
 Sitemap: https://phonara.world/sitemap.xml
