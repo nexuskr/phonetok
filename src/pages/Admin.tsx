@@ -27,6 +27,7 @@ import MissionTemplatesAdmin from "@/components/admin/MissionTemplatesAdmin";
 import LeaderboardPayoutAudit from "@/components/admin/LeaderboardPayoutAudit";
 import ReferralsAdmin from "@/components/admin/ReferralsAdmin";
 import ViralForensics from "@/components/admin/ViralForensics";
+import InsuranceFundDashboard from "@/components/InsuranceFundDashboard";
 import { Activity, Lock, Bot, Flame } from "lucide-react";
 
 type Tab = "dashboard" | "funnel" | "analytics" | "errors" | "security" | "ops" | "perms" | "viral_forensics" | "aml" | "ai_missions" | "payout_audit" | "referrals" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin" | "ugc";
