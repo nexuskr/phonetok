@@ -225,8 +225,9 @@ export default function AdminCockpit() {
             </section>
 
             {/* Quick links */}
-            <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <section className="grid grid-cols-2 md:grid-cols-5 gap-3">
               {[
+                { to: "/admin/ops-report", label: "AI 일일 리포트", icon: Zap },
                 { to: "/admin", label: "전체 어드민", icon: Crown },
                 { to: "/trust", label: "Trust 리포트", icon: ShieldCheck },
                 { to: "/status", label: "Status", icon: Activity },
