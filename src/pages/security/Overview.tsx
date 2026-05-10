@@ -8,6 +8,7 @@ import {
   Lock, CheckCircle2, Circle, AlertTriangle, ChevronRight, BellRing, Activity,
 } from "lucide-react";
 import { LoadingList } from "@/components/ui/loading-state";
+import MyDevices from "@/components/security/MyDevices";
 
 type Status = "complete" | "partial" | "missing";
 
@@ -188,6 +189,15 @@ export default function SecurityOverview() {
             <Smartphone className="w-4 h-4" />
             고객센터 문의하기
           </Link>
+        </section>
+
+        {/* My Devices */}
+        <section>
+          <h2 className="text-xs tracking-[0.25em] font-bold text-muted-foreground mb-3">
+            <Smartphone className="w-3 h-3 inline mr-1.5" />
+            내 디바이스
+          </h2>
+          <MyDevices />
         </section>
 
         {/* Recent activity */}
