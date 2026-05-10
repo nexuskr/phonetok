@@ -9,7 +9,8 @@ interface State {
   loaded: boolean;
   loading: boolean;
   load: () => Promise<void>;
-  open: (args: { symbol: string; side: Side; leverage: number; margin: number; mark: number }) => Promise<{ id: string } | { error: string }>;
+  open: (args: { symbol: string; side: Side; leverage: number; margin: number; mark: number; tpPct?: number; slPct?: number; trailingPct?: number }) => Promise<{ id: string } | { error: string }>;
+  setTriggers: (id: string, t: { tpPct?: number; slPct?: number; trailingPct?: number }) => Promise<{ ok: true } | { error: string }>;
   close: (id: string, mark: number) => Promise<{ pnl: number; roi: number; credit: number; exit: number } | { error: string }>;
   liquidate: (id: string, mark: number) => Promise<{ liquidated: true; margin_lost: number } | { error: string }>;
   subscribe: (userId: string) => () => void;
