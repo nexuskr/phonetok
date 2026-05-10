@@ -26,6 +26,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import FreezeBanner from "./FreezeBanner";
 import { useAchievementWatcher } from "@/hooks/use-achievement-watcher";
 import NeonNotificationFeed from "./NeonNotificationFeed";
+import QuickAccessStrip from "./QuickAccessStrip";
 
 /**
  * Phonara — Empire 5축 IA
