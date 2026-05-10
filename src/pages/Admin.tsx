@@ -118,6 +118,7 @@ export default function Admin() {
     { id: "coin", label: t("tabCoin"), icon: Coins },
     { id: "ugc", label: "UGC 성과", icon: BarChart3 },
     { id: "insurance", label: "보험펀드", icon: ShieldCheck },
+    { id: "accounting", label: "회계 (Zero-Loss)", icon: Coins },
   ];
 
   return (
