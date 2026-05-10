@@ -140,6 +140,7 @@ export const useRealStore = create<State>()((set, get) => ({
     if (error) return { error: error.message };
     set({ comboWins: 0 });
     await get().load();
+    if (typeof window !== "undefined") window.dispatchEvent(new Event("wallet:refresh"));
     return data as { liquidated: true; margin_lost: number };
   },
 
@@ -153,6 +154,7 @@ export const useRealStore = create<State>()((set, get) => ({
         (payload) => {
           notifyHistoryRow(payload.new);
           get().load();
+          if (typeof window !== "undefined") window.dispatchEvent(new Event("wallet:refresh"));
         })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
