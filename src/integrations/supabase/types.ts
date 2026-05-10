@@ -1349,6 +1349,30 @@ export type Database = {
         }
         Relationships: []
       }
+      passkey_verifications: {
+        Row: {
+          created_at: string
+          credential_id: string
+          expires_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credential_id: string
+          expires_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credential_id?: string
+          expires_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pending_orders: {
         Row: {
           cancelled_at: string | null
@@ -4076,6 +4100,7 @@ export type Database = {
         Returns: string
       }
       is_account_frozen: { Args: { _user_id: string }; Returns: boolean }
+      is_passkey_verified: { Args: never; Returns: boolean }
       latest_chaos_run: { Args: never; Returns: Json }
       live_account_equity: { Args: { p_user_id: string }; Returns: Json }
       live_close_position: {
