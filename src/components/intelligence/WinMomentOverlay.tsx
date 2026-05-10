@@ -11,6 +11,7 @@ export interface WinMoment {
   side: "long" | "short";
   leverage: number;
   level: "small" | "big" | "huge";
+  unit?: "USDT" | "KRW";
 }
 
 let _push: ((m: WinMoment) => void) | null = null;
