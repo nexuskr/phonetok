@@ -386,7 +386,7 @@ export function getFeed(): BybitFeed {
 export async function fetchKlineHistory(
   symbol: string,
   interval: KlineInterval = "1",
-  limit = 300,
+  limit = 1000,
 ): Promise<KlineBar[]> {
   const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${encodeURIComponent(symbol)}&interval=${interval}&limit=${limit}`;
   try {
