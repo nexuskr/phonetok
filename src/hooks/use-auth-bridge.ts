@@ -47,11 +47,19 @@ async function syncFromSession(session: any) {
 
 export function useAuthBridge() {
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       // Defer to avoid deadlock
       setTimeout(() => { syncFromSession(session); }, 0);
+      if (event === "SIGNED_IN" && session?.user) {
+        setTimeout(() => { void registerCurrentDevice(); }, 500);
+      }
     });
-    supabase.auth.getSession().then(({ data }) => syncFromSession(data.session));
+    supabase.auth.getSession().then(({ data }) => {
+      syncFromSession(data.session);
+      if (data.session?.user) {
+        setTimeout(() => { void registerCurrentDevice(); }, 500);
+      }
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
 }
