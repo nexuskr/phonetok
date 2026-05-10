@@ -159,6 +159,16 @@ export default function Support() {
               {messages.map(m => {
                 const isUser = m.sender === "user";
                 const isAi = m.sender === "ai";
+                const isSystem = m.sender === "system";
+                if (isSystem) {
+                  return (
+                    <div key={m.id} className="flex justify-center">
+                      <div className="text-[11px] text-muted-foreground bg-muted/30 rounded-full px-3 py-1 border border-border/40">
+                        {m.message}
+                      </div>
+                    </div>
+                  );
+                }
                 return (
                   <div key={m.id} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap break-words ${
