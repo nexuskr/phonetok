@@ -65,6 +65,11 @@ export default function Dashboard() {
           {/* 🏛️ Command Hero — 영웅 카드 (잔고 + 추천 미션 + 100석) */}
           <CommandHero />
 
+          {/* P2 — Empire P2E (Daily Combo + Idle Growth + Tap-to-Reinforce) */}
+          <div className="mt-4">
+            <EmpireP2EDashboard />
+          </div>
+
           {/* Live ticker (compact, beneath hero) */}
           <div className="grid grid-cols-2 gap-2 mt-4 mb-4">
             <div className="glass rounded-2xl p-3 flex items-center gap-3">
