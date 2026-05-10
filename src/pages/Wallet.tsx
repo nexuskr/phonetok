@@ -25,6 +25,7 @@ import { z } from "zod";
 import Disclaimer from "@/components/Disclaimer";
 import StepUpGate from "@/components/security/StepUpGate";
 import { useStepUp } from "@/hooks/use-step-up";
+import { AdultOnlyBanner } from "@/components/AdultOnlyBanner";
 
 type AssetTab = "bank" | "coin";
 type ActionTab = "withdraw" | "deposit" | "history";
@@ -297,6 +298,7 @@ export default function Wallet() {
 
   return (
     <Layout>
+      <AdultOnlyBanner />
       <StepUpGate {...stepUpProps} />
       <HubTabs hub="treasury" />
       <div className="container pt-6 pb-10 animate-liquid-in max-w-3xl">

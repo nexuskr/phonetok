@@ -12,6 +12,7 @@ import { RouteFallback } from "./components/RouteFallback";
 import { installGlobalErrorLogging } from "./lib/error-logger";
 import { installFetchInstrument, installWebVitals, recordRouteChange } from "./lib/spans";
 import { ReviewerGuard } from "./components/ReviewerGuard";
+import { AdultGate } from "./components/AdultGate";
 
 installGlobalErrorLogging();
 installFetchInstrument();
@@ -113,9 +114,9 @@ const App = () => (
               {/* 기존 라우트 — 그대로 작동 (HubTabs 통해 통합 UX) */}
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/missions" element={<Missions />} />
-              <Route path="/roulette" element={<ReviewerGuard><Roulette /></ReviewerGuard>} />
-              <Route path="/packages" element={<ReviewerGuard><Packages /></ReviewerGuard>} />
-              <Route path="/wallet" element={<ReviewerGuard><Wallet /></ReviewerGuard>} />
+              <Route path="/roulette" element={<ReviewerGuard><AdultGate><Roulette /></AdultGate></ReviewerGuard>} />
+              <Route path="/packages" element={<ReviewerGuard><AdultGate><Packages /></AdultGate></ReviewerGuard>} />
+              <Route path="/wallet" element={<ReviewerGuard><AdultGate><Wallet /></AdultGate></ReviewerGuard>} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/support" element={<Support />} />
               <Route path="/support/tickets" element={<SupportTickets />} />
