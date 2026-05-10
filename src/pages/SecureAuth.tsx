@@ -60,8 +60,8 @@ export default function SecureAuth() {
           toast({ title: t("errInputCheck"), description: parsed.error.errors[0].message, variant: "destructive" });
           return;
         }
-        if (!checkAge14(form.birth)) {
-          toast({ title: t("errAgeTitle"), description: t("errAge"), variant: "destructive" });
+        if (!checkAge19(form.birth)) {
+          toast({ title: "만 19세 이상만 이용 가능합니다", description: "본 서비스는 만 19세 이상 성인 전용입니다.", variant: "destructive" });
           return;
         }
         const redirectUrl = `${window.location.origin}/packages?welcome=1`;

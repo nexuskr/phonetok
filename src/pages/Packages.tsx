@@ -47,6 +47,7 @@ export default function Packages() {
 
   return (
     <Layout>
+      <AdultOnlyBanner />
       <HubTabs hub="empire" />
       <div className="container pt-6 pb-10 animate-liquid-in">
         <div className="mb-6">
