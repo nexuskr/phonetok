@@ -1156,6 +1156,54 @@ export type Database = {
         }
         Relationships: []
       }
+      fomo_notifications: {
+        Row: {
+          created_at: string
+          cta_label: string | null
+          cta_url: string | null
+          dedupe_key: string | null
+          expires_at: string
+          id: string
+          kind: string
+          message: string
+          payload: Json
+          priority: number
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          cta_label?: string | null
+          cta_url?: string | null
+          dedupe_key?: string | null
+          expires_at?: string
+          id?: string
+          kind: string
+          message: string
+          payload?: Json
+          priority?: number
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          cta_label?: string | null
+          cta_url?: string | null
+          dedupe_key?: string | null
+          expires_at?: string
+          id?: string
+          kind?: string
+          message?: string
+          payload?: Json
+          priority?: number
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       function_permissions_baseline: {
         Row: {
           allowed_roles: string[]
@@ -4881,6 +4929,21 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      enqueue_fomo_notification: {
+        Args: {
+          _cta_label?: string
+          _cta_url?: string
+          _dedupe_key?: string
+          _kind: string
+          _message: string
+          _payload?: Json
+          _priority?: number
+          _title: string
+          _ttl_hours?: number
+          _user_id: string
+        }
+        Returns: string
+      }
       ensure_settlement_audit_partition: {
         Args: { _when?: string }
         Returns: undefined
@@ -4989,6 +5052,30 @@ export type Database = {
         }[]
       }
       get_my_empire_map: { Args: never; Returns: Json }
+      get_my_fomo_notifications: {
+        Args: { _limit?: number }
+        Returns: {
+          created_at: string
+          cta_label: string | null
+          cta_url: string | null
+          dedupe_key: string | null
+          expires_at: string
+          id: string
+          kind: string
+          message: string
+          payload: Json
+          priority: number
+          read_at: string | null
+          title: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "fomo_notifications"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_my_quests: { Args: never; Returns: Json }
       get_my_security_events: {
         Args: { _limit?: number }
@@ -5241,6 +5328,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      mark_fomo_notification_read: { Args: { _id: string }; Returns: boolean }
       mark_handbook_step: { Args: { _step: string }; Returns: Json }
       move_to_dlq: {
         Args: {

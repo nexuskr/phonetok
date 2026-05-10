@@ -19,6 +19,7 @@ import FirstTimeOnboarding from "@/components/FirstTimeOnboarding";
 import FirstMissionCard from "@/components/FirstMissionCard";
 import CommandHero from "@/components/CommandHero";
 import EmpireP2EDashboard from "@/components/empire/EmpireP2EDashboard";
+import { FomoNotificationStrip } from "@/components/empire/FomoNotificationStrip";
 import SixtySecondFlow from "@/components/onboarding/SixtySecondFlow";
 import EarnedToast from "@/components/onboarding/EarnedToast";
 import EmpireSignature from "@/components/status/EmpireSignature";
@@ -62,6 +63,8 @@ export default function Dashboard() {
         <HubTabs hub="command" />
 
         <div className="container relative pt-2 pb-10">
+          {/* P5 — Recovery FOMO cascade */}
+          <FomoNotificationStrip />
           {/* 🏛️ Command Hero — 영웅 카드 (잔고 + 추천 미션 + 100석) */}
           <CommandHero />
 

@@ -35,3 +35,7 @@ project_id = "ketlqzfaplppmupaiwft"
     verify_jwt = false
   [functions.enforce-position-triggers]
     verify_jwt = false
+  [functions.og-card-renderer]
+    verify_jwt = false
+  [functions.recovery-fomo-trigger]
+    verify_jwt = false

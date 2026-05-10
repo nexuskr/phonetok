@@ -1,0 +1,56 @@
+import { useEffect, useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useRequireAuth } from "@/hooks/use-require-auth";
+
+export type FomoNotification = {
+  id: string;
+  kind: string;
+  title: string;
+  message: string;
+  cta_label: string | null;
+  cta_url: string | null;
+  priority: number;
+  read_at: string | null;
+  created_at: string;
+  expires_at: string;
+};
+
+export function useFomoNotifications() {
+  const user = useRequireAuth();
+  const [items, setItems] = useState<FomoNotification[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const { data } = await supabase.rpc("get_my_fomo_notifications", { _limit: 10 });
+    setItems((data ?? []) as FomoNotification[]);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (user) void load();
+  }, [user, load]);
+
+  useEffect(() => {
+    if (!user) return;
+    const ch = supabase
+      .channel("fomo-notifs")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "fomo_notifications", filter: `user_id=eq.${user.id}` },
+        () => void load(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [user, load]);
+
+  const markRead = useCallback(async (id: string) => {
+    setItems((prev) => prev.map((x) => (x.id === id ? { ...x, read_at: new Date().toISOString() } : x)));
+    await supabase.rpc("mark_fomo_notification_read", { _id: id });
+  }, []);
+
+  const unread = items.filter((x) => !x.read_at);
+  return { items, unread, loading, markRead, reload: load };
+}
