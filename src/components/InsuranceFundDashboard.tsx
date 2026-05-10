@@ -28,24 +28,17 @@ export default function InsuranceFundDashboard({ variant = "admin", className = 
   useEffect(() => {
     let alive = true;
     async function load() {
-      const tasks: Promise<unknown>[] = [
-        supabase.from("insurance_fund_24h").select("*").maybeSingle(),
-        supabase.from("insurance_fund_log").select("*").order("ts", { ascending: false }).limit(20),
-      ];
-      if (variant === "admin") {
-        tasks.unshift(supabase.from("insurance_fund").select("accumulated").maybeSingle());
-      }
-      const results = await Promise.all(tasks);
+      const [bRes, sRes, lRes] = await Promise.all([
+        variant === "admin"
+          ? supabase.from("insurance_fund").select("accumulated").maybeSingle().then((r) => r)
+          : Promise.resolve({ data: null }),
+        supabase.from("insurance_fund_24h").select("*").maybeSingle().then((r) => r),
+        supabase.from("insurance_fund_log").select("*").order("ts", { ascending: false }).limit(20).then((r) => r),
+      ]);
       if (!alive) return;
-      let i = 0;
-      if (variant === "admin") {
-        const b = results[i++] as { data?: { accumulated: number } | null };
-        setBalance(b.data?.accumulated ?? 0);
-      }
-      const s = results[i++] as { data?: typeof stats };
-      const l = results[i++] as { data?: LogRow[] };
-      setStats(s.data ?? { contributed_24h: 0, paid_24h: 0, events_24h: 0 });
-      setRecent(l.data ?? []);
+      if (variant === "admin") setBalance((bRes.data as { accumulated: number } | null)?.accumulated ?? 0);
+      setStats((sRes.data as typeof stats) ?? { contributed_24h: 0, paid_24h: 0, events_24h: 0 });
+      setRecent((lRes.data as LogRow[] | null) ?? []);
       setLoading(false);
     }
     void load();
