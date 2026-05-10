@@ -25,6 +25,7 @@ export default function SecureAuth() {
   const { isReady, hasSession } = useAuthReady();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [busy, setBusy] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [form, setForm] = useState({
     email: "", password: "", nickname: "", realName: "", phone: "", birth: "",
     agreeTerms: false, agreeAge: false,
