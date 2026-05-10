@@ -24,6 +24,7 @@ const Packages = lazy(() => import("./pages/Packages.tsx"));
 const Wallet = lazy(() => import("./pages/Wallet.tsx"));
 const Profile = lazy(() => import("./pages/Profile.tsx"));
 const Support = lazy(() => import("./pages/Support.tsx"));
+const SupportTickets = lazy(() => import("./pages/SupportTickets.tsx"));
 const Guide = lazy(() => import("./pages/Guide.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
 const AdminCockpit = lazy(() => import("./pages/admin/Cockpit.tsx"));
