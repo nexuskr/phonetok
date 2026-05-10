@@ -4,11 +4,13 @@ import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Activity, X, Heart, Target, ShieldCheck, TrendingUp as TUp, Pencil, Check } from "lucide-react";
 import type { LivePosition } from "@/lib/trading/types";
+import { FEE_RATE, SLIPPAGE } from "@/lib/trading/types";
 import { computePnl, computeRoi, liquidationProgress } from "@/lib/trading/engine";
 import { triggerFx } from "./DopamineLayer";
 import { sfx } from "@/lib/trading/sounds";
 import { useTriggerStore, type PositionTriggers } from "@/lib/trading/triggers-store";
 import { notify } from "@/lib/notify";
+import LiquidationReplayModal, { type ReplayPayload } from "./LiquidationReplayModal";
 
 interface CloseResult { pnl: number; roi: number; credit: number; exit: number }
 interface CloseError { error: string }
@@ -35,6 +37,22 @@ function OpenPositionsLiveImpl({
 }: Props) {
   const fmt = fmtFn(unit);
   const liqLock = useRef<Set<string>>(new Set());
+  const [replay, setReplay] = useState<ReplayPayload | null>(null);
+
+  const buildReplay = (p: LivePosition, exit: number, pnl: number, roi: number, reason: ReplayPayload["reason"]): ReplayPayload => {
+    const feeOpen = Number(p.fee_open ?? 0) || Math.floor(p.margin * p.leverage * FEE_RATE);
+    const feeClose = Math.floor(exit * Number(p.size) * FEE_RATE);
+    const slippage = Math.floor(exit * Number(p.size) * SLIPPAGE);
+    const insuranceShare = reason === "liquidation"
+      ? Math.max(0, Math.floor(p.margin * 0.25))
+      : Math.floor((feeOpen + feeClose) * 0.25);
+    return {
+      symbol: p.symbol, side: p.side as "long" | "short", leverage: p.leverage,
+      margin: p.margin, entry: Number(p.entry), exit, pnl, roi,
+      feeOpen, feeClose, reason, insuranceShare, slippage,
+      openedAt: p.opened_at, closedAt: new Date().toISOString(),
+    };
+  };
 
   // Auto-liquidate when ROI <= -0.99
   useEffect(() => {
@@ -46,6 +64,7 @@ function OpenPositionsLiveImpl({
         liqLock.current.add(p.id);
         onLiquidate(p.id, m).then(() => {
           triggerFx({ kind: "liquidate", pnl: -p.margin, roi: -1, symbol: p.symbol });
+          setReplay(buildReplay(p, m, -p.margin, -1, "liquidation"));
         }).catch(() => liqLock.current.delete(p.id));
       }
     }
@@ -68,6 +87,7 @@ function OpenPositionsLiveImpl({
   }
 
   return (
+    <>
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2 px-1">
         <div className="text-xs text-muted-foreground">
@@ -89,10 +109,19 @@ function OpenPositionsLiveImpl({
           mark={prices[p.symbol] ?? p.entry}
           busy={!!busy}
           unit={unit}
-          onClose={onClose}
+          onClose={async (id, mark) => {
+            const r = await onClose(id, mark);
+            if (!("error" in r)) {
+              const reason: ReplayPayload["reason"] = r.roi <= -0.99 ? "liquidation" : "manual";
+              setReplay(buildReplay(p, r.exit ?? mark, r.pnl, r.roi, reason));
+            }
+            return r;
+          }}
         />
       ))}
     </div>
+    <LiquidationReplayModal payload={replay} onClose={() => setReplay(null)} />
+    </>
   );
 }
 

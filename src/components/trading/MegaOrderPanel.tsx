@@ -345,6 +345,7 @@ function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit,
           v={fmtMoney(fee, unit, { decimals: unit === "USDT" ? 4 : 0 })}
           sub={`≈ ${fmtMoney(approxCross(fee, unit).value, approxCross(fee, unit).unit, { decimals: approxCross(fee, unit).unit === "USDT" ? 4 : 0 })}`}
           tone="warn"
+          tooltip={`Taker 수수료 0.1% × 명목가치(=증거금×레버리지)\n진입+청산 양쪽 각각 부과됩니다.\n예: 증거금 ${fmtMoney(marginNum, unit, { decimals: unit === "USDT" ? 2 : 0 })} × ${leverage}× × 0.1% = ${fmtMoney(fee, unit, { decimals: unit === "USDT" ? 4 : 0 })}\n하단 환산값은 USDT/KRW 자동 변환(1 USDT ≈ 1,400 KRW 기준).`}
         />
       </div>
 
@@ -377,10 +378,13 @@ function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit,
 
 export default memo(MegaOrderPanelImpl);
 
-function Stat({ label, v, sub, tone }: { label: string; v: string; sub?: string; tone?: "loss" | "warn" }) {
+function Stat({ label, v, sub, tone, tooltip }: { label: string; v: string; sub?: string; tone?: "loss" | "warn"; tooltip?: string }) {
   return (
-    <div className="rounded-xl bg-background/40 border border-border/40 p-2">
-      <div className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</div>
+    <div className="rounded-xl bg-background/40 border border-border/40 p-2" title={tooltip}>
+      <div className="text-[10px] text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+        <span>{label}</span>
+        {tooltip && <span aria-hidden className="inline-flex items-center justify-center w-3 h-3 rounded-full border border-muted-foreground/40 text-[8px] font-bold cursor-help">?</span>}
+      </div>
       <div className={`font-mono tabular-nums font-bold mt-0.5 text-sm ${
         tone === "loss" ? "text-rose-300" : tone === "warn" ? "text-amber-300" : "text-foreground"
       }`}>{v}</div>
