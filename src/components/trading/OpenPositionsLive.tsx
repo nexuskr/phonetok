@@ -19,8 +19,12 @@ interface Props {
 }
 
 export default function OpenPositionsLive({
-  positions, prices, busy, onClose, onLiquidate, onCloseAll, modeLabel,
+  positions, prices, busy, onClose, onLiquidate, onCloseAll, modeLabel, unit = "USDT",
 }: Props) {
+  const fmt = (n: number) => unit === "KRW"
+    ? `${n < 0 ? "-" : ""}₩${Math.abs(Math.floor(n)).toLocaleString()}`
+    : n.toFixed(2);
+  const sym = unit === "KRW" ? "₩" : "";
   // Auto-liquidate when ROI <= -0.99 (client safety net; server also checks via cron)
   const liqLock = useRef<Set<string>>(new Set());
   useEffect(() => {
