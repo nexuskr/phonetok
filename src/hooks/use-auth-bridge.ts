@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { loadDB, saveDB, type Tier } from "@/lib/store";
+import { registerCurrentDevice } from "@/lib/deviceFingerprint";
 
 const TIER_MAP: Record<string, Tier> = {
   normal: "NORMAL", vip: "VIP", god: "GOD", empire: "EMPIRE",
