@@ -252,7 +252,7 @@ export default function Lounge() {
                     <div className="h-80 overflow-y-auto p-4 space-y-2">
                       {messages.length === 0 ? (
                         <EmptyState
-                          icon={Users}
+                          icon={<Users className="h-6 w-6" />}
                           title="첫 메시지를 보내세요"
                           description="길드원과 작전을 공유하세요"
                         />
