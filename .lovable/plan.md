@@ -1,65 +1,52 @@
+# 오류 원인
 
-# wallet_balances `chk_consistency` 위반 핫픽스
-
-## 🐛 근본 원인
-
-`wallet_balances` 테이블 제약:
 ```
-CHECK (total_balance = available_balance + pending_balance + locked_balance)
+column "direction" is of type tx_direction but expression is of type text
 ```
 
-**4개 close 계열 함수**가 wallet UPDATE 시 `total_balance`에서 `v_fee_close`를 한 번 더 빼버려 제약을 깨뜨립니다.
-
-| 함수 | 현재 (버그) | 올바른 식 |
-|---|---|---|
-| `live_close_position` | `total += v_credit - p.margin - v_fee_close` | `total += v_credit - p.margin` |
-| `live_liquidate_position` | (동일 패턴) | (동일) |
-| `admin_force_close_position(uuid, numeric, text)` | (동일 패턴) | (동일) |
-| `admin_force_close_position(uuid, numeric, text, numeric)` | (동일 패턴) | (동일) |
-
-### 왜 이게 정답인가
-`v_credit = GREATEST(0, p.margin + v_pnl - v_fee_close)` 이므로:
-- 정상(클램프 안 됨): `Δtotal = v_credit - margin = pnl - fee_close` ✅
-- 클램프(`v_credit = 0`, 큰 손실): `Δtotal = -margin` — 이미 음수 PnL이 margin을 모두 소진, 초과분은 보험기금 부담 ✅
-
-`Δavail + Δlocked = v_credit + (-margin) = v_credit - margin = Δtotal` ✅
-
-## 📍 사용자에게 드러난 증상
-
-1. 백그라운드 watcher(client `position-watcher` + cron `enforce-position-triggers-1m`)가 SL/TP/Trailing/Cross-MM 조건으로 close 시도
-2. 트랜잭션이 chk_consistency 위반으로 롤백
-3. 사용자가 LONG 클릭한 시점에 **다른 close 시도의 에러 토스트**가 우연히 표시 → "오픈 시 오류"로 오인
-4. 포지션은 그대로 열려 있고, wallet도 변경 없음 (롤백 덕분)
-
-## 🛠️ 마이그레이션 내용
-
-4개 함수의 wallet UPDATE 라인 단 한 줄씩만 교체:
+직전 핫픽스에서 `live_close_position` / `live_liquidate_position` / `admin_force_close_position`(2 오버로드) 함수를 재작성하면서 `transactions.direction` (enum `tx_direction`) 컬럼에 들어가는 값이 다음 형태로 작성되어 있습니다:
 
 ```sql
--- 변경 전
-total_balance = total_balance + v_credit - p.margin - v_fee_close
-
--- 변경 후
-total_balance = total_balance + v_credit - p.margin
+CASE WHEN v_pnl>=0 THEN 'credit' ELSE 'debit' END
 ```
 
-다른 모든 로직(insurance_fund, live_trade_history, transactions, position_trigger_audit) **변경 없음**.
+PostgreSQL에서 CASE 식의 두 분기가 모두 문자열 리터럴이면 결과 타입이 `text`로 결정되며, `text → tx_direction` 암묵적 캐스팅은 허용되지 않아 INSERT 시 오류가 납니다. 단순 리터럴 한 개(`'debit'`)는 unknown 타입이라 통과되지만, CASE를 거치는 순간 막힙니다.
 
-## ✅ 검증 절차
+## 수정 범위 (4개 함수)
 
-마이그레이션 적용 후:
+각 함수의 CASE 결과에 `::tx_direction` 캐스팅 추가, 그리고 단독 리터럴도 함께 명시적 캐스팅 적용(안전 차원).
 
-1. **DB 시뮬레이션 쿼리** 재실행 — 임의 (margin, pnl, fee) 조합에 대해 `Δtotal == Δavail + Δlocked` 성립 확인
-2. **사용자 시나리오 재현**:
-   - REAL 모드에서 SOLUSDT 새 포지션 LONG 5×, 50,000원 오픈
-   - TP Price = 현재가 -0.01% (즉시 발동)
-   - 1분 내 cron이 자동 청산 → Trade History에 `reason='tp'`, `source='cron'` 기록
-   - wallet_balances 일관성 유지 확인
-3. **기존 두 포지션도 정상 청산 가능** 확인 (수동 청산 테스트)
+1. `live_close_position`
+2. `live_liquidate_position`
+3. `admin_force_close_position(uuid)` — 인자 1개 오버로드
+4. `admin_force_close_position(uuid, uuid)` — 인자 2개 오버로드
 
-## 🔒 부수 효과 / 리스크
+수정 패턴:
+```sql
+-- before
+CASE WHEN v_pnl>=0 THEN 'credit' ELSE 'debit' END
+-- after
+(CASE WHEN v_pnl>=0 THEN 'credit' ELSE 'debit' END)::tx_direction
 
-- **None.** SECURITY DEFINER allowlist, RLS, 기타 트리거 영향 없음.
-- 과거 잘못된 함수로 청산된 거래는 없음 (트랜잭션이 모두 롤백되어 wallet은 손상 없음).
+-- before
+'debit', v_fee_close, ...
+-- after
+'debit'::tx_direction, v_fee_close, ...
+```
 
-승인하시면 즉시 마이그레이션 실행 후 검증 결과 보고합니다.
+## 작업 단계
+
+1. 마이그레이션으로 위 4개 함수의 본문을 그대로 두고 INSERT 절의 `direction` 부분만 enum 캐스팅 추가하여 `CREATE OR REPLACE FUNCTION` 재선언.
+2. 마이그레이션 직후 `pg_proc` 조회로 4개 함수 모두 `::tx_direction`이 포함되었는지 검증.
+3. 사용자에게 F5 → 기존 ETHUSDT/BTCUSDT 포지션 "청산" 또는 "Close All" 클릭 → 토스트가 "성공"으로 뜨고 잔고 변화 확인 요청.
+4. 정상 청산되면 직전 잔고 일관성 핫픽스(`Δtotal = Δavail + Δlocked`)도 함께 검증된 것이므로 추가 작업 없음.
+
+## 영향 범위
+
+- 트레이딩 외 다른 22개 함수에서 검색된 `'credit'`/`'debit'` 매칭은 대부분 jsonb metadata 내부 문자열이거나 단독 리터럴이라 정상 동작 중. 이번 오류는 CASE 결과 타입 결정 규칙 때문에 발생한 4개 함수 한정 문제이므로 그 외 함수는 건드리지 않음.
+- 데이터/스키마 변경 없음, 함수 정의만 갱신.
+
+## 리스크
+
+- 매우 낮음. 캐스팅만 추가하므로 기존 잔고/PnL/수수료 계산 로직에 영향 없음.
+- linter 0028/0029/0011 경고는 기존과 동일한 accepted risk.
