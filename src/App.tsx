@@ -110,6 +110,7 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/complete-profile" element={<CompleteProfile />} />
               <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/security" element={<SecurityOverview />} />
               <Route path="/security/totp" element={<SecurityTotp />} />
               <Route path="/security/passkey" element={<SecurityPasskey />} />
               <Route path="/achievements" element={<Achievements />} />
