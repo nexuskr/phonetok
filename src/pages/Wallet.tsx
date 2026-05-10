@@ -52,6 +52,7 @@ export default function Wallet() {
   const user = useRequireAuth() ?? db.user;
   const [asset, setAsset] = useState<AssetTab>("bank");
   const [action, setAction] = useState<ActionTab>("withdraw");
+  const { requireStepUp, dialogProps: stepUpProps } = useStepUp();
 
   useEffect(() => { void refreshWallet(); }, []);
 
