@@ -19,6 +19,8 @@ import WithdrawQueueStatus from "@/components/wallet/WithdrawQueueStatus";
 import WithdrawReceiptUpload from "@/components/wallet/WithdrawReceiptUpload";
 import WithdrawETABadge from "@/components/wallet/WithdrawETABadge";
 import NotificationPreferencesPanel from "@/components/wallet/NotificationPreferencesPanel";
+import RiskLimitsPanel from "@/components/wallet/RiskLimitsPanel";
+import InsuranceFundDashboard from "@/components/InsuranceFundDashboard";
 import { z } from "zod";
 import Disclaimer from "@/components/Disclaimer";
 
@@ -573,6 +575,8 @@ export default function Wallet() {
               <DepositHistoryList />
             </div>
             <NotificationPreferencesPanel userId={u.id} />
+            <RiskLimitsPanel />
+            <InsuranceFundDashboard variant="user" />
             <div>
               <div className="text-[10px] tracking-[0.25em] text-primary font-black mb-3 uppercase">{t("historyTitle")}</div>
               <ServerTxList />
