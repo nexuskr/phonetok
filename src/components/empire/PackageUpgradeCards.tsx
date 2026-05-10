@@ -356,7 +356,7 @@ export default function PackageUpgradeCards() {
                   ) : (
                     <div className="rounded-xl border border-dashed border-gold/30 p-3 text-center">
                       <div className="text-[10px] text-muted-foreground mb-1 break-keep">{t.unlockHint}</div>
-                      <div className="text-[10px] font-black text-gold/70">결제 흐름 곧 활성화</div>
+                      <div className="text-[10px] font-black text-gold/70">미션·잭팟으로 해금 진행</div>
                     </div>
                   )}
                 </div>
