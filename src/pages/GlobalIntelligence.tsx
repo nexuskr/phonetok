@@ -7,6 +7,7 @@ import ModeToggle from "@/components/trading/ModeToggle";
 import ChartWithHeader from "@/components/trading/ChartWithHeader";
 import MegaOrderPanel from "@/components/trading/MegaOrderPanel";
 import type { OrderTriggers } from "@/components/trading/MegaOrderPanel";
+import { PendingOrderManager } from "@/components/trading/PendingOrderManager";
 import OpenPositionsLive from "@/components/trading/OpenPositionsLive";
 import TradingHistoryGold from "@/components/trading/TradingHistoryGold";
 import ComboStreakHUD from "@/components/trading/ComboStreakHUD";
@@ -260,6 +261,11 @@ export default function GlobalIntelligence() {
                 busy={busy}
               />
             </div>
+            {mode === "real" && (
+              <div className="lg:col-span-2">
+                <PendingOrderManager symbol={symbol} currentPrice={price ?? 0} />
+              </div>
+            )}
             <div className="lg:col-span-2">
               <h2 className="font-display font-bold text-base mb-2">Open Positions ({mode === "real" ? "REAL" : "PAPER"})</h2>
               <OpenPositionsLive
