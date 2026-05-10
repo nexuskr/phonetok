@@ -149,6 +149,24 @@ class BybitFeed {
         if (wl.has(r.symbol)) {
           const last = parseFloat(r.lastPrice);
           if (Number.isFinite(last) && last > 0) this.prices[r.symbol] = last;
+          const change = parseFloat(r.price24hPcnt);
+          const vol = parseFloat(r.volume24h);
+          const turn = parseFloat(r.turnover24h);
+          const hi = parseFloat(r.highPrice24h);
+          const lo = parseFloat(r.lowPrice24h);
+          this.updateStat(r.symbol, {
+            ...(Number.isFinite(last) && last > 0 ? { last } : {}),
+            ...(Number.isFinite(change) ? { change24hPct: change * 100 } : {}),
+            ...(Number.isFinite(vol) ? { volume24h: vol } : {}),
+            ...(Number.isFinite(turn) ? { turnover24h: turn } : {}),
+            ...(Number.isFinite(hi) ? { high24h: hi } : {}),
+            ...(Number.isFinite(lo) ? { low24h: lo } : {}),
+          });
+        }
+      }
+      this.emit();
+    } catch {}
+  }
         }
       }
       this.emit();
