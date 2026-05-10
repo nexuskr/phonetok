@@ -4081,6 +4081,10 @@ export type Database = {
       }
     }
     Functions: {
+      _accrue_jackpot_internal: {
+        Args: { _deposit_amount: number; _user_id: string }
+        Returns: number
+      }
       _credit_referral_commission: {
         Args: { _base: number; _invitee: string; _source: string }
         Returns: undefined
