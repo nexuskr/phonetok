@@ -890,6 +890,30 @@ export type Database = {
         }
         Relationships: []
       }
+      insurance_fund_log: {
+        Row: {
+          balance_after: number
+          delta: number
+          id: string
+          metadata: Json
+          ts: string
+        }
+        Insert: {
+          balance_after: number
+          delta: number
+          id?: string
+          metadata?: Json
+          ts?: string
+        }
+        Update: {
+          balance_after?: number
+          delta?: number
+          id?: string
+          metadata?: Json
+          ts?: string
+        }
+        Relationships: []
+      }
       jackpot_pool: {
         Row: {
           amount: number
@@ -2573,6 +2597,33 @@ export type Database = {
           },
         ]
       }
+      user_risk_limits: {
+        Row: {
+          daily_loss_cap: number
+          enabled: boolean
+          max_leverage: number
+          max_margin_per_trade: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          daily_loss_cap?: number
+          enabled?: boolean
+          max_leverage?: number
+          max_margin_per_trade?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          daily_loss_cap?: number
+          enabled?: boolean
+          max_leverage?: number
+          max_margin_per_trade?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -3409,6 +3460,14 @@ export type Database = {
         }
         Relationships: []
       }
+      insurance_fund_24h: {
+        Row: {
+          contributed_24h: number | null
+          events_24h: number | null
+          paid_24h: number | null
+        }
+        Relationships: []
+      }
       leaderboard_today: {
         Row: {
           best_streak: number | null
@@ -4133,6 +4192,28 @@ export type Database = {
       run_policy_assertions: { Args: never; Returns: Json }
       run_security_self_audit: { Args: { _source?: string }; Returns: Json }
       run_uptime_canary: { Args: never; Returns: undefined }
+      set_user_risk_limits: {
+        Args: {
+          p_daily_loss_cap: number
+          p_enabled?: boolean
+          p_max_leverage: number
+          p_max_margin_per_trade: number
+        }
+        Returns: {
+          daily_loss_cap: number
+          enabled: boolean
+          max_leverage: number
+          max_margin_per_trade: number
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "user_risk_limits"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       settle_mission: {
         Args: { _base_reward: number; _is_win: boolean; _mission_id: string }
         Returns: Json
