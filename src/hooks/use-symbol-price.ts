@@ -14,6 +14,7 @@ export function useSymbolPrice(symbol: string): number {
 
 const EMPTY_STAT: TickerStat = {
   last: 0, change24hPct: 0, volume24h: 0, turnover24h: 0, high24h: 0, low24h: 0,
+  fundingRate: 0, nextFundingTime: 0,
 };
 
 export function useSymbolStat(symbol: string): TickerStat {
