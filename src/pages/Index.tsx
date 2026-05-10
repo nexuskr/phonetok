@@ -22,6 +22,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import throneBg from "@/assets/command-throne-bg.jpg";
 import { track } from "@/lib/analytics";
 import LivePayoutSlaBadge from "@/components/landing/LivePayoutSlaBadge";
+import LivePulseStrip from "@/components/landing/LivePulseStrip";
 
 // KST 자정 기준 경과 비율로 오늘 신규 가입자 추정 (베이스 1,180 + 시간대별 가중)
 function computeTodaySignups(): number {
@@ -225,6 +226,7 @@ export default function Index() {
           </div>
           <p className="text-xs sm:text-sm text-muted-foreground mt-2">{t("megaSub")}</p>
           <LivePayoutSlaBadge />
+          <LivePulseStrip />
         </div>
       </section>
 
