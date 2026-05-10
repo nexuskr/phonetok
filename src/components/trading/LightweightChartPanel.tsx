@@ -1,29 +1,32 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import {
   createChart, CandlestickSeries, type IChartApi, type ISeriesApi,
-  type Time, type IPriceLine, LineStyle, type CandlestickData, type UTCTimestamp,
+  type IPriceLine, LineStyle, type CandlestickData, type UTCTimestamp,
 } from "lightweight-charts";
+import { getFeed, fetchKlineHistory, type KlineBar } from "@/lib/paper-trading/bybit-feed";
 
 interface OverlayLine { price: number; color: string; title: string }
 
-const BUCKET_SEC = 60; // 1-minute candles
-
-function bucket(ts: number) { return Math.floor(ts / BUCKET_SEC) * BUCKET_SEC; }
-
-export default function LightweightChartPanel({
-  symbol, price, overlays = [], height = 320,
-}: {
+interface Props {
   symbol: string;
+  /** Tick price (from useSymbolPrice) — used as fallback when kline events are not yet flowing. */
   price: number;
   overlays?: OverlayLine[];
   height?: number;
-}) {
+}
+
+const BUCKET_SEC = 60;
+function bucket(ts: number) { return Math.floor(ts / BUCKET_SEC) * BUCKET_SEC; }
+
+function LightweightChartPanelImpl({ symbol, price, overlays = [], height = 320 }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const candlesRef = useRef<CandlestickData[]>([]);
   const linesRef = useRef<IPriceLine[]>([]);
-  const lastSymbol = useRef(symbol);
+  const overlaysSigRef = useRef<string>("");
+  const klineActiveRef = useRef(false);
+  const lastDevLogRef = useRef(0);
 
   // Init chart
   useEffect(() => {
@@ -66,18 +69,66 @@ export default function LightweightChartPanel({
     return () => { ro.disconnect(); chart.remove(); chartRef.current = null; seriesRef.current = null; };
   }, [height]);
 
-  // Reset on symbol change
+  // Symbol load: REST history + kline subscribe
   useEffect(() => {
-    if (lastSymbol.current !== symbol && seriesRef.current) {
-      candlesRef.current = [];
-      seriesRef.current.setData([]);
-      lastSymbol.current = symbol;
-    }
+    let cancelled = false;
+    const series = seriesRef.current;
+    const chart = chartRef.current;
+    if (!series || !chart) return;
+
+    klineActiveRef.current = false;
+    candlesRef.current = [];
+    series.setData([]);
+
+    (async () => {
+      const history = await fetchKlineHistory(symbol, "1", 300);
+      if (cancelled || !seriesRef.current) return;
+      const data: CandlestickData[] = history.map((b) => ({
+        time: b.time as UTCTimestamp,
+        open: b.open, high: b.high, low: b.low, close: b.close,
+      }));
+      candlesRef.current = data;
+      seriesRef.current.setData(data);
+      try { chartRef.current?.timeScale().fitContent(); } catch {}
+    })();
+
+    const feed = getFeed();
+    const off = feed.onKline(symbol, (bar: KlineBar) => {
+      if (cancelled || !seriesRef.current) return;
+      klineActiveRef.current = true;
+      const arr = candlesRef.current;
+      const last = arr[arr.length - 1];
+      const candle: CandlestickData = {
+        time: bar.time as UTCTimestamp,
+        open: bar.open, high: bar.high, low: bar.low, close: bar.close,
+      };
+      if (!last || (last.time as number) < bar.time) {
+        arr.push(candle);
+        if (arr.length > 600) arr.shift();
+      } else if ((last.time as number) === bar.time) {
+        last.open = bar.open; last.high = bar.high; last.low = bar.low; last.close = bar.close;
+      }
+      seriesRef.current.update(candle);
+      try { chartRef.current?.timeScale().scrollToRealTime(); } catch {}
+
+      if (import.meta.env.DEV) {
+        const now = Date.now();
+        if (now - lastDevLogRef.current >= 1000) {
+          lastDevLogRef.current = now;
+          // eslint-disable-next-line no-console
+          console.debug("[KLINE]", symbol, bar.close);
+        }
+      }
+    });
+
+    return () => { cancelled = true; off(); };
   }, [symbol]);
 
-  // Tick → 1m candles
+  // Tick fallback: only used if kline events are NOT flowing yet.
   useEffect(() => {
-    if (!seriesRef.current || !price) return;
+    if (klineActiveRef.current) return;
+    const series = seriesRef.current;
+    if (!series || !price) return;
     const t = bucket(Math.floor(Date.now() / 1000)) as UTCTimestamp;
     const arr = candlesRef.current;
     const last = arr[arr.length - 1];
@@ -85,21 +136,23 @@ export default function LightweightChartPanel({
       const open = last ? last.close : price;
       const candle: CandlestickData = { time: t, open, high: Math.max(open, price), low: Math.min(open, price), close: price };
       arr.push(candle);
-      // Cap history at 480 candles (8h)
-      if (arr.length > 480) arr.shift();
-      seriesRef.current.update(candle);
+      if (arr.length > 600) arr.shift();
+      series.update(candle);
     } else {
       last.high = Math.max(last.high, price);
       last.low = Math.min(last.low, price);
       last.close = price;
-      seriesRef.current.update(last);
+      series.update(last);
     }
   }, [price]);
 
-  // Overlay lines
+  // Overlay lines (hash-compared to avoid recreating every tick)
   useEffect(() => {
     const s = seriesRef.current; if (!s) return;
-    linesRef.current.forEach((l) => s.removePriceLine(l));
+    const sig = overlays.map((o) => `${o.price.toFixed(6)}|${o.color}|${o.title}`).join(";");
+    if (sig === overlaysSigRef.current) return;
+    overlaysSigRef.current = sig;
+    linesRef.current.forEach((l) => { try { s.removePriceLine(l); } catch {} });
     linesRef.current = overlays.map((o) =>
       s.createPriceLine({
         price: o.price,
@@ -112,7 +165,8 @@ export default function LightweightChartPanel({
     );
   }, [overlays]);
 
-  return (
-    <div ref={ref} style={{ width: "100%", height }} />
-  );
+  return <div ref={ref} style={{ width: "100%", height }} />;
 }
+
+const LightweightChartPanel = memo(LightweightChartPanelImpl);
+export default LightweightChartPanel;
