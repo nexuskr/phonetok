@@ -1,12 +1,14 @@
-import { memo, useEffect, useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Activity, X, Heart, Target, ShieldCheck, TrendingUp as TUp } from "lucide-react";
+import { Activity, X, Heart, Target, ShieldCheck, TrendingUp as TUp, Pencil, Check } from "lucide-react";
 import type { LivePosition } from "@/lib/trading/types";
 import { computePnl, computeRoi, liquidationProgress } from "@/lib/trading/engine";
 import { triggerFx } from "./DopamineLayer";
 import { sfx } from "@/lib/trading/sounds";
 import { useTriggerStore, type PositionTriggers } from "@/lib/trading/triggers-store";
+import { notify } from "@/lib/notify";
 
 interface CloseResult { pnl: number; roi: number; credit: number; exit: number }
 interface CloseError { error: string }
