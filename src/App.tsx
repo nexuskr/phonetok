@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useSessionGuard } from "./hooks/use-session-guard";
 import { useAuthBridge } from "./hooks/use-auth-bridge";
+import { useAdultGate } from "./hooks/use-adult-gate";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { RouteFallback } from "./components/RouteFallback";
 import { installGlobalErrorLogging } from "./lib/error-logger";
