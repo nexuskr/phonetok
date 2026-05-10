@@ -151,7 +151,7 @@ export default function GlobalIntelligence() {
         return r;
       } finally { setBusy(false); }
     }
-    const closed = paperClose(id, mark, reason === "tp" || reason === "sl" || reason === "trailing" ? reason : "manual");
+    const closed = paperClose(id, mark, "manual");
     const cp = closed?.closed;
     if (!cp) return { error: "fail" };
     const sym = closed!.symbol;
