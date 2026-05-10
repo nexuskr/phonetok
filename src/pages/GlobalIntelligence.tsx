@@ -40,7 +40,7 @@ export default function GlobalIntelligence() {
   const userId = session?.user?.id;
   const { wallet } = useWallet(userId);
 
-  const { prices, status } = useBybitTicker();
+  const { prices, stats, status } = useBybitTicker();
   const [mode, setMode] = useState<Mode>("paper");
   const [symbol, setSymbol] = useState<string>("BTCUSDT");
   const [busy, setBusy] = useState(false);
