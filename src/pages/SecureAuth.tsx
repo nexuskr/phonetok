@@ -9,12 +9,13 @@ import { useAuthReady } from "@/hooks/use-auth-ready";
 import { ShieldCheck, Mail, Lock, Sparkles, ArrowRight, User as UserIcon, Calendar, Phone } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import CinematicIntro from "@/components/CinematicIntro";
+import { AdultOnlyBanner } from "@/components/AdultOnlyBanner";
 
-function checkAge14(birth: string) {
+function checkAge19(birth: string) {
   if (!birth) return false;
   const d = new Date(birth);
   const age = (Date.now() - d.getTime()) / (365.25 * 24 * 3600 * 1000);
-  return age >= 14;
+  return age >= 19;
 }
 
 export default function SecureAuth() {
