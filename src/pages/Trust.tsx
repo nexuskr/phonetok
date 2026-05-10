@@ -301,8 +301,76 @@ export default function Trust() {
           </div>
         </section>
 
-        <section className="mt-6 glass-strong rounded-3xl p-6 border border-primary/20">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        {/* Public Payout SLA */}
+        <section className="mt-6 glass-strong rounded-3xl p-6 border border-gold/30">
+          <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
+            <div className="flex items-center gap-2 font-display font-black text-base break-keep">
+              <Clock className="w-5 h-5 text-gold" /> {t("payoutSlaTitle")}
+            </div>
+            <div className="text-[10px] text-muted-foreground break-keep">{t("payoutSlaHint")}</div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Tile
+              icon={Activity}
+              label={t("payoutSla30Rate7d")}
+              value={fmtPct(payoutSla?.sla_30min_rate_7d ?? 0)}
+              loading={loading && !payoutSla}
+              ok={(payoutSla?.sla_30min_rate_7d ?? 0) >= 95}
+            />
+            <Tile
+              icon={Clock}
+              label={t("payoutAvg7d")}
+              value={`${(payoutSla?.avg_minutes_7d ?? 0).toFixed(1)} ${t("minutesUnit")}`}
+              loading={loading && !payoutSla}
+              ok={(payoutSla?.avg_minutes_7d ?? 0) <= 30}
+            />
+            <Tile
+              icon={Clock}
+              label={t("payoutP95_7d")}
+              value={`${(payoutSla?.p95_minutes_7d ?? 0).toFixed(1)} ${t("minutesUnit")}`}
+              loading={loading && !payoutSla}
+              ok={(payoutSla?.p95_minutes_7d ?? 0) <= 60}
+            />
+            <Tile
+              icon={TrendingUp}
+              label={t("payoutCount7d")}
+              value={fmtNum(payoutSla?.count_7d ?? 0)}
+              loading={loading && !payoutSla}
+              ok={(payoutSla?.count_7d ?? 0) > 0}
+            />
+            <Tile
+              icon={Activity}
+              label={t("payoutSla30Rate30d")}
+              value={fmtPct(payoutSla?.sla_30min_rate_30d ?? 0)}
+              loading={loading && !payoutSla}
+              ok={(payoutSla?.sla_30min_rate_30d ?? 0) >= 95}
+            />
+            <Tile
+              icon={Clock}
+              label={t("payoutAvg30d")}
+              value={`${(payoutSla?.avg_minutes_30d ?? 0).toFixed(1)} ${t("minutesUnit")}`}
+              loading={loading && !payoutSla}
+              ok={(payoutSla?.avg_minutes_30d ?? 0) <= 30}
+            />
+            <Tile
+              icon={Clock}
+              label={t("payoutP95_30d")}
+              value={`${(payoutSla?.p95_minutes_30d ?? 0).toFixed(1)} ${t("minutesUnit")}`}
+              loading={loading && !payoutSla}
+              ok={(payoutSla?.p95_minutes_30d ?? 0) <= 60}
+            />
+            <Tile
+              icon={TrendingUp}
+              label={t("payoutCount30d")}
+              value={fmtNum(payoutSla?.count_30d ?? 0)}
+              loading={loading && !payoutSla}
+              ok={(payoutSla?.count_30d ?? 0) > 0}
+            />
+          </div>
+          <p className="mt-3 text-[10px] text-muted-foreground break-keep">
+            {t("payoutSlaNote")}
+          </p>
+        </section>
             <div className="flex items-center gap-2 font-display font-black text-base break-keep">
               <History className="w-5 h-5 text-primary" /> {t("historyTitle")}
             </div>
