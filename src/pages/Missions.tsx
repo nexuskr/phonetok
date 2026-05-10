@@ -372,7 +372,12 @@ export default function Missions() {
                 )}
                 <div className="relative">
                   <div className="flex items-center justify-between text-[10px] mb-2">
-                    <span className="px-2 py-0.5 rounded-full bg-primary/15 text-primary font-bold">{m.category}</span>
+                    <div className="flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded-full bg-primary/15 text-primary font-bold">{m.category}</span>
+                      {recommended.has(m.id) && (
+                        <span className="px-2 py-0.5 rounded-full bg-gold/20 text-gold font-black animate-pulse">⭐ 추천</span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-1">
                       {m.fomoLimit && (
                         <span className="px-2 py-0.5 rounded-full bg-destructive/20 text-destructive font-bold animate-pulse tabular-nums">
