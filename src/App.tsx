@@ -109,7 +109,7 @@ const App = () => (
               <Route path="/start" element={<Navigate to="/dashboard" replace />} />
               <Route path="/earnings" element={<Navigate to="/missions" replace />} />
               <Route path="/arena" element={<EmpireArena />} />
-              <Route path="/lounge" element={<Navigate to="/empire" replace />} />
+              <Route path="/lounge" element={<Lounge />} />
               <Route path="/jackpot" element={<Navigate to="/roulette" replace />} />
               {/* /wallet 는 이미 존재 */}
 
