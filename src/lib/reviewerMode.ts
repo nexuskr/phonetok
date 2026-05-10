@@ -15,8 +15,7 @@ const LS_KEY = "phonara_reviewer_mode";
 
 function readEnvFlag() {
   try {
-    // @ts-expect-error vite env
-    return import.meta?.env?.VITE_REVIEWER_MODE === "1";
+    return (import.meta as any)?.env?.VITE_REVIEWER_MODE === "1";
   } catch {
     return false;
   }
