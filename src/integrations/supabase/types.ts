@@ -506,6 +506,104 @@ export type Database = {
         }
         Relationships: []
       }
+      bot_activity_events: {
+        Row: {
+          event_text: string
+          event_type: string
+          expires_at: string
+          id: number
+          occurred_at: string
+          persona_id: string
+          reward_amount: number | null
+        }
+        Insert: {
+          event_text: string
+          event_type: string
+          expires_at?: string
+          id?: never
+          occurred_at?: string
+          persona_id: string
+          reward_amount?: number | null
+        }
+        Update: {
+          event_text?: string
+          event_type?: string
+          expires_at?: string
+          id?: never
+          occurred_at?: string
+          persona_id?: string
+          reward_amount?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bot_activity_events_persona_id_fkey"
+            columns: ["persona_id"]
+            isOneToOne: false
+            referencedRelation: "bot_personas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bot_personas: {
+        Row: {
+          avatar_emoji: string
+          created_at: string
+          generation: string
+          id: string
+          nickname: string
+          region: string
+          tier_weight: string
+        }
+        Insert: {
+          avatar_emoji?: string
+          created_at?: string
+          generation: string
+          id?: string
+          nickname: string
+          region?: string
+          tier_weight?: string
+        }
+        Update: {
+          avatar_emoji?: string
+          created_at?: string
+          generation?: string
+          id?: string
+          nickname?: string
+          region?: string
+          tier_weight?: string
+        }
+        Relationships: []
+      }
+      bot_settings: {
+        Row: {
+          enabled: boolean
+          id: number
+          online_base: number
+          online_jitter: number
+          strength_pct: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          enabled?: boolean
+          id?: number
+          online_base?: number
+          online_jitter?: number
+          strength_pct?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          enabled?: boolean
+          id?: number
+          online_base?: number
+          online_jitter?: number
+          strength_pct?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       chaos_runs: {
         Row: {
           duration_ms: number | null
@@ -4188,6 +4286,29 @@ export type Database = {
             }
             Returns: Json
           }
+      admin_set_bot_strength: {
+        Args: {
+          _enabled: boolean
+          _online_base?: number
+          _online_jitter?: number
+          _strength_pct: number
+        }
+        Returns: {
+          enabled: boolean
+          id: number
+          online_base: number
+          online_jitter: number
+          strength_pct: number
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bot_settings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_set_tier: {
         Args: {
           _target: string
@@ -4391,6 +4512,19 @@ export type Database = {
           total_reward: number
         }[]
       }
+      get_bot_feed: {
+        Args: { _limit?: number }
+        Returns: {
+          avatar_emoji: string
+          event_text: string
+          event_type: string
+          id: number
+          nickname: string
+          occurred_at: string
+          reward_amount: number
+        }[]
+      }
+      get_bot_online_count: { Args: never; Returns: number }
       get_empire_seats_remaining: { Args: never; Returns: number }
       get_error_stats: {
         Args: { _hours?: number }
