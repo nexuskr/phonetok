@@ -94,8 +94,9 @@ Deno.serve(async (req) => {
       },
     });
   } catch (e) {
+    console.error("[catalog-cache] error", e);
     return new Response(
-      JSON.stringify({ error: (e as Error).message }),
+      JSON.stringify({ error: "internal_error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }

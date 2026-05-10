@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     .select("id")
     .eq("referral_code", ref_code)
     .maybeSingle();
-  if (invErr) return json(500, { error: "lookup_failed", detail: invErr.message });
+  if (invErr) { console.error("[attribute-click] lookup_failed", invErr); return json(500, { error: "internal_error" }); }
   if (!inviter) return json(404, { error: "ref_code_not_found" });
 
   // Optional: invitee_id if caller is signed in
@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
         })
         .select("id")
         .single();
-      if (insErr) return json(400, { error: "chain_insert_failed", detail: insErr.message });
+      if (insErr) { console.error("[attribute-click] chain_insert_failed", insErr); return json(400, { error: "chain_insert_failed" }); }
       chainId = ins.id;
     }
   } else {
@@ -114,7 +114,7 @@ Deno.serve(async (req) => {
         })
         .select("id")
         .single();
-      if (insErr) return json(400, { error: "chain_insert_failed", detail: insErr.message });
+      if (insErr) { console.error("[attribute-click] chain_insert_failed (anon)", insErr); return json(400, { error: "chain_insert_failed" }); }
       chainId = ins.id;
     }
   }

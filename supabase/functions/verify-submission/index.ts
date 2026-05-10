@@ -75,7 +75,7 @@ serve(async (req) => {
 
     // Authorization: caller must own the submission OR be admin
     const { data: sub, error: subErr } = await supabase
-      .from("viral_submissions")
+      .from("viral_mission_submissions")
       .select("user_id")
       .eq("id", submission_id)
       .maybeSingle();
@@ -167,10 +167,7 @@ serve(async (req) => {
     });
   } catch (err) {
     console.error("verify-submission error:", err);
-    return json(
-      { error: (err as Error)?.message ?? "internal_error" },
-      500,
-    );
+    return json({ error: "internal_error" }, 500);
   }
 });
 

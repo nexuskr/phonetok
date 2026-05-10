@@ -90,8 +90,9 @@ Deno.serve(async (req) => {
       },
     });
   } catch (e) {
+    console.error("[public-status] error", e);
     return new Response(
-      JSON.stringify({ status: "unknown", error: (e as Error).message }),
+      JSON.stringify({ status: "unknown" }),
       {
         status: 200, // intentionally 200 so monitors don't false-alarm on RPC blip
         headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
