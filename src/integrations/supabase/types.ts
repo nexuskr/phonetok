@@ -1349,6 +1349,60 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_orders: {
+        Row: {
+          cancelled_at: string | null
+          created_at: string
+          expires_at: string | null
+          fill_error: string | null
+          filled_at: string | null
+          filled_position_id: string | null
+          id: string
+          kind: string
+          leverage: number
+          margin: number
+          side: string
+          status: string
+          symbol: string
+          trigger_price: number
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          fill_error?: string | null
+          filled_at?: string | null
+          filled_position_id?: string | null
+          id?: string
+          kind: string
+          leverage: number
+          margin: number
+          side: string
+          status?: string
+          symbol: string
+          trigger_price: number
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          fill_error?: string | null
+          filled_at?: string | null
+          filled_position_id?: string | null
+          id?: string
+          kind?: string
+          leverage?: number
+          margin?: number
+          side?: string
+          status?: string
+          symbol?: string
+          trigger_price?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       permission_change_log: {
         Row: {
           change_type: string
@@ -3680,6 +3734,7 @@ export type Database = {
         Args: { _delta?: number; _metric: string }
         Returns: undefined
       }
+      cancel_pending_order: { Args: { p_order_id: string }; Returns: boolean }
       check_achievements: { Args: { _user_id?: string }; Returns: Json }
       check_permission_drift: { Args: never; Returns: Json }
       check_rls_integrity: { Args: never; Returns: Json }
@@ -3747,6 +3802,10 @@ export type Database = {
       equip_badge: {
         Args: { _badge_key: string; _slot: number }
         Returns: Json
+      }
+      fill_pending_order: {
+        Args: { p_mark_price: number; p_order_id: string }
+        Returns: string
       }
       finalize_ai_bot_run: {
         Args: {
