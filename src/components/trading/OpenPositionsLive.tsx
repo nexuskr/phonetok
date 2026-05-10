@@ -111,6 +111,12 @@ function priceFromRoi(side: "long" | "short", entry: number, leverage: number, r
   return side === "long" ? entry * (1 + change) : entry * (1 - change);
 }
 
+function priceToRoiPct(side: "long" | "short", entry: number, leverage: number, price: number) {
+  if (entry <= 0 || leverage <= 0 || price <= 0) return 0;
+  const change = side === "long" ? (price - entry) / entry : (entry - price) / entry;
+  return change * leverage * 100;
+}
+
 function PositionRowImpl({ position: p, mark, busy, unit, onClose }: RowProps) {
   const fmt = fmtFn(unit);
   const pnl = computePnl(p.side, p.entry, mark, p.size);
@@ -120,12 +126,46 @@ function PositionRowImpl({ position: p, mark, busy, unit, onClose }: RowProps) {
   const positive = pnl >= 0;
 
   const triggers = useTriggerStore((s) => s.triggers[p.id]);
+  const setTrigger = useTriggerStore((s) => s.set);
+  const updateTrigger = useTriggerStore((s) => s.update);
   const removeTrigger = useTriggerStore((s) => s.remove);
   const tpPrice = triggers?.tpPct ? priceFromRoi(p.side, p.entry, p.leverage, triggers.tpPct) : 0;
   const slPrice = triggers?.slPct ? priceFromRoi(p.side, p.entry, p.leverage, -triggers.slPct) : 0;
 
   // Distance-to-SL in % of price
   const slDistPct = slPrice > 0 ? ((mark - slPrice) / mark) * 100 : 0;
+
+  // Inline editor state
+  const [editing, setEditing] = useState(false);
+  const [tpInput, setTpInput] = useState<string>(triggers?.tpPct ? String(triggers.tpPct) : "");
+  const [slInput, setSlInput] = useState<string>(triggers?.slPct ? String(triggers.slPct) : "");
+  const [trailInput, setTrailInput] = useState<string>(triggers?.trailingPct ? String(triggers.trailingPct) : "");
+  // Optional price-mode inputs for big-exchange feel
+  const [tpPriceInput, setTpPriceInput] = useState<string>(tpPrice ? tpPrice.toFixed(4) : "");
+  const [slPriceInput, setSlPriceInput] = useState<string>(slPrice ? slPrice.toFixed(4) : "");
+
+  useEffect(() => {
+    // sync when triggers change externally
+    setTpInput(triggers?.tpPct ? String(triggers.tpPct) : "");
+    setSlInput(triggers?.slPct ? String(triggers.slPct) : "");
+    setTrailInput(triggers?.trailingPct ? String(triggers.trailingPct) : "");
+    setTpPriceInput(triggers?.tpPct ? priceFromRoi(p.side, p.entry, p.leverage, triggers.tpPct).toFixed(4) : "");
+    setSlPriceInput(triggers?.slPct ? priceFromRoi(p.side, p.entry, p.leverage, -triggers.slPct).toFixed(4) : "");
+  }, [triggers, p.side, p.entry, p.leverage]);
+
+  const saveTriggers = () => {
+    const tp = tpInput ? Math.max(0, Number(tpInput)) : undefined;
+    const sl = slInput ? Math.max(0, Number(slInput)) : undefined;
+    const tr = trailInput ? Math.max(0, Number(trailInput)) : undefined;
+    if (!tp && !sl && !tr) {
+      removeTrigger(p.id);
+      notify.message("TP/SL/트레일링 모두 해제됨");
+    } else {
+      setTrigger(p.id, { tpPct: tp, slPct: sl, trailingPct: tr, peakRoiPct: triggers?.peakRoiPct });
+      notify.success("TP/SL 저장 완료");
+    }
+    setEditing(false);
+  };
 
   return (
     <div
@@ -162,21 +202,31 @@ function PositionRowImpl({ position: p, mark, busy, unit, onClose }: RowProps) {
           {positive ? "+" : ""}{fmt(pnl)}
           <span className="block text-[10px]">{(roi * 100).toFixed(1)}%</span>
         </div>
-        <Button
-          size="sm" variant="outline" disabled={busy}
-          onClick={async () => {
-            sfx.click();
-            const r = await onClose(p.id, mark);
-            if ("error" in r) return;
-            if (r.pnl > 0) {
-              triggerFx({ kind: r.roi >= 5 ? "legendary" : "win", pnl: r.pnl, roi: r.roi, symbol: p.symbol });
-            } else {
-              triggerFx({ kind: "loss", pnl: r.pnl, roi: r.roi, symbol: p.symbol });
-            }
-          }}
-        >
-          청산
-        </Button>
+        <div className="flex gap-1">
+          <Button
+            size="sm" variant="ghost" disabled={busy}
+            onClick={() => { sfx.click(); setEditing((e) => !e); }}
+            title="TP/SL 수정"
+            className="h-8 px-2"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </Button>
+          <Button
+            size="sm" variant="outline" disabled={busy}
+            onClick={async () => {
+              sfx.click();
+              const r = await onClose(p.id, mark);
+              if ("error" in r) return;
+              if (r.pnl > 0) {
+                triggerFx({ kind: r.roi >= 5 ? "legendary" : "win", pnl: r.pnl, roi: r.roi, symbol: p.symbol });
+              } else {
+                triggerFx({ kind: "loss", pnl: r.pnl, roi: r.roi, symbol: p.symbol });
+              }
+            }}
+          >
+            청산
+          </Button>
+        </div>
       </div>
 
       <div className="relative h-1.5 rounded-full bg-background/60 overflow-hidden">
@@ -193,8 +243,8 @@ function PositionRowImpl({ position: p, mark, busy, unit, onClose }: RowProps) {
         <span>{(liqPct * 100).toFixed(1)}% to liq</span>
       </div>
 
-      {/* SL/TP/Trailing badges */}
-      {triggers && (triggers.tpPct || triggers.slPct || triggers.trailingPct) && (
+      {/* SL/TP/Trailing badges (read-only quick view) */}
+      {!editing && triggers && (triggers.tpPct || triggers.slPct || triggers.trailingPct) && (
         <div className="flex flex-wrap items-center gap-1.5 text-[10px] pt-1 border-t border-border/40">
           {triggers.tpPct ? (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-mono tabular-nums">
@@ -214,11 +264,125 @@ function PositionRowImpl({ position: p, mark, busy, unit, onClose }: RowProps) {
             </span>
           ) : null}
           <button
-            onClick={() => removeTrigger(p.id)}
-            className="ml-auto text-[10px] text-muted-foreground/70 hover:text-foreground underline"
+            onClick={() => setEditing(true)}
+            className="ml-auto text-[10px] text-primary/80 hover:text-primary underline"
           >
-            clear
+            수정
           </button>
+        </div>
+      )}
+
+      {!editing && !(triggers && (triggers.tpPct || triggers.slPct || triggers.trailingPct)) && (
+        <button
+          onClick={() => setEditing(true)}
+          className="w-full text-[10px] text-muted-foreground hover:text-foreground underline pt-1 border-t border-border/40"
+        >
+          + TP / SL / 트레일링 추가
+        </button>
+      )}
+
+      {/* Inline editor */}
+      {editing && (
+        <div className="pt-2 border-t border-border/40 space-y-2">
+          <div className="grid grid-cols-3 gap-2">
+            <label className="space-y-1">
+              <span className="block text-[10px] text-emerald-300 font-bold flex items-center gap-1">
+                <Target className="w-3 h-3" /> TP (ROI %)
+              </span>
+              <Input
+                type="number" inputMode="decimal" step="0.1" min="0"
+                placeholder="예: 20"
+                value={tpInput}
+                onChange={(e) => {
+                  setTpInput(e.target.value);
+                  const v = Number(e.target.value);
+                  setTpPriceInput(v > 0 ? priceFromRoi(p.side, p.entry, p.leverage, v).toFixed(4) : "");
+                }}
+                className="h-8 text-xs font-mono"
+              />
+              <Input
+                type="number" inputMode="decimal" step="0.0001" min="0"
+                placeholder="가격"
+                value={tpPriceInput}
+                onChange={(e) => {
+                  setTpPriceInput(e.target.value);
+                  const v = Number(e.target.value);
+                  if (v > 0) {
+                    const r = priceToRoiPct(p.side, p.entry, p.leverage, v);
+                    setTpInput(r > 0 ? r.toFixed(2) : "");
+                  } else setTpInput("");
+                }}
+                className="h-7 text-[10px] font-mono opacity-80"
+              />
+            </label>
+            <label className="space-y-1">
+              <span className="block text-[10px] text-rose-300 font-bold flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3" /> SL (ROI %)
+              </span>
+              <Input
+                type="number" inputMode="decimal" step="0.1" min="0"
+                placeholder="예: 10"
+                value={slInput}
+                onChange={(e) => {
+                  setSlInput(e.target.value);
+                  const v = Number(e.target.value);
+                  setSlPriceInput(v > 0 ? priceFromRoi(p.side, p.entry, p.leverage, -v).toFixed(4) : "");
+                }}
+                className="h-8 text-xs font-mono"
+              />
+              <Input
+                type="number" inputMode="decimal" step="0.0001" min="0"
+                placeholder="가격"
+                value={slPriceInput}
+                onChange={(e) => {
+                  setSlPriceInput(e.target.value);
+                  const v = Number(e.target.value);
+                  if (v > 0) {
+                    const r = -priceToRoiPct(p.side, p.entry, p.leverage, v);
+                    setSlInput(r > 0 ? r.toFixed(2) : "");
+                  } else setSlInput("");
+                }}
+                className="h-7 text-[10px] font-mono opacity-80"
+              />
+            </label>
+            <label className="space-y-1">
+              <span className="block text-[10px] text-amber-300 font-bold flex items-center gap-1">
+                <TUp className="w-3 h-3" /> Trail %
+              </span>
+              <Input
+                type="number" inputMode="decimal" step="0.1" min="0"
+                placeholder="예: 5"
+                value={trailInput}
+                onChange={(e) => setTrailInput(e.target.value)}
+                className="h-8 text-xs font-mono"
+              />
+              <span className="block text-[9px] text-muted-foreground/70">peak 대비 하락 %</span>
+            </label>
+          </div>
+          <div className="flex gap-1.5">
+            <Button size="sm" onClick={saveTriggers} className="h-7 text-xs flex-1">
+              <Check className="w-3 h-3 mr-1" /> 저장
+            </Button>
+            <Button
+              size="sm" variant="outline"
+              onClick={() => { setEditing(false); }}
+              className="h-7 text-xs"
+            >
+              취소
+            </Button>
+            {triggers && (
+              <Button
+                size="sm" variant="outline"
+                onClick={() => { removeTrigger(p.id); setEditing(false); notify.message("TP/SL 해제됨"); }}
+                className="h-7 text-xs text-rose-300 border-rose-500/40 hover:bg-rose-500/10"
+              >
+                전체 해제
+              </Button>
+            )}
+          </div>
+          <p className="text-[9px] text-muted-foreground/70 leading-relaxed">
+            ROI % 또는 가격 어느 쪽이든 입력하세요. 한 쪽을 입력하면 다른 쪽은 자동 계산됩니다. 비워두면 해당 트리거는 비활성화됩니다.
+          </p>
         </div>
       )}
     </div>
