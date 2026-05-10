@@ -1712,6 +1712,7 @@ export type Database = {
           daily_mission_count: number | null
           email_notifications_enabled: boolean | null
           id: string
+          is_adult: boolean
           last_attendance: string | null
           last_reset_date: string | null
           nickname: string
@@ -1742,6 +1743,7 @@ export type Database = {
           daily_mission_count?: number | null
           email_notifications_enabled?: boolean | null
           id: string
+          is_adult?: boolean
           last_attendance?: string | null
           last_reset_date?: string | null
           nickname: string
@@ -1772,6 +1774,7 @@ export type Database = {
           daily_mission_count?: number | null
           email_notifications_enabled?: boolean | null
           id?: string
+          is_adult?: boolean
           last_attendance?: string | null
           last_reset_date?: string | null
           nickname?: string
