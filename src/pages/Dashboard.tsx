@@ -63,6 +63,8 @@ export default function Dashboard() {
         <HubTabs hub="command" />
 
         <div className="container relative pt-2 pb-10">
+          {/* P5 — Recovery FOMO cascade */}
+          <FomoNotificationStrip />
           {/* 🏛️ Command Hero — 영웅 카드 (잔고 + 추천 미션 + 100석) */}
           <CommandHero />
 
