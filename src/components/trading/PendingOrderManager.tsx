@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { notify } from "@/lib/notify";
 import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
-import { FEE_RATE } from "@/lib/trading/engine";
+import { FEE_RATE } from "@/lib/trading/types";
 
 interface PendingOrder {
   id: string;
