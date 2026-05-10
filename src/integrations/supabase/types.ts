@@ -182,6 +182,42 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_daily_ops_reports: {
+        Row: {
+          actions: Json
+          created_at: string
+          highlights: Json
+          id: string
+          model: string
+          raw_input: Json
+          report_date: string
+          risks: Json
+          summary: string
+        }
+        Insert: {
+          actions?: Json
+          created_at?: string
+          highlights?: Json
+          id?: string
+          model?: string
+          raw_input?: Json
+          report_date: string
+          risks?: Json
+          summary: string
+        }
+        Update: {
+          actions?: Json
+          created_at?: string
+          highlights?: Json
+          id?: string
+          model?: string
+          raw_input?: Json
+          report_date?: string
+          risks?: Json
+          summary?: string
+        }
+        Relationships: []
+      }
       ai_generated_missions: {
         Row: {
           ai_reasoning: string | null
