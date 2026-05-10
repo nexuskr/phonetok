@@ -148,7 +148,22 @@ export default function GlobalIntelligence() {
       try {
         const r = await realClose(id, mark);
         if ("error" in r) { notify.error(r.error); return r; }
-        // Real-mode notification fires from realtime live_trade_history INSERT (real-store).
+        // Real-mode toast fires from realtime live_trade_history INSERT (real-store).
+        // Celebrate / win-moment / loss-thud must fire here in KRW unit.
+        const pos = positionsAsLive.find((p) => p.id === id);
+        if (r.pnl > 0) {
+          const lvl = levelFromPnl(r.pnl, "KRW");
+          celebrateWin(lvl);
+          if (pos) {
+            pushWinMoment({
+              id, pnl: r.pnl, roi: r.roi,
+              symbol: pos.symbol, side: pos.side as "long" | "short",
+              leverage: pos.leverage, level: lvl, unit: "KRW",
+            });
+          }
+        } else if (r.pnl < 0) {
+          playLossThud();
+        }
         return r;
       } finally { setBusy(false); }
     }
@@ -164,13 +179,13 @@ export default function GlobalIntelligence() {
     else if (reason === "trailing") notify.info("트레일링 스탑 자동 청산 (Paper)", { description: desc });
     else notify.message("포지션 청산 (Paper)", { description: desc });
     if (cp.pnl > 0) {
-      const lvl = levelFromPnl(cp.pnl); celebrateWin(lvl);
-      pushWinMoment({ id, pnl: cp.pnl, roi: cp.roi, symbol: sym, side: closed!.side, leverage: closed!.leverage, level: lvl });
+      const lvl = levelFromPnl(cp.pnl, "USDT"); celebrateWin(lvl);
+      pushWinMoment({ id, pnl: cp.pnl, roi: cp.roi, symbol: sym, side: closed!.side, leverage: closed!.leverage, level: lvl, unit: "USDT" });
     } else {
       playLossThud();
     }
     return { pnl: cp.pnl, roi: cp.roi, exit: mark, credit: closed!.margin + cp.pnl };
-  }, [mode, realClose, paperClose]);
+  }, [mode, realClose, paperClose, positionsAsLive]);
 
   const liquidatePos = useCallback(async (id: string, mark: number) => {
     if (mode === "real") return realLiquidate(id, mark);
