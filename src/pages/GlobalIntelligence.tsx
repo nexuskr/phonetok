@@ -261,6 +261,11 @@ export default function GlobalIntelligence() {
                 busy={busy}
               />
             </div>
+            {mode === "real" && (
+              <div className="lg:col-span-2">
+                <PendingOrderManager symbol={symbol} currentPrice={price ?? 0} />
+              </div>
+            )}
             <div className="lg:col-span-2">
               <h2 className="font-display font-bold text-base mb-2">Open Positions ({mode === "real" ? "REAL" : "PAPER"})</h2>
               <OpenPositionsLive
