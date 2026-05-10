@@ -52,6 +52,8 @@ export default function Packages() {
       <AdultOnlyBanner />
       <HubTabs hub="empire" />
       <div className="container pt-6 pb-10 animate-liquid-in">
+        {/* P6-2: Axie-style Empire Unit cards (XP/진화/스탯) */}
+        <PackageUpgradeCards />
         <div className="mb-6">
           <h1 className="font-imperial font-black text-2xl sm:text-3xl flex items-center gap-2 tracking-[0.04em] break-keep">
             <Crown className="w-5 h-5 text-gold shrink-0" /> <span className="text-gradient-gold">{t("headline")}</span>
