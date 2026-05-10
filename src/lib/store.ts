@@ -59,12 +59,13 @@ export function todayStr() {
 }
 
 export type MissionTier = "NORMAL" | "VIP" | "GOD" | "EMPIRE";
+export type Persona = "gen20" | "gen30" | "gen40" | "gen5060" | "gen6070" | "freelancer";
 export type Mission = {
   id: string;
   title: string;
   desc: string;
   reward: number;
-  category: "광고" | "설문" | "리뷰" | "추천" | "데이터" | "AI" | "UGC" | "게임";
+  category: "광고" | "설문" | "리뷰" | "추천" | "데이터" | "AI" | "UGC" | "게임" | "트레이딩" | "출석" | "바이럴" | "퀴즈";
   difficulty: "EASY" | "NORMAL" | "HARD" | "VIP";
   tier: MissionTier;
   duration: string;
@@ -72,6 +73,10 @@ export type Mission = {
   game?: "tap" | "lucky" | "memory" | "reaction" | "scratch" | "dice" | "slot" | "highlow";
   fomoLimit?: number; // FOMO: only N plays remain today
   boostable?: boolean; // tier-boost reward effect
+  // P1: persona targeting + special hooks
+  hook?: "coin_paper_first_win" | "weekly_streak_compound" | "viral_sns_share" | "family_invite" | "market_pulse_quiz" | "night_owl_boost" | "empire_day_double";
+  bonusWindowKr?: { startHour: number; endHour: number; multiplier: number }; // night_owl_boost 등
+  empireDayOnly?: boolean; // empire_day_double: 매월 1·15일만
 };
 
 export type Pkg = {
