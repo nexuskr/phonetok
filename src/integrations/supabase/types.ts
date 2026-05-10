@@ -931,8 +931,13 @@ export type Database = {
           opened_at: string
           side: string
           size: number
+          sl_pct: number | null
           status: string
           symbol: string
+          tp_pct: number | null
+          trailing_active: boolean
+          trailing_pct: number | null
+          trailing_peak_roi_pct: number | null
           user_id: string
         }
         Insert: {
@@ -945,8 +950,13 @@ export type Database = {
           opened_at?: string
           side: string
           size: number
+          sl_pct?: number | null
           status?: string
           symbol: string
+          tp_pct?: number | null
+          trailing_active?: boolean
+          trailing_pct?: number | null
+          trailing_peak_roi_pct?: number | null
           user_id: string
         }
         Update: {
@@ -959,8 +969,13 @@ export type Database = {
           opened_at?: string
           side?: string
           size?: number
+          sl_pct?: number | null
           status?: string
           symbol?: string
+          tp_pct?: number | null
+          trailing_active?: boolean
+          trailing_pct?: number | null
+          trailing_peak_roi_pct?: number | null
           user_id?: string
         }
         Relationships: []
@@ -3301,6 +3316,10 @@ export type Database = {
         Args: { _delta: number; _reason: string; _target: string }
         Returns: Json
       }
+      admin_force_close_position: {
+        Args: { p_mark_price: number; p_position_id: string; p_reason?: string }
+        Returns: Json
+      }
       admin_get_user_email: { Args: { _user_id: string }; Returns: string }
       admin_release_freeze: {
         Args: { _freeze_id: string; _note?: string }
@@ -3365,6 +3384,10 @@ export type Database = {
           _tier: Database["public"]["Enums"]["user_tier"]
         }
         Returns: Json
+      }
+      admin_update_trailing_peak: {
+        Args: { p_peak_roi_pct: number; p_position_id: string }
+        Returns: undefined
       }
       admin_upsert_mission_template: {
         Args: {
@@ -3692,8 +3715,13 @@ export type Database = {
           opened_at: string
           side: string
           size: number
+          sl_pct: number | null
           status: string
           symbol: string
+          tp_pct: number | null
+          trailing_active: boolean
+          trailing_pct: number | null
+          trailing_peak_roi_pct: number | null
           user_id: string
         }[]
         SetofOptions: {
@@ -3713,9 +3741,21 @@ export type Database = {
           p_margin: number
           p_mark_price: number
           p_side: string
+          p_sl_pct?: number
           p_symbol: string
+          p_tp_pct?: number
+          p_trailing_pct?: number
         }
         Returns: string
+      }
+      live_set_position_triggers: {
+        Args: {
+          p_position_id: string
+          p_sl_pct: number
+          p_tp_pct: number
+          p_trailing_pct: number
+        }
+        Returns: undefined
       }
       log_client_error: {
         Args: {
