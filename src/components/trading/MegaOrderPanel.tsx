@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ARENA_SYMBOLS, MAX_LEVERAGE, type Mode } from "@/lib/trading/types";
 import { applySlippage, computeSize, liquidationPrice, openFee } from "@/lib/trading/engine";
 import { sfx } from "@/lib/trading/sounds";
+import { unitForMode, fmtMoney, approxCross } from "@/lib/trading/currency";
 
 interface Props {
   mode: Mode;
