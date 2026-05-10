@@ -1650,6 +1650,7 @@ export type Database = {
           coin_network: string | null
           created_at: string
           daily_mission_count: number | null
+          email_notifications_enabled: boolean | null
           id: string
           last_attendance: string | null
           last_reset_date: string | null
@@ -1659,6 +1660,7 @@ export type Database = {
           real_name: string | null
           referral_code: string | null
           referred_by: string | null
+          sms_notifications_enabled: boolean | null
           terms_agreed_at: string | null
           tier: Database["public"]["Enums"]["user_tier"]
           total_coin_deposits: number
@@ -1678,6 +1680,7 @@ export type Database = {
           coin_network?: string | null
           created_at?: string
           daily_mission_count?: number | null
+          email_notifications_enabled?: boolean | null
           id: string
           last_attendance?: string | null
           last_reset_date?: string | null
@@ -1687,6 +1690,7 @@ export type Database = {
           real_name?: string | null
           referral_code?: string | null
           referred_by?: string | null
+          sms_notifications_enabled?: boolean | null
           terms_agreed_at?: string | null
           tier?: Database["public"]["Enums"]["user_tier"]
           total_coin_deposits?: number
@@ -1706,6 +1710,7 @@ export type Database = {
           coin_network?: string | null
           created_at?: string
           daily_mission_count?: number | null
+          email_notifications_enabled?: boolean | null
           id?: string
           last_attendance?: string | null
           last_reset_date?: string | null
@@ -1715,6 +1720,7 @@ export type Database = {
           real_name?: string | null
           referral_code?: string | null
           referred_by?: string | null
+          sms_notifications_enabled?: boolean | null
           terms_agreed_at?: string | null
           tier?: Database["public"]["Enums"]["user_tier"]
           total_coin_deposits?: number
@@ -3347,6 +3353,36 @@ export type Database = {
         }
         Relationships: []
       }
+      withdraw_otp_codes: {
+        Row: {
+          attempts: number
+          code_hash: string
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       withdrawal_requests: {
         Row: {
           admin_evidence_checklist: Json
@@ -4232,6 +4268,7 @@ export type Database = {
       }
       recover_stuck_settlements: { Args: never; Returns: Json }
       redetect_anomaly: { Args: { _id: string }; Returns: Json }
+      request_withdraw_otp: { Args: never; Returns: Json }
       request_withdrawal: {
         Args: {
           _amount: number
@@ -4419,6 +4456,7 @@ export type Database = {
         Args: { _iso_week?: string }
         Returns: Json
       }
+      verify_withdraw_otp: { Args: { _code: string }; Returns: Json }
       xp_for_level: { Args: { _level: number }; Returns: number }
     }
     Enums: {

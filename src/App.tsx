@@ -31,6 +31,7 @@ const SecureWallet = lazy(() => import("./pages/SecureWallet.tsx"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
 const CompleteProfile = lazy(() => import("./pages/CompleteProfile.tsx"));
+const AuthCallback = lazy(() => import("./pages/AuthCallback.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const Achievements = lazy(() => import("./pages/Achievements.tsx"));
 const SeasonPass = lazy(() => import("./pages/SeasonPass.tsx"));
@@ -105,6 +106,7 @@ const App = () => (
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/complete-profile" element={<CompleteProfile />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="/achievements" element={<Achievements />} />
               <Route path="/season-pass" element={<SeasonPass />} />
               <Route path="/quests" element={<Quests />} />

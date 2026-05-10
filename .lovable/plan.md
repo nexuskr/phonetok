@@ -1,52 +1,108 @@
-# Trading Arena — ALL-IN 버그 + Fee 표시 통일
 
-## 문제 진단
+# Phonara SMS-Free 인증 전환 플랜
 
-### 1. ALL-IN 클릭 시 "insufficient balance"
-`MegaOrderPanel.setPct(1)`이 `balance`(예: ₩61,366) 그대로 마진에 넣음.  
-하지만 서버 RPC `live_open_position`은 **마진 + 오픈 수수료**(`margin × leverage × 0.1%`)가 잔액 이내여야 통과.  
-100× · 0.1%이면 필요 잔액 = 마진 × 1.10 → 마진=잔액 그대로면 항상 부족.  
-대형 거래소(Bybit/Binance)는 Max 버튼이 **수수료를 자동 차감한 최대 가용 마진**을 넣음.
+현재 `SecureAuth.tsx` 는 이메일+비밀번호 / Google / Apple 을 지원하고, 회원가입 시 전화번호를 수집해 출금 SMS에 사용 중. SMS 의존을 단계적으로 제거하고 4가지 SMS-Free 인증을 도입.
 
-### 2. Fee 표시가 모드마다 다름
-`Fee 0.1% (USDT)` (Paper) vs `Fee 0.1% (KRW)` (Real) — 라벨·소수점 자릿수·환산값이 통일 안 됨.  
-대형 거래소는 항상 동일 포맷(주로 USDT 기준 + 현지통화 환산)으로 표기.
+## 목표 인증 매트릭스
 
----
+| 우선순위 | 방법 | 사용 위치 | 비고 |
+|---|---|---|---|
+| 1 | Google / Apple OAuth | 신규/기존 로그인 (기본 노출) | 이미 구현, 노출 강화 |
+| 2 | Email Magic Link / OTP | 비번 없는 로그인, 출금 본인확인 | 신규 |
+| 3 | TOTP (Authenticator) | 2FA, 출금 PIN 대체 | 신규 |
+| 4 | Passkey (WebAuthn) | 차세대 로그인 | 신규 (옵트인) |
 
-## 변경 범위 (UI/프레젠테이션 한정)
+## Phase A — Magic Link / Email OTP (가장 큰 효과)
 
-수정 파일: `src/components/trading/MegaOrderPanel.tsx` 만.  
-서버 RPC, 엔진 계산식, 잔액·체결 로직, 디자인 토큰은 1픽셀도 건드리지 않음.
+1. `SecureAuth.tsx` UI 개편:
+   - 탭 구조 변경: **OAuth (구글/애플) → 이메일 매직링크 → 비밀번호 (legacy)** 순으로 우선순위 재정렬
+   - 비밀번호 가입 폼은 "고급" 토글 안으로 숨김
+2. 신규 액션 `sendMagicLink(email)`:
+   - `supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo: origin+'/auth/callback' }})`
+   - 동일 함수로 가입+로그인 동시 처리 (`shouldCreateUser:true`)
+3. `/auth/callback` 페이지 신설 — Supabase가 토큰 hash로 리다이렉트하므로 `supabase.auth.exchangeCodeForSession`/`getSession` 처리 후 `/` 이동
+4. 출금 본인확인용 6자리 OTP:
+   - 새 RPC `request_withdraw_otp()` → `auth.signInWithOtp({email, channel:'email'})` 와 별개로 자체 `withdraw_otp_codes(user_id, code_hash, expires_at)` 테이블 + `verify_withdraw_otp(code)` RPC
+   - 기존 `request_withdrawal` 호출 전 OTP 검증 단계 추가
 
-### A. ALL-IN/퍼센트 버튼 — 수수료 차감 후 최대치
+## Phase B — TOTP 2FA (Authenticator 앱)
 
-`setPct(p)` 변경:
-- 현재: `raw = balance * p`
-- 변경: `raw = (balance * p) / (1 + leverage * FEE_RATE)`
-  - `FEE_RATE = 0.001`은 `@/lib/trading/types`에서 import (이미 존재)
-  - KRW 모드: `Math.floor`, USDT 모드: 소수 둘째 자리 내림
-- 25%/50%/75%에도 동일 적용 (그 비율 안에서 풀-사이즈 가능하도록)
-- 100× ALL-IN 시: ₩61,366 → 마진 ₩55,787 (수수료 ₩6,136 ≤ 가용)
+1. Supabase Auth MFA(TOTP) 활성화 (Cloud → Auth Providers → MFA)
+2. 신규 페이지 `/security/totp`:
+   - `supabase.auth.mfa.enroll({ factorType:'totp' })` → QR 코드 표시
+   - `supabase.auth.mfa.challenge` + `verify(code)` 로 등록 완료
+3. 로그인 후 AAL 체크: `mfa.getAuthenticatorAssuranceLevel()` 로 AAL2 필요 화면(출금/관리자) 보호
+4. 출금 흐름 통합:
+   - 기존 `withdraw_pin_hash` 비교 로직을 "TOTP 6자리 코드 검증" 으로 교체
+   - 미설정 사용자는 비밀번호 PIN fallback 유지 (마이그레이션 윈도우)
+5. 관리자(`/admin`)는 TOTP 강제 (AAL2 미달 시 차단)
 
-레버리지 슬라이더가 움직이면 마진 입력값은 자동으로 재계산하지 않음(사용자 입력 보존). ALL-IN을 다시 누를 때만 새 레버리지 기준으로 재계산.
+## Phase C — Passkey / WebAuthn
 
-### B. Fee 표시 통일
+1. Supabase Auth WebAuthn factor (`factorType:'webauthn'`) 활용
+2. `/security/passkey`:
+   - `mfa.enroll({ factorType:'webauthn', friendlyName })` → 브라우저 `navigator.credentials.create` 자동 호출
+   - 등록된 passkey 목록/삭제 UI
+3. 로그인 화면 상단에 "Passkey 로 로그인" 버튼 — `mfa.challengeAndVerify` 로 단일 클릭 로그인
+4. 모바일 Safari/Chrome 호환성 가드: `PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()` false 면 비노출
 
-`Stat label="Fee 0.1% ..."` 한 줄을 두 모드 동일 포맷으로:
-- 라벨: 항상 `Fee (0.1%)` (단위 표기 제거)
-- 값: `fmtMoney(fee, unit, { decimals: unit === "USDT" ? 4 : 0 })`
-- 아래 작은 글씨로 환산: `≈ ${fmtMoney(approxCross(fee, unit).value, approxCross(fee, unit).unit)}`
-  - Real 모드: `₩6,136` + `≈ 4.3829 USDT`
-  - Paper 모드: `4.3829 USDT` + `≈ ₩6,136`
-- `Stat` 컴포넌트에 옵셔널 `sub?: string` prop 추가하여 환산값 표기
+## Phase D — SMS 의존 제거
 
----
+1. `tg_withdrawal_status_notify` 트리거의 SMS dispatch를 옵션화:
+   - `notification_preferences.sms_enabled` 컬럼 기본 false
+   - 사용자가 명시적으로 켠 경우만 Twilio 호출
+2. `SecureAuth` 회원가입 폼에서 `phone` 필드를 **선택 사항**으로 변경 (zod regex → optional)
+3. `profiles.phone` 미입력 사용자도 정상 진행 — 알림은 인앱+이메일 기본
+4. 이메일 알림 인프라가 없을 경우 `email_domain--setup_email_infra` 호출하여 출금 상태 이메일 활성화
 
-## 검증 체크리스트
+## 데이터베이스 변경
 
-- [ ] Real 모드 ALL-IN + 100× → LONG/SHORT 정상 진입 (insufficient balance 사라짐)
-- [ ] 25%/50%/75% 버튼도 항상 진입 가능
-- [ ] 레버리지 변경 후 ALL-IN 다시 누르면 새 레버리지 기준으로 마진 갱신
-- [ ] Paper/Real 모두 Fee 줄에 USDT/KRW 두 값 동시 표시, 라벨 동일
-- [ ] 잔액·청산가·사이즈·실제 PnL 계산식 변경 없음
+```sql
+-- withdraw_otp_codes
+CREATE TABLE public.withdraw_otp_codes (
+  id uuid PK,
+  user_id uuid (FK auth.users),
+  code_hash text,
+  attempts int default 0,
+  expires_at timestamptz,
+  consumed_at timestamptz,
+  created_at timestamptz
+);
+-- RLS: 본인만 SELECT, INSERT는 SECURITY DEFINER RPC 만
+
+-- notification_preferences
+ALTER TABLE profiles
+  ADD COLUMN sms_notifications_enabled boolean DEFAULT false,
+  ADD COLUMN email_notifications_enabled boolean DEFAULT true;
+```
+
+## UI 변경 파일
+
+- `src/pages/SecureAuth.tsx` — 매직링크 우선 UI
+- `src/pages/AuthCallback.tsx` (신규)
+- `src/pages/security/Totp.tsx` (신규)
+- `src/pages/security/Passkey.tsx` (신규)
+- `src/components/withdrawal/WithdrawOtpDialog.tsx` (신규) — 출금 전 6자리 OTP
+- `src/pages/Admin.tsx` — AAL2 가드
+
+## 보안 고려
+
+- TOTP secret 은 Supabase Auth 가 관리 (별도 저장 X)
+- Magic Link 토큰은 1회용 + 짧은 TTL (Supabase 기본 1시간 — 출금 OTP 는 5분으로 단축)
+- AAL2 강제 페이지: `/admin/*`, `/wallet/withdraw`
+- Passkey 미지원 브라우저 fallback: TOTP
+
+## 실행 순서
+
+1. Phase A (가장 빠른 ROI): 매직링크 + 출금 OTP — 약 1 작업 묶음
+2. Phase B: TOTP + AAL 가드
+3. Phase C: Passkey (옵션)
+4. Phase D: phone 필드 옵션화 + SMS off-by-default
+
+## 확인이 필요한 항목
+
+- Phase B 에서 기존 `withdraw_pin` 사용자는 강제 마이그레이션? 아니면 양립 유지? (현재 플랜 = 양립 유지)
+- Phase C Passkey 를 로그인 1차 수단으로 노출 vs 2FA 전용? (현재 플랜 = 1차 + 2FA 둘 다)
+- Magic Link 사용 시 회원가입 폼의 닉네임/실명 수집은 가입 직후 `/complete-profile` 에서 받을지 — OAuth 와 동일 흐름 권장
+
+승인되면 **Phase A 부터** 즉시 구현 시작합니다.
