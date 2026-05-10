@@ -8,7 +8,7 @@ export default function RedDisclaimerBanner() {
   return (
     <div
       role="alert"
-      className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-red-700 via-red-600 to-red-700 text-white text-center py-2 px-3 text-[11px] sm:text-sm font-semibold shadow-[0_4px_20px_rgba(220,38,38,0.4)] border-b-4 border-red-900"
+      className="relative z-30 bg-gradient-to-r from-red-700 via-red-600 to-red-700 text-white text-center py-2 px-3 text-[11px] sm:text-sm font-semibold shadow-[0_4px_20px_rgba(220,38,38,0.4)] border-b-4 border-red-900"
     >
       <div className="flex items-center justify-center gap-2 mb-0.5">
         <AlertTriangle className="w-4 h-4 animate-pulse" />
