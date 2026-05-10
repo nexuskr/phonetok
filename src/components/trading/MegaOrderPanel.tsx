@@ -73,7 +73,9 @@ function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit,
   const slPriceNum = Math.max(0, parseFloat(slPrice) || 0);
 
   const setPct = (p: number) => {
-    const raw = balance * p;
+    // Reserve open fee (margin × leverage × FEE_RATE) so server-side
+    // (margin + fee) ≤ available_balance check always passes — matches Bybit/Binance Max.
+    const raw = (balance * p) / (1 + leverage * FEE_RATE);
     const v = unit === "KRW" ? Math.floor(raw) : Math.floor(raw * 100) / 100;
     setMargin(Math.max(0, v).toString());
   };
