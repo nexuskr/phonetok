@@ -96,8 +96,10 @@ function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit,
 
   const buildTriggers = (): OrderTriggers | undefined => {
     const t: OrderTriggers = {};
-    if (tpNum > 0) t.tpPct = tpNum;
-    if (slNum > 0) t.slPct = slNum;
+    if (tpPriceMode === "price" && tpPriceNum > 0) t.tpPrice = tpPriceNum;
+    else if (tpNum > 0) t.tpPct = tpNum;
+    if (slPriceMode === "price" && slPriceNum > 0) t.slPrice = slPriceNum;
+    else if (slNum > 0) t.slPct = slNum;
     if (trailingOn && trailNum > 0) t.trailingPct = trailNum;
     return Object.keys(t).length ? t : undefined;
   };
@@ -112,11 +114,18 @@ function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit,
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [marginNum, leverage, price, tpNum, slNum, trailingOn, trailNum]);
+  }, [marginNum, leverage, price, tpNum, slNum, trailingOn, trailNum, tpPriceNum, slPriceNum, tpPriceMode, slPriceMode, marginMode]);
 
   const doSubmit = (side: "long" | "short") => {
     sfx.click();
-    onSubmit({ side, leverage, margin: marginNum, triggers: buildTriggers() });
+    onSubmit({
+      side,
+      leverage,
+      margin: marginNum,
+      triggers: buildTriggers(),
+      marginMode,
+      allocatedMargin: marginMode === "isolated" ? marginNum : undefined,
+    });
   };
 
   return (
