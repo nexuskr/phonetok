@@ -950,6 +950,33 @@ export type Database = {
         }
         Relationships: []
       }
+      jackpot_contributions: {
+        Row: {
+          contribution_amount: number
+          contribution_pct: number
+          created_at: string
+          deposit_amount: number
+          id: string
+          user_id: string
+        }
+        Insert: {
+          contribution_amount: number
+          contribution_pct?: number
+          created_at?: string
+          deposit_amount: number
+          id?: string
+          user_id: string
+        }
+        Update: {
+          contribution_amount?: number
+          contribution_pct?: number
+          created_at?: string
+          deposit_amount?: number
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       jackpot_pool: {
         Row: {
           amount: number
@@ -977,6 +1004,39 @@ export type Database = {
           last_won_amount?: number | null
           last_won_at?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      jackpot_settlements: {
+        Row: {
+          created_at: string
+          id: string
+          operator_retain: number
+          total_pool: number
+          winner_id: string
+          winner_nickname: string | null
+          winner_payout: number
+          winner_pct: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          operator_retain: number
+          total_pool: number
+          winner_id: string
+          winner_nickname?: string | null
+          winner_payout: number
+          winner_pct?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          operator_retain?: number
+          total_pool?: number
+          winner_id?: string
+          winner_nickname?: string | null
+          winner_payout?: number
+          winner_pct?: number
         }
         Relationships: []
       }
@@ -3910,6 +3970,7 @@ export type Database = {
       _cron_settle_package_daily: { Args: never; Returns: Json }
       _edge_internal_auth_header: { Args: never; Returns: Json }
       _period_key: { Args: { _period: string }; Returns: string }
+      accrue_jackpot: { Args: { p_deposit_amount: number }; Returns: Json }
       acknowledge_anomaly: {
         Args: { _id: string; _note?: string }
         Returns: Json
@@ -4640,6 +4701,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      settle_jackpot: {
+        Args: { p_nickname?: string; p_winner_id: string }
+        Returns: Json
       }
       settle_mission: {
         Args: { _base_reward: number; _is_win: boolean; _mission_id: string }
