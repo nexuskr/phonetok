@@ -4,7 +4,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ARENA_SYMBOLS, MAX_LEVERAGE, type Mode } from "@/lib/trading/types";
+import { ARENA_SYMBOLS, MAX_LEVERAGE, FEE_RATE, type Mode } from "@/lib/trading/types";
 import { applySlippage, computeSize, liquidationPrice, openFee } from "@/lib/trading/engine";
 import { sfx } from "@/lib/trading/sounds";
 import { unitForMode, fmtMoney, approxCross } from "@/lib/trading/currency";
@@ -73,7 +73,9 @@ function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit,
   const slPriceNum = Math.max(0, parseFloat(slPrice) || 0);
 
   const setPct = (p: number) => {
-    const raw = balance * p;
+    // Reserve open fee (margin × leverage × FEE_RATE) so server-side
+    // (margin + fee) ≤ available_balance check always passes — matches Bybit/Binance Max.
+    const raw = (balance * p) / (1 + leverage * FEE_RATE);
     const v = unit === "KRW" ? Math.floor(raw) : Math.floor(raw * 100) / 100;
     setMargin(Math.max(0, v).toString());
   };
@@ -338,7 +340,12 @@ function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit,
         <Stat label="Long Liq" v={liqLong.toFixed(4)} tone="loss" />
         <Stat label="Short Liq" v={liqShort.toFixed(4)} tone="loss" />
         <Stat label="Size" v={`${sizeLong.toFixed(4)}/${sizeShort.toFixed(4)}`} />
-        <Stat label={`Fee 0.1% (${unit})`} v={fmtMoney(fee, unit, { decimals: 0 })} tone="warn" />
+        <Stat
+          label="Fee (0.1%)"
+          v={fmtMoney(fee, unit, { decimals: unit === "USDT" ? 4 : 0 })}
+          sub={`≈ ${fmtMoney(approxCross(fee, unit).value, approxCross(fee, unit).unit, { decimals: approxCross(fee, unit).unit === "USDT" ? 4 : 0 })}`}
+          tone="warn"
+        />
       </div>
 
       {/* Big buttons */}
@@ -370,13 +377,14 @@ function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit,
 
 export default memo(MegaOrderPanelImpl);
 
-function Stat({ label, v, tone }: { label: string; v: string; tone?: "loss" | "warn" }) {
+function Stat({ label, v, sub, tone }: { label: string; v: string; sub?: string; tone?: "loss" | "warn" }) {
   return (
     <div className="rounded-xl bg-background/40 border border-border/40 p-2">
       <div className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</div>
       <div className={`font-mono tabular-nums font-bold mt-0.5 text-sm ${
         tone === "loss" ? "text-rose-300" : tone === "warn" ? "text-amber-300" : "text-foreground"
       }`}>{v}</div>
+      {sub && <div className="text-[10px] text-muted-foreground/70 font-mono tabular-nums mt-0.5">{sub}</div>}
     </div>
   );
 }

@@ -1,52 +1,52 @@
-# 오류 원인
+# Trading Arena — ALL-IN 버그 + Fee 표시 통일
 
-```
-column "direction" is of type tx_direction but expression is of type text
-```
+## 문제 진단
 
-직전 핫픽스에서 `live_close_position` / `live_liquidate_position` / `admin_force_close_position`(2 오버로드) 함수를 재작성하면서 `transactions.direction` (enum `tx_direction`) 컬럼에 들어가는 값이 다음 형태로 작성되어 있습니다:
+### 1. ALL-IN 클릭 시 "insufficient balance"
+`MegaOrderPanel.setPct(1)`이 `balance`(예: ₩61,366) 그대로 마진에 넣음.  
+하지만 서버 RPC `live_open_position`은 **마진 + 오픈 수수료**(`margin × leverage × 0.1%`)가 잔액 이내여야 통과.  
+100× · 0.1%이면 필요 잔액 = 마진 × 1.10 → 마진=잔액 그대로면 항상 부족.  
+대형 거래소(Bybit/Binance)는 Max 버튼이 **수수료를 자동 차감한 최대 가용 마진**을 넣음.
 
-```sql
-CASE WHEN v_pnl>=0 THEN 'credit' ELSE 'debit' END
-```
+### 2. Fee 표시가 모드마다 다름
+`Fee 0.1% (USDT)` (Paper) vs `Fee 0.1% (KRW)` (Real) — 라벨·소수점 자릿수·환산값이 통일 안 됨.  
+대형 거래소는 항상 동일 포맷(주로 USDT 기준 + 현지통화 환산)으로 표기.
 
-PostgreSQL에서 CASE 식의 두 분기가 모두 문자열 리터럴이면 결과 타입이 `text`로 결정되며, `text → tx_direction` 암묵적 캐스팅은 허용되지 않아 INSERT 시 오류가 납니다. 단순 리터럴 한 개(`'debit'`)는 unknown 타입이라 통과되지만, CASE를 거치는 순간 막힙니다.
+---
 
-## 수정 범위 (4개 함수)
+## 변경 범위 (UI/프레젠테이션 한정)
 
-각 함수의 CASE 결과에 `::tx_direction` 캐스팅 추가, 그리고 단독 리터럴도 함께 명시적 캐스팅 적용(안전 차원).
+수정 파일: `src/components/trading/MegaOrderPanel.tsx` 만.  
+서버 RPC, 엔진 계산식, 잔액·체결 로직, 디자인 토큰은 1픽셀도 건드리지 않음.
 
-1. `live_close_position`
-2. `live_liquidate_position`
-3. `admin_force_close_position(uuid)` — 인자 1개 오버로드
-4. `admin_force_close_position(uuid, uuid)` — 인자 2개 오버로드
+### A. ALL-IN/퍼센트 버튼 — 수수료 차감 후 최대치
 
-수정 패턴:
-```sql
--- before
-CASE WHEN v_pnl>=0 THEN 'credit' ELSE 'debit' END
--- after
-(CASE WHEN v_pnl>=0 THEN 'credit' ELSE 'debit' END)::tx_direction
+`setPct(p)` 변경:
+- 현재: `raw = balance * p`
+- 변경: `raw = (balance * p) / (1 + leverage * FEE_RATE)`
+  - `FEE_RATE = 0.001`은 `@/lib/trading/types`에서 import (이미 존재)
+  - KRW 모드: `Math.floor`, USDT 모드: 소수 둘째 자리 내림
+- 25%/50%/75%에도 동일 적용 (그 비율 안에서 풀-사이즈 가능하도록)
+- 100× ALL-IN 시: ₩61,366 → 마진 ₩55,787 (수수료 ₩6,136 ≤ 가용)
 
--- before
-'debit', v_fee_close, ...
--- after
-'debit'::tx_direction, v_fee_close, ...
-```
+레버리지 슬라이더가 움직이면 마진 입력값은 자동으로 재계산하지 않음(사용자 입력 보존). ALL-IN을 다시 누를 때만 새 레버리지 기준으로 재계산.
 
-## 작업 단계
+### B. Fee 표시 통일
 
-1. 마이그레이션으로 위 4개 함수의 본문을 그대로 두고 INSERT 절의 `direction` 부분만 enum 캐스팅 추가하여 `CREATE OR REPLACE FUNCTION` 재선언.
-2. 마이그레이션 직후 `pg_proc` 조회로 4개 함수 모두 `::tx_direction`이 포함되었는지 검증.
-3. 사용자에게 F5 → 기존 ETHUSDT/BTCUSDT 포지션 "청산" 또는 "Close All" 클릭 → 토스트가 "성공"으로 뜨고 잔고 변화 확인 요청.
-4. 정상 청산되면 직전 잔고 일관성 핫픽스(`Δtotal = Δavail + Δlocked`)도 함께 검증된 것이므로 추가 작업 없음.
+`Stat label="Fee 0.1% ..."` 한 줄을 두 모드 동일 포맷으로:
+- 라벨: 항상 `Fee (0.1%)` (단위 표기 제거)
+- 값: `fmtMoney(fee, unit, { decimals: unit === "USDT" ? 4 : 0 })`
+- 아래 작은 글씨로 환산: `≈ ${fmtMoney(approxCross(fee, unit).value, approxCross(fee, unit).unit)}`
+  - Real 모드: `₩6,136` + `≈ 4.3829 USDT`
+  - Paper 모드: `4.3829 USDT` + `≈ ₩6,136`
+- `Stat` 컴포넌트에 옵셔널 `sub?: string` prop 추가하여 환산값 표기
 
-## 영향 범위
+---
 
-- 트레이딩 외 다른 22개 함수에서 검색된 `'credit'`/`'debit'` 매칭은 대부분 jsonb metadata 내부 문자열이거나 단독 리터럴이라 정상 동작 중. 이번 오류는 CASE 결과 타입 결정 규칙 때문에 발생한 4개 함수 한정 문제이므로 그 외 함수는 건드리지 않음.
-- 데이터/스키마 변경 없음, 함수 정의만 갱신.
+## 검증 체크리스트
 
-## 리스크
-
-- 매우 낮음. 캐스팅만 추가하므로 기존 잔고/PnL/수수료 계산 로직에 영향 없음.
-- linter 0028/0029/0011 경고는 기존과 동일한 accepted risk.
+- [ ] Real 모드 ALL-IN + 100× → LONG/SHORT 정상 진입 (insufficient balance 사라짐)
+- [ ] 25%/50%/75% 버튼도 항상 진입 가능
+- [ ] 레버리지 변경 후 ALL-IN 다시 누르면 새 레버리지 기준으로 마진 갱신
+- [ ] Paper/Real 모두 Fee 줄에 USDT/KRW 두 값 동시 표시, 라벨 동일
+- [ ] 잔액·청산가·사이즈·실제 PnL 계산식 변경 없음
