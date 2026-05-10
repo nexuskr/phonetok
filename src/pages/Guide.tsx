@@ -8,6 +8,7 @@ import { useDB } from "@/lib/store";
 import { toast } from "@/hooks/use-toast";
 import EarningsSimulator from "@/components/guide/EarningsSimulator";
 import TrustCounter from "@/components/guide/TrustCounter";
+import RecoveryBonusCalculator from "@/components/guide/RecoveryBonusCalculator";
 import AMLGate from "@/components/wallet/AMLGate";
 import { AML_TIERS, currentTierByVerificationLevel } from "@/lib/aml-tiers";
 
@@ -50,9 +51,9 @@ export default function Guide() {
       <div className="container pt-6 pb-32 animate-liquid-in">
         <h1 className="font-imperial font-black text-2xl flex items-center gap-2 mb-1 break-keep">
           <BookOpen className="w-5 h-5 text-primary" />
-          <span className="text-gradient-primary">{t("title")}</span>
+          <span className="text-gradient-primary">제국 건설 6단계 가이드</span>
         </h1>
-        <p className="text-xs text-muted-foreground mb-4 break-keep">{t("subtitle")}</p>
+        <p className="text-xs text-muted-foreground mb-4 break-keep">3분 만에 첫 수익을 경험하세요.</p>
 
         <div className="grid grid-cols-5 gap-1.5 mb-5">
           {tabs.map((tt) => {
@@ -241,6 +242,9 @@ function StarterGuide({ t }: any) {
 
       {/* Earnings simulator */}
       <EarningsSimulator />
+
+      {/* Recovery Bonus 실시간 계산기 */}
+      <RecoveryBonusCalculator />
 
       {/* 6 steps with inline extras for step5 / step6 */}
       <div className="space-y-2.5">
