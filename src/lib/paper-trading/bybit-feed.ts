@@ -3,15 +3,17 @@ import { rafScheduler } from "@/lib/util/raf-scheduler";
 
 export interface TickerStat {
   last: number;
-  change24hPct: number; // -100..+inf, percent
-  volume24h: number; // base volume
-  turnover24h: number; // quote volume (USDT)
+  change24hPct: number;
+  volume24h: number;
+  turnover24h: number;
   high24h: number;
   low24h: number;
+  fundingRate: number;        // e.g. 0.0001 = 0.01%
+  nextFundingTime: number;    // ms epoch
 }
 
 export interface KlineBar {
-  time: number;     // seconds (UTCTimestamp)
+  time: number;
   open: number;
   high: number;
   low: number;
@@ -20,25 +22,31 @@ export interface KlineBar {
   confirm: boolean;
 }
 
+export type KlineInterval = "1" | "3" | "5" | "15" | "30" | "60" | "240" | "D" | "W";
+export const DEFAULT_INTERVAL: KlineInterval = "1";
+
 type PriceListener = (priceMap: Record<string, number>) => void;
 type StatsListener = (stats: Record<string, TickerStat>) => void;
 type StatusListener = (s: "connecting" | "open" | "reconnecting" | "rest-fallback") => void;
 type KlineListener = (bar: KlineBar) => void;
 type Notify = () => void;
 
+const klineKey = (sym: string, interval: KlineInterval) => `${interval}:${sym}`;
+
 class BybitFeed {
   private ws: WebSocket | null = null;
   private prices: Record<string, number> = {};
   private stats: Record<string, TickerStat> = {};
   private klines: Record<string, KlineBar> = {};
-  // Global listeners (used by useBybitTicker for full snapshots)
   private listeners = new Set<PriceListener>();
   private statsListeners = new Set<StatsListener>();
   private statusListeners = new Set<StatusListener>();
-  // Per-symbol listeners (used by useSymbolPrice / useSymbolStat / chart kline)
   private symbolPriceListeners = new Map<string, Set<Notify>>();
   private symbolStatListeners = new Map<string, Set<Notify>>();
+  // key = `${interval}:${symbol}`
   private klineListeners = new Map<string, Set<KlineListener>>();
+  // active interval-symbol subscriptions tracked for re-subscribe on reconnect
+  private activeKlineTopics = new Set<string>(); // topic strings like kline.1.BTCUSDT
   private dirtyPriceSyms = new Set<string>();
   private dirtyStatSyms = new Set<string>();
 
@@ -55,7 +63,6 @@ class BybitFeed {
     if (this.started) return;
     this.started = true;
     this.alive = true;
-    // Immediate REST warm-up so prices appear within ~1s even if WS is slow/blocked.
     this.fetchRestOnce();
     this.connect();
   }
@@ -69,7 +76,6 @@ class BybitFeed {
     this.ws = null;
   }
 
-  // ---- subscriptions ----
   onPrices(fn: PriceListener) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
   onStats(fn: StatsListener) { this.statsListeners.add(fn); return () => this.statsListeners.delete(fn); }
   onStatus(fn: StatusListener) { this.statusListeners.add(fn); return () => this.statusListeners.delete(fn); }
@@ -86,18 +92,52 @@ class BybitFeed {
     set.add(fn);
     return () => { set!.delete(fn); };
   }
-  onKline(sym: string, fn: KlineListener) {
-    let set = this.klineListeners.get(sym);
-    if (!set) { set = new Set(); this.klineListeners.set(sym, set); }
+
+  /** Subscribe to a kline interval for a symbol. Reference-counted: subscribes WS topic on first listener,
+   *  unsubscribes on last. Default 1m is already subscribed for all symbols at WS open. */
+  onKline(sym: string, interval: KlineInterval, fn: KlineListener) {
+    const key = klineKey(sym, interval);
+    let set = this.klineListeners.get(key);
+    const firstForKey = !set || set.size === 0;
+    if (!set) { set = new Set(); this.klineListeners.set(key, set); }
     set.add(fn);
-    return () => { set!.delete(fn); };
+
+    const topic = `kline.${interval}.${sym}`;
+    if (firstForKey && interval !== DEFAULT_INTERVAL && !this.activeKlineTopics.has(topic)) {
+      this.activeKlineTopics.add(topic);
+      this.sendSub([topic]);
+    }
+    return () => {
+      set!.delete(fn);
+      if (set!.size === 0 && interval !== DEFAULT_INTERVAL) {
+        this.klineListeners.delete(key);
+        this.activeKlineTopics.delete(topic);
+        this.sendUnsub([topic]);
+      }
+    };
   }
 
   getPrices() { return this.prices; }
   getStats() { return this.stats; }
   getKline(sym: string) { return this.klines[sym]; }
 
-  // ---- emit (rAF coalesced) ----
+  private sendSub(args: string[]) {
+    const ws = this.ws;
+    if (!ws || ws.readyState !== WebSocket.OPEN || args.length === 0) return;
+    for (let i = 0; i < args.length; i += 10) {
+      const chunk = args.slice(i, i + 10);
+      try { ws.send(JSON.stringify({ op: "subscribe", args: chunk })); } catch {}
+    }
+  }
+  private sendUnsub(args: string[]) {
+    const ws = this.ws;
+    if (!ws || ws.readyState !== WebSocket.OPEN || args.length === 0) return;
+    for (let i = 0; i < args.length; i += 10) {
+      const chunk = args.slice(i, i + 10);
+      try { ws.send(JSON.stringify({ op: "unsubscribe", args: chunk })); } catch {}
+    }
+  }
+
   private emit() {
     this.dirty = true;
     if (this.emitScheduled) return;
@@ -106,8 +146,6 @@ class BybitFeed {
       this.emitScheduled = false;
       if (!this.dirty) return;
       this.dirty = false;
-
-      // Fan out per-symbol notifies first (cheap, fine-grained selectors)
       for (const sym of this.dirtyPriceSyms) {
         const set = this.symbolPriceListeners.get(sym);
         if (set) for (const fn of set) fn();
@@ -118,8 +156,6 @@ class BybitFeed {
       }
       this.dirtyPriceSyms.clear();
       this.dirtyStatSyms.clear();
-
-      // Then global snapshots (kept for back-compat with useBybitTicker)
       if (this.listeners.size > 0) {
         const psnap = { ...this.prices };
         for (const fn of this.listeners) fn(psnap);
@@ -134,7 +170,10 @@ class BybitFeed {
   private status(s: Parameters<StatusListener>[0]) { for (const fn of this.statusListeners) fn(s); }
 
   private updateStat(sym: string, partial: Partial<TickerStat>) {
-    const prev = this.stats[sym] ?? { last: 0, change24hPct: 0, volume24h: 0, turnover24h: 0, high24h: 0, low24h: 0 };
+    const prev = this.stats[sym] ?? {
+      last: 0, change24hPct: 0, volume24h: 0, turnover24h: 0,
+      high24h: 0, low24h: 0, fundingRate: 0, nextFundingTime: 0,
+    };
     this.stats[sym] = { ...prev, ...partial };
     this.dirtyStatSyms.add(sym);
   }
@@ -152,17 +191,16 @@ class BybitFeed {
         window.clearTimeout(watchdog);
         this.restMode = false;
         if (this.restTimer) { window.clearInterval(this.restTimer); this.restTimer = null; }
-        // Subscribe both tickers AND 1-minute kline for every symbol.
-        // Bybit allows up to 10 args per message — chunk to be safe.
+        // Default subscriptions: tickers + 1m kline for all symbols.
         const args: string[] = [];
         for (const s of SYMBOLS) {
           args.push(`tickers.${s}`);
-          args.push(`kline.1.${s}`);
+          args.push(`kline.${DEFAULT_INTERVAL}.${s}`);
         }
-        for (let i = 0; i < args.length; i += 10) {
-          const chunk = args.slice(i, i + 10);
-          try { ws.send(JSON.stringify({ op: "subscribe", args: chunk })); } catch {}
-        }
+        // Re-subscribe any active non-default kline topics (e.g. if user had switched timeframe before reconnect).
+        for (const t of this.activeKlineTopics) args.push(t);
+        this.sendSub(args);
+
         this.pingTimer = window.setInterval(() => {
           try { ws.send(JSON.stringify({ op: "ping" })); } catch {}
         }, 20_000);
@@ -186,6 +224,8 @@ class BybitFeed {
               const turn = parseFloat(d.turnover24h);
               const hi = parseFloat(d.highPrice24h);
               const lo = parseFloat(d.lowPrice24h);
+              const fr = parseFloat(d.fundingRate);
+              const nft = parseFloat(d.nextFundingTime);
               this.updateStat(sym, {
                 last,
                 ...(Number.isFinite(change) ? { change24hPct: change * 100 } : {}),
@@ -193,6 +233,8 @@ class BybitFeed {
                 ...(Number.isFinite(turn) ? { turnover24h: turn } : {}),
                 ...(Number.isFinite(hi) ? { high24h: hi } : {}),
                 ...(Number.isFinite(lo) ? { low24h: lo } : {}),
+                ...(Number.isFinite(fr) ? { fundingRate: fr } : {}),
+                ...(Number.isFinite(nft) ? { nextFundingTime: nft } : {}),
               });
               this.emit();
             }
@@ -200,10 +242,13 @@ class BybitFeed {
           }
 
           if (topic.startsWith("kline.")) {
-            // topic format: kline.{interval}.{symbol}
+            // kline.{interval}.{symbol}
             const parts = topic.split(".");
+            const interval = parts[1] as KlineInterval;
             const sym = parts[2];
             const arr = Array.isArray(msg.data) ? msg.data : [msg.data];
+            const key = klineKey(sym, interval);
+            const set = this.klineListeners.get(key);
             for (const k of arr) {
               const time = Math.floor(Number(k.start) / 1000);
               const open = Number(k.open);
@@ -214,11 +259,11 @@ class BybitFeed {
               const confirm = !!k.confirm;
               if (!Number.isFinite(time) || !Number.isFinite(close) || close <= 0) continue;
               const bar: KlineBar = { time, open, high, low, close, volume, confirm };
-              this.klines[sym] = bar;
-              // Also keep last price in sync from kline close (failsafe)
-              this.prices[sym] = close;
-              this.dirtyPriceSyms.add(sym);
-              const set = this.klineListeners.get(sym);
+              if (interval === DEFAULT_INTERVAL) {
+                this.klines[sym] = bar;
+                this.prices[sym] = close;
+                this.dirtyPriceSyms.add(sym);
+              }
               if (set) for (const fn of set) { try { fn(bar); } catch {} }
             }
             this.emit();
@@ -226,7 +271,7 @@ class BybitFeed {
           }
         } catch {}
       };
-      ws.onerror = () => { /* will close */ };
+      ws.onerror = () => {};
       ws.onclose = () => {
         window.clearTimeout(watchdog);
         if (this.pingTimer) { window.clearInterval(this.pingTimer); this.pingTimer = null; }
@@ -260,6 +305,8 @@ class BybitFeed {
           const turn = parseFloat(r.turnover24h);
           const hi = parseFloat(r.highPrice24h);
           const lo = parseFloat(r.lowPrice24h);
+          const fr = parseFloat(r.fundingRate);
+          const nft = parseFloat(r.nextFundingTime);
           this.updateStat(r.symbol, {
             ...(Number.isFinite(last) && last > 0 ? { last } : {}),
             ...(Number.isFinite(change) ? { change24hPct: change * 100 } : {}),
@@ -267,6 +314,8 @@ class BybitFeed {
             ...(Number.isFinite(turn) ? { turnover24h: turn } : {}),
             ...(Number.isFinite(hi) ? { high24h: hi } : {}),
             ...(Number.isFinite(lo) ? { low24h: lo } : {}),
+            ...(Number.isFinite(fr) ? { fundingRate: fr } : {}),
+            ...(Number.isFinite(nft) ? { nextFundingTime: nft } : {}),
           });
         }
       }
@@ -289,10 +338,9 @@ export function getFeed(): BybitFeed {
   return _feed;
 }
 
-/** REST fetch for historical klines — used by chart on mount/symbol change. */
 export async function fetchKlineHistory(
   symbol: string,
-  interval: "1" | "3" | "5" | "15" | "60" = "1",
+  interval: KlineInterval = "1",
   limit = 300,
 ): Promise<KlineBar[]> {
   const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${encodeURIComponent(symbol)}&interval=${interval}&limit=${limit}`;
@@ -300,7 +348,6 @@ export async function fetchKlineHistory(
     const res = await fetch(url);
     const json = await res.json();
     const list: any[] = json?.result?.list ?? [];
-    // Bybit returns newest-first; chart needs oldest-first ascending.
     const out: KlineBar[] = list.map((row) => ({
       time: Math.floor(Number(row[0]) / 1000),
       open: Number(row[1]),
