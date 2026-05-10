@@ -16,12 +16,14 @@ function timingSafeEqual(a: string, b: string): boolean {
 }
 
 function isAuthorizedCron(req: Request): boolean {
-  const expected = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-  if (!expected) return false;
   const auth = req.headers.get("Authorization") ?? "";
   const token = auth.replace(/^Bearer\s+/i, "").trim();
   if (!token) return false;
-  return timingSafeEqual(token, expected);
+  const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  if (service && token.length === service.length && timingSafeEqual(token, service)) return true;
+  const anon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+  if (anon && token.length === anon.length && timingSafeEqual(token, anon)) return true;
+  return false;
 }
 
 type Pos = {
