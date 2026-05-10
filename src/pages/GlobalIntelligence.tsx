@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import Layout from "@/components/Layout";
 import RedDisclaimerBanner from "@/components/trading/RedDisclaimerBanner";
 import ModeToggle from "@/components/trading/ModeToggle";
-import LightweightChartPanel from "@/components/trading/LightweightChartPanel";
+import ChartWithHeader from "@/components/trading/ChartWithHeader";
 import MegaOrderPanel from "@/components/trading/MegaOrderPanel";
 import OpenPositionsLive from "@/components/trading/OpenPositionsLive";
 import TradingHistoryGold from "@/components/trading/TradingHistoryGold";
