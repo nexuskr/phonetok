@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { LoadingState } from "@/components/ui/loading-state";
+import { LoadingPage } from "@/components/ui/loading-state";
 import { notify } from "@/lib/notify";
 
 /**
@@ -39,7 +39,7 @@ export default function AuthCallback() {
           setTimeout(() => nav("/secure-auth", { replace: true }), 2000);
         }
       } catch (e: any) {
-        notify.error("로그인 실패", e?.message ?? "잠시 후 다시 시도해주세요.");
+        notify.error("로그인 실패", { description: e?.message ?? "잠시 후 다시 시도해주세요." });
         setTimeout(() => nav("/secure-auth", { replace: true }), 1500);
       }
     })();
@@ -49,7 +49,7 @@ export default function AuthCallback() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="glass-strong rounded-2xl p-8 max-w-sm w-full text-center">
-        <LoadingState label={msg} />
+        <LoadingPage label={msg} />
       </div>
     </div>
   );

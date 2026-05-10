@@ -48,12 +48,12 @@ export default function WithdrawOtpDialog({ open, onClose, onVerified }: Props) 
       const { error } = await supabase.rpc("request_withdraw_otp" as any);
       if (error) throw error;
       setSentAt(Date.now());
-      notify.success("인증 코드를 이메일로 발송했어요", "5분 이내에 입력해주세요.");
+      notify.success("인증 코드를 이메일로 발송했어요", { description: "5분 이내에 입력해주세요." });
     } catch (e: any) {
       const msg = e?.message?.includes("rate_limited")
         ? "요청이 너무 많습니다. 잠시 후 다시 시도해주세요."
         : e?.message ?? "발송에 실패했습니다.";
-      notify.error("OTP 발송 실패", msg);
+      notify.error("OTP 발송 실패", { description: msg });
     } finally {
       setSending(false);
     }
@@ -78,7 +78,7 @@ export default function WithdrawOtpDialog({ open, onClose, onVerified }: Props) 
         invalid_format: "6자리 숫자를 입력해주세요.",
       };
       const key = (e?.message ?? "").trim();
-      notify.error("인증 실패", map[key] ?? key);
+      notify.error("인증 실패", { description: map[key] ?? key });
     } finally {
       setVerifying(false);
     }
