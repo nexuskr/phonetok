@@ -23,6 +23,8 @@ import RiskLimitsPanel from "@/components/wallet/RiskLimitsPanel";
 import InsuranceFundDashboard from "@/components/InsuranceFundDashboard";
 import { z } from "zod";
 import Disclaimer from "@/components/Disclaimer";
+import StepUpGate from "@/components/security/StepUpGate";
+import { useStepUp } from "@/hooks/use-step-up";
 
 type AssetTab = "bank" | "coin";
 type ActionTab = "withdraw" | "deposit" | "history";
