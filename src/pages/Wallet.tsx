@@ -434,17 +434,21 @@ export default function Wallet() {
                 className="w-full min-h-[52px] bg-input/60 border border-border rounded-xl px-4 py-3.5 text-base font-bold tabular-nums focus:outline-none focus:border-primary transition"
               />
             </Field>
-            <div className="grid grid-cols-3 gap-2">
-              {[10000, 50000, 100000].map(v => (
-                <button
-                  key={v}
-                  onClick={() => setAmount(String(v))}
-                  className="min-h-[44px] py-2.5 rounded-xl glass border border-border/40 text-xs font-bold tabular-nums hover:border-primary/40 hover:text-primary transition press"
-                >
-                  +{v.toLocaleString()}
-                </button>
-              ))}
-            </div>
+            {action === "deposit" ? (
+              <AmountPresetChips value={amount} onChange={setAmount} />
+            ) : (
+              <div className="grid grid-cols-3 gap-2">
+                {[10000, 50000, 100000].map(v => (
+                  <button
+                    key={v}
+                    onClick={() => setAmount(String(v))}
+                    className="min-h-[44px] py-2.5 rounded-xl glass border border-border/40 text-xs font-bold tabular-nums hover:border-primary/40 hover:text-primary transition press"
+                  >
+                    +{v.toLocaleString()}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {asset === "bank" && action === "withdraw" && (
               <>
@@ -492,6 +496,10 @@ export default function Wallet() {
                     <div className="flex justify-between"><span className="text-muted-foreground">{t("depositOwner")}</span><span className="font-bold">{lng === "en" ? "Phonara Inc." : "(주)Phonara"}</span></div>
                     <p className="text-[10px] text-muted-foreground pt-2 border-t border-border/40">{t("depositMemo")}</p>
                   </div>
+                )}
+
+                {depositChannel === "bank" && (
+                  <BankAppDeeplinks amount={amount} />
                 )}
 
                 {depositChannel === "bank" && (
