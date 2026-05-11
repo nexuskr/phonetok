@@ -137,7 +137,7 @@ export default function TradingArenaBybit() {
           notify.success(`${args.side.toUpperCase()} ${args.leverage}× 개시`, {
             description: `${symbol} @ ${entry.toFixed(4)} · ${args.margin} USDT`,
           });
-          triggerFx({ kind: "open", pnl: 0, roi: 0, symbol, unit: "USDT" });
+          
         }
       } else {
         if (realAvailable <= 0) {
