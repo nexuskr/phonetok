@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ShieldCheck, TrendingUp, Activity, Crown, Clock, Users, FileCheck2, Radar, ArrowLeft, RefreshCw, History } from "lucide-react";
 import Particles from "@/components/Particles";
 import TrustHistoryCharts from "@/components/trust/TrustHistoryCharts";
+import OpsTransparencyCard from "@/components/trust/OpsTransparencyCard";
 import { LuxButton, LuxChip, Money } from "@/components/ui/lux";
 import { prefetchTrust, getTrustCache, invalidateTrustCache } from "@/lib/trustPrefetch";
 
@@ -240,6 +241,8 @@ export default function Trust() {
             sub={loading ? "" : t("heroMembersSub", { n: fmtNum(m?.active_members_30d ?? 0) })}
           />
         </section>
+
+        <OpsTransparencyCard />
 
         {/* SLO grid */}
         <section className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-3">
