@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Flame, Zap, Coins, Timer, CheckCircle2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { assertRateLimit, RL_WALLET } from "@/lib/rateLimit";
 import { notify } from "@/lib/notify";
 import { formatKRW } from "@/lib/store";
 
@@ -103,6 +104,7 @@ export default function EmpireP2EDashboard() {
     if (claiming) return;
     setClaiming(true);
     try {
+      await assertRateLimit(RL_WALLET.scope, RL_WALLET.max);
       const { data, error } = await supabase.rpc("claim_idle_growth" as any);
       if (error) throw error;
       const res = data as any;

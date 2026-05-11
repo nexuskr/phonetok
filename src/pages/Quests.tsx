@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
+import { assertRateLimit, RL_MISSION } from "@/lib/rateLimit";
 import { useDB, formatKRW } from "@/lib/store";
 import { toast } from "@/hooks/use-toast";
 import { CheckCircle2, Clock, Zap } from "lucide-react";
@@ -31,6 +32,8 @@ export default function Quests() {
   useEffect(() => { load(); }, [db.user]);
 
   async function claim(key: string) {
+    try { await assertRateLimit(RL_MISSION.scope, RL_MISSION.max); }
+    catch (e: any) { return toast({ title: t("claimFail"), description: e?.message, variant: "destructive" }); }
     const { data, error } = await supabase.rpc("claim_quest" as any, { _quest_key: key });
     if (error) return toast({ title: t("claimFail"), description: error.message, variant: "destructive" });
     const r = data as any;

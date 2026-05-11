@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { assertRateLimit, RL_MISSION } from "@/lib/rateLimit";
 import { Sparkles, Zap, Loader2, Bot, Clock, Inbox } from "lucide-react";
 import { notify } from "@/lib/notify";
 import { LoadingList } from "@/components/ui/loading-state";
@@ -80,6 +81,8 @@ export default function AIMissionCard() {
 
   async function claim(id: string) {
     setClaiming(id);
+    try { await assertRateLimit(RL_MISSION.scope, RL_MISSION.max); }
+    catch (e: any) { setClaiming(null); notify.error("요청 제한", { description: e?.message }); return; }
     const { error } = await supabase.rpc("claim_ai_mission", { _mission_id: id });
     setClaiming(null);
     if (error) {

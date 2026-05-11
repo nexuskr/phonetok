@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
+import { assertRateLimit, RL_WALLET } from "@/lib/rateLimit";
 import { useDB, formatKRW } from "@/lib/store";
 import { toast } from "@/hooks/use-toast";
 import { Crown, Gift, Lock, Sparkles } from "lucide-react";
@@ -35,6 +36,8 @@ export default function SeasonPass() {
   useEffect(() => { load(); }, [db.user]);
 
   async function claim(level: number, track: "free" | "premium") {
+    try { await assertRateLimit(RL_WALLET.scope, RL_WALLET.max); }
+    catch (e: any) { return toast({ title: t("claimFail"), description: e?.message, variant: "destructive" }); }
     const { data, error } = await supabase.rpc("claim_season_reward" as any, { _level: level, _track: track });
     if (error) return toast({ title: t("claimFail"), description: error.message, variant: "destructive" });
     const r = data as any;

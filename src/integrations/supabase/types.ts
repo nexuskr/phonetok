@@ -4744,6 +4744,23 @@ export type Database = {
             }
             Returns: Json
           }
+      admin_get_ab_stats: {
+        Args: { _key: string }
+        Returns: {
+          assignments: number
+          variant: string
+        }[]
+      }
+      admin_get_ev_history: {
+        Args: { _limit?: number }
+        Returns: {
+          created_at: string
+          dedupe_key: string
+          evidence: Json
+          id: string
+          severity: string
+        }[]
+      }
       admin_get_user_email: { Args: { _user_id: string }; Returns: string }
       admin_operator_pnl: {
         Args: { p_from?: string; p_to?: string }
@@ -4806,6 +4823,15 @@ export type Database = {
             }
             Returns: Json
           }
+      admin_run_ev_health_now: { Args: never; Returns: Json }
+      admin_set_ab_active: {
+        Args: { _active: boolean; _key: string }
+        Returns: {
+          experiment_key: string
+          is_active: boolean
+          updated_at: string
+        }[]
+      }
       admin_set_bot_strength: {
         Args: {
           _enabled: boolean

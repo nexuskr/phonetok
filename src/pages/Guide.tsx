@@ -4,6 +4,7 @@ import Layout from "@/components/Layout";
 import { ShieldCheck, Crown, Sparkles, Lock, Wallet as WalletIcon, BookOpen, Trophy, Zap, Coins, ArrowLeftRight, Star, CheckCircle2, GraduationCap, Gift, ArrowRight, Share2, Copy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { assertRateLimit, RL_WALLET } from "@/lib/rateLimit";
 import { useDB } from "@/lib/store";
 import { toast } from "@/hooks/use-toast";
 import EarningsSimulator from "@/components/guide/EarningsSimulator";
@@ -135,6 +136,7 @@ function StarterGuide({ t }: any) {
     if (!isLoggedIn || bonusPaid || !allDone || claiming) return;
     setClaiming(true);
     try {
+      await assertRateLimit(RL_WALLET.scope, RL_WALLET.max);
       const { data, error } = await supabase.rpc("claim_handbook_bonus");
       if (error) throw error;
       const r = data as { ok: boolean; amount?: number; error?: string };
