@@ -40,6 +40,7 @@ function useDelta1s(symbol: string, currentPrice: number) {
 
 export default function TradingArenaWithArmy() {
   const user = useRequireAuth();
+  const navigate = useNavigate();
   const [symbol, setSymbol] = useState<typeof SYMBOLS[number]>("BTCUSDT");
   const [size, setSize] = useState(100);
   const [mode, setMode] = useState<"paper" | "real">("paper");
