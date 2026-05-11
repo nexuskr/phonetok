@@ -24,6 +24,7 @@ const Index = lazy(() => import("./pages/Index.tsx"));
 const Auth = lazy(() => import("./pages/Auth.tsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
 const EmpireArena = lazy(() => import("./pages/EmpireArena.tsx"));
+const TradingArenaWithArmy = lazy(() => import("./pages/TradingArenaWithArmy.tsx"));
 const Lounge = lazy(() => import("./pages/Lounge.tsx"));
 const Roulette = lazy(() => import("./pages/Roulette.tsx"));
 const Missions = lazy(() => import("./pages/Missions.tsx"));
@@ -112,7 +113,10 @@ const App = () => (
               {/* 초직관 6대 메뉴 alias — 20~70대 한국인용 */}
               <Route path="/start" element={<Navigate to="/dashboard" replace />} />
               <Route path="/earnings" element={<Navigate to="/missions" replace />} />
-              <Route path="/arena" element={<EmpireArena />} />
+              <Route path="/arena" element={<TradingArenaWithArmy />} />
+              <Route path="/arena/classic" element={<EmpireArena />} />
+              <Route path="/empire-arena" element={<TradingArenaWithArmy />} />
+              <Route path="/empire-arena/classic" element={<EmpireArena />} />
               <Route path="/lounge" element={<Lounge />} />
               <Route path="/jackpot" element={<Navigate to="/roulette" replace />} />
               {/* /wallet 는 이미 존재 */}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Layout from "@/components/Layout";
 import HubTabs from "@/components/HubTabs";
@@ -53,6 +53,15 @@ export default function Wallet() {
   const user = useRequireAuth() ?? db.user;
   const [asset, setAsset] = useState<AssetTab>("bank");
   const [action, setAction] = useState<ActionTab>("withdraw");
+  const [searchParams] = useSearchParams();
+  const isFirstDepositIntent = searchParams.get("intent") === "first-deposit";
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "deposit") setAction("deposit");
+    else if (tab === "withdraw") setAction("withdraw");
+    else if (tab === "history") setAction("history");
+    if (isFirstDepositIntent) setAction("deposit");
+  }, [searchParams, isFirstDepositIntent]);
   const { requireStepUp, dialogProps: stepUpProps } = useStepUp();
 
   useEffect(() => { void refreshWallet(); }, []);
@@ -381,6 +390,16 @@ export default function Wallet() {
             </button>
           ))}
         </div>
+
+        {isFirstDepositIntent && action === "deposit" && (
+          <div className="rounded-2xl p-3 mb-4 border-2 border-gold/50 bg-gradient-to-r from-gold/15 to-primary/10 flex items-center gap-2">
+            <span className="text-2xl">🎁</span>
+            <div className="flex-1 text-xs">
+              <div className="font-display font-black text-gold">첫입금 +30% 보너스 활성</div>
+              <div className="text-muted-foreground text-[10px]">입금 즉시 보너스가 자동 지급됩니다</div>
+            </div>
+          </div>
+        )}
 
         {resultCode && (action === "withdraw" || action === "deposit") && (
           <div className="glass-strong rounded-2xl p-6 border border-primary/40 glow-imperial mb-5 text-center">

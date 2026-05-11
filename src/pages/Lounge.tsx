@@ -11,7 +11,7 @@ import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
 import { notify } from "@/lib/notify";
 import Layout from "@/components/Layout";
-import GuildActivityTicker from "@/components/lounge/GuildActivityTicker";
+import GuildLiveFeed from "@/components/lounge/GuildLiveFeed";
 
 type Guild = {
   id: string;
@@ -384,7 +384,7 @@ export default function Lounge() {
                       <Plus className="h-4 w-4 mr-1" /> 길드 창설하기
                     </Button>
                   </Card>
-                  <GuildActivityTicker />
+                  <GuildLiveFeed />
                 </>
               )}
             </div>

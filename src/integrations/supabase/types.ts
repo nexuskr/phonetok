@@ -1327,6 +1327,50 @@ export type Database = {
         }
         Relationships: []
       }
+      guild_activity_feed: {
+        Row: {
+          action: string
+          actor_name: string
+          actor_seed: number
+          amount: number | null
+          created_at: string
+          guild_id: string
+          id: string
+          is_bot: boolean
+          metadata: Json
+        }
+        Insert: {
+          action: string
+          actor_name: string
+          actor_seed?: number
+          amount?: number | null
+          created_at?: string
+          guild_id: string
+          id?: string
+          is_bot?: boolean
+          metadata?: Json
+        }
+        Update: {
+          action?: string
+          actor_name?: string
+          actor_seed?: number
+          amount?: number | null
+          created_at?: string
+          guild_id?: string
+          id?: string
+          is_bot?: boolean
+          metadata?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guild_activity_feed_guild_id_fkey"
+            columns: ["guild_id"]
+            isOneToOne: false
+            referencedRelation: "guilds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guild_chat_messages: {
         Row: {
           created_at: string
@@ -3681,6 +3725,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_onboarding_progress: {
+        Row: {
+          completed_at: string | null
+          data: Json
+          flow: string
+          step: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          data?: Json
+          flow: string
+          step?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          data?: Json
+          flow?: string
+          step?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_passkeys: {
         Row: {
           counter: number
@@ -5093,6 +5164,7 @@ export type Database = {
       gacha_pull: { Args: never; Returns: Json }
       gc_rate_limit_buckets: { Args: never; Returns: number }
       gen_referral_code: { Args: never; Returns: string }
+      gen_seed_activity: { Args: never; Returns: undefined }
       get_ab_variant: { Args: { p_experiment_key: string }; Returns: string }
       get_active_boost_count: { Args: never; Returns: number }
       get_admin_audit_recent: {
