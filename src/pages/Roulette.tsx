@@ -106,6 +106,7 @@ export default function Roulette() {
       setPulling(false);
       toast({ title: `${res.grade}`, description: res.label });
       loadAll();
+      import("@/lib/walletRefresh").then(m => m.refreshWallet());
     }, 1800);
   }
 
