@@ -252,7 +252,7 @@ export default function TradingArenaBybit() {
             </h1>
             <p className="text-[11px] text-muted-foreground mt-0.5 tracking-wide">
               바이비트급 차트 · 25 페어 · 최대 100× · Paper ↔ Real
-              <span className="hidden md:inline text-muted-foreground/60"> · 단축키: B / S / Esc</span>
+              <span className="hidden md:inline text-muted-foreground/60"> · Esc로 전체 청산</span>
             </p>
           </div>
           <div className="inline-flex gap-1.5 glass rounded-full p-1 border border-primary/30">
