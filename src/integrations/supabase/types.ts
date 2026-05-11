@@ -931,6 +931,66 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_whale_leaderboard: {
+        Row: {
+          date: string
+          deposit_total_krw: number
+          is_total: number
+          nickname_masked: string
+          rank: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          date?: string
+          deposit_total_krw?: number
+          is_total?: number
+          nickname_masked?: string
+          rank?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          date?: string
+          deposit_total_krw?: number
+          is_total?: number
+          nickname_masked?: string
+          rank?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      deposit_booster_windows: {
+        Row: {
+          created_at: string
+          expires_at: string
+          hours_accumulated: number
+          id: string
+          source_purchase_id: string | null
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          hours_accumulated?: number
+          id?: string
+          source_purchase_id?: string | null
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          hours_accumulated?: number
+          id?: string
+          source_purchase_id?: string | null
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       deposit_requests: {
         Row: {
           admin_evidence_checklist: Json
@@ -1269,6 +1329,47 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      escalation_milestones_catalog: {
+        Row: {
+          badge_key: string | null
+          created_at: string
+          key: string
+          label: string
+          reward_json: Json
+          sort_order: number
+          threshold_krw: number
+          threshold_window: string
+        }
+        Insert: {
+          badge_key?: string | null
+          created_at?: string
+          key: string
+          label: string
+          reward_json?: Json
+          sort_order?: number
+          threshold_krw: number
+          threshold_window: string
+        }
+        Update: {
+          badge_key?: string | null
+          created_at?: string
+          key?: string
+          label?: string
+          reward_json?: Json
+          sort_order?: number
+          threshold_krw?: number
+          threshold_window?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escalation_milestones_catalog_badge_key_fkey"
+            columns: ["badge_key"]
+            isOneToOne: false
+            referencedRelation: "badges_catalog"
+            referencedColumns: ["key"]
+          },
+        ]
       }
       fomo_notifications: {
         Row: {
@@ -1678,6 +1779,72 @@ export type Database = {
           last_claim_at?: string | null
           last_tick_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      imperial_score_events: {
+        Row: {
+          base: number
+          created_at: string
+          delta: number
+          id: string
+          meta: Json
+          multiplier: number
+          source: string
+          user_id: string
+        }
+        Insert: {
+          base: number
+          created_at?: string
+          delta: number
+          id?: string
+          meta?: Json
+          multiplier?: number
+          source: string
+          user_id: string
+        }
+        Update: {
+          base?: number
+          created_at?: string
+          delta?: number
+          id?: string
+          meta?: Json
+          multiplier?: number
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      imperial_scores: {
+        Row: {
+          daily_date: string
+          daily_is: number
+          season_is: number
+          total_is: number
+          updated_at: string
+          user_id: string
+          weekly_is: number
+          weekly_key: string
+        }
+        Insert: {
+          daily_date?: string
+          daily_is?: number
+          season_is?: number
+          total_is?: number
+          updated_at?: string
+          user_id: string
+          weekly_is?: number
+          weekly_key?: string
+        }
+        Update: {
+          daily_date?: string
+          daily_is?: number
+          season_is?: number
+          total_is?: number
+          updated_at?: string
+          user_id?: string
+          weekly_is?: number
+          weekly_key?: string
         }
         Relationships: []
       }
@@ -3809,6 +3976,38 @@ export type Database = {
         }
         Relationships: []
       }
+      user_escalation_progress: {
+        Row: {
+          id: string
+          milestone_key: string
+          reached_at: string
+          user_id: string
+          window_date: string | null
+        }
+        Insert: {
+          id?: string
+          milestone_key: string
+          reached_at?: string
+          user_id: string
+          window_date?: string | null
+        }
+        Update: {
+          id?: string
+          milestone_key?: string
+          reached_at?: string
+          user_id?: string
+          window_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_escalation_progress_milestone_key_fkey"
+            columns: ["milestone_key"]
+            isOneToOne: false
+            referencedRelation: "escalation_milestones_catalog"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
       user_onboarding_progress: {
         Row: {
           completed_at: string | null
@@ -5099,6 +5298,10 @@ export type Database = {
         Args: { _amount: number; _user_id: string }
         Returns: Json
       }
+      apply_booster_multipliers: {
+        Args: { _base: number; _source: string; _user_id: string }
+        Returns: number
+      }
       apply_referral_code: { Args: { _code: string }; Returns: Json }
       arena_join_duel: { Args: { p_round_id: string }; Returns: Json }
       arena_open_round: {
@@ -5125,6 +5328,10 @@ export type Database = {
       }
       assign_persona: { Args: never; Returns: string }
       auto_freeze_critical_anomalies: { Args: never; Returns: Json }
+      award_imperial_score: {
+        Args: { _base: number; _meta?: Json; _source: string; _user_id: string }
+        Returns: number
+      }
       award_xp: { Args: { _amount: number; _source?: Json }; Returns: Json }
       bulk_acknowledge_anomalies: {
         Args: { _ids: string[]; _note?: string }
@@ -5138,6 +5345,7 @@ export type Database = {
       cancel_pending_order: { Args: { p_order_id: string }; Returns: boolean }
       check_achievements: { Args: { _user_id?: string }; Returns: Json }
       check_daily_ev_health: { Args: never; Returns: Json }
+      check_escalation: { Args: { _user_id: string }; Returns: number }
       check_permission_drift: { Args: never; Returns: Json }
       check_rls_integrity: { Args: never; Returns: Json }
       claim_ai_bot_run: { Args: { _run_id: string }; Returns: Json }
@@ -5338,6 +5546,7 @@ export type Database = {
           total_power: number
         }[]
       }
+      get_my_dashboard_state: { Args: never; Returns: Json }
       get_my_empire_map: { Args: never; Returns: Json }
       get_my_fomo_notifications: {
         Args: { _limit?: number }
@@ -5466,6 +5675,15 @@ export type Database = {
           nickname: string
           rank: number
           tier: Database["public"]["Enums"]["user_tier"]
+        }[]
+      }
+      get_whale_leaderboard: {
+        Args: { _date?: string }
+        Returns: {
+          deposit_total_krw: number
+          is_total: number
+          nickname_masked: string
+          rank: number
         }[]
       }
       grant_recovery_bonus: {
@@ -5870,6 +6088,10 @@ export type Database = {
           _prompt: string
         }
         Returns: Json
+      }
+      start_or_extend_booster: {
+        Args: { _hours?: number; _purchase_id: string; _user_id: string }
+        Returns: string
       }
       submit_aml_verification: {
         Args: {
