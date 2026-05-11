@@ -2549,6 +2549,7 @@ export type Database = {
           sms_notifications_enabled: boolean | null
           terms_agreed_at: string | null
           tier: Database["public"]["Enums"]["user_tier"]
+          tos_version: string | null
           total_coin_deposits: number
           total_withdrawn: number
           updated_at: string
@@ -2581,6 +2582,7 @@ export type Database = {
           sms_notifications_enabled?: boolean | null
           terms_agreed_at?: string | null
           tier?: Database["public"]["Enums"]["user_tier"]
+          tos_version?: string | null
           total_coin_deposits?: number
           total_withdrawn?: number
           updated_at?: string
@@ -2613,6 +2615,7 @@ export type Database = {
           sms_notifications_enabled?: boolean | null
           terms_agreed_at?: string | null
           tier?: Database["public"]["Enums"]["user_tier"]
+          tos_version?: string | null
           total_coin_deposits?: number
           total_withdrawn?: number
           updated_at?: string
@@ -5083,6 +5086,7 @@ export type Database = {
       cron_run_finalize_weekly_pass: { Args: never; Returns: Json }
       cron_run_pay_weekly_leaderboard: { Args: never; Returns: Json }
       current_season_id: { Args: never; Returns: string }
+      current_tos_version: { Args: never; Returns: string }
       declare_guild_war: {
         Args: { _defender_guild_id: string }
         Returns: string
