@@ -123,6 +123,8 @@ export default function Admin() {
     { id: "insurance", label: "보험펀드", icon: ShieldCheck },
     { id: "accounting", label: "회계 (Zero-Loss)", icon: Coins },
     { id: "bots", label: "봇 시딩 (FOMO 엔진)", icon: Bot },
+    { id: "ev_health", label: "EV 건전성", icon: HeartPulse },
+    { id: "ab_experiments", label: "A/B 실험", icon: FlaskConical },
   ];
 
   return (
