@@ -252,8 +252,17 @@ export default function TradingArenaBybit() {
     <Layout>
       <HubTabs hub="earn" />
       <div className="container pt-3 pb-10 animate-fade-in space-y-3">
-        {/* Top: Mode switcher between bybit-grade vs army */}
-        <div className="flex items-center justify-between gap-2 flex-wrap">
+        {/* Title — matches ArenaHeader typography for design consistency */}
+        <header className="flex items-end justify-between gap-3 flex-wrap">
+          <div>
+            <h1 className="font-imperial text-2xl sm:text-3xl tracking-[0.18em] text-gradient-imperial flex items-center gap-2">
+              <Crown className="w-5 h-5 text-gold" /> 실전 트레이딩 아레나
+            </h1>
+            <p className="text-[11px] text-muted-foreground mt-0.5 tracking-wide">
+              바이비트급 차트 · 25 페어 · 최대 100× · Paper ↔ Real
+              <span className="hidden md:inline text-muted-foreground/60"> · 단축키: B / S / Esc</span>
+            </p>
+          </div>
           <div className="inline-flex gap-1.5 glass rounded-full p-1 border border-primary/30">
             <button
               type="button"
@@ -269,26 +278,37 @@ export default function TradingArenaBybit() {
               <Swords className="w-3.5 h-3.5" /> 군대 배틀
             </NavLink>
           </div>
-          {mode === "real" && realAvailable <= 0 && (
-            <NavLink
-              to="/wallet?tab=deposit"
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-black bg-gradient-imperial text-primary-foreground glow-imperial press"
-            >
-              <WalletIcon className="w-3.5 h-3.5" /> 지금 충전하기
-            </NavLink>
-          )}
-        </div>
+        </header>
 
         {/* Disclaimer banner (REAL only) */}
         {mode === "real" && <RedDisclaimerBanner />}
 
-        {/* Mode toggle paper ↔ real */}
-        <ModeToggle
-          mode={mode}
-          onChange={setMode}
-          paperBalance={paperCredit}
-          realAvailable={realAvailable}
-        />
+        {/* Account mode label + toggle (paper ↔ real) */}
+        <div className="space-y-1.5">
+          <div className="px-1 text-[10px] font-black tracking-[0.2em] text-muted-foreground">
+            계좌 모드 · ACCOUNT
+          </div>
+          <ModeToggle
+            mode={mode}
+            onChange={setMode}
+            paperBalance={paperCredit}
+            realAvailable={realAvailable}
+          />
+        </div>
+
+        {/* Full-width deposit CTA when REAL balance is empty */}
+        {mode === "real" && realAvailable <= 0 && (
+          <NavLink
+            to="/wallet?tab=deposit"
+            className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-gradient-imperial text-primary-foreground glow-imperial press border border-primary/40"
+          >
+            <span className="inline-flex items-center gap-2 font-black tracking-wide text-sm">
+              <WalletIcon className="w-4 h-4" /> REAL 잔액이 0입니다 · 지금 충전하세요
+            </span>
+            <span className="text-xs font-bold opacity-90">충전하기 →</span>
+          </NavLink>
+        )}
+
 
         {/* Chart + Order grid */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-3">
