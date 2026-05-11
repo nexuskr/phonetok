@@ -52,7 +52,11 @@ export default function Missions() {
   const [ugcOpen, setUgcOpen] = useState<Mission | null>(null);
   const [gameOpen, setGameOpen] = useState<Mission | null>(null);
   // 4-bucket 단순 카테고리: 매일 출석 / 전투 / 보상 받기 / 시니어 안전
-  const [catTab, setCatTab] = useState<"daily" | "battle" | "rewards" | "senior">("battle");
+  const initialTab = (typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : null) as
+    | "daily" | "battle" | "rewards" | "senior" | null;
+  const [catTab, setCatTab] = useState<"daily" | "battle" | "rewards" | "senior">(
+    initialTab && ["daily","battle","rewards","senior"].includes(initialTab) ? initialTab : "battle"
+  );
   const [jackpotWin, setJackpotWin] = useState<{ amount: number; type: "main" | "mini" } | null>(null);
   const { persona, recommended } = usePersonaMissions();
 
