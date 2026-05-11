@@ -5,6 +5,7 @@ import { ChevronDown, Flame, Crown, TrendingUp, ArrowRight, Clock, Users } from 
 import Layout from "@/components/Layout";
 import { useDB, formatKRW } from "@/lib/store";
 import EarningsSimulator from "@/components/guide/EarningsSimulator";
+import DepositCTA from "@/components/onboarding/DepositCTA";
 
 /**
  * 풀스크린 스토리텔링 가이드
@@ -385,12 +386,9 @@ function SceneFinalCTA({ isLoggedIn }: { isLoggedIn: boolean }) {
           오늘 남은 가입 슬롯 <span className="tabular-nums">{seats}</span>석
         </div>
 
-        <Link
-          to={isLoggedIn ? "/wallet" : "/auth"}
-          className="press sheen mt-6 w-full min-h-[64px] rounded-2xl bg-gradient-gold text-gold-foreground font-display font-black text-lg flex items-center justify-center gap-2 glow-gold"
-        >
-          {isLoggedIn ? "지금 입금하기" : "1분 안에 가입하기"} <ArrowRight className="w-5 h-5" />
-        </Link>
+        <div className="mt-6">
+          <DepositCTA />
+        </div>
 
         <Link to="/empire" className="block mt-3 text-xs text-muted-foreground underline-offset-4 hover:underline">
           제국 라운지 미리보기 →
