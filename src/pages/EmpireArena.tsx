@@ -220,31 +220,36 @@ export default function EmpireArena() {
           </div>
         </div>
 
-        {/* Long/Short 버튼 (Paper 데모) */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        {/* 오른다 / 내린다 버튼 (Paper 데모) */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
           <button
             onClick={() => fight("long")}
-            className="press sheen min-h-[64px] rounded-2xl bg-gradient-to-br from-secondary to-secondary/70 text-secondary-foreground font-display font-black flex items-center justify-center gap-2 glow-primary"
+            className="press sheen min-h-[80px] rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white font-display font-black flex items-center justify-center gap-3 shadow-lg shadow-emerald-500/30"
           >
-            <Sword className="w-5 h-5" />
+            <TrendingUp className="w-7 h-7" />
             <div className="text-left">
-              <div className="text-[10px] tracking-widest opacity-80">LONG</div>
-              <div className="text-base">영토 정복</div>
+              <div className="text-[10px] tracking-[0.2em] opacity-80">오른다에 베팅 · LONG</div>
+              <div className="text-base">📈 영토 정복</div>
+              <div className="text-[9px] opacity-70 mt-0.5">BTC ↑ 이기면 승리</div>
             </div>
           </button>
           <button
             onClick={() => fight("short")}
-            className="press sheen min-h-[64px] rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground font-display font-black flex items-center justify-center gap-2 glow-primary"
+            className="press sheen min-h-[80px] rounded-2xl bg-gradient-to-br from-rose-500 to-rose-700 text-white font-display font-black flex items-center justify-center gap-3 shadow-lg shadow-rose-500/30"
           >
-            <Shield className="w-5 h-5" />
+            <TrendingDown className="w-7 h-7" />
             <div className="text-left">
-              <div className="text-[10px] tracking-widest opacity-80">SHORT</div>
-              <div className="text-base">적국 약탈</div>
+              <div className="text-[10px] tracking-[0.2em] opacity-80">내린다에 베팅 · SHORT</div>
+              <div className="text-base">📉 적국 약탈</div>
+              <div className="text-[9px] opacity-70 mt-0.5">BTC ↓ 이기면 승리</div>
             </div>
           </button>
         </div>
-        <div className="text-[10px] text-muted-foreground text-center mb-4 flex items-center justify-center gap-1">
-          <Coins className="w-3 h-3" /> Paper 모드 데모 · 실전 트레이딩은 Bybit 패널에서 진행 (수수료 50% 쿠폰 지급 후 자동 적용)
+        <div className="text-[10px] text-muted-foreground text-center mb-4 flex flex-col items-center gap-1.5">
+          <div className="flex items-center gap-1">
+            <Coins className="w-3 h-3" /> Paper 모드 데모 · 실전은 Bybit 패널에서 (수수료 50% 쿠폰 자동 지급)
+          </div>
+          <ArenaTutorialOverlay />
         </div>
 
         {/* 전투 히스토리 */}
