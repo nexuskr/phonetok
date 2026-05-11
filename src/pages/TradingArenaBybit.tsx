@@ -185,20 +185,12 @@ export default function TradingArenaBybit() {
   const history = mode === "paper" ? paperLiveHistory : realHistory.slice(0, 50);
   const unit = mode === "paper" ? "USDT" : "KRW";
 
-  // Desktop keyboard shortcuts: B=long focus, S=short focus, Esc=close all
-  const longBtnRef = useRef<HTMLDivElement>(null);
-  const shortBtnRef = useRef<HTMLDivElement>(null);
+  // Desktop keyboard shortcut: Esc = close all open positions (confirm).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tgt = e.target as HTMLElement | null;
-      if (tgt && (tgt.tagName === "INPUT" || tgt.tagName === "TEXTAREA" || (tgt as HTMLElement).isContentEditable)) return;
-      if (e.key === "b" || e.key === "B") {
-        const btn = longBtnRef.current?.querySelector<HTMLButtonElement>("button");
-        btn?.focus();
-      } else if (e.key === "s" || e.key === "S") {
-        const btn = shortBtnRef.current?.querySelector<HTMLButtonElement>("button");
-        btn?.focus();
-      } else if (e.key === "Escape" && positions.length > 0) {
+      if (tgt && (tgt.tagName === "INPUT" || tgt.tagName === "TEXTAREA" || tgt.isContentEditable)) return;
+      if (e.key === "Escape" && positions.length > 0) {
         if (window.confirm(`모든 포지션(${positions.length}건)을 청산합니다.`)) {
           positions.forEach((p) => { void handleClose(p.id, prices[p.symbol] ?? p.entry); });
         }
