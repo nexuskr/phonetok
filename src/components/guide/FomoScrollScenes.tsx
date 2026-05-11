@@ -248,15 +248,17 @@ export function ScenePersona({ large = false }: { large?: boolean }) {
           </h2>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3" style={{ perspective: 1200 }}>
           {personas.map((p, i) => (
             <motion.div
               key={p.age}
               initial={reduce ? false : { opacity: 0, y: 22 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
+              viewport={{ once: true, margin: "-80px" }}
               transition={{ delay: i * 0.1, duration: 0.55 }}
-              className="relative glass-strong rounded-2xl p-4 flex items-center gap-4 border border-gold/25 overflow-hidden"
+              whileHover={reduce ? undefined : { rotateX: -4, rotateY: 5, scale: 1.02 }}
+              style={{ transformStyle: "preserve-3d" }}
+              className="relative glass-strong rounded-2xl p-4 flex items-center gap-4 border border-gold/30 overflow-hidden shadow-[0_0_18px_hsl(var(--gold)/0.18)]"
             >
               {!reduce && (
                 <motion.div
@@ -265,12 +267,12 @@ export function ScenePersona({ large = false }: { large?: boolean }) {
                   transition={{ duration: 5, repeat: Infinity, ease: "linear", delay: i * 0.4 }}
                 />
               )}
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/25 to-accent/15 flex items-center justify-center text-3xl shrink-0 ring-2 ring-gold/60 shadow-[0_0_16px_hsl(var(--gold)/0.35)]">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/30 to-accent/20 flex items-center justify-center text-3xl shrink-0 ring-2 ring-gold/70 shadow-[0_0_18px_hsl(var(--gold)/0.45)]">
                 {p.emoji}
               </div>
               <div className="flex-1 min-w-0 relative">
                 <div className="text-[10px] tracking-widest font-black text-gold">{p.age}</div>
-                <div className={`font-bold text-sm break-keep ${senior.body}`}>{p.title}</div>
+                <div className={`font-bold text-sm break-keep ${senior.bodyXl}`}>{p.title}</div>
                 <div className={`text-xs text-muted-foreground break-keep ${senior.body}`}>{p.line}</div>
               </div>
             </motion.div>
