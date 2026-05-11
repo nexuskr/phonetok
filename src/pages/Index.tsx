@@ -23,6 +23,8 @@ import throneBg from "@/assets/command-throne-bg.jpg";
 import { track } from "@/lib/analytics";
 import LivePayoutSlaBadge from "@/components/landing/LivePayoutSlaBadge";
 import LivePulseStrip from "@/components/landing/LivePulseStrip";
+import ThreeSecondHero from "@/components/landing/ThreeSecondHero";
+import { markLandingStart } from "@/lib/funnel";
 
 // KST 자정 기준 경과 비율로 오늘 신규 가입자 추정 (베이스 1,180 + 시간대별 가중)
 function computeTodaySignups(): number {
@@ -52,7 +54,7 @@ export default function Index() {
     const ref = url.searchParams.get("ref");
     nav(`/guide?tab=starter${ref ? `&ref=${encodeURIComponent(ref)}` : ""}`, { replace: true });
   }, [isReady, hasSession, nav]);
-  useEffect(() => { track("landing_view", { lang: i18n.language }); }, [i18n.language]);
+  useEffect(() => { markLandingStart(); track("landing_view", { lang: i18n.language }); }, [i18n.language]);
   const onCta = (location: string) => track("cta_click", { location, lang: i18n.language });
   const online = useOnline();
   const total = useTotalPayout();
@@ -113,6 +115,11 @@ export default function Index() {
           </div>
         </div>
       </header>
+
+      {/* 3초 입금 히어로 — 최상단 고정 */}
+      <section className="relative z-20 container pt-4">
+        <ThreeSecondHero />
+      </section>
 
       {/* Hero */}
       <section className="relative z-10 container pt-10 pb-24 text-center">
