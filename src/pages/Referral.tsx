@@ -109,6 +109,8 @@ export default function Referral() {
       <HubTabs hub="legacy" />
       <div className="container pt-4 pb-12 animate-liquid-in space-y-6">
 
+        <EmpireTreePreview />
+
         {/* HERO */}
         <section className="relative glass-strong rounded-3xl p-6 md:p-8 neon-border overflow-hidden">
           <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-gradient-gold blur-3xl opacity-25" />
