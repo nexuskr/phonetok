@@ -1,4 +1,5 @@
 import { useEffect, useSyncExternalStore, useState, useCallback, useRef, useMemo, lazy, Suspense } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import HubTabs from "@/components/HubTabs";
 import { useRequireAuth } from "@/hooks/use-require-auth";
