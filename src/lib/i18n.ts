@@ -1436,7 +1436,7 @@ const resources = {
       command: { title: "COMMAND", tagline: "Your daily ops · balance · boost — at a glance",
         dashboard: "Command" },
       earn: { title: "EARN", tagline: "Every way to earn — in one place",
-        missions: "Missions", quests: "Quests", roulette: "Roulette", seasonPass: "Season Pass" },
+        tradingArena: "Trading", missions: "Missions", quests: "Quests", roulette: "Roulette", seasonPass: "Season Pass" },
       empire: { title: "EMPIRE", tagline: "Your empire, defined by tier",
         packages: "Packages", tier: "Tier", founding: "Founders" },
       treasury: { title: "TREASURY", tagline: "Balance · Deposit · Withdraw · History",
