@@ -116,9 +116,9 @@ const App = () => (
               <Route path="/empire-arena" element={<Navigate to="/arena" replace />} />
               <Route path="/empire-arena/army" element={<Navigate to="/arena/army" replace />} />
               <Route path="/empire-arena/classic" element={<EmpireArena />} />
-              <Route path="/lounge" element={<Lounge />} />
-              <Route path="/whales" element={<Whales />} />
-              <Route path="/jackpot" element={<Navigate to="/roulette" replace />} />
+              <Route path="/lounge" element={<Navigate to="/achievements" replace />} />
+              <Route path="/whales" element={<Navigate to="/achievements" replace />} />
+              <Route path="/jackpot" element={<Navigate to="/missions?tab=battle" replace />} />
               {/* /wallet 는 이미 존재 */}
 
               {/* 기존 라우트 — 그대로 작동 (HubTabs 통해 통합 UX) */}
