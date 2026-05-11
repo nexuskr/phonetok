@@ -55,17 +55,10 @@ const Quests = lazy(() => import("./pages/Quests.tsx"));
 const Empire = lazy(() => import("./pages/Empire.tsx"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe.tsx"));
 const Settlements = lazy(() => import("./pages/Settlements.tsx"));
-const Trust = lazy(() => import("./pages/Trust.tsx"));
 const Status = lazy(() => import("./pages/Status.tsx"));
-const HallOfFame = lazy(() => import("./pages/HallOfFame.tsx"));
 const Referral = lazy(() => import("./pages/Referral.tsx"));
 const UgcDashboard = lazy(() => import("./pages/UgcDashboard.tsx"));
 const CampaignRedirect = lazy(() => import("./pages/CampaignRedirect.tsx"));
-const GlobalIntelligence = lazy(() => import("./pages/GlobalIntelligence.tsx"));
-const Infrastructure = lazy(() => import("./pages/Infrastructure.tsx"));
-const IntelligenceLoop = lazy(() => import("./pages/IntelligenceLoop.tsx"));
-const Vision = lazy(() => import("./pages/Vision.tsx"));
-const GlobalLive = lazy(() => import("./pages/GlobalLive.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -150,17 +143,17 @@ const App = () => (
               <Route path="/season-pass" element={<SeasonPass />} />
               <Route path="/quests" element={<Quests />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
-              <Route path="/trust" element={<Trust />} />
+              <Route path="/trust" element={<Navigate to="/status" replace />} />
               <Route path="/status" element={<Status />} />
-             <Route path="/hall-of-fame" element={<HallOfFame />} />
+              <Route path="/hall-of-fame" element={<Navigate to="/legacy" replace />} />
               <Route path="/referral" element={<Referral />} />
               <Route path="/ugc" element={<UgcDashboard />} />
               <Route path="/c/:slug" element={<CampaignRedirect />} />
-              <Route path="/global-intelligence" element={<GlobalIntelligence />} />
-              <Route path="/infrastructure" element={<Infrastructure />} />
-              <Route path="/intelligence-loop" element={<IntelligenceLoop />} />
-              <Route path="/vision" element={<Vision />} />
-              <Route path="/global/live" element={<GlobalLive />} />
+              <Route path="/global-intelligence" element={<Navigate to="/" replace />} />
+              <Route path="/infrastructure" element={<Navigate to="/" replace />} />
+              <Route path="/intelligence-loop" element={<Navigate to="/" replace />} />
+              <Route path="/vision" element={<Navigate to="/" replace />} />
+              <Route path="/global/live" element={<Navigate to="/" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
