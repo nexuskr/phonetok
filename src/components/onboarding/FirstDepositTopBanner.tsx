@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Flame, ArrowRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useDB } from "@/lib/store";
+import { track } from "@/lib/analytics";
 
 const DISMISS_KEY = "first_deposit_banner_dismissed_until";
 
