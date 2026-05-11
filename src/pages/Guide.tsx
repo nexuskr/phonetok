@@ -61,6 +61,10 @@ export default function Guide() {
 
   return (
     <Layout>
+      {/* 3초 입금 히어로 — 가이드 최상단 sticky */}
+      <div className="sticky top-0 z-30 px-3 pt-2 pb-1 bg-background/85 backdrop-blur-md">
+        <ThreeSecondHero />
+      </div>
       <div
         ref={containerRef}
         className={`snap-y snap-mandatory overflow-y-auto h-[calc(100vh-56px)] scroll-smooth ${largeText ? "text-[112%]" : ""}`}

@@ -3,6 +3,7 @@ import { ArrowRight, Flame } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useDB } from "@/lib/store";
+import { markDepositIntent } from "@/lib/funnel";
 
 type Props = {
   size?: "lg" | "md";
@@ -69,6 +70,7 @@ export default function DepositCTA({
     <Link
       to={href}
       onClick={() => {
+        markDepositIntent("deposit_cta", { state, size });
         // dynamic import to keep cold-start small
         import("@/lib/analytics").then(({ track }) => track("cta_click", { surface: "deposit_cta", state, size }));
       }}
