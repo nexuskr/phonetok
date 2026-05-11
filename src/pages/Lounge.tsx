@@ -429,12 +429,17 @@ export default function Lounge() {
                             ⚔️ {g.total_power.toLocaleString()} · {g.member_count}명
                           </div>
                         </div>
-                        {!myGuild && g.member_count < g.max_members && (
+                        {!myGuild && !g.is_seed && g.member_count < g.max_members && (
                           <Button size="sm" variant="ghost" onClick={() => handleJoin(g.id)}>
                             가입
                           </Button>
                         )}
-                        {myGuild && myGuild.id !== g.id && (
+                        {!myGuild && g.is_seed && (
+                          <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground px-2 py-1 rounded-md bg-muted/50">
+                            <Eye className="h-3 w-3" /> 관전
+                          </span>
+                        )}
+                        {myGuild && myGuild.id !== g.id && !g.is_seed && (
                           <Button
                             size="sm"
                             variant="ghost"
