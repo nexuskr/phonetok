@@ -33,6 +33,7 @@ export default function WeeklyPassSection() {
     const { error } = await supabase.rpc("claim_weekly_pass_reward", { _level: level });
     setClaiming(null);
     if (error) { notify.error("수령 실패", { description: error.message }); return; }
+    import("@/lib/walletRefresh").then(m => m.refreshWallet());
     load();
   }
 
