@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Share2, Link2, Check } from "lucide-react";
 import { notify } from "@/lib/notify";
+import { track } from "@/lib/analytics";
 
 type Props = {
   url?: string;
@@ -27,6 +28,7 @@ export default function ShareBar({
       await navigator.clipboard.writeText(`${text}\n${shareUrl}`);
       setCopied(true);
       notify.success("링크가 복사되었습니다");
+      track("share", { channel: "copy_link" });
       setTimeout(() => setCopied(false), 1800);
     } catch {
       notify.error("복사 실패");
@@ -35,7 +37,7 @@ export default function ShareBar({
 
   async function nativeShare() {
     if (navigator.share) {
-      try { await navigator.share({ title, text, url: shareUrl }); } catch {}
+      try { await navigator.share({ title, text, url: shareUrl }); track("share", { channel: "native" }); } catch {}
     } else {
       copyLink();
     }
@@ -58,6 +60,7 @@ export default function ShareBar({
         href={`https://story.kakao.com/share?url=${enc(shareUrl)}`}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => track("share", { channel: "kakao" })}
         className={`${btnBase} text-[#3c1e1e] bg-[#fee500] hover:bg-[#ffe300] border-[#fee500]`}
         aria-label="카카오 공유"
       >
@@ -67,6 +70,7 @@ export default function ShareBar({
         href={lineUrl}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => track("share", { channel: "line" })}
         className={`${btnBase} text-white bg-[#06c755] hover:bg-[#05b34c] border-[#06c755]`}
         aria-label="LINE 공유"
       >
@@ -76,6 +80,7 @@ export default function ShareBar({
         href={xUrl}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => track("share", { channel: "x" })}
         className={`${btnBase} text-foreground`}
         aria-label="X 공유"
       >
