@@ -356,29 +356,36 @@ export default function Lounge() {
                   )}
                 </>
               ) : (
-                <Card className="p-8 border-primary/30">
-                  <h3 className="text-xl font-bold mb-2">🏰 새 길드 창설</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    당신만의 제국을 시작하세요. 30명까지 입성 가능.
-                  </p>
-                  <div className="flex gap-2 mb-3">
-                    <Input
-                      placeholder="이모지"
-                      value={newEmblem}
-                      onChange={(e) => setNewEmblem(e.target.value.slice(0, 2))}
-                      className="w-20 text-center text-2xl"
-                    />
-                    <Input
-                      placeholder="길드 이름 (2-30자)"
-                      value={newName}
-                      onChange={(e) => setNewName(e.target.value)}
-                      maxLength={30}
-                    />
-                  </div>
-                  <Button onClick={handleCreate} className="w-full">
-                    <Plus className="h-4 w-4 mr-1" /> 창설하기
-                  </Button>
-                </Card>
+                <>
+                  <Card className="p-6 border-primary/30 bg-gradient-to-br from-card to-primary/5">
+                    <div className="flex items-center gap-2 text-[10px] font-black tracking-[0.3em] text-primary mb-2">
+                      <Flame className="h-3 w-3 animate-pulse" /> 지금 1만 명+ 활동 중
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">🏰 당신만의 길드를 창설하세요</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      이미 50개 길드가 한반도를 분할 점령했습니다.<br />
+                      늦기 전에 깃발을 꽂으세요. 길드장은 매주 분배금 +30%.
+                    </p>
+                    <div className="flex gap-2 mb-3">
+                      <Input
+                        placeholder="이모지"
+                        value={newEmblem}
+                        onChange={(e) => setNewEmblem(e.target.value.slice(0, 2))}
+                        className="w-20 text-center text-2xl"
+                      />
+                      <Input
+                        placeholder="길드 이름 (예: 서초빅스타)"
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        maxLength={30}
+                      />
+                    </div>
+                    <Button onClick={handleCreate} className="w-full">
+                      <Plus className="h-4 w-4 mr-1" /> 길드 창설하기
+                    </Button>
+                  </Card>
+                  <GuildActivityTicker />
+                </>
               )}
             </div>
 
