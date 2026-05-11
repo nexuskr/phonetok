@@ -8,6 +8,8 @@ import EarningsSimulator from "@/components/guide/EarningsSimulator";
 import DepositCTA from "@/components/onboarding/DepositCTA";
 import { supabase } from "@/integrations/supabase/client";
 import { notify } from "@/lib/notify";
+import { markLandingStart } from "@/lib/funnel";
+import ThreeSecondHero from "@/components/landing/ThreeSecondHero";
 
 /**
  * 풀스크린 스토리텔링 가이드 — 7씬
@@ -31,6 +33,8 @@ export default function Guide() {
   const reduce = useReducedMotion();
 
   const sceneCount = 7;
+
+  useEffect(() => { markLandingStart(); }, []);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -57,6 +61,10 @@ export default function Guide() {
 
   return (
     <Layout>
+      {/* 3초 입금 히어로 — 가이드 최상단 sticky */}
+      <div className="sticky top-0 z-30 px-3 pt-2 pb-1 bg-background/85 backdrop-blur-md">
+        <ThreeSecondHero />
+      </div>
       <div
         ref={containerRef}
         className={`snap-y snap-mandatory overflow-y-auto h-[calc(100vh-56px)] scroll-smooth ${largeText ? "text-[112%]" : ""}`}

@@ -23,6 +23,8 @@ import throneBg from "@/assets/command-throne-bg.jpg";
 import { track } from "@/lib/analytics";
 import LivePayoutSlaBadge from "@/components/landing/LivePayoutSlaBadge";
 import LivePulseStrip from "@/components/landing/LivePulseStrip";
+import ThreeSecondHero from "@/components/landing/ThreeSecondHero";
+import { markLandingStart } from "@/lib/funnel";
 
 // KST 자정 기준 경과 비율로 오늘 신규 가입자 추정 (베이스 1,180 + 시간대별 가중)
 function computeTodaySignups(): number {
@@ -52,7 +54,7 @@ export default function Index() {
     const ref = url.searchParams.get("ref");
     nav(`/guide?tab=starter${ref ? `&ref=${encodeURIComponent(ref)}` : ""}`, { replace: true });
   }, [isReady, hasSession, nav]);
-  useEffect(() => { track("landing_view", { lang: i18n.language }); }, [i18n.language]);
+  useEffect(() => { markLandingStart(); track("landing_view", { lang: i18n.language }); }, [i18n.language]);
   const onCta = (location: string) => track("cta_click", { location, lang: i18n.language });
   const online = useOnline();
   const total = useTotalPayout();
@@ -114,6 +116,11 @@ export default function Index() {
         </div>
       </header>
 
+      {/* 3초 입금 히어로 — 최상단 고정 */}
+      <section className="relative z-20 container pt-4">
+        <ThreeSecondHero />
+      </section>
+
       {/* Hero */}
       <section className="relative z-10 container pt-10 pb-24 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-8 animate-fade-up border border-primary/30">
@@ -167,8 +174,8 @@ export default function Index() {
         {/* CTA — single button, Musk tone */}
         <div className="mt-12 flex flex-col items-center justify-center gap-3 animate-fade-up" style={{ animationDelay: "0.3s" }}>
           <Link
-            to={hasSession ? "/dashboard" : "/secure-auth?signup=1"}
-            onClick={() => { onCta("hero_primary"); track("cta_click", { surface: "hero_primary" }); }}
+            to={hasSession ? "/wallet?intent=first-deposit&tab=deposit&amount=50000" : "/secure-auth?signup=1&next=" + encodeURIComponent("/wallet?intent=first-deposit&tab=deposit&amount=50000")}
+            onClick={() => { onCta("hero_primary"); track("cta_click", { surface: "hero_primary" }); import("@/lib/funnel").then(m => m.markDepositIntent("hero_primary", { logged_in: hasSession })); }}
             className="group relative px-10 py-4 rounded-2xl font-display font-black text-lg sm:text-xl bg-gradient-imperial text-primary-foreground glow-imperial animate-pulse-glow hover:scale-105 transition inline-flex items-center gap-2"
           >
             지금 참여하기
