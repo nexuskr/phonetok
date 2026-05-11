@@ -48,7 +48,7 @@ export default function Missions() {
   const [completing, setCompleting] = useState<string | null>(null);
   const [ugcOpen, setUgcOpen] = useState<Mission | null>(null);
   const [gameOpen, setGameOpen] = useState<Mission | null>(null);
-  const [catTab, setCatTab] = useState<"all" | "game">("game");
+  const [catTab, setCatTab] = useState<"all" | "game" | "ugc" | "daily" | "earn">("game");
   const [jackpotWin, setJackpotWin] = useState<{ amount: number; type: "main" | "mini" } | null>(null);
   const { persona, recommended } = usePersonaMissions();
 
@@ -64,7 +64,15 @@ export default function Missions() {
   const limitReached = playsLeft <= 0;
 
   const missions = [...DEFAULT_MISSIONS, ...db.customMissions];
-  const list = missions.filter((m) => m.tier === tierTab && (catTab === "all" || m.category === "게임"));
+  const list = missions.filter((m) => {
+    if (m.tier !== tierTab) return false;
+    if (catTab === "all") return true;
+    if (catTab === "game") return m.category === "게임";
+    if (catTab === "ugc") return !!m.ugc || m.category === "UGC" || m.category === "리뷰";
+    if (catTab === "daily") return m.category === "출석" || m.category === "퀴즈";
+    if (catTab === "earn") return ["광고", "설문", "추천", "데이터", "AI", "트레이딩", "바이럴"].includes(m.category);
+    return true;
+  });
 
   // Every game play contributes to jackpot + rolls for win
   function rollJackpot(): { won: boolean; amount: number; type: "main" | "mini" } | null {
