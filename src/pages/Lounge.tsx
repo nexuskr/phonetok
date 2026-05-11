@@ -25,7 +25,7 @@ type Guild = {
   is_seed?: boolean;
 };
 
-type ChatMsg = { id: string; user_id: string; message: string; created_at: string };
+type ChatMsg = { id: string; user_id: string | null; message: string; created_at: string; is_bot?: boolean; bot_nickname?: string | null; bot_emoji?: string | null };
 
 type War = {
   id: string;
