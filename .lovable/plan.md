@@ -1,114 +1,90 @@
 
-# /guide?tab=starter — Empire Cinematic V2
+# /secure-auth Empire Cinematic V2 재작성 플랜
 
-현재 상태: 10씬(`FomoScrollHero` → `SceneProblem/Solution/Proof/Persona/NetworkEffect/GuildWar/EmpireMap/Package` → `FomoFinalCTA`), `EmpireFX`(GoldNebulaBg/ParticleField/AnimatedCounter/SimBadge/senior 토큰) 적용 완료, Magic Link CTA, 70대 친화 22px+ 본문/64px+ 버튼, scroll-snap.
+Guide V2와 동일한 프리미엄·시네마틱 수준으로 로그인 페이지를 완전히 새로 만든다. 기능(매직링크/Google/Apple/이메일+비밀번호/회원가입)은 100% 유지하고, 시각·모션·정보 위계만 업그레이드한다.
 
-V2의 목표는 "이미 좋은 페이지"를 **3배 더 영화처럼** 만드는 것 — 새 씬은 추가하지 않고, 모든 씬의 모션·층감(layered depth)·임페리얼 인장을 강화한다.
-
----
-
-## 1. EmpireFX 강화 (모든 씬 공통)
-
-`src/components/guide/EmpireFX.tsx`에 새 프리미티브 추가:
-
-- **`GoldOrbitField`** — 캔버스 기반 황금 입자가 곡선 궤도(orbit)를 도는 0.6 FPS 저전력 효과. 현재 `ParticleField`(랜덤 점멸)보다 한 단계 위. `prefers-reduced-motion` 시 정적 PNG 폴백.
-- **`ImperialSeal`** — SVG 골드 인장(원형 + 왕관 + "EMPIRE · EST. 2024" 각인), 호버/뷰포트 진입 시 회전 + 빛 번짐. Proof 씬의 "운영자 무손실 황금 인장"으로 사용.
-- **`ParallaxLayer`** — `useScroll` + `useTransform` 기반 컴포넌트. 씬 내부에서 배경/중경/전경 3겹 시차 스크롤.
-- **`CinemaTransition`** — 씬 사이에 들어가는 12px 높이의 황금 leak/glow strip. snap 경계가 영화 컷처럼 느껴지게.
-- **`GoldVignette`** — 화면 코너 4개 골드 글로우 SVG. 모든 씬 최상단에 1회만.
-- 기존 `GoldNebulaBg`는 그라데이션을 한 단계 더 짙게 (gold/30 → gold/45, 추가 라디얼 2개).
-
-토큰만 사용(`--gold`, `--imperial`, `--destructive`, `--secondary`). 1픽셀 불변.
-
-## 2. 씬별 V2 강화
-
-### 씬1 HERO (`FomoScrollHero.tsx`)
-- 타이틀을 화면 폭의 88%까지 키우고 `font-imperial` + 황금 그라데이션 위에 **얇은 골드 stroke + 큰 drop-shadow**.
-- "오늘 누적 출금" 박스를 **3카드 라이브 대시보드**로 확장: 동시접속 / 오늘 누적 출금 / 평균 출금시간(`LivePayoutSlaBadge`). 각 카드 `glass-strong` + 골드 hairline.
-- 배경에 `GoldOrbitField` + `ParallaxLayer`로 골드 행성 SVG(느린 회전).
-- CTA 버튼에 sheen 애니메이션을 **2.4s 주기 골드 wave**로 교체, 버튼 그림자를 `glow-gold-xl`로.
-
-### 씬2 PROBLEM
-- 3개 통계 카드를 **세로 카운트업 + 가로 빨간 임팩트 라인**(SVG `path` length 애니메이션)으로 강화.
-- 시니어 친화 폰트 사이즈를 기본 22px → **24px**로 한 단계 더 올린 분기(`senior.bodyXl`).
-- 카드 진입 시 살짝 흔들리는 `shake` 키프레임(reduce-motion 시 생략).
-
-### 씬3 SOLUTION (60초 군대 배틀)
-- 현재 SoldierRow를 **15→25명**으로 확대하고, 진격 애니메이션을 `motion.g` keyframe으로 좌→우 슬라이드.
-- 승리 시점에 **골드 임펄스 펄스**(원형 ring 2겹 expand) + "내 군대 승리" 자막 카드.
-- 상단에 ↑/↓ 두 거대 버튼 데모(실제 동작 X, 단순 시각 데모).
-
-### 씬4 PROOF
-- `PayoutTicker`를 풀너비 + 위/아래 **골드 페이드 마스크**로 둘러싸 영화 자막처럼.
-- `LivePayoutSlaBadge` 옆에 새 **`ImperialSeal`** 컴포넌트 배치 — "운영자 무손실 · 출금 100% 보장" 각인. 클릭 시 약관 페이지(`/legal/escrow`)로.
-- 하단에 "최근 24h 출금 ₩X,XXX,XXX,XXX" 메가 카운터.
-
-### 씬5 PERSONA
-- 20·40·60대 아바타 3개를 **`@dicebear` 대신 인라인 SVG 초상**(이미 있는 디자인 시스템 컬러로) 또는 `lovable-asset` 이미지로 교체. 70대도 읽히도록 22px+ 인용문.
-- 각 카드에 **3D tilt**(`framer-motion` `whileHover` rotateX/Y ±6°, reduce-motion 시 비활성).
-- 카드 하단에 작은 "지금 ₩X만원 누적 출금" 라이브 미니바.
-
-### 씬6 NETWORK EFFECT (기존)
-- SVG 트리 노드를 **펄스 링**(2겹 expanding ring)으로 강조.
-- "1명 데려오면 평생 5%" 문구를 **임페리얼 인장 미니 버전**으로 감싸기.
-
-### 씬7 GUILD WAR (기존)
-- TOP 3 길드 카드에 **순위 메달 SVG**(1=gold, 2=silver, 3=bronze) + 골드 외곽선.
-- "상금 풀" 카운터를 헤더 메가 사이즈로.
-
-### 씬8 EMPIRE MAP (기존)
-- 9개 region circle에 **점령 진행 ring** 애니메이션 추가.
-- 지도 위 골드 헤일로(radial gradient) 보강.
-
-### 씬9 PACKAGE (`ScenePackage`)
-- `EmpireMonarch` 카드에 **회전 골드 frame**(2.4s linear) + `RecoveryBonusCalculator` 결과에 **숫자 폭발**(particles burst 12개 SVG).
-- 카드 진입 시 `scale 0.92 → 1` + `boxShadow` 키프레임.
-
-### 씬10 FINAL CTA (`FomoFinalCTA`)
-- 버튼을 **80px 높이**로 키우고 💎 아이콘을 SVG로 교체(애니메이션 회전).
-- 버튼 아래 **"지금 18,432명이 보고 있습니다"** 라이브 시청자 카운터(`SimBadge`).
-- 버튼 위에 **`ImperialSeal`** + "환불보장 / 19+ 본인인증 / OTP 필수" 3-pill row.
-
-## 3. 시네마틱 전환 (씬 사이)
-
-- `Guide.tsx`에서 각 starter 씬 사이에 `<CinemaTransition />` 삽입 (12px 골드 leak strip + 1.2s shimmer). snap-stop이 아니므로 스크롤 흐름 그대로.
-- 씬 진입 시 `whileInView` margin을 `-40px` → `-80px`로 통일 → 더 일찍 모션 시작.
-
-## 4. 타이포 & 토큰
-
-- `tailwind.config.ts`에 `glow-gold-xl`, `text-gradient-imperial-2` 두 토큰만 추가 (기존 토큰 확장).
-- `senior` 객체에 `bodyXl: "data-[large=true]:text-[24px]"` 추가, 본문 분기를 22px→24px로 한 단계 올린다.
-- `index.css`에 `--gold-stroke` HSL 토큰 1개 추가(타이틀 1px stroke용).
-
-## 5. 백엔드/데이터 — 0 변경
-
-- 모든 카운터·티커는 기존 `useOnline`, `LivePayoutSlaBadge`, `PayoutTicker`, `get_referral_stats`, `guilds` SELECT 그대로.
-- 새 RPC·테이블·RLS 없음. 결제·출금·게임 엔진·미션 로직 1픽셀 불변.
-- AdultGate / Magic Link / 19+ 컴플라이언스 그대로.
-
-## 6. 회귀 보호
-
-- `?tab=detail` 코드 경로(`SceneTrust/Hook/LiveProof/...`)는 건드리지 않음.
-- `prefers-reduced-motion` 분기 모든 신규 모션에 적용(`useReducedMotion`).
-- 모바일 360px 폭에서 본문 22px+ / 버튼 56px+ / CTA 64px+ 유지, scroll-snap 정상.
-
-## 7. 변경 파일 (예상)
+## 1. 최종 구조 (위에서 아래로)
 
 ```text
-src/components/guide/EmpireFX.tsx          (확장: GoldOrbitField, ImperialSeal, ParallaxLayer, CinemaTransition, GoldVignette)
-src/components/guide/FomoScrollHero.tsx    (3카드 라이브 대시보드, 행성 파라랙스)
-src/components/guide/FomoScrollScenes.tsx  (씬2~5 모션 강화, ImperialSeal, 3D tilt)
-src/components/guide/SceneNetworkEffect.tsx (펄스 링, 미니 인장)
-src/components/guide/SceneGuildWar.tsx     (메달 SVG, 메가 카운터)
-src/components/guide/SceneEmpireMap.tsx    (점령 ring 애니)
-src/components/guide/FomoFinalCTA.tsx      (80px 버튼, 인장, 시청자 카운터)
-src/pages/Guide.tsx                        (CinemaTransition 삽입만)
-tailwind.config.ts                         (glow-gold-xl 토큰 1개)
-src/index.css                              (--gold-stroke 토큰 1개)
+┌─────────────────────────────────────────┐
+│ AdultOnlyBanner (상단 고정)              │
+│ LanguageSwitcher (top-right)             │
+├─────────────────────────────────────────┤
+│ [배경 레이어]                            │
+│  GoldNebulaBg(tone=gold)                 │
+│  ParallaxLayer → GoldOrbitField(12)      │
+│  ParticleField(10)                       │
+│  GoldVignette (포함)                     │
+├─────────────────────────────────────────┤
+│ ImperialSeal 168px                       │
+│  label="ENTRY" / title="제국\n입장"      │
+│  caption="PHONARA EMPIRE · EST. 2026"    │
+│                                          │
+│ HERO 타이틀 (gold stroke + glow + drop)  │
+│  "제국 입장을 위한 마지막 관문"           │
+│  "폰 하나로 제국을 쌓는다"                │
+│                                          │
+│ 라이브 SIM 스트립 (3 카드)               │
+│  지금 입장 중 · 오늘 가입 · 평균 입장 22초 │
+│  (AnimatedCounter + SimBadge)            │
+├─────────────────────────────────────────┤
+│ [메인 CTA 카드 — neon-border + glow-xl]  │
+│  ① 이메일 입력 (h-14, text-lg)           │
+│  ② 🪄 Magic Link 메가 버튼               │
+│     - min-h 72px, text-2xl, gold gradient│
+│     - 2.4s sheen wave, glow-gold-xl      │
+│  ③ helper: 5분 유효 · 비밀번호 불필요     │
+│  ─────── GoldDivider ───────             │
+│  ▼ 고급 옵션 (Google/Apple/비번/회원가입) │
+│     접힘 기본, motion height auto         │
+├─────────────────────────────────────────┤
+│ Trust footer pills (가로 4)              │
+│  19+ AdultGate · Magic Link 5분 ·        │
+│  AAL2 · 운영자 무손실                    │
+└─────────────────────────────────────────┘
 ```
 
-신규 컴포넌트 0개, 신규 테이블 0개, 신규 RPC 0개.
+## 2. 비주얼 / 모션 사양
 
----
+- **배경**: `GoldNebulaBg tone="gold"` → 그 위에 `ParallaxLayer strength={40}` 안에 `GoldOrbitField count={12}`, 추가로 `ParticleField density={10}`. `scroll-snap` 미사용(단일 뷰포트). `prefers-reduced-motion`이면 EmpireFX 내부 가드로 자동 정적.
+- **인장**: 기존 `ImperialSeal` 재사용. 라벨 `ENTRY`, 타이틀 `제국\n입장`, 캡션 `PHONARA EMPIRE · EST. 2026`. 모바일에서 size=132, sm 이상 168.
+- **타이틀**: `font-imperial` + `text-gradient-gold` + `WebkitTextStroke: 1px hsl(var(--gold-stroke))` + drop-shadow `glow-gold-xl`. 22px(모바일) → 56px(데스크).
+- **서브카피**: 24px (`senior.bodyXl` 토큰), break-keep, `text-foreground/85`.
+- **SIM 스트립**: 3 카드 횡배치(모바일 1열 가로 스크롤 없이 grid-cols-3 작게), 각 카드 `AnimatedCounter jitter` + `SimBadge`. 카운터는 클라이언트 측 fake (백엔드 미변경): 연결 1,247 / 오늘 가입 384 / 평균 22초.
+- **메가 CTA**: `min-h-[72px]` (시니어 모드 시 `senior.btnXl`로 자동), `text-2xl`, `bg-gradient-imperial` + `glow-gold-xl`, 내부 `motion.div` sheen: `x: ["-120%","220%"]` 2.4s linear infinite, 마스크 `linear-gradient(90deg,transparent,white,transparent)`.
+- **고급 옵션 토글**: `motion.div animate height` + `▼/▲` 회전. 안에 Google·Apple 2-col, 그 아래 비밀번호/회원가입 폼(기존 코드 그대로 이식, Field 컴포넌트 재사용).
+- **트랜지션**: 카드 진입 `whileInView fade+y`, stagger. 페이지 진입 시 ImperialSeal `scale 0.9→1`, 타이틀 `y 24→0`.
+- **시니어 토큰**: 루트 div에 `data-large={isLargeMode}` 부여. `isLargeMode`는 localStorage `pm_large` 또는 기본 `true`(20~70대 친화 요구) — 기존 senior 토큰 적용.
 
-이대로 진행할까요?
+## 3. 정보 위계 (요구 사항 그대로)
+
+1. ImperialSeal + Hero
+2. 이메일 + **Magic Link 메가 버튼** (최우선)
+3. 고급 옵션(접힘): Google / Apple / 이메일+비번 로그인 / 회원가입(닉/실명/전화/생년월일/약관 2개)
+4. Trust 푸터
+
+기존 모든 핸들러(`sendMagicLink`, `social`, `submit`, signup zod 스키마, referral code apply, age 19 체크) **100% 보존**. 다국어 키도 동일.
+
+## 4. 파일 변경
+
+- **edit**: `src/pages/SecureAuth.tsx` — 전체 JSX/스타일만 V2로 교체. 비즈니스 로직(이벤트 핸들러, zod, redirect 로직)은 동일 함수 그대로 둠.
+- **재사용 (수정 없음)**: `EmpireFX.tsx`의 `GoldNebulaBg`, `GoldOrbitField`, `ParallaxLayer`, `ParticleField`, `ImperialSeal`, `AnimatedCounter`, `SimBadge`, `GoldDivider`, `senior` 토큰.
+- **재사용**: `AdultOnlyBanner`, `LanguageSwitcher`, `CinematicIntro`(타이틀 위 한 줄 인트로로 유지).
+- **신규 컴포넌트 없음**, **신규 토큰 없음**, **백엔드/마이그레이션 없음**, **types.ts 미수정**.
+
+## 5. 접근성 / 시니어
+
+- 본문 24px, 메가 버튼 72px, 보조 버튼 56px.
+- 포커스 링 명확(`focus-visible:ring-2 ring-gold/70`).
+- `aria-expanded`, `aria-controls`로 고급 옵션 토글 명시.
+- `prefers-reduced-motion` 시 EmpireFX 가드 + sheen 자동 정적.
+- 컬러 토큰만 사용, 하드코드 색 없음.
+
+## 6. 검증
+
+- 빌드 통과 (typecheck 자동).
+- `/secure-auth` 진입 시: 인장→타이틀→메가 CTA 자연스러운 스크롤(단일 뷰포트 fit), 951×1250 viewport에서 클리핑 없음.
+- 매직링크 발송, Google/Apple, 이메일 로그인/회원가입, referral code apply, 1세션 자동 `/dashboard` 리다이렉트 — 기능 회귀 없음.
+- reduced-motion ON 상태 시 모든 무한 애니메이션 정지 확인.
+
+승인 시 단일 파일 교체로 즉시 적용한다.
