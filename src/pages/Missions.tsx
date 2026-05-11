@@ -26,6 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AIBotCards from "@/components/AIBotCards";
 import { usePersonaMissions, PERSONA_LABEL } from "@/hooks/use-persona-missions";
 import { Sparkle } from "lucide-react";
+import MissionDailyCapCard from "@/components/missions/MissionDailyCapCard";
 
 const tierFilters: { key: Tier; tk: string; color: string }[] = [
   { key: "NORMAL", tk: "tierNormal", color: "text-secondary" },
@@ -47,7 +48,7 @@ export default function Missions() {
   const [completing, setCompleting] = useState<string | null>(null);
   const [ugcOpen, setUgcOpen] = useState<Mission | null>(null);
   const [gameOpen, setGameOpen] = useState<Mission | null>(null);
-  const [catTab, setCatTab] = useState<"all" | "game">("game");
+  const [catTab, setCatTab] = useState<"all" | "game" | "ugc" | "daily" | "earn">("game");
   const [jackpotWin, setJackpotWin] = useState<{ amount: number; type: "main" | "mini" } | null>(null);
   const { persona, recommended } = usePersonaMissions();
 
@@ -63,7 +64,15 @@ export default function Missions() {
   const limitReached = playsLeft <= 0;
 
   const missions = [...DEFAULT_MISSIONS, ...db.customMissions];
-  const list = missions.filter((m) => m.tier === tierTab && (catTab === "all" || m.category === "게임"));
+  const list = missions.filter((m) => {
+    if (m.tier !== tierTab) return false;
+    if (catTab === "all") return true;
+    if (catTab === "game") return m.category === "게임";
+    if (catTab === "ugc") return !!m.ugc || m.category === "UGC" || m.category === "리뷰";
+    if (catTab === "daily") return m.category === "출석" || m.category === "퀴즈";
+    if (catTab === "earn") return ["광고", "설문", "추천", "데이터", "AI", "트레이딩", "바이럴"].includes(m.category);
+    return true;
+  });
 
   // Every game play contributes to jackpot + rolls for win
   function rollJackpot(): { won: boolean; amount: number; type: "main" | "mini" } | null {
@@ -204,21 +213,15 @@ export default function Missions() {
     <Layout>
       <HubTabs hub="earn" />
       <div className="container pt-6 pb-10 animate-liquid-in">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h1 className="font-imperial text-2xl sm:text-3xl tracking-[0.18em] text-gradient-imperial flex items-center gap-2 break-keep">
-              <Sparkles className="w-5 h-5 text-primary" /> {t("title")}
-            </h1>
-            <p className="text-xs text-muted-foreground mt-1 break-keep">{t("subtitle")}</p>
-          </div>
-          <div className={`text-right glass rounded-xl px-3 py-2 ${limitReached ? "border border-destructive/50" : ""}`}>
-            <div className="text-[9px] tracking-widest text-muted-foreground font-bold">{t("todayPlays")}</div>
-            <div className={`text-sm font-display font-black tabular-nums ${limitReached ? "text-destructive" : "text-gradient-primary"}`}>
-              {playsUsed} / {playLimit}
-            </div>
-            <div className="text-[9px] text-muted-foreground">{userTier} {t("tierSuffix")}</div>
-          </div>
+        <div className="mb-4">
+          <h1 className="font-imperial text-2xl sm:text-3xl tracking-[0.18em] text-gradient-imperial flex items-center gap-2 break-keep">
+            <Sparkles className="w-5 h-5 text-primary" /> {t("title")}
+          </h1>
+          <p className="text-xs text-muted-foreground mt-1 break-keep">{t("subtitle")}</p>
         </div>
+
+        {/* 일일 한도 카드 (시니어 친화 — 풀폭 진행바 + 카운트다운) */}
+        <MissionDailyCapCard playsUsed={playsUsed} playLimit={playLimit} tier={userTier} />
 
         {/* MEGA JACKPOT BANNER */}
         <div className="mb-5">
@@ -297,18 +300,21 @@ export default function Missions() {
           })}
         </div>
 
-        {/* Category sub-tabs */}
-        <div className="flex gap-2 mb-5">
+        {/* Category sub-tabs — 5종 (전체·게임·UGC·매일·수익형) */}
+        <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-1 px-1">
           {([
-            { key: "all", label: t("catAll") },
-            { key: "game", label: t("catGame") },
+            { key: "all",   label: "전체",  icon: null },
+            { key: "game",  label: "게임",  icon: "🎮" },
+            { key: "ugc",   label: "UGC",   icon: "📸" },
+            { key: "daily", label: "매일",  icon: "📅" },
+            { key: "earn",  label: "수익형", icon: "💰" },
           ] as const).map((c) => (
             <button
               key={c.key}
               onClick={() => setCatTab(c.key)}
-              className={`px-4 min-h-[44px] py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition press ${catTab === c.key ? "bg-gradient-cyber text-primary-foreground" : "glass text-muted-foreground"}`}
+              className={`shrink-0 px-4 min-h-[44px] py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap transition press ${catTab === c.key ? "bg-gradient-cyber text-primary-foreground" : "glass text-muted-foreground"}`}
             >
-              {c.key === "game" && <Gamepad2 className="w-3.5 h-3.5" />} {c.label}
+              {c.icon && <span>{c.icon}</span>}{c.label}
             </button>
           ))}
         </div>
