@@ -51,6 +51,7 @@ export default function Dashboard() {
 
   return (
     <Layout>
+      <FirstDepositTopBanner />
       <SixtySecondFlow enabled={!!user} />
       <EarnedToast />
       <EmpireSignature />
