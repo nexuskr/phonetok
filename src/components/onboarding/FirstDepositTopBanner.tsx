@@ -42,10 +42,17 @@ export default function FirstDepositTopBanner() {
     return () => { alive = false; };
   }, [isLoggedIn, db.deposits?.length]);
 
-  if (!isLoggedIn || hasDeposited !== false || dismissed) return null;
+  // log impression once per session-shown
+  const shown = isLoggedIn && hasDeposited === false && !dismissed;
+  useEffect(() => {
+    if (shown) track("first_deposit_banner_view", { surface: "dashboard_top" });
+  }, [shown]);
+
+  if (!shown) return null;
 
   function dismiss() {
     try { localStorage.setItem(DISMISS_KEY, String(Date.now() + 24 * 3600_000)); } catch {}
+    track("first_deposit_banner_dismiss", { surface: "dashboard_top" });
     setDismissed(true);
   }
 
@@ -63,6 +70,7 @@ export default function FirstDepositTopBanner() {
         </div>
         <Link
           to="/wallet?tab=deposit&intent=first-deposit"
+          onClick={() => track("cta_click", { surface: "first_deposit_banner", action: "go_deposit" })}
           className="press sheen shrink-0 inline-flex items-center gap-1 min-h-[40px] px-3 rounded-xl bg-gradient-gold text-gold-foreground font-bold text-xs glow-gold"
         >
           시작 <ArrowRight className="w-3.5 h-3.5" />
