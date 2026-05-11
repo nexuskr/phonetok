@@ -23,6 +23,13 @@ export default function WeeklyPassSection() {
 
   async function claim(level: number) {
     setClaiming(level);
+    try {
+      await assertRateLimit(RL_WALLET.scope, RL_WALLET.max);
+    } catch (e: any) {
+      setClaiming(null);
+      notify.error("요청 제한", { description: e?.message ?? "잠시 후 다시 시도하세요." });
+      return;
+    }
     const { error } = await supabase.rpc("claim_weekly_pass_reward", { _level: level });
     setClaiming(null);
     if (error) { notify.error("수령 실패", { description: error.message }); return; }
