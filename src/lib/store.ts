@@ -303,26 +303,29 @@ export const DEFAULT_MISSIONS: Mission[] = [
   { id: "m11", title: "EMPIRE 콘텐츠 캠페인", desc: "단독 UGC 영상 1편 (자동 검증 후 지급)", reward: 85_000, category: "UGC", difficulty: "VIP", tier: "EMPIRE", duration: "1일", ugc: true },
   { id: "empire_day_double", title: "👑 제국의 날 2× (매월 1·15일)", desc: "해당일 모든 미션 보상 2배 · EMPIRE 등급 자동 적용", reward: 0, category: "출석", difficulty: "EASY", tier: "EMPIRE", duration: "당일", hook: "empire_day_double", empireDayOnly: true },
 
-  // ─── 게임 카드 (잭팟·중독성 핵심, 유지) ───
-  { id: "g1",  title: "사이버 탭 챌린지",        desc: "10초간 빠르게 탭",            reward: 120,    category: "게임",   difficulty: "EASY",   tier: "NORMAL", duration: "10초", game: "tap",      boostable: true },
-  { id: "g2",  title: "럭키 박스 오픈",          desc: "1일 1회 무료 박스",            reward: 250,    category: "게임",   difficulty: "EASY",   tier: "NORMAL", duration: "5초",  game: "lucky",    boostable: true },
-  { id: "g3",  title: "메모리 매칭",            desc: "카드 6쌍 매칭",                reward: 350,    category: "게임",   difficulty: "NORMAL", tier: "NORMAL", duration: "1분",  game: "memory",   boostable: true },
-  { id: "g6",  title: "리액션 스피드",          desc: "녹색 신호에 즉시 탭",          reward: 200,    category: "게임",   difficulty: "EASY",   tier: "NORMAL", duration: "20초", game: "reaction", boostable: true },
-  { id: "g7",  title: "스크래치 카드",          desc: "코팅을 긁어 보상 확인",         reward: 180,    category: "게임",   difficulty: "EASY",   tier: "NORMAL", duration: "5초",  game: "scratch",  boostable: true },
-  { id: "g8",  title: "주사위 더블",            desc: "2개 주사위 합 7 이상",         reward: 240,    category: "게임",   difficulty: "EASY",   tier: "NORMAL", duration: "5초",  game: "dice",     boostable: true },
-  { id: "g9",  title: "네온 슬롯",              desc: "3릴 슬롯 매칭",                reward: 320,    category: "게임",   difficulty: "NORMAL", tier: "NORMAL", duration: "10초", game: "slot",     boostable: true },
-  { id: "g10", title: "하이로우",               desc: "다음 카드 더 큼/작음",          reward: 280,    category: "게임",   difficulty: "NORMAL", tier: "NORMAL", duration: "15초", game: "highlow",  boostable: true },
+  // ─── 게임 카드 (20~70대 누구나 1탭 가능: 럭키/스크래치/휠만 유지) ───
+  // tap/memory/reaction/dice/slot/highlow 는 시니어 부적합·도박 연상으로 제거 (게임 엔진 코드는 보존)
+  { id: "g2",  title: "럭키 박스 오픈",          desc: "1일 1회 무료 박스 (1탭)",       reward: 250,    category: "게임",   difficulty: "EASY",   tier: "NORMAL", duration: "5초",  game: "lucky",    boostable: true },
+  { id: "g7",  title: "스크래치 카드",          desc: "큰 영역을 1탭으로 긁기",         reward: 180,    category: "게임",   difficulty: "EASY",   tier: "NORMAL", duration: "5초",  game: "scratch",  boostable: true },
   { id: "g11", title: "한정 럭키 (오늘만)",      desc: "오늘 단 100회만 플레이 가능",   reward: 450,    category: "게임",   difficulty: "NORMAL", tier: "NORMAL", duration: "5초",  game: "lucky",    boostable: true, fomoLimit: 100 },
-  { id: "g4",  title: "VIP 럭키 휠",            desc: "최대 5,000원 당첨",            reward: 800,    category: "게임",   difficulty: "VIP",    tier: "VIP",    duration: "5초",  game: "lucky",    boostable: true },
-  { id: "g12", title: "VIP 골드 슬롯",          desc: "황금 릴 잭팟 기여 2배",         reward: 1_500,  category: "게임",   difficulty: "NORMAL", tier: "VIP",    duration: "10초", game: "slot",     boostable: true },
-  { id: "g13", title: "VIP 스크래치 골드",      desc: "프리미엄 스크래치",             reward: 1_000,  category: "게임",   difficulty: "EASY",   tier: "VIP",    duration: "5초",  game: "scratch",  boostable: true },
-  { id: "g14", title: "VIP 리액션 마스터",      desc: "리액션 시 보상 1.5배",          reward: 1_200,  category: "게임",   difficulty: "EASY",   tier: "VIP",    duration: "15초", game: "reaction", boostable: true },
-  { id: "g5",  title: "GOD 럭키 휠",            desc: "최대 50,000원 당첨",           reward: 5_000,  category: "게임",   difficulty: "VIP",    tier: "GOD",    duration: "5초",  game: "lucky",    boostable: true },
-  { id: "g15", title: "GOD 다이아 슬롯",        desc: "잭팟 기여 5배",                 reward: 8_000,  category: "게임",   difficulty: "NORMAL", tier: "GOD",    duration: "10초", game: "slot",     boostable: true },
-  { id: "g16", title: "GOD 하이로우 챔프",      desc: "9라운드 연승 가능",             reward: 6_500,  category: "게임",   difficulty: "NORMAL", tier: "GOD",    duration: "30초", game: "highlow",  boostable: true },
-  { id: "g17", title: "EMPIRE 다이아 휠",       desc: "최대 100만원 + 메가 잭팟",       reward: 50_000, category: "게임",   difficulty: "VIP",    tier: "EMPIRE", duration: "5초",  game: "lucky",    boostable: true },
-  { id: "g18", title: "EMPIRE 잭팟 슬롯",       desc: "잭팟 기여 10배 · 다중 당첨",     reward: 80_000, category: "게임",   difficulty: "VIP",    tier: "EMPIRE", duration: "10초", game: "slot",     boostable: true },
+  { id: "g4",  title: "VIP 럭키 휠",            desc: "최대 5,000원 당첨 (1탭)",        reward: 800,    category: "게임",   difficulty: "VIP",    tier: "VIP",    duration: "5초",  game: "lucky",    boostable: true },
+  { id: "g13", title: "VIP 스크래치 골드",      desc: "프리미엄 스크래치 (1탭)",        reward: 1_000,  category: "게임",   difficulty: "EASY",   tier: "VIP",    duration: "5초",  game: "scratch",  boostable: true },
+  { id: "g5",  title: "GOD 럭키 휠",            desc: "최대 50,000원 당첨 (1탭)",       reward: 5_000,  category: "게임",   difficulty: "VIP",    tier: "GOD",    duration: "5초",  game: "lucky",    boostable: true },
+  { id: "g17", title: "EMPIRE 다이아 휠",       desc: "최대 100만원 + 메가 잭팟 (1탭)",  reward: 50_000, category: "게임",   difficulty: "VIP",    tier: "EMPIRE", duration: "5초",  game: "lucky",    boostable: true },
 ];
+
+// 12개 원본 카테고리 → 4개 단순 버킷 (20~70대 인지 부하 최소화)
+export type MissionBucket = "daily" | "battle" | "rewards" | "senior";
+export function missionBucket(m: Mission): MissionBucket[] {
+  const out: MissionBucket[] = [];
+  if (m.category === "출석" || m.category === "퀴즈") out.push("daily");
+  if (m.category === "트레이딩" || m.category === "게임") out.push("battle");
+  if (["추천","바이럴","UGC","리뷰","AI","데이터","광고","설문"].includes(m.category)) out.push("rewards");
+  // 시니어 안전: 1탭 또는 매우 단순한 항목만
+  const seniorIds = new Set(["family_invite","weekly_streak_compound","market_pulse_quiz","empire_day_double","g2","g7","g4","g13","g5","g17"]);
+  if (seniorIds.has(m.id)) out.push("senior");
+  return out;
+}
 
 export function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
 // 원화 포맷 — 천 단위 콤마, 소수점 반올림(0자리), NBSP 미사용. 사이트 전 영역 단일 진입점.
