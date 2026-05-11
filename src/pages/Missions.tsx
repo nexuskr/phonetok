@@ -49,9 +49,19 @@ export default function Missions() {
   const [completing, setCompleting] = useState<string | null>(null);
   const [ugcOpen, setUgcOpen] = useState<Mission | null>(null);
   const [gameOpen, setGameOpen] = useState<Mission | null>(null);
-  const [catTab, setCatTab] = useState<"all" | "game" | "ugc" | "daily" | "earn">("game");
+  // 4-bucket 단순 카테고리: 매일 출석 / 전투 / 보상 받기 / 시니어 안전
+  const [catTab, setCatTab] = useState<"daily" | "battle" | "rewards" | "senior">("battle");
   const [jackpotWin, setJackpotWin] = useState<{ amount: number; type: "main" | "mini" } | null>(null);
   const { persona, recommended } = usePersonaMissions();
+
+  // 페르소나가 60s/70s+ 이거나 시니어 모드 ON 이면 시니어 탭 강제
+  const isSenior = typeof window !== "undefined" && (
+    document.documentElement.classList.contains("senior-mode") ||
+    persona === "60s" || persona === "70s+"
+  );
+  if (isSenior && catTab !== "senior") {
+    setTimeout(() => setCatTab("senior"), 0);
+  }
 
   if (!user) return null;
   const userTier = user.tier;
@@ -67,12 +77,8 @@ export default function Missions() {
   const missions = [...DEFAULT_MISSIONS, ...db.customMissions];
   const list = missions.filter((m) => {
     if (m.tier !== tierTab) return false;
-    if (catTab === "all") return true;
-    if (catTab === "game") return m.category === "게임";
-    if (catTab === "ugc") return !!m.ugc || m.category === "UGC" || m.category === "리뷰";
-    if (catTab === "daily") return m.category === "출석" || m.category === "퀴즈";
-    if (catTab === "earn") return ["광고", "설문", "추천", "데이터", "AI", "트레이딩", "바이럴"].includes(m.category);
-    return true;
+    const buckets = missionBucket(m);
+    return buckets.includes(catTab);
   });
 
   // Every game play contributes to jackpot + rolls for win
