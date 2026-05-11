@@ -136,7 +136,6 @@ export default function EmpireArena() {
   return (
     <Layout>
       <HubTabs hub="empire" />
-      <ArenaTutorialOverlay />
       <div className="container pt-6 pb-10 animate-fade-in">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
