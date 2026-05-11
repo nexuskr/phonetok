@@ -55,10 +55,7 @@ const NAV: NavItem[] = [
 ];
 
 const SIDE_EXTRA: Array<{ to: string; icon: typeof MessageSquare; labelKey: any; gold?: boolean }> = [
-  { to: "/global-intelligence", icon: TrendingUp, labelKey: "tradingArena", gold: true },
-  { to: "/intelligence-loop", icon: Network, labelKey: "intelligenceLoop" },
-  { to: "/infrastructure", icon: Zap, labelKey: "infrastructure" },
-  { to: "/vision", icon: Eye, labelKey: "vision" },
+  { to: "/arena", icon: TrendingUp, labelKey: "tradingArena", gold: true },
   { to: "/support", icon: MessageSquare, labelKey: "support" },
   { to: "/profile", icon: UserIcon, labelKey: "my" },
 ];
