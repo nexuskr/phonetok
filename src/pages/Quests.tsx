@@ -10,6 +10,7 @@ import { LuxButton } from "@/components/ui/lux";
 import ReferralLeaderboard from "@/components/ReferralLeaderboard";
 import AIMissionCard from "@/components/AIMissionCard";
 import WeeklyPassSection from "@/components/WeeklyPassSection";
+import BoosterPill from "@/components/imperial/BoosterPill";
 
 type Q = {
   key: string; name: string; description: string; period: "daily" | "weekly";
