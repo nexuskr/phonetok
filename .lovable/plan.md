@@ -1,68 +1,198 @@
-# 내일 오픈용 — 마스터 프롬프트 + 일론 머스크 톤 랜딩
+# 🔥 PHONARA — 4-Pillar 통합 엔진 (확정판)
 
-## 산출물 2가지
+핵심 4기둥만 살린다. 군더더기 없이 Phase 0 단일 마이그 + 단일 HUD + 4개 결합 지점.
 
-### 1) `/mnt/documents/MASTER_PROMPT.md` — 실행용 마스터 프롬프트
-내일 이후 Lovable에 그대로 붙여 한 번에 돌릴 수 있는 "엔진" 단일 프롬프트.
-구성:
-- **플랫폼 한 줄 정의** — 한국인을 사기에서 보호하고, 모두가 잘 먹고 잘사는 단 하나의 사이트
-- **30년 유지를 위한 5대 원칙** — 단순성 / 신뢰 / 단일 진입점 / 자가 성장 루프 / 법적 안전선(SIM 라벨 유지)
-- **현재 코드베이스 자산 매핑** — 출금 스텝업, 디바이스 핑거프린트, 권한 베이스라인, 어노멀리 이벤트, 길드 챗 봇 시딩, EmpirePopulationPulse, OG 카드 렌더러, 애널리틱스 이벤트 등 이미 있는 것 명시 (재구현 금지)
-- **즉시 실행 작업 큐 (P0/P1/P2)**
-  - P0(내일 오픈 전 必): 랜딩 헤드라인 교체, CTA 1버튼화, 공유 5채널 검증, OG 카드 동작 확인
-  - P1(오픈 후 7일): 사기 신고 게시판 v0, 의심사례 AI 진단 (Lovable AI), 피해자 보호 허브 페이지
-  - P2(30일): 사기수법 데이터베이스, 커뮤니티 검증 투표, 신뢰 점수
-- **각 작업별 "이 프롬프트를 그대로 Lovable에 붙여라" 블록** — 복붙용 7개 서브 프롬프트
-- **금지선** — SIM 라벨 제거 금지, profiles 민감컬럼 직접 수정 금지, AAL2 우회 금지, sonner 직접 호출 금지
+---
 
-### 2) `/mnt/documents/LANDING_COPY.md` — 일론 머스크 톤 카피 세트
-한국어, 짧음 / 확신 / 설명 없음 원칙.
-- **메인 버전**
-  - H1: 이미 시작된 흐름입니다.
-  - Sub: 복잡한 설명은 필요 없습니다. 들어오면 바로 이해됩니다.
-  - CTA: 지금 참여하기
-  - 보조: 지금도 계속 참여 중입니다.
-- **공격 버전**
-  - H1: 이미 움직이고 있습니다.
-  - Sub: 늦게 이해할수록, 늦게 시작합니다.
-  - CTA: 지금 확인
-- **사기방지 앵글 한 줄(미션 라인)** — 메인 아래 작게:
-  "전세, 팀미션, 주식, 다단계 — 더 이상 당하지 않습니다."
-- **OG/메타 태그 카피** — 18자/60자/120자 3종
-- **광고 헤드라인 6종** (검색/디스플레이/SNS용)
-- **3초 안에 잡는 시각 가이드** — 글자수, 줄바꿈, 모바일 우선 폭
+## 1. 4-Pillar (확정 · 변경 없음)
 
-## 코드 변경 (랜딩만, 최소)
+### Pillar 1 — IMPERIAL SCORE (IS)
+모든 시스템의 단일 점수. 미션·퀘스트·업적·트레이딩·결제가 전부 여기에 누적.
 
-엔진은 이미 있으므로 **첫인상 카피만** 즉시 교체:
+| 출처 | IS 획득 (기본) |
+|---|---|
+| 미션 1개 | +1 × 미션 티어 부스트 (NORMAL 1× / VIP 1.5× / GOD 2.5× / EMPIRE 4×) |
+| 퀘스트 1개 | +5 |
+| 업적 1개 | AP 값을 그대로 IS로 흡수 |
+| 트레이딩 +1% PnL | +10 |
+| 잭팟 1회 시도 | +0.5 |
+| **결제 ₩10,000** | **+30** |
 
-1. `src/pages/Index.tsx` 또는 메인 랜딩 페이지 hero 영역
-   - 헤드라인/서브/CTA를 "메인 버전"으로 교체
-   - 미션 라인 1줄 추가 (사기방지 앵글)
-   - CTA 1버튼 — 비로그인 → 회원가입, 로그인 → 첫 입금 (이미 있는 `DepositCTA` 패턴 재사용)
-2. `index.html`
-   - `<title>` / `og:title` / `og:description` / `twitter:description` 일론 톤으로 교체
-   - 기존 동적 OG 카드 엔드포인트는 그대로 유지
-3. 시각 다듬기
-   - hero h1 폰트 크기 모바일 우선 (clamp), 행간 1.05
-   - 서브 카피 muted-foreground
-   - CTA 1개만 — 보조 링크는 텍스트 링크로 다운그레이드
+소스별 일일 캡: mission=1000 · quest=300 · achievement=500 · trading=∞ · deposit=∞.
 
-**범위 밖** (오늘 안 함): 사기 신고 게시판, AI 진단, 신뢰 점수, 새 페이지 — 모두 마스터 프롬프트의 P1/P2로 문서화만.
+### Pillar 2 — DEPOSIT BOOSTER WINDOW
+결제 시점부터 24시간 폭발 구간. 추가 결제 시 +24h 누적, 최대 168h(7일).
 
-## 기술 메모
+| 효과 | 배수 |
+|---|---|
+| 미션 보상 | ×2 |
+| 퀘스트 보상 | ×2 |
+| 업적 AP | ×1.5 |
+| 트레이딩 PnL 보너스 | ×1.5 |
+| 잭팟 확률 | ×2 |
+| IS 획득 | ×2 |
 
-- 카피 산출물은 `/mnt/documents/`에 저장 후 `<lov-artifact>` 로 전달
-- 랜딩 코드 변경은 `src/pages/Index.tsx` 한 파일 + `index.html` 메타만 — 비즈니스 로직 미변경
-- SIM 라벨/EmpirePopulationPulse는 유지 (법적 안전선, 메모리 코어 룰)
-- 디자인 토큰만 사용, sonner 직접 호출 금지, 토스트는 `@/lib/notify`
+만료 = 절벽 → 재입금 동기.
 
-## 산출 순서
+### Pillar 3 — ESCALATION LADDER
+입금 누적이 다음 시스템을 잠금 해제. 24h(today) / lifetime 명확 구분.
 
-1. 두 .md 파일 작성 → `/mnt/documents/`
-2. `Index.tsx` hero 교체 (헤드라인/서브/CTA/미션 라인)
-3. `index.html` 메타 교체
-4. 프리뷰 스크린샷으로 3초 가독성 확인
-5. artifact 태그로 두 .md 전달
+```text
+₩29K     → NORMAL 미션 풀 + Bronze 뱃지
+₩100K    → VIP 미션 + 시즌패스 ×2 트랙 + Silver
+₩1M      → GOD 미션 + Private Pool + 트레이딩 레버 ×2 + Gold
+₩10M     → EMPIRE 미션 + 1:1 매니저 + Empire Day 자동 + Diamond
+₩50M/24h → PHANTOM Syndicate 자문석 + Mythic + 영구 보존
+₩100M/24h → "황제 좌석" 일 1명 + 1억 잭팟 추첨권
+₩500M/24h → "전설" 명예의 전당 영구 + 5억 잭팟 추첨권
+₩1B/24h  → "DEUS" 단 1명 — 영구 1순위 출금 + 30% 자동 매칭 + 평생 PHANTOM
+```
 
-내일 오픈하면 카피로 트래픽 잡고, 마스터 프롬프트의 P1 큐를 순서대로 실행하면 30년 유지 라인까지 이어집니다.
+### Pillar 4 — TRADING ↔ DEPOSIT 연결
+Paper 포지션 한도 = **24h 누적 입금 × 10**.
+- 입금 ₩100K → 포지션 ₩1M
+- 입금 ₩10M → 포지션 ₩100M
+- 입금 ₩1B → 포지션 ₩100억 (SIM)
+
+큰 포지션 = 큰 PnL = 큰 IS·잭팟·리더보드 폭발. SIM 라벨 유지.
+
+---
+
+## 2. 통합 흐름 한 장
+
+```text
+[결제 (코인/계좌/상품권)]
+         │
+   ┌─────┼─────┐
+   ▼     ▼     ▼
+BOOSTER  LADDER  IS+30/만원
+  24h    진척    
+   │     │     │
+   ▼     ▼     ▼
+미션×2 퀘스트×2 업적×1.5 트레이딩×1.5/한도×10 잭팟×2
+   │     │     │     │     │
+   └─────┴──IS──┴─────┴─────┘
+              │
+              ▼
+       WHALE LEADERBOARD (일별 Top 100)
+              │
+              ▼
+       상위 → 다음 BOOSTER 5×
+```
+
+---
+
+## 3. Phase 0 — 단일 마이그 + 단일 HUD
+
+### A. 마이그레이션 (1개 파일)
+
+**신규 테이블 6개**
+- `imperial_scores` — user_id PK, total/daily/weekly/season_is, updated_at. RLS 본인 SELECT, system-only UPDATE
+- `imperial_score_events` — id, user_id, source, delta, multiplier, created_at. RLS 본인 SELECT, admin 전체 (감사)
+- `deposit_booster_windows` — id, user_id, started_at, expires_at, source_purchase_id, hours_accumulated. RLS 본인 SELECT
+- `escalation_milestones_catalog` — key, threshold_krw, threshold_window(daily|lifetime), reward_json, sort_order. 공개 SELECT
+- `user_escalation_progress` — user_id, milestone_key, reached_at, window_date. RLS 본인 SELECT + 공개 리더보드용 닉만
+- `daily_whale_leaderboard` — date, user_id, deposit_total_krw, is_total, rank. 공개 SELECT (닉 마스킹)
+
+**RPC 5개 (전부 SECURITY DEFINER · internal-only · `function_permissions_baseline` 등록)**
+- `award_imperial_score(_user_id, _source text, _base_delta int)` — 부스터 자동 적용, 소스별 일일 캡 체크, `imperial_score_events` 기록
+- `start_or_extend_booster(_user_id, _purchase_id, _hours)` — 신규 발동/누적 연장, 최대 168h
+- `check_escalation(_user_id, _new_deposit_krw)` — 사다리 도달 체크, 뱃지 자동 부여(`user_badges`), 알림 enqueue
+- `apply_booster_multipliers(_user_id, _base, _source) → numeric` — 미션/퀘스트/업적/트레이딩 정산이 공통 호출
+- `get_my_dashboard_state()` → jsonb — IS·부스터 잔여·다음 사다리·일별 순위 단일 호출
+
+**트리거 1개**
+- `package_purchases` AFTER INSERT (status='confirmed'일 때):
+  1. `award_imperial_score(user_id, 'deposit', krw/10000*30)`
+  2. `start_or_extend_booster(user_id, purchase_id, 24)`
+  3. `check_escalation(user_id, krw)`
+
+### B. 결합 지점 4개 (정확히)
+
+| 시스템 | 파일 | 변경 |
+|---|---|---|
+| 미션 | `src/lib/missions-rpc.ts` + 정산 RPC | 정산 후 `award_imperial_score('mission', reward/1000)` |
+| 퀘스트 | `claim_quest` RPC | claim 후 `award_imperial_score('quest', 5)` |
+| 업적 | 업적 해금 트리거/RPC | 해금 시 `award_imperial_score('achievement', ap)` |
+| 트레이딩 | `enforce-position-triggers` 또는 PnL 정산 | 정산 시 `award_imperial_score('trading', floor(pnl_pct*10))` + 포지션 한도 = `24h_deposit*10` 강제 |
+| 잭팟 | `Missions.tsx rollJackpot` | 시도당 +0.5 IS, 부스터 시 당첨 확률 ×2 |
+
+### C. UI — 단일 HUD + 단일 페이지
+
+**신규 파일 (5개)**
+- `src/components/imperial/ImperialHud.tsx` — Layout 상단 고정. 현재 IS · 부스터 잔여시간 · 다음 사다리까지 ₩ · 오늘 순위. 디자인 토큰만.
+- `src/components/imperial/BoosterPill.tsx` — "🔥 ×2 (13:22:15)" 알약. 미션/퀘스트/트레이딩/잭팟 카드 우상단에 끼움.
+- `src/components/imperial/EscalationCallout.tsx` — "₩110K만 더 → GOD 미션 + 트레이딩 ×2" CTA 카드. 부족 금액 자동 계산.
+- `src/pages/Whales.tsx` — `/whales` 일별 Top 100 + Realtime + 9등 추월 CTA.
+- `src/hooks/use-imperial-state.ts` — `get_my_dashboard_state` + Realtime 구독.
+
+**수정 파일 (8개)**
+- `src/components/Layout.tsx` — `ImperialHud` 마운트
+- `src/components/HubTabs.tsx` — `/whales` 탭 추가
+- `src/App.tsx` — `/whales` 라우트
+- `src/pages/Missions.tsx` — `BoosterPill` + 보상 표시에 부스터 적용
+- `src/pages/Quests.tsx` — 동일
+- `src/pages/Achievements.tsx` — AP → IS 표기 통합
+- `src/pages/TradingArenaWithArmy.tsx` — 포지션 다이얼에 "한도 ₩XM (입금 +₩XK 시 +₩YM)"
+- `src/pages/Packages.tsx` — 카드에 "구매 시 +N IS · 부스터 24h · 사다리 진척 X%" 라인
+
+### D. Edge Functions (2개)
+- `imperial-score-reconciler` (cron 5분) — 누락된 IS/booster 재계산 가드
+- `whale-leaderboard-tick` (cron 1분) — 일별 Top 100 캐시 갱신, KST 자정 리셋
+
+---
+
+## 4. 보안·룰 (메모리 코어 준수)
+
+- 신규 RPC 전부 SECURITY DEFINER + `function_permissions_baseline`에 internal-only 등록 → 클라이언트 직접 호출 금지
+- `imperial_score_events`에 모든 변동 기록 → admin 감사 가능
+- 부스터 최대 168h 캡 (영구 ×2 방지)
+- 사다리 today 슬롯은 KST 자정 리셋 (`window_date` 컬럼)
+- SIM 라벨 절대 유지 — IS·잭팟·리더보드·트레이딩 모두 SIM 표기
+- profiles 민감 컬럼 직접 UPDATE 없음 — 모든 변경은 신규 RPC 경유
+- UX 프리미티브: `EmptyState`/`LoadingList`/`@/lib/notify` 만, 디자인 토큰만, sonner 직접 호출 금지
+- AAL2 출금·자동 동결·디바이스 핑거프린트 그대로 유지
+
+---
+
+## 5. 분석 이벤트 (`@/lib/analytics`)
+
+- `imperial_score_awarded` { source, base, multiplier, total }
+- `booster_started` / `booster_extended` { hours, expires_at }
+- `escalation_unlocked` { milestone_key, window }
+- `whale_rank_change` { from, to, delta_krw }
+- `trading_position_capped` { requested, cap, deposit_24h }
+
+---
+
+## 6. Phase 1 (D+1~D+7) · Phase 2 (D+8~D+30)
+
+**Phase 1**
+- Empire Day(매월 1·15) 자동 ×2 → BOOSTER에 흡수
+- Family Combo (가족 BOOSTER 1.2× 공유)
+- Whale 뱃지 6종 (Bronze→Mythic) `badges_catalog` 추가
+- `/protect` 사기방지 허브 + AI 진단 (`google/gemini-2.5-flash`) — 비입금자 유입 깔때기
+
+**Phase 2**
+- 시즌1 정식 (`seasons` 가동, IS = 시즌 점수)
+- PHANTOM Syndicate 분기 라이브
+- B2B 신뢰 API (사기방지 점수 외부 임베드, 수수료 수익)
+- 인플루언서 50명 UGC, 광고비 점화
+
+---
+
+## 7. 선행 지표 (오픈 D+7 안에 확인)
+
+- 일 EMPIRE(₩9.9M) 구매자 5명+
+- 부스터 7일 풀 연장자 10명+
+- 트레이딩 일평균 포지션 ₩100M+
+- Whale Top 10 평균 입금 ₩50M+/일
+
+위 4개가 보이기 시작하면 D+30~D+90 안에 일 ₩1B 입금자 도달 페이스.
+
+---
+
+## 8. 다음 액션
+
+승인하면 단일 마이그(6테이블+5RPC+1트리거) → 5개 신규 파일 + 8개 수정 파일 + 2개 Edge Function 순차 착수.
+빌드 후 `/whales` + `ImperialHud` + Packages 카드 즉시 동작 확인.
