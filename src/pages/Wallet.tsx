@@ -27,6 +27,8 @@ import Disclaimer from "@/components/Disclaimer";
 import StepUpGate from "@/components/security/StepUpGate";
 import { useStepUp } from "@/hooks/use-step-up";
 import { AdultOnlyBanner } from "@/components/AdultOnlyBanner";
+import BankAppDeeplinks from "@/components/wallet/BankAppDeeplinks";
+import AmountPresetChips from "@/components/wallet/AmountPresetChips";
 
 type AssetTab = "bank" | "coin";
 type ActionTab = "withdraw" | "deposit" | "history";
@@ -62,6 +64,8 @@ export default function Wallet() {
     else if (tab === "withdraw") setAction("withdraw");
     else if (tab === "history") setAction("history");
     if (isFirstDepositIntent) setAction("deposit");
+    const presetAmount = searchParams.get("amount");
+    if (presetAmount && /^\d{3,9}$/.test(presetAmount)) setAmount(presetAmount);
   }, [searchParams, isFirstDepositIntent]);
   const { requireStepUp, dialogProps: stepUpProps } = useStepUp();
 
