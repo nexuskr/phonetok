@@ -47,6 +47,7 @@ export default function AttendanceCard() {
         };
       });
       emitEarned(serverReward);
+      refreshWallet();
       toast({
         title: `🗓️ 출석 완료 +${formatKRW(serverReward)}`,
         description: isWeekly ? `7일 연속! 보너스 포함` : `${newStreakSrv}일 연속 출석`,
