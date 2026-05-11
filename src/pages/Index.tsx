@@ -121,16 +121,17 @@ export default function Index() {
           <span className="text-xs text-primary font-bold tracking-[0.2em]">{t("badge")}</span>
         </div>
 
-        <h1 className="font-display font-black text-4xl sm:text-6xl lg:text-7xl leading-[1.05] tracking-tight animate-fade-up">
-          {t("h1Line1")}
-          <br />
-          <span className="text-gradient-imperial">{t("h1Line2")}</span>
+        <h1
+          className="font-display font-black tracking-tight animate-fade-up text-gradient-imperial"
+          style={{ fontSize: "clamp(40px, 9vw, 84px)", lineHeight: 1.04 }}
+        >
+          이미 시작된 흐름입니다.
         </h1>
-        <p className="mt-3 text-xs sm:text-sm tracking-[0.4em] text-primary/80 font-bold animate-fade-up" style={{ animationDelay: "0.05s" }}>
-          {t("h1Sub")}
+        <p className="mt-6 text-base sm:text-xl text-muted-foreground max-w-xl mx-auto animate-fade-up" style={{ animationDelay: "0.1s" }}>
+          복잡한 설명은 필요 없습니다.<br />들어오면 바로 이해됩니다.
         </p>
-        <p className="mt-6 text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto animate-fade-up" style={{ animationDelay: "0.1s" }}>
-          {t("sub")}
+        <p className="mt-5 text-[11px] sm:text-xs tracking-[0.25em] text-primary/80 font-bold animate-fade-up" style={{ animationDelay: "0.15s" }}>
+          전세 · 팀미션 · 주식 · 다단계 — 더 이상 당하지 않습니다.
         </p>
 
         {/* Throne treasury card */}
@@ -163,24 +164,20 @@ export default function Index() {
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up" style={{ animationDelay: "0.3s" }}>
+        {/* CTA — single button, Musk tone */}
+        <div className="mt-12 flex flex-col items-center justify-center gap-3 animate-fade-up" style={{ animationDelay: "0.3s" }}>
           <Link
-            to="/global-intelligence"
-            onClick={() => { onCta("hero_infra"); track("cta_click", { surface: "hero_infra", variant: "trading" }); }}
-            className="group relative px-8 py-4 rounded-2xl font-display font-bold text-base sm:text-lg bg-gradient-imperial text-primary-foreground glow-imperial animate-pulse-glow hover:scale-105 transition flex items-center gap-2"
+            to={hasSession ? "/dashboard" : "/secure-auth?signup=1"}
+            onClick={() => { onCta("hero_primary"); track("cta_click", { surface: "hero_primary" }); }}
+            className="group relative px-10 py-4 rounded-2xl font-display font-black text-lg sm:text-xl bg-gradient-imperial text-primary-foreground glow-imperial animate-pulse-glow hover:scale-105 transition inline-flex items-center gap-2"
           >
-            <TrendingUp className="w-5 h-5" />
-            {t("ctaPrimary")}
+            지금 참여하기
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition" />
           </Link>
-          <Link
-            to="/empire"
-            onClick={() => { onCta("hero_infra"); track("cta_click", { surface: "hero_infra", variant: "tier" }); }}
-            className="px-6 py-3 rounded-2xl text-sm font-bold border border-primary/40 text-primary hover:bg-primary/10 transition inline-flex items-center gap-2"
-          >
-            <Crown className="w-4 h-4" /> Infrastructure Tier 참여하기
-          </Link>
+          <div className="text-[11px] text-muted-foreground tracking-wide">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse mr-1.5 align-middle" />
+            지금도 계속 참여 중입니다.
+          </div>
         </div>
 
         {/* 즉시 가치 + 사회적 증거 */}
