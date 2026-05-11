@@ -181,6 +181,8 @@ export default function Admin() {
           {tab === "insurance" && <InsuranceFundDashboard variant="admin" />}
           {tab === "accounting" && <OperatorAccounting />}
           {tab === "bots" && <BotStrengthAdmin />}
+          {tab === "ev_health" && <EvHealthAdmin />}
+          {tab === "ab_experiments" && <AbExperimentsAdmin />}
         </AdminAal2Gate>
       </div>
     </Layout>
