@@ -59,16 +59,21 @@ export default function Lounge() {
   async function loadAll() {
     setLoading(true);
     try {
-      const { data: lb } = await supabase.rpc("get_guild_leaderboard", { _limit: 20 });
-      const lbList: Guild[] = (lb ?? []).map((r: any) => ({
-        id: r.guild_id,
+      const { data: lb } = await supabase
+        .from("guilds")
+        .select("id, name, emblem, total_power, member_count, max_members, description, leader_id, is_seed")
+        .order("total_power", { ascending: false })
+        .limit(30);
+      const lbList: Guild[] = ((lb ?? []) as any[]).map((r) => ({
+        id: r.id,
         name: r.name,
         emblem: r.emblem,
         total_power: Number(r.total_power),
         member_count: r.member_count,
-        max_members: 30,
-        description: null,
-        leader_id: "",
+        max_members: r.max_members,
+        description: r.description,
+        leader_id: r.leader_id,
+        is_seed: !!r.is_seed,
       }));
       setLeaderboard(lbList);
 
