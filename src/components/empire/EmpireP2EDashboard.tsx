@@ -104,6 +104,7 @@ export default function EmpireP2EDashboard() {
     if (claiming) return;
     setClaiming(true);
     try {
+      await assertRateLimit(RL_WALLET.scope, RL_WALLET.max);
       const { data, error } = await supabase.rpc("claim_idle_growth" as any);
       if (error) throw error;
       const res = data as any;
