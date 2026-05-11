@@ -607,6 +607,9 @@ export type Database = {
           created_at: string
           generation: string
           id: string
+          is_synthetic: boolean
+          language: string
+          last_active_at: string
           nickname: string
           region: string
           tier_weight: string
@@ -616,6 +619,9 @@ export type Database = {
           created_at?: string
           generation: string
           id?: string
+          is_synthetic?: boolean
+          language?: string
+          last_active_at?: string
           nickname: string
           region?: string
           tier_weight?: string
@@ -625,6 +631,9 @@ export type Database = {
           created_at?: string
           generation?: string
           id?: string
+          is_synthetic?: boolean
+          language?: string
+          last_active_at?: string
           nickname?: string
           region?: string
           tier_weight?: string
@@ -633,6 +642,10 @@ export type Database = {
       }
       bot_settings: {
         Row: {
+          auto_phase_enabled: boolean
+          bot_ratio_phase: number
+          dau_threshold_high: number
+          dau_threshold_low: number
           enabled: boolean
           id: number
           online_base: number
@@ -642,6 +655,10 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          auto_phase_enabled?: boolean
+          bot_ratio_phase?: number
+          dau_threshold_high?: number
+          dau_threshold_low?: number
           enabled?: boolean
           id?: number
           online_base?: number
@@ -651,6 +668,10 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          auto_phase_enabled?: boolean
+          bot_ratio_phase?: number
+          dau_threshold_high?: number
+          dau_threshold_low?: number
           enabled?: boolean
           id?: number
           online_base?: number
@@ -1538,7 +1559,7 @@ export type Database = {
           emblem: string
           id: string
           is_seed: boolean
-          leader_id: string
+          leader_id: string | null
           max_members: number
           member_count: number
           name: string
@@ -1551,7 +1572,7 @@ export type Database = {
           emblem?: string
           id?: string
           is_seed?: boolean
-          leader_id: string
+          leader_id?: string | null
           max_members?: number
           member_count?: number
           name: string
@@ -1564,7 +1585,7 @@ export type Database = {
           emblem?: string
           id?: string
           is_seed?: boolean
-          leader_id?: string
+          leader_id?: string | null
           max_members?: number
           member_count?: number
           name?: string
@@ -5004,6 +5025,10 @@ export type Database = {
           _strength_pct: number
         }
         Returns: {
+          auto_phase_enabled: boolean
+          bot_ratio_phase: number
+          dau_threshold_high: number
+          dau_threshold_low: number
           enabled: boolean
           id: number
           online_base: number
@@ -5125,6 +5150,7 @@ export type Database = {
         Returns: Json
       }
       claim_weekly_pass_reward: { Args: { _level: number }; Returns: Json }
+      cleanup_bot_activity: { Args: never; Returns: undefined }
       complete_guide_bonus: { Args: never; Returns: Json }
       contribute_guild_war: {
         Args: { _score: number; _war_id: string }
