@@ -32,7 +32,7 @@ export default function ReplayLanding() {
       setData(r as unknown as Replay);
       setLoading(false);
       // bump view (best-effort)
-      supabase.rpc("bump_crown_replay_view", { _token: token }).catch(() => {});
+      try { await supabase.rpc("bump_crown_replay_view", { _token: token }); } catch {}
     })();
   }, [token]);
 
