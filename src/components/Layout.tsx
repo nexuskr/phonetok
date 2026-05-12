@@ -276,7 +276,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       )}
 
       <main className="relative">{children}</main>
-      <NeonNotificationFeed />
+      {idleReady && (
+        <Suspense fallback={null}>
+          <NeonNotificationFeed />
+        </Suspense>
+      )}
 
       {/* Mobile bottom nav — 5 tabs with center FAB */}
       {user && (
