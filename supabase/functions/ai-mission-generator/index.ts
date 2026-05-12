@@ -159,7 +159,8 @@ Deno.serve(async (req: Request) => {
     const msg = e?.message ?? "unknown";
     const status = msg === "rate_limited" ? 429 : msg === "payment_required" ? 402 : 500;
     console.error("ai-mission-generator error:", msg);
-    return new Response(JSON.stringify({ error: msg }), {
+    const safe = status === 500 ? "internal_error" : msg;
+    return new Response(JSON.stringify({ error: safe }), {
       status, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
