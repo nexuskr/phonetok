@@ -42,7 +42,7 @@ export default function AdminKpi() {
         supabase.from("viral_metrics" as any).select("viral_score").order("updated_at", { ascending: false }).limit(500),
       ]);
 
-      const fe = (feed24.data ?? []) as Array<{ user_id: string | null; event_type: string }>;
+      const fe = (feed24.data ?? []) as unknown as Array<{ user_id: string | null; event_type: string }>;
       const dauSet = new Set<string>();
       let views = 0, clicks = 0;
       for (const e of fe) {
@@ -52,14 +52,14 @@ export default function AdminKpi() {
       }
 
       const mauSet = new Set<string>();
-      for (const r of (feed30.data ?? []) as Array<{ user_id: string }>) mauSet.add(r.user_id);
+      for (const r of (feed30.data ?? []) as unknown as Array<{ user_id: string }>) mauSet.add(r.user_id);
 
-      const rev = (rev7.data ?? []) as Array<{ user_id: string | null; amount_krw: number }>;
+      const rev = (rev7.data ?? []) as unknown as Array<{ user_id: string | null; amount_krw: number }>;
       const revSum = rev.reduce((s, r) => s + (Number(r.amount_krw) || 0), 0);
       const payerSet = new Set<string>();
       for (const r of rev) if (r.user_id) payerSet.add(r.user_id);
 
-      const profs = (prof7.data ?? []) as Array<{ id: string; referred_by: string | null }>;
+      const profs = (prof7.data ?? []) as unknown as Array<{ id: string; referred_by: string | null }>;
       const inviters = new Set<string>();
       let invitedNew = 0;
       for (const p of profs) {
@@ -70,7 +70,7 @@ export default function AdminKpi() {
       }
       const kFactor = inviters.size ? invitedNew / inviters.size : 0;
 
-      const vs = (viral.data ?? []) as Array<{ viral_score: number }>;
+      const vs = (viral.data ?? []) as unknown as Array<{ viral_score: number }>;
       const viralAvg = vs.length ? vs.reduce((s, r) => s + (r.viral_score || 0), 0) / vs.length : 0;
 
       setK({
