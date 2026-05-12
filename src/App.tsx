@@ -58,6 +58,9 @@ const Settlements = lazy(() => import("./pages/Settlements.tsx"));
 const Status = lazy(() => import("./pages/Status.tsx"));
 const Referral = lazy(() => import("./pages/Referral.tsx"));
 const CampaignRedirect = lazy(() => import("./pages/CampaignRedirect.tsx"));
+const Trust = lazy(() => import("./pages/Trust.tsx"));
+const LegalDoc = lazy(() => import("./pages/LegalDoc.tsx"));
+import { LegalConsentGate } from "./components/legal/LegalConsentGate";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -91,6 +94,7 @@ const App = () => (
           <SessionWatcher />
           <ReviewerMaskRoot />
           <ReviewerBadge />
+          <LegalConsentGate />
           <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -147,7 +151,8 @@ const App = () => (
               <Route path="/season-pass" element={<Navigate to="/missions?tab=daily" replace />} />
               <Route path="/quests" element={<Navigate to="/missions?tab=daily" replace />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
-              <Route path="/trust" element={<Navigate to="/status" replace />} />
+              <Route path="/trust" element={<Trust />} />
+              <Route path="/legal/:docKey" element={<LegalDoc />} />
               <Route path="/status" element={<Status />} />
               <Route path="/hall-of-fame" element={<Navigate to="/legacy" replace />} />
               <Route path="/referral" element={<Referral />} />
