@@ -15,7 +15,7 @@ export interface FeedCardProps {
   viralScore?: number | null;
 }
 
-export default function FeedCard({ videoId, title, thumbnail, region }: FeedCardProps) {
+export default function FeedCard({ videoId, title, thumbnail, region, viralScore }: FeedCardProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const enteredAt = useRef<number | null>(null);
   const firedView = useRef(false);
