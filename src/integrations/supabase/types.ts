@@ -910,6 +910,57 @@ export type Database = {
         }
         Relationships: []
       }
+      crown_events: {
+        Row: {
+          awarded_amount: number
+          base_amount: number
+          created_at: string
+          dedupe_key: string
+          event_type: string
+          expected_amount: number
+          id: number
+          level_mult: number
+          meta: Json
+          rpe: number
+          streak_mult: number
+          type_mult: number
+          user_id: string
+          variance: number
+        }
+        Insert: {
+          awarded_amount: number
+          base_amount: number
+          created_at?: string
+          dedupe_key: string
+          event_type: string
+          expected_amount: number
+          id?: number
+          level_mult: number
+          meta?: Json
+          rpe: number
+          streak_mult: number
+          type_mult: number
+          user_id: string
+          variance: number
+        }
+        Update: {
+          awarded_amount?: number
+          base_amount?: number
+          created_at?: string
+          dedupe_key?: string
+          event_type?: string
+          expected_amount?: number
+          id?: number
+          level_mult?: number
+          meta?: Json
+          rpe?: number
+          streak_mult?: number
+          type_mult?: number
+          user_id?: string
+          variance?: number
+        }
+        Relationships: []
+      }
       daily_combo_progress: {
         Row: {
           date: string
@@ -1264,6 +1315,36 @@ export type Database = {
           claimed_by?: string | null
           purchase_id?: string | null
           seat_no?: number
+        }
+        Relationships: []
+      }
+      empire_levels: {
+        Row: {
+          crown_required: number
+          fee_discount: number
+          growth_speed_bonus: number
+          level: number
+          leverage_cap: number
+          name: string
+          perks: Json
+        }
+        Insert: {
+          crown_required: number
+          fee_discount?: number
+          growth_speed_bonus?: number
+          level: number
+          leverage_cap?: number
+          name: string
+          perks?: Json
+        }
+        Update: {
+          crown_required?: number
+          fee_discount?: number
+          growth_speed_bonus?: number
+          level?: number
+          leverage_cap?: number
+          name?: string
+          perks?: Json
         }
         Relationships: []
       }
@@ -2901,8 +2982,10 @@ export type Database = {
           coin_master_unlocked: boolean
           coin_network: string | null
           created_at: string
+          crown_score: number
           daily_mission_count: number | null
           email_notifications_enabled: boolean | null
+          empire_level: number
           id: string
           is_adult: boolean
           last_attendance: string | null
@@ -2934,8 +3017,10 @@ export type Database = {
           coin_master_unlocked?: boolean
           coin_network?: string | null
           created_at?: string
+          crown_score?: number
           daily_mission_count?: number | null
           email_notifications_enabled?: boolean | null
+          empire_level?: number
           id: string
           is_adult?: boolean
           last_attendance?: string | null
@@ -2967,8 +3052,10 @@ export type Database = {
           coin_master_unlocked?: boolean
           coin_network?: string | null
           created_at?: string
+          crown_score?: number
           daily_mission_count?: number | null
           email_notifications_enabled?: boolean | null
+          empire_level?: number
           id?: string
           is_adult?: boolean
           last_attendance?: string | null
@@ -5542,6 +5629,15 @@ export type Database = {
       assign_persona: { Args: never; Returns: string }
       auto_adjust_bot_strength: { Args: never; Returns: Json }
       auto_freeze_critical_anomalies: { Args: never; Returns: Json }
+      award_crown: {
+        Args: {
+          _base: number
+          _dedupe_key?: string
+          _meta?: Json
+          _type: string
+        }
+        Returns: Json
+      }
       award_imperial_score: {
         Args: { _base: number; _meta?: Json; _source: string; _user_id: string }
         Returns: number
@@ -6136,6 +6232,7 @@ export type Database = {
         }[]
       }
       recompute_daily_whale_leaderboard: { Args: never; Returns: undefined }
+      recompute_empire_level: { Args: { _user_id: string }; Returns: number }
       record_chaos_run:
         | {
             Args: {
