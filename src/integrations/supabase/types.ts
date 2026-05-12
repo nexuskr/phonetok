@@ -6051,6 +6051,7 @@ export type Database = {
           total_reward: number
         }[]
       }
+      get_beta_funnel_stats: { Args: never; Returns: Json }
       get_bot_feed: {
         Args: { _limit?: number }
         Returns: {
