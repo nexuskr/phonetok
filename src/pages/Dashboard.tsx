@@ -31,6 +31,7 @@ import { useTranslation } from "react-i18next";
 import HubTabs from "@/components/HubTabs";
 import Disclaimer from "@/components/Disclaimer";
 import PersonalizedFeedRail from "@/components/feed/PersonalizedFeedRail";
+import RevenueWidget from "@/components/feed/RevenueWidget";
 
 export default function Dashboard() {
   const [db] = useDB();
