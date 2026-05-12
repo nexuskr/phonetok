@@ -545,6 +545,68 @@ export type Database = {
         }
         Relationships: []
       }
+      beta_invites: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          max_uses: number
+          note: string | null
+          uses: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          max_uses?: number
+          note?: string | null
+          uses?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          max_uses?: number
+          note?: string | null
+          uses?: number
+        }
+        Relationships: []
+      }
+      beta_redemptions: {
+        Row: {
+          id: string
+          invite_id: string
+          redeemed_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          invite_id: string
+          redeemed_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          invite_id?: string
+          redeemed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beta_redemptions_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: false
+            referencedRelation: "beta_invites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       boost_schedule: {
         Row: {
           label: string | null
@@ -6173,6 +6235,7 @@ export type Database = {
         Returns: Json
       }
       harvest_machine: { Args: { _purchase_id: string }; Returns: Json }
+      has_beta_access: { Args: never; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -6499,6 +6562,7 @@ export type Database = {
         Returns: string
       }
       recover_stuck_settlements: { Args: never; Returns: Json }
+      redeem_beta_invite: { Args: { _code: string }; Returns: Json }
       redeem_real_coupon: { Args: { _code: string }; Returns: Json }
       redetect_anomaly: { Args: { _id: string }; Returns: Json }
       register_device: { Args: { _fp: string; _ua?: string }; Returns: Json }
