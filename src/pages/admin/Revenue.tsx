@@ -40,7 +40,7 @@ export default function AdminRevenue() {
       .gt("created_at", since)
       .order("created_at", { ascending: false })
       .limit(1000);
-    setRows((data as RevenueRow[] | null) ?? []);
+    setRows(((data as unknown) as RevenueRow[] | null) ?? []);
     setRefreshing(false);
   };
 
