@@ -1,7 +1,9 @@
 // PR-3: Empire Level Badge — shows current level + progress to next.
+// PR-11: Crown Aura 시각 적용.
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Crown } from "lucide-react";
+import CrownAura from "@/components/empire/CrownAura";
 
 type Level = { level: number; name: string; crown_required: number; perks: any };
 
@@ -48,7 +50,9 @@ export default function EmpireLevelBadge({ compact = false }: { compact?: boolea
   if (compact) {
     return (
       <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md glass border border-sim-gold/30 text-xs">
-        <span>{curBadge}</span>
+        <CrownAura level={level} size={18}>
+          <span className="text-[12px] leading-none">{curBadge}</span>
+        </CrownAura>
         <span className="font-bold tabular-nums">L{level}</span>
         <span className="text-muted-foreground tabular-nums">{score.toLocaleString()}₡</span>
       </div>
@@ -57,8 +61,10 @@ export default function EmpireLevelBadge({ compact = false }: { compact?: boolea
 
   return (
     <div className="glass-strong rounded-xl p-3 border border-sim-gold/30">
-      <div className="flex items-center gap-2">
-        <span className="text-2xl">{curBadge}</span>
+      <div className="flex items-center gap-3">
+        <CrownAura level={level} size={42}>
+          <span className="text-2xl leading-none">{curBadge}</span>
+        </CrownAura>
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2">
             <span className="font-imperial text-sm tracking-wider text-gradient-imperial">
