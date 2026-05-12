@@ -164,6 +164,7 @@ const App = () => (
               <Route path="/referral" element={<Referral />} />
               <Route path="/ugc" element={<Navigate to="/missions?tab=rewards" replace />} />
               <Route path="/c/:slug" element={<CampaignRedirect />} />
+              <Route path="/r/:token" element={<ReplayLanding />} />
               <Route path="/global-intelligence" element={<Navigate to="/" replace />} />
               <Route path="/infrastructure" element={<Navigate to="/" replace />} />
               <Route path="/intelligence-loop" element={<Navigate to="/" replace />} />
