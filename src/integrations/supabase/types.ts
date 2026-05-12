@@ -1371,6 +1371,66 @@ export type Database = {
           },
         ]
       }
+      feed_events: {
+        Row: {
+          created_at: string
+          dwell_ms: number
+          event: string
+          id: number
+          region: string | null
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          dwell_ms?: number
+          event: string
+          id?: number
+          region?: string | null
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          dwell_ms?: number
+          event?: string
+          id?: number
+          region?: string | null
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
+      feed_recommendations: {
+        Row: {
+          clicked_at: string | null
+          id: number
+          mode: string
+          score: number
+          served_at: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          clicked_at?: string | null
+          id?: number
+          mode?: string
+          score?: number
+          served_at?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          clicked_at?: string | null
+          id?: number
+          mode?: string
+          score?: number
+          served_at?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
       fomo_notifications: {
         Row: {
           created_at: string
@@ -2769,6 +2829,33 @@ export type Database = {
         }
         Relationships: []
       }
+      posting_schedule_queue: {
+        Row: {
+          created_at: string
+          id: number
+          region: string
+          scheduled_at: string
+          status: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          region: string
+          scheduled_at: string
+          status?: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          region?: string
+          scheduled_at?: string
+          status?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age_confirmed: boolean
@@ -3171,6 +3258,42 @@ export type Database = {
           request_kind?: string
           to_status?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      revenue_events: {
+        Row: {
+          amount_krw: number
+          attribution_referrer: string | null
+          attribution_video_id: string | null
+          created_at: string
+          currency: string
+          id: number
+          meta: Json
+          source: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_krw: number
+          attribution_referrer?: string | null
+          attribution_video_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: number
+          meta?: Json
+          source: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_krw?: number
+          attribution_referrer?: string | null
+          attribution_video_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: number
+          meta?: Json
+          source?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -4008,6 +4131,30 @@ export type Database = {
           },
         ]
       }
+      user_feed_profile: {
+        Row: {
+          mode: string
+          persona: string
+          region: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          mode?: string
+          persona?: string
+          region?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          mode?: string
+          persona?: string
+          region?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_onboarding_progress: {
         Row: {
           completed_at: string | null
@@ -4220,6 +4367,39 @@ export type Database = {
           status?: string
           updated_at?: string
           window_expires_at?: string
+        }
+        Relationships: []
+      }
+      viral_metrics: {
+        Row: {
+          completion_rate: number
+          posted_at: string | null
+          region: string | null
+          share_rate: number
+          updated_at: string
+          video_id: string
+          viral_score: number
+          watch_3s_rate: number
+        }
+        Insert: {
+          completion_rate?: number
+          posted_at?: string | null
+          region?: string | null
+          share_rate?: number
+          updated_at?: string
+          video_id: string
+          viral_score?: number
+          watch_3s_rate?: number
+        }
+        Update: {
+          completion_rate?: number
+          posted_at?: string | null
+          region?: string | null
+          share_rate?: number
+          updated_at?: string
+          video_id?: string
+          viral_score?: number
+          watch_3s_rate?: number
         }
         Relationships: []
       }
@@ -5903,6 +6083,15 @@ export type Database = {
       public_uptime_summary: { Args: never; Returns: Json }
       public_withdrawal_sla: { Args: never; Returns: Json }
       purchase_season_pass: { Args: never; Returns: Json }
+      rank_feed_for_user: {
+        Args: { _limit?: number }
+        Returns: {
+          mode: string
+          score: number
+          served_at: string
+          video_id: string
+        }[]
+      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -5939,6 +6128,15 @@ export type Database = {
         Args: { _mode?: string; _pnl: number; _result: string; _side: string }
         Returns: Json
       }
+      record_feed_event: {
+        Args: {
+          _dwell_ms?: number
+          _event: string
+          _region?: string
+          _video_id: string
+        }
+        Returns: number
+      }
       record_paper_trade_outcome: {
         Args: {
           p_is_win: boolean
@@ -5970,6 +6168,17 @@ export type Database = {
           _user_id: string
         }
         Returns: undefined
+      }
+      record_revenue_event: {
+        Args: {
+          _amount_krw: number
+          _attribution_referrer?: string
+          _attribution_video_id?: string
+          _meta?: Json
+          _source: string
+          _user_id: string
+        }
+        Returns: number
       }
       record_span: {
         Args: {
