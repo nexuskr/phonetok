@@ -85,13 +85,23 @@ const PHASE_MULT: Record<number, number> = { 1: 1.0, 2: 0.3, 3: 0.1, 4: 0.05 };
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  if (CRON_SECRET) {
-    const provided = req.headers.get("x-bot-cron-secret") ?? "";
-    if (provided !== CRON_SECRET) {
-      return new Response(JSON.stringify({ error: "unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+  // Fail-closed: cron secret must be configured AND match (timing-safe).
+  if (!CRON_SECRET) {
+    console.error("[bot-seed-engine] BOT_CRON_SECRET is not configured");
+    return new Response(JSON.stringify({ error: "misconfigured" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const provided = req.headers.get("x-bot-cron-secret") ?? "";
+  const a = new TextEncoder().encode(provided);
+  const b = new TextEncoder().encode(CRON_SECRET);
+  let ok = a.length === b.length;
+  const len = Math.max(a.length, b.length);
+  for (let i = 0; i < len; i++) ok = ok && (a[i] === b[i]);
+  if (!ok) {
+    return new Response(JSON.stringify({ error: "unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   try {
