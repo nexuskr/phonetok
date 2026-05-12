@@ -5,7 +5,7 @@ import { Crown, Sparkles, Swords, Zap, Share2, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useEmpireBooster } from "@/hooks/use-empire-booster";
-import { useCrownWar, formatRemaining } from "@/hooks/use-crown-war";
+import { useCrownWar, formatMSS } from "@/hooks/use-crown-war";
 import Layout from "@/components/Layout";
 import { LoadingList } from "@/components/ui/loading-state";
 import { ShareReplayButton } from "@/components/empire/ShareReplayButton";
