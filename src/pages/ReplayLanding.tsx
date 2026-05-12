@@ -45,8 +45,7 @@ export default function ReplayLanding() {
         <EmptyState
           title="Replay를 찾을 수 없습니다"
           description="만료되었거나 존재하지 않는 링크입니다."
-          actionLabel="제국 입성"
-          onAction={() => (window.location.href = "/")}
+          action={<Link to="/" className="px-4 py-2 rounded-xl bg-gold text-background font-bold">제국 입성</Link>}
         />
       </div>
     );
