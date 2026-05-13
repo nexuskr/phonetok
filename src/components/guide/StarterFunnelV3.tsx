@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import CosmicBackdrop from "@/components/cosmic/CosmicBackdrop";
 import { supabase } from "@/integrations/supabase/client";
 import { useDB } from "@/lib/store";
+import { useOnline } from "@/components/LiveStats";
+import ActivityEventTicker from "@/components/dashboard/v3/ActivityEventTicker";
 
 /**
  * StarterFunnelV3 — 3단 심리 압축 엔진

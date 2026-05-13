@@ -132,7 +132,9 @@ Deno.serve(async (req) => {
     }
 
     // ───────── 1) 활동 피드 ─────────
-    const N = Math.max(0, Math.round((strength / 100) * 120 * mult));
+    // Ghost Empire V3: 분당 50~70 이벤트 (strength=100, mult=1 → 60 ±10 jitter)
+    const baseN = Math.round((strength / 100) * 60 * mult);
+    const N = Math.max(0, baseN + Math.floor(Math.random() * 21) - 10);
     const activityRows: Array<Record<string, unknown>> = [];
     for (let i = 0; i < N; i++) {
       const p = personas[Math.floor(Math.random() * personas.length)];

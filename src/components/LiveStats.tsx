@@ -45,7 +45,9 @@ export function useOnline() {
     const t = setInterval(tick, 30_000);
     return () => { cancelled = true; clearInterval(t); };
   }, []);
-  return useJitter(base, { min: -8, max: 14, every: 4000 });
+  // base 기준 ±10% 범위에서 자연 변동 (15,000 → 12,000~18,000)
+  const span = Math.max(20, Math.floor(base * 0.10));
+  return useJitter(base, { min: -span, max: span, every: 6000 });
 }
 
 export function useTotalPayout() {
