@@ -191,21 +191,27 @@ export default function Dashboard() {
           </div>
 
           {/* 보조 훅 */}
-          <div className="mt-4 space-y-3">
-            <SevenDayChallengeCard />
-            <div className="flex justify-center"><EmpireDayCountdown /></div>
-            <MachineFomoTicker />
-          </div>
+          <LazyMount minHeight={240} rootMargin="500px 0px">
+            <div className="mt-4 space-y-3">
+              <Suspense fallback={null}><SevenDayChallengeCard /></Suspense>
+              <div className="flex justify-center"><Suspense fallback={null}><EmpireDayCountdown /></Suspense></div>
+              <Suspense fallback={null}><MachineFomoTicker /></Suspense>
+            </div>
+          </LazyMount>
 
           {/* DAILY ATTENDANCE — habit/streak driver */}
-          <div className="mt-4">
-            <AttendanceCard />
-          </div>
+          <LazyMount minHeight={120} rootMargin="500px 0px">
+            <div className="mt-4">
+              <Suspense fallback={null}><AttendanceCard /></Suspense>
+            </div>
+          </LazyMount>
 
           {/* TIER COMPARISON — 한국 유저 우월감 엔진 */}
-          <div className="mt-4">
-            <TierComparisonCard />
-          </div>
+          <LazyMount minHeight={140} rootMargin="500px 0px">
+            <div className="mt-4">
+              <Suspense fallback={null}><TierComparisonCard /></Suspense>
+            </div>
+          </LazyMount>
 
           {/* LUCKY ROULETTE entry */}
           <Link to="/roulette" className="mt-4 block press">
@@ -241,14 +247,18 @@ export default function Dashboard() {
           </div>
 
           {/* MEGA JACKPOT — primary dopamine driver */}
-          <div className="mt-5">
-            <JackpotBanner />
-          </div>
+          <LazyMount minHeight={180} rootMargin="500px 0px">
+            <div className="mt-5">
+              <Suspense fallback={null}><JackpotBanner /></Suspense>
+            </div>
+          </LazyMount>
 
           {/* AI Auto Bots summary */}
-          <div className="mt-5">
-            <ActiveBotsMini />
-          </div>
+          <LazyMount minHeight={180} rootMargin="500px 0px">
+            <div className="mt-5">
+              <Suspense fallback={null}><ActiveBotsMini /></Suspense>
+            </div>
+          </LazyMount>
 
           {/* Quick actions */}
           <div className="grid grid-cols-4 gap-2 mt-5">
