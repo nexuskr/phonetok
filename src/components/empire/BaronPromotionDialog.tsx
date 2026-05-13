@@ -1,6 +1,7 @@
 // PR-12: Baron FOMO Dialog v2 — pulsing countdown, 3 message variants, shimmer CTA.
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { useNowTick } from "@/hooks/use-now-tick";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
