@@ -140,6 +140,32 @@ export default function PhonaraPayPanel({ receiveAddress }: Props) {
         </div>
       </div>
 
+      {/* 실시간 입금 상태 배지 */}
+      {intent && (
+        <div
+          className={cn(
+            "mb-3 flex items-center justify-between gap-2 rounded-xl px-3 py-2 border text-[11px] font-bold",
+            isFilled && "border-emerald-500/50 bg-emerald-500/10 text-emerald-300",
+            !isFilled && isExpired && "border-rose-500/50 bg-rose-500/10 text-rose-300",
+            !isFilled && !isExpired && intent.status === "canceled" && "border-muted/50 bg-muted/30 text-muted-foreground",
+            !isFilled && !isExpired && intent.status === "pending" && "border-amber-500/50 bg-amber-500/10 text-amber-300",
+          )}
+        >
+          <span className="inline-flex items-center gap-1.5">
+            {isFilled ? (
+              <><CheckCircle2 className="w-3.5 h-3.5" /> 입금 승인 완료 · PHON 적립됨</>
+            ) : isExpired ? (
+              <><Clock className="w-3.5 h-3.5" /> 만료됨 — 다시 만들어주세요</>
+            ) : intent.status === "canceled" ? (
+              <><Clock className="w-3.5 h-3.5" /> 취소됨</>
+            ) : (
+              <><Loader2 className="w-3.5 h-3.5 animate-spin" /> 입금 대기중 — 송금 즉시 자동 인식</>
+            )}
+          </span>
+          <span className="text-[9px] tracking-widest opacity-80 uppercase">{intent.status}</span>
+        </div>
+      )}
+
       {!intent || isExpired ? (
         <>
           <div className="text-xs font-bold text-muted-foreground mb-2">입금 금액 (USDT)</div>
