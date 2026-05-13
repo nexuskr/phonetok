@@ -63,6 +63,8 @@ export default function PhonaraPayPanel({ receiveAddress }: Props) {
     intentRef.current = intent;
   }, [intent]);
 
+  const fireBurst = useFirstEmperorBurst((s) => s.fire);
+
   useEffect(() => {
     const ch = supabase
       .channel(`pay:intents:${Math.random().toString(36).slice(2, 8)}`)
@@ -71,13 +73,31 @@ export default function PhonaraPayPanel({ receiveAddress }: Props) {
         if (intentRef.current && row.id === intentRef.current.id && row.status === "filled") {
           setIntent(row);
           const phon = Math.round(row.unique_amount * PHON_PER_USDT);
-          notify.success("입금 매칭 완료!", { description: `+${phon.toLocaleString()} PHON 적립` });
+          // Fetch power state to determine NFT level + first-bonus
+          const [{ data: nftRows }, { data: lev }, { data: boost }] = await Promise.all([
+            supabase.rpc("get_my_nft_collection"),
+            supabase.rpc("get_my_max_leverage"),
+            supabase.rpc("get_my_total_boost_pct"),
+          ]);
+          const list = (nftRows as any[]) || [];
+          const isFirst = list.length === 1 && list[0]?.source === "deposit";
+          const latest = list[0]; // ordered DESC
+          notify.success(`💥 ${(latest?.level ?? "BRONZE").toUpperCase()} CROWN 획득`, {
+            description: `+${phon.toLocaleString()} PHON · ⚡ +${boost ?? 0}% · 🚀 ${lev ?? 10}x 해금`,
+          });
+          fireBurst({
+            nft_level: latest?.level ?? "bronze",
+            boost_pct: Number(boost ?? 0),
+            max_leverage: Number(lev ?? 10),
+            phon_bonus: Math.floor(phon * 0.1),
+            first_bonus: isFirst,
+          });
           void getPhonBalance().then(setPhonBal);
         }
       })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, []);
+  }, [fireBurst]);
 
   const remaining = intent ? new Date(intent.expires_at).getTime() - now : 0;
   const isFilled = intent?.status === "filled";
