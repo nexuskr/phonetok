@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
 import Layout from "@/components/Layout";
 import HubTabs from "@/components/HubTabs";
@@ -37,6 +37,34 @@ export default function Packages() {
   const user = useRequireAuth() ?? db.user;
   const [selected, setSelected] = useState<Pkg | null>(null);
   const [paywall, setPaywall] = useState<Pkg | null>(null);
+  const [flashId, setFlashId] = useState<string | null>(null);
+  const [sp, setSp] = useSearchParams();
+
+  useEffect(() => {
+    const focus = sp.get("focus");
+    if (focus) {
+      const el = document.getElementById(`pkg-${focus}`);
+      if (el) {
+        requestAnimationFrame(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          setFlashId(focus);
+          setTimeout(() => setFlashId(null), 1800);
+          const next = new URLSearchParams(sp);
+          next.delete("focus");
+          setSp(next, { replace: true });
+        });
+      }
+    }
+    function onFocusEvt(e: Event) {
+      const id = (e as CustomEvent<string>).detail;
+      if (!id) return;
+      setFlashId(id);
+      setTimeout(() => setFlashId(null), 1800);
+    }
+    window.addEventListener("packages:focus", onFocusEvt);
+    return () => window.removeEventListener("packages:focus", onFocusEvt);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sp.get("focus")]);
 
   function handleCTA(p: Pkg) {
     if (isFlagOn("frictionZeroPay") && (p.tier === "STARTER" || p.tier === "VIP" || p.tier === "GOD")) {
@@ -79,7 +107,7 @@ export default function Packages() {
             const ts = tierStyles[p.tier];
             const isEmpire = p.tier === "EMPIRE" || p.tier === "PHANTOM";
             return (
-              <div key={p.id} className="relative lift group">
+              <div key={p.id} id={`pkg-${p.id}`} className={`relative lift group scroll-mt-24 transition ${flashId === p.id ? "ring-2 ring-gold rounded-3xl animate-pulse" : ""}`}>
                 <div aria-hidden className={`pointer-events-none absolute -inset-0.5 rounded-3xl bg-gradient-to-br ${ts.ring} opacity-60 blur-md group-hover:opacity-100 transition duration-700`} />
                 <div className="relative glass-strong rounded-3xl p-5 sm:p-6 overflow-hidden sheen">
                   <div aria-hidden className={`pointer-events-none absolute -top-20 -right-20 w-44 h-44 rounded-full bg-gradient-to-br ${ts.bg} to-transparent blur-3xl opacity-70`} />
@@ -279,7 +307,7 @@ function PurchaseModal({ pkg, onClose }: { pkg: Pkg; onClose: () => void }) {
           aria-label="Close"
           className="absolute top-4 right-4 z-[70] w-11 h-11 rounded-full bg-muted/60 hover:bg-muted flex items-center justify-center min-h-[44px] min-w-[44px]"
         ><X className="w-4 h-4" /></button>
-        <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-gradient-primary blur-3xl opacity-50" />
+        <div aria-hidden className="pointer-events-none absolute -top-20 -right-20 w-40 h-40 rounded-full bg-gradient-primary blur-3xl opacity-50" />
         <div className="relative">
           <h2 className="font-imperial font-black text-xl sm:text-2xl tracking-[0.02em]">{pkg.name}</h2>
           <p className="text-xs text-muted-foreground break-keep">{pkg.tagline}</p>
