@@ -311,7 +311,6 @@ export default function AdminCockpitV2() {
 
       {/* PR-22 Predictive SLA */}
       <PredictiveSlaPanel />
-      </section>
 
       <div className="grid lg:grid-cols-2 gap-4">
         {/* Top Risk Withdrawals */}
