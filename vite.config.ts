@@ -31,17 +31,18 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
-          if (/[\\/]react(?:-dom|-router-dom)?[\\/]/.test(id)) return "react-vendor";
+          // Keep React + anything that depends on React's module identity
+          // (radix, framer-motion, react-router, react-dom, scheduler, jsx-runtime)
+          // in ONE chunk to avoid "createContext of undefined" from out-of-order
+          // evaluation across split chunks.
           if (id.includes("@supabase")) return "supabase";
-          if (id.includes("@tanstack")) return "query";
           if (id.includes("recharts") || id.includes("d3-")) return "charts";
           if (id.includes("three") || id.includes("@react-three")) return "three";
-          if (id.includes("framer-motion")) return "motion";
-          if (id.includes("@radix-ui")) return "radix";
           if (id.includes("lucide-react")) return "icons";
           if (id.includes("date-fns")) return "date";
-          if (id.includes("i18next") || id.includes("react-i18next")) return "i18n";
-          return "vendor";
+          if (id.includes("i18next")) return "i18n";
+          // everything else (react, react-dom, react-router, radix, motion,
+          // tanstack, etc.) falls into the default vendor chunk together.
         },
       },
     },
