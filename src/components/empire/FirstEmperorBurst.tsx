@@ -163,12 +163,6 @@ export default function FirstEmperorBurst({ onCta }: Props) {
               onClick={close}
               className="mt-2 w-full text-[11px] text-muted-foreground hover:text-foreground"
             >
-              🚀 지금 베팅하러 가기
-            </Button>
-            <button
-              onClick={close}
-              className="mt-2 w-full text-[11px] text-muted-foreground hover:text-foreground"
-            >
               나중에 보기
             </button>
           </motion.div>
