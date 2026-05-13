@@ -320,13 +320,15 @@ export default function PackageUpgradeCards() {
                 <Table2 className="w-3.5 h-3.5" /> 등급 비교 한 장으로 보기
               </button>
             </DialogTrigger>
-            <DialogContent className="max-w-3xl">
+            <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto overscroll-contain">
               <DialogHeader>
                 <DialogTitle className="font-imperial text-gradient-gold flex items-center gap-2">
                   <Crown className="w-5 h-5 text-gold" /> 단계별 혜택 비교
                 </DialogTitle>
               </DialogHeader>
-              <TierBenefitMatrix tiers={MATRIX_TIERS} />
+              <div className="min-w-0 overflow-x-auto">
+                <TierBenefitMatrix tiers={MATRIX_TIERS} />
+              </div>
             </DialogContent>
           </Dialog>
         </div>
