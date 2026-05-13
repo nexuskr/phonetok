@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNowTick } from "@/hooks/use-now-tick";
 import { useNavigate } from "react-router-dom";
 import { Crown, Zap, Sparkles, X, ChevronRight, Coins } from "lucide-react";
 import { track } from "@/lib/analytics";
@@ -29,11 +30,16 @@ export default function SixtySecondFlow({ enabled }: { enabled: boolean }) {
     return () => clearTimeout(ti);
   }, [enabled]);
 
+  const startRef = useRef(0);
+  const tickNow = useNowTick(1000);
   useEffect(() => {
-    if (!open) return;
-    const id = setInterval(() => setSeconds((s) => s + 1), 1000);
-    return () => clearInterval(id);
+    if (!open) { startRef.current = 0; return; }
+    if (!startRef.current) startRef.current = Date.now();
   }, [open]);
+  useEffect(() => {
+    if (!open || !startRef.current) return;
+    setSeconds(Math.floor((tickNow - startRef.current) / 1000));
+  }, [tickNow, open]);
 
   function close(via: "skip" | "complete") {
     localStorage.setItem(KEY, String(Date.now()));

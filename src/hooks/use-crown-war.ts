@@ -1,6 +1,7 @@
 // PR-C: Crown Wars — live snapshot hook (poll + realtime).
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useNowTick } from "@/hooks/use-now-tick";
 
 export type CrownWarLeader = {
   rnk: number;

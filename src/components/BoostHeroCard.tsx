@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNowTick } from "@/hooks/use-now-tick";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { formatKRW } from "@/lib/store";
@@ -72,10 +73,8 @@ export default function BoostHeroCard() {
   };
 
   useEffect(() => { void load(); }, []);
-  useEffect(() => {
-    const i = setInterval(() => setTick((t) => t + 1), 2000);
-    return () => clearInterval(i);
-  }, []);
+  const _boostTick = useNowTick(2000);
+  useEffect(() => { setTick((t) => t + 1); }, [_boostTick]);
 
   const harvest = async (m: Machine) => {
     setHarvesting(m.id);

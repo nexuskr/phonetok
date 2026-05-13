@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNowTick } from "@/hooks/use-now-tick";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,16 +32,11 @@ export default function WithdrawOtpDialog({ open, onClose, onVerified }: Props) 
     }
   }, [open]);
 
+  const _otpTick = useNowTick(1000);
   useEffect(() => {
     if (!sentAt) return;
-    const tick = () => {
-      const remain = Math.max(0, 300 - Math.floor((Date.now() - sentAt) / 1000));
-      setSecondsLeft(remain);
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [sentAt]);
+    setSecondsLeft(Math.max(0, 300 - Math.floor((Date.now() - sentAt) / 1000)));
+  }, [sentAt, _otpTick]);
 
   async function sendOtp() {
     setSending(true);

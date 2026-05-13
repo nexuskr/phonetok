@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNowTick } from "@/hooks/use-now-tick";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { formatKRW } from "@/lib/store";
@@ -56,10 +57,8 @@ export default function MachineDashboardCard() {
   };
 
   useEffect(() => { void load(); }, []);
-  useEffect(() => {
-    const i = setInterval(() => setTick(t => t + 1), 1000);
-    return () => clearInterval(i);
-  }, []);
+  const _machineTick = useNowTick(2000);
+  useEffect(() => { setTick((t) => t + 1); }, [_machineTick]);
 
   const harvest = async (m: Machine) => {
     setHarvesting(m.id);
