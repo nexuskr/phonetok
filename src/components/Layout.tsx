@@ -40,6 +40,8 @@ const EmpireBoosterTimer = lazy(() => import("./empire/EmpireBoosterTimer"));
 const EmpireConcierge = lazy(() => import("./empire/EmpireConcierge"));
 const ReplayShareGlobal = lazy(() => import("./empire/ReplayShareGlobal"));
 const CrownWarFinaleModal = lazy(() => import("./empire/CrownWarFinaleModal"));
+const PowerHeader = lazy(() => import("./empire/PowerHeader"));
+const FirstEmperorBurst = lazy(() => import("./empire/FirstEmperorBurst"));
 
 function useIdleMount(delayMs = 1500) {
   const [ready, setReady] = useStateIdle(false);
