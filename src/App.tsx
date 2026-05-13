@@ -181,6 +181,8 @@ const App = () => (
               <Route path="/intelligence-loop" element={<Navigate to="/" replace />} />
               <Route path="/vision" element={<Navigate to="/" replace />} />
               <Route path="/global/live" element={<Navigate to="/" replace />} />
+              <Route path="/funnel" element={<Navigate to="/admin/funnel" replace />} />
+              <Route path="/kpi" element={<Navigate to="/admin/kpi" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
