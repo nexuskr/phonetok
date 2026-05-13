@@ -5,6 +5,7 @@ import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import EmpireFoundingCounter from "@/components/EmpireFoundingCounter";
+import FoundingSeasonHall from "@/components/empire/FoundingSeasonHall";
 import EmpireDayCountdown from "@/components/EmpireDayCountdown";
 import { Crown, Trophy, Lock, Users, Flame, Swords, Gem, Award, Activity } from "lucide-react";
 import { formatKRW } from "@/lib/store";
@@ -161,6 +162,11 @@ export default function Empire() {
               </motion.div>
             );
           })}
+        </div>
+
+        {/* Founding Season Hall (시즌 좌석/홀) */}
+        <div className="mb-6">
+          <FoundingSeasonHall />
         </div>
 
         {/* 좌석 / Founding 영역 */}
