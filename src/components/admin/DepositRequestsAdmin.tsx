@@ -6,6 +6,8 @@ import { Check, X, Clock, Inbox } from "lucide-react";
 import AdminReviewModal from "@/components/admin/AdminReviewModal";
 import RequestTimeline from "@/components/RequestTimeline";
 import { EmptyState } from "@/components/ui/empty-state";
+import { useDeepLinkHighlight } from "@/hooks/use-deep-link-highlight";
+import { cn } from "@/lib/utils";
 
 type Row = {
   id: string;
