@@ -38,10 +38,14 @@ export function WhaleStrikeRail() {
   useEffect(() => {
     let alive = true;
     async function load() {
-      const { data, error } = await supabase.rpc("get_whale_strikes_24h", { _limit: 24 });
-      if (!alive) return;
-      if (!error && Array.isArray(data)) setItems(data as unknown as Strike[]);
-      setLoaded(true);
+      try {
+        const { data, error } = await supabase.rpc("get_whale_strikes_24h", { _limit: 24 });
+        if (!alive) return;
+        if (!error && Array.isArray(data)) setItems(data as unknown as Strike[]);
+      } catch {
+        /* network/realtime unreachable — keep last items */
+      }
+      if (alive) setLoaded(true);
     }
     void load();
     const id = setInterval(load, 60_000);

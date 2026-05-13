@@ -34,8 +34,12 @@ export function useOnline() {
     if (isReviewerMode()) { setBase(0); return; }
     let cancelled = false;
     async function tick() {
-      const { data } = await supabase.rpc("get_bot_online_count");
-      if (!cancelled) setBase(typeof data === "number" && data > 0 ? data : 2847);
+      try {
+        const { data } = await supabase.rpc("get_bot_online_count");
+        if (!cancelled) setBase(typeof data === "number" && data > 0 ? data : 2847);
+      } catch {
+        if (!cancelled) setBase(2847); // fallback when realtime/RPC unreachable
+      }
     }
     void tick();
     const t = setInterval(tick, 30_000);

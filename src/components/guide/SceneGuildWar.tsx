@@ -18,12 +18,16 @@ export function SceneGuildWar({ large = false }: { large?: boolean }) {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const { data } = await supabase
-        .from("guilds")
-        .select("id,name,emblem,total_power,member_count")
-        .order("total_power", { ascending: false })
-        .limit(3);
-      if (alive && data && data.length > 0) setGuilds(data as GuildRow[]);
+      try {
+        const { data } = await supabase
+          .from("guilds")
+          .select("id,name,emblem,total_power,member_count")
+          .order("total_power", { ascending: false })
+          .limit(3);
+        if (alive && data && data.length > 0) setGuilds(data as GuildRow[]);
+      } catch {
+        /* backend unreachable — fall through to static display rows */
+      }
     })();
     return () => { alive = false; };
   }, []);

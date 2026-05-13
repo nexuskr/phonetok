@@ -38,23 +38,31 @@ export function subscribePostgres(
 ): () => void {
   let entry = channels.get(key);
   if (!entry) {
-    const ch = supabase
-      .channel(key)
-      .on(
-        // @ts-ignore - supabase realtime typing
-        "postgres_changes",
-        { event, schema, table, ...(filter ? { filter } : {}) },
-        (payload: unknown) => {
-          const e = channels.get(key);
-          if (!e) return;
-          e.listeners.forEach((l) => {
-            try { l(payload); } catch { /* swallow */ }
-          });
-        },
-      )
-      .subscribe();
-    entry = { channel: ch, listeners: new Set() };
-    channels.set(key, entry);
+    try {
+      const ch = supabase
+        .channel(key)
+        .on(
+          // @ts-ignore - supabase realtime typing
+          "postgres_changes",
+          { event, schema, table, ...(filter ? { filter } : {}) },
+          (payload: unknown) => {
+            const e = channels.get(key);
+            if (!e) return;
+            e.listeners.forEach((l) => {
+              try { l(payload); } catch { /* swallow */ }
+            });
+          },
+        )
+        .subscribe((_status: string, err?: unknown) => {
+          // Swallow CHANNEL_ERROR / TIMED_OUT / network failures; UI stays on fallback data.
+          if (err) { /* no-op */ }
+        });
+      entry = { channel: ch, listeners: new Set() };
+      channels.set(key, entry);
+    } catch {
+      // Realtime endpoint unreachable (NAME_NOT_RESOLVED, 404). Return inert unsubscribe.
+      return () => {};
+    }
   }
   entry.listeners.add(onChange);
   return () => {
@@ -62,7 +70,7 @@ export function subscribePostgres(
     if (!e) return;
     e.listeners.delete(onChange);
     if (e.listeners.size === 0) {
-      void supabase.removeChannel(e.channel);
+      try { void supabase.removeChannel(e.channel); } catch { /* swallow */ }
       channels.delete(key);
     }
   };
