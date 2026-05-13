@@ -402,14 +402,14 @@ export default function SecureAuth() {
             onClick={sendMagicLink}
             disabled={busy || !form.email}
             data-large={true}
-            className={`relative w-full mt-4 rounded-2xl bg-gradient-imperial text-primary-foreground font-black tracking-wider transition-[transform,box-shadow] duration-200 disabled:opacity-50 disabled:cursor-not-allowed motion-safe:hover:scale-[1.02] motion-safe:hover:shadow-[0_0_48px_hsl(var(--gold)/0.5),0_0_96px_hsl(var(--gold)/0.25)] active:scale-[0.99] glow-gold-xl ${senior.btnXl} min-h-[72px] text-xl sm:text-2xl flex items-center justify-center gap-3`}
+            className={`relative w-full mt-4 rounded-2xl bg-gradient-imperial text-primary-foreground font-black tracking-wider transition-[transform,box-shadow] duration-200 disabled:opacity-50 disabled:cursor-not-allowed motion-safe:hover:scale-[1.02] motion-safe:hover:shadow-[0_0_52px_hsl(var(--gold)/0.55),0_0_104px_hsl(var(--gold)/0.28)] active:scale-[0.99] glow-gold-xl ${senior.btnXl} min-h-[64px] sm:min-h-[72px] text-lg sm:text-2xl flex items-center justify-center gap-2 sm:gap-3`}
             aria-label="매직링크로 제국 입장하기"
           >
-            <span aria-hidden className="text-gold-foreground/90">✦</span>
-            <Sparkles className="w-6 h-6" />
+            <span aria-hidden className="text-gold-foreground/90 hidden sm:inline">✦</span>
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
             <span>매직링크로 제국 입장</span>
-            <ArrowRight className="w-6 h-6" />
-            <span aria-hidden className="text-gold-foreground/90">✦</span>
+            <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            <span aria-hidden className="text-gold-foreground/90 hidden sm:inline">✦</span>
           </button>
 
 
