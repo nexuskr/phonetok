@@ -279,21 +279,21 @@ export default function SecureAuth() {
           </div>
           {/* Imperial kicker */}
           <div className="inline-flex items-center gap-2 mb-3 text-gold">
-            <Crown className="w-[18px] h-[18px] drop-shadow-[0_0_8px_hsl(var(--gold)/0.65)]" />
+            <Crown className="w-[18px] h-[18px] drop-shadow-[0_0_9px_hsl(var(--gold)/0.7)]" />
             <span
-              className="font-imperial font-black text-[12px] sm:text-[13px] tracking-[0.34em] uppercase"
-              style={{ textShadow: "0 0 14px hsl(var(--gold)/0.4)" }}
+              className="font-imperial font-black text-[11.5px] sm:text-[13px] tracking-[0.3em] sm:tracking-[0.34em] uppercase"
+              style={{ textShadow: "0 0 16px hsl(var(--gold)/0.45)" }}
             >
               패키지 1회로 모든 미션이 자동 완료
             </span>
-            <Crown className="w-[18px] h-[18px] drop-shadow-[0_0_8px_hsl(var(--gold)/0.65)]" />
+            <Crown className="w-[18px] h-[18px] drop-shadow-[0_0_9px_hsl(var(--gold)/0.7)]" />
           </div>
           <h1
-            className="font-imperial font-black text-gradient-gold leading-[1.05] text-[34px] sm:text-[56px]"
+            className="font-imperial font-black text-gradient-gold leading-[1.05] text-[32px] sm:text-[56px]"
             style={{
-              WebkitTextStroke: "1px hsl(var(--gold-stroke) / 0.45)",
+              WebkitTextStroke: "1px hsl(var(--gold-stroke) / 0.48)",
               textShadow:
-                "0 0 32px hsl(var(--gold) / 0.25), 0 0 70px hsl(var(--gold) / 0.15)",
+                "0 0 32px hsl(var(--gold) / 0.28), 0 0 72px hsl(var(--gold) / 0.18)",
             }}
           >
             제국 입장을 위한
