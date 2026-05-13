@@ -82,7 +82,7 @@ export default function ThresholdsAdmin() {
   function reset() {
     setT(DEFAULT_T);
     setS(DEFAULT_S);
-    notify.info("기본값으로 복원됨", "저장 버튼을 눌러야 적용됩니다.");
+    notify.info("기본값으로 복원됨", { description: "저장 버튼을 눌러야 적용됩니다." });
   }
 
   if (loading) return <LoadingList rows={6} />;
