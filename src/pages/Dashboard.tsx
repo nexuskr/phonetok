@@ -12,6 +12,7 @@ import { Flame, Zap, Trophy, ChevronRight, TrendingUp, Sparkles, Crown, Wallet, 
 import CommandHero from "@/components/CommandHero";
 import { FomoNotificationStrip } from "@/components/empire/FomoNotificationStrip";
 import WhaleStrikeRail from "@/components/empire/WhaleStrikeRail";
+import LiveRankingMarquee from "@/components/LiveRankingMarquee";
 import CrownWarHUD from "@/components/empire/CrownWarHUD";
 import EmpireSignature from "@/components/status/EmpireSignature";
 import { useWinback } from "@/hooks/use-winback";
@@ -162,6 +163,7 @@ export default function Dashboard() {
           <FomoNotificationStrip />
           <div className="mb-3"><CrownWarHUD /></div>
           <div className="mb-4"><WhaleStrikeRail /></div>
+          <div className="mb-4"><LiveRankingMarquee /></div>
           {/* 🏛️ Command Hero — 영웅 카드 (잔고 + 추천 미션 + 100석) */}
           <CommandHero />
 

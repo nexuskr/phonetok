@@ -16,7 +16,7 @@ import {
 import Particles from "@/components/Particles";
 import PayoutTicker from "@/components/PayoutTicker";
 import WhaleStrikeRail from "@/components/empire/WhaleStrikeRail";
-import { useOnline, useTotalPayout, useTodayPayout, useMembers } from "@/components/LiveStats.tsx";
+import { useOnline, useTotalPayout, useTodayPayout, useTotalUsers } from "@/components/LiveStats.tsx";
 import { useAuthReady } from "@/hooks/use-auth-ready";
 import EmpireFoundingCounter from "@/components/EmpireFoundingCounter";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -60,7 +60,7 @@ export default function Index() {
   const online = useOnline();
   const total = useTotalPayout();
   const today = useTodayPayout();
-  const members = useMembers();
+  const members = useTotalUsers();
 
   // 실시간 신규 가입 카운터 — KST 자정 기준 누적, 60~90s 간격으로 +1~3 미세 증가
   const [todaySignups, setTodaySignups] = useState(() => computeTodaySignups());
