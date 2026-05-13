@@ -18,6 +18,7 @@ type Side = "long" | "short";
 const SYMBOL = "BTCUSDT";
 const LAST_AMOUNT_KEY = "phonara_last_bet_amount_v1";
 const LAST_LEV_KEY = "phonara_last_leverage_v1";
+const LAST_SIDE_KEY = "phonara_last_side_v1";
 const FIRST_TRADE_KEY = "first_trade_done";
 
 // PHON gates for high leverage tiers
@@ -51,7 +52,10 @@ const DashboardBetPanel = forwardRef<BetPanelHandle>(function DashboardBetPanel(
   const [leverage, setLeverage] = useState<number>(() => {
     try { return Number(localStorage.getItem(LAST_LEV_KEY)) || 10; } catch { return 10; }
   });
-  const lastSideRef = useRef<Side>("long");
+  const [autoSide, setAutoSide] = useState<Side>(() => {
+    try { return (localStorage.getItem(LAST_SIDE_KEY) as Side) === "short" ? "short" : "long"; } catch { return "long"; }
+  });
+  const lastSideRef = useRef<Side>(autoSide);
   const [firstDone, setFirstDone] = useState<boolean>(() => {
     try { return sessionStorage.getItem(FIRST_TRADE_KEY) === "1"; } catch { return false; }
   });
@@ -88,9 +92,11 @@ const DashboardBetPanel = forwardRef<BetPanelHandle>(function DashboardBetPanel(
     if (!pos) { notify.error("주문을 열 수 없습니다."); return false; }
 
     lastSideRef.current = side;
+    setAutoSide(side);
     try {
       localStorage.setItem(LAST_AMOUNT_KEY, String(amountNum));
       localStorage.setItem(LAST_LEV_KEY, String(leverage));
+      localStorage.setItem(LAST_SIDE_KEY, side);
     } catch {}
     if (!firstDone) {
       try { sessionStorage.setItem(FIRST_TRADE_KEY, "1"); } catch {}
