@@ -60,7 +60,7 @@ export default function Index() {
   const online = useOnline();
   const total = useTotalPayout();
   const today = useTodayPayout();
-  const members = useMembers();
+  const members = useTotalUsers();
 
   // 실시간 신규 가입 카운터 — KST 자정 기준 누적, 60~90s 간격으로 +1~3 미세 증가
   const [todaySignups, setTodaySignups] = useState(() => computeTodaySignups());
