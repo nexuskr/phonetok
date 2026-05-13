@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { Flame, Users, ChevronDown, Shield, Clock, Coins } from "lucide-react";
+import { Flame, Users, ChevronDown, Shield, Clock, Coins, Crown } from "lucide-react";
 import { useOnline } from "@/components/LiveStats";
 import {
   GoldNebulaBg,
