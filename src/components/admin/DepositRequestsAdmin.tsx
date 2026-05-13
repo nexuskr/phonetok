@@ -27,6 +27,7 @@ export default function DepositRequestsAdmin() {
   const [rows, setRows] = useState<Row[]>([]);
   const [modal, setModal] = useState<{ id: string; action: "approve" | "reject" } | null>(null);
   const [openTimeline, setOpenTimeline] = useState<string | null>(null);
+  const highlightId = useDeepLinkHighlight();
 
   async function load() {
     const { data, error } = await supabase
