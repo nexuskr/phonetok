@@ -28,6 +28,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
 const EmpireArena = lazy(() => import("./pages/EmpireArena.tsx"));
 const TradingArenaWithArmy = lazy(() => import("./pages/TradingArenaWithArmy.tsx"));
 const TradingArenaBybit = lazy(() => import("./pages/TradingArenaBybit.tsx"));
+const WarTradingArena = lazy(() => import("./pages/WarTradingArena.tsx"));
 // Lounge/Whales/Roulette — 통합되었으나 직관적인 진입을 위해 직접 라우팅 복원
 const Lounge = lazy(() => import("./pages/Lounge.tsx"));
 const Whales = lazy(() => import("./pages/Whales.tsx"));
@@ -130,6 +131,7 @@ const App = () => (
               <Route path="/start" element={<Navigate to="/dashboard" replace />} />
               <Route path="/earnings" element={<Navigate to="/missions" replace />} />
               <Route path="/arena" element={<TradingArenaBybit />} />
+              <Route path="/war" element={<WarTradingArena />} />
               <Route path="/arena/army" element={<TradingArenaWithArmy />} />
               <Route path="/arena/classic" element={<EmpireArena />} />
               <Route path="/empire-arena" element={<Navigate to="/arena" replace />} />
