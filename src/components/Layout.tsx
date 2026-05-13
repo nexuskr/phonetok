@@ -135,7 +135,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  <span>{t(item.labelKey)}</span>
+                  <span>{item.label}</span>
                   {active && <ChevronRight className="w-3 h-3 ml-auto" />}
                 </NavLink>
               );
@@ -301,7 +301,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           style={{ bottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
         >
           <div className="glass-strong rounded-2xl px-2 py-2 flex items-end justify-between shadow-2xl neon-border relative overflow-visible">
-            {NAV.map((item) => {
+            {NAV.filter((n) => !n.desktopOnly).map((item) => {
               const Icon = item.icon;
               const active = isActive(item, loc.pathname);
 
@@ -316,7 +316,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       <div className="absolute inset-0 rounded-full bg-primary/30 blur-xl animate-ring-pulse -z-10" />
                       <Icon className="w-7 h-7 text-primary-foreground" />
                       <span className="absolute -bottom-5 text-[10px] font-imperial tracking-[0.2em] text-primary">
-                        {t(item.labelKey).toUpperCase()}
+                        {item.label.toUpperCase()}
                       </span>
                     </div>
                   </NavLink>
@@ -337,7 +337,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <span
                       className={`text-[10px] font-semibold ${active ? "text-foreground" : "text-muted-foreground"}`}
                     >
-                      {t(item.labelKey)}
+                      {item.label}
                     </span>
                   </div>
                 </NavLink>
