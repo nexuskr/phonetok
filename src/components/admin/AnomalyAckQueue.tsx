@@ -63,7 +63,7 @@ function AnomalyAckQueueBase() {
       _note: null,
     });
     if (error) {
-      notify.error("ack 실패", error.message);
+      notify.fail("ack 실패", error);
       return;
     }
     notify.success(`${data ?? ids.length}건 확인 처리 완료`);
