@@ -6,8 +6,29 @@
  */
 import { useEffect, useState, useMemo, memo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, User as UserIcon, Loader2, Snowflake, Sun } from "lucide-react";
+import { Search, User as UserIcon, Loader2, Snowflake, Sun, Clock } from "lucide-react";
 import { notify } from "@/lib/notify";
+
+const RECENTS_KEY = "admin_cmdk_recents_v1";
+const RECENTS_MAX = 6;
+
+type RecentItem = { to: string; name: string; section: string; ts: number };
+
+function readRecents(): RecentItem[] {
+  try {
+    const raw = localStorage.getItem(RECENTS_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw) as RecentItem[];
+  } catch { return []; }
+}
+function writeRecents(items: RecentItem[]) {
+  try { localStorage.setItem(RECENTS_KEY, JSON.stringify(items.slice(0, RECENTS_MAX))); } catch { /* */ }
+}
+function pushRecent(item: Omit<RecentItem, "ts">) {
+  const list = readRecents().filter((r) => r.to !== item.to);
+  list.unshift({ ...item, ts: Date.now() });
+  writeRecents(list);
+}
 import {
   CommandDialog,
   CommandInput,
