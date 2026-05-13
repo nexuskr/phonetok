@@ -109,6 +109,7 @@ const App = () => (
           <LegalConsentGate />
           <PracticeModeBanner />
           <SimGlobalBadge />
+          <Suspense fallback={null}><EmpireMomentToast /></Suspense>
           <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<Index />} />
