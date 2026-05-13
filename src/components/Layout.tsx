@@ -387,6 +387,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <EmpireConcierge />
           <ReplayShareGlobal />
           <CrownWarFinaleModal />
+          <PowerHeader />
+          <FirstEmperorBurst />
         </Suspense>
       )}
 
