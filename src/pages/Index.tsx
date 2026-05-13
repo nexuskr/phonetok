@@ -121,8 +121,10 @@ export default function Index() {
       </header>
 
       {/* 3초 입금 히어로 — 최상단 고정 */}
-      <section className="relative z-20 container pt-4">
+      <section className="relative z-20 container pt-4 space-y-3">
         <ThreeSecondHero />
+        <Suspense fallback={null}><LiveCounterStrip /></Suspense>
+        <Suspense fallback={null}><GhostPulseGlobe /></Suspense>
       </section>
 
       {/* Hero */}
