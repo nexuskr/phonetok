@@ -45,6 +45,16 @@ export default function AdminLayout() {
     };
   }, [active, totalPending]);
 
+  // Idle-prefetch the hottest admin queues once after entering Mission Control.
+  useEffect(() => {
+    schedulePrefetch([
+      "/admin/treasury/deposits",
+      "/admin/treasury/withdrawals",
+      "/admin/compliance/aml",
+      "/admin/ops/errors",
+    ]);
+  }, []);
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
