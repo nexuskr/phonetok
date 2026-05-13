@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Crown, Sparkles, KeyRound, Rocket, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { setPracticeMode } from "@/lib/practiceMode";
 import { notify } from "@/lib/notify";
@@ -103,6 +103,8 @@ export function OnboardingV2({ enabled }: { enabled: boolean }) {
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
+        <DialogTitle className="sr-only">Phonara 시작 안내</DialogTitle>
+        <DialogDescription className="sr-only">연속 온보딩 단계와 베타 코드 입력을 위한 안내 모달입니다.</DialogDescription>
         <div className={`relative bg-gradient-to-br ${s.accent} p-6 sm:p-8 text-foreground`}>
           <button
             onClick={close}
@@ -143,6 +145,8 @@ export function OnboardingV2({ enabled }: { enabled: boolean }) {
               </div>
               <div className="flex gap-2">
                 <Input
+                  id="beta-invite-code"
+                  name="betaInviteCode"
                   placeholder="BETA-XXXX"
                   value={code}
                   onChange={(e) => setCode(e.target.value.toUpperCase())}
