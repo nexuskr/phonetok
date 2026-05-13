@@ -186,7 +186,7 @@ export default function SecureAuth() {
         />
         {/* fine gold grid */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.034]"
           style={{
             backgroundImage:
               "linear-gradient(hsl(var(--gold)/0.6) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--gold)/0.6) 1px, transparent 1px)",
