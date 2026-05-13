@@ -52,16 +52,22 @@ function readMuted(): boolean {
 
 export function useAdminSiren(enabled: boolean) {
   const [muted, setMutedState] = useState<boolean>(() => readMuted());
+  const [pushEnabled, setPushEnabledState] = useState<boolean>(() => readPush());
   const ctxRef = useRef<AudioContext | null>(null);
   const [lastFiredAt, setLastFiredAt] = useState<number | null>(null);
 
   const setMuted = useCallback((v: boolean) => {
     setMutedState(v);
-    try {
-      localStorage.setItem(MUTE_KEY, v ? "1" : "0");
-    } catch {
-      /* ignore */
+    try { localStorage.setItem(MUTE_KEY, v ? "1" : "0"); } catch { /* */ }
+  }, []);
+
+  const setPushEnabled = useCallback(async (v: boolean) => {
+    if (v) {
+      const ok = await ensurePushPermission();
+      if (!ok) { setPushEnabledState(false); return; }
     }
+    setPushEnabledState(v);
+    try { localStorage.setItem(PUSH_KEY, v ? "1" : "0"); } catch { /* */ }
   }, []);
 
   const beep = useCallback(() => {
@@ -71,7 +77,6 @@ export function useAdminSiren(enabled: boolean) {
       if (!Ctx) return;
       if (!ctxRef.current) ctxRef.current = new Ctx();
       const ctx = ctxRef.current;
-      // Two-tone urgent chirp
       const now = ctx.currentTime;
       [880, 1320].forEach((freq, i) => {
         const osc = ctx.createOscillator();
@@ -86,9 +91,7 @@ export function useAdminSiren(enabled: boolean) {
         osc.stop(now + i * 0.18 + 0.18);
       });
       setLastFiredAt(Date.now());
-    } catch {
-      /* audio blocked — ignore */
-    }
+    } catch { /* */ }
   }, [muted]);
 
   useEffect(() => {
@@ -99,16 +102,22 @@ export function useAdminSiren(enabled: boolean) {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "anomaly_events" },
         (payload) => {
-          const row = payload.new as { severity?: string; rule?: string };
+          const row = payload.new as { severity?: string; rule?: string; user_id?: string };
           const sev = (row?.severity ?? "").toLowerCase();
-          if (sev === "critical" || sev === "high") beep();
+          if (sev === "critical" || sev === "high") {
+            beep();
+            if (pushEnabled && (document.hidden || !document.hasFocus())) {
+              fireBrowserNotify(
+                `🚨 ${sev.toUpperCase()} 이상감지`,
+                `규칙: ${row?.rule ?? "anomaly"} · 클릭하여 처리`,
+              );
+            }
+          }
         },
       )
       .subscribe();
-    return () => {
-      supabase.removeChannel(ch);
-    };
-  }, [enabled, beep]);
+    return () => { supabase.removeChannel(ch); };
+  }, [enabled, beep, pushEnabled]);
 
-  return { muted, setMuted, lastFiredAt, testBeep: beep };
+  return { muted, setMuted, pushEnabled, setPushEnabled, lastFiredAt, testBeep: beep };
 }
