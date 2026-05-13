@@ -179,7 +179,8 @@ export default function AdminCockpitV2() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
+    <div className="space-y-6 pb-20 md:pb-0">
       {/* Header */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
