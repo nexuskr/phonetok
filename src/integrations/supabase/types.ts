@@ -3270,6 +3270,27 @@ export type Database = {
         }
         Relationships: []
       }
+      pay_config: {
+        Row: {
+          id: number
+          tron_receive_address: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: number
+          tron_receive_address?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          id?: number
+          tron_receive_address?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       pending_orders: {
         Row: {
           cancelled_at: string | null
@@ -6921,6 +6942,7 @@ export type Database = {
       }
       get_my_weekly_referral_rank: { Args: never; Returns: Json }
       get_next_empire_day: { Args: never; Returns: string }
+      get_pay_receive_address: { Args: never; Returns: string }
       get_payout_ops_stats_24h: { Args: never; Returns: Json }
       get_permission_change_log: {
         Args: { _limit?: number }
