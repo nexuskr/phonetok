@@ -177,7 +177,7 @@ export default function SecureAuth() {
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-[hsl(var(--background))]" />
         {/* large gold grid */}
         <div
-          className="absolute inset-0 opacity-[0.04]"
+          className="absolute inset-0 opacity-[0.06]"
           style={{
             backgroundImage:
               "linear-gradient(hsl(var(--gold)/0.7) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--gold)/0.7) 1px, transparent 1px)",
@@ -186,34 +186,52 @@ export default function SecureAuth() {
         />
         {/* fine gold grid */}
         <div
-          className="absolute inset-0 opacity-[0.025]"
+          className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage:
               "linear-gradient(hsl(var(--gold)/0.6) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--gold)/0.6) 1px, transparent 1px)",
             backgroundSize: "28px 28px",
           }}
         />
-        {/* double vignette for depth */}
+        {/* ultra-fine gold grain/noise — pure CSS, no image asset */}
+        <div
+          className="absolute inset-0 opacity-[0.05] mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "radial-gradient(hsl(var(--gold)/0.55) 0.5px, transparent 0.5px), radial-gradient(hsl(var(--gold)/0.35) 0.5px, transparent 0.5px)",
+            backgroundSize: "3px 3px, 7px 7px",
+            backgroundPosition: "0 0, 1px 2px",
+          }}
+        />
+        {/* triple vignette for cinematic depth */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(60% 50% at 50% 30%, transparent 0%, hsl(var(--background)/0.65) 100%)",
+              "radial-gradient(70% 55% at 50% 30%, transparent 0%, hsl(var(--background)/0.55) 70%, hsl(var(--background)/0.85) 100%)",
           }}
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(50% 35% at 50% 100%, transparent 0%, hsl(var(--background)/0.85) 100%)",
+              "radial-gradient(45% 30% at 50% 45%, transparent 0%, hsl(var(--background)/0.7) 100%)",
+            mixBlendMode: "multiply",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(55% 38% at 50% 100%, transparent 0%, hsl(var(--background)/0.92) 100%)",
           }}
         />
         {/* top-center static gold ray */}
         <div
-          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[420px] opacity-[0.18]"
+          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[420px] opacity-[0.22]"
           style={{
             background:
-              "conic-gradient(from 270deg at 50% 100%, transparent 0deg, hsl(var(--gold)/0.55) 90deg, transparent 180deg, transparent 360deg)",
+              "conic-gradient(from 270deg at 50% 100%, transparent 0deg, hsl(var(--gold)/0.6) 90deg, transparent 180deg, transparent 360deg)",
             filter: "blur(40px)",
           }}
         />
