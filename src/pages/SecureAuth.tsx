@@ -301,11 +301,11 @@ export default function SecureAuth() {
           </h1>
           <p
             data-large={true}
-            className={`mt-4 text-foreground/85 break-keep ${senior.bodyXl} text-[18px] leading-relaxed`}
+            className={`mt-4 text-foreground/85 break-keep ${senior.bodyXl} text-[16px] sm:text-[18px] leading-relaxed`}
           >
             폰 하나로 제국을 쌓는다.
             <br className="sm:hidden" />
-            <span className="text-gold/90"> 비밀번호 없이, 5분 안에.</span>
+            <span className="text-gold/95"> 비밀번호 없이, 5분 안에.</span>
           </p>
         </div>
 
