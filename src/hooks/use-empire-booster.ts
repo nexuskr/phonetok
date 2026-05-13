@@ -19,12 +19,17 @@ export function useEmpireBooster() {
   const now = useNowTick(2000);
 
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setBooster(null); setLoading(false); return; }
-    const { data } = await (supabase.rpc as any)("get_active_empire_booster");
-    const row = Array.isArray(data) && data.length > 0 ? (data[0] as EmpireBooster) : null;
-    setBooster(row);
-    setLoading(false);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setBooster(null); setLoading(false); return; }
+      const { data } = await (supabase.rpc as any)("get_active_empire_booster");
+      const row = Array.isArray(data) && data.length > 0 ? (data[0] as EmpireBooster) : null;
+      setBooster(row);
+    } catch {
+      setBooster(null);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
