@@ -84,24 +84,35 @@ export default function ActivityEventTicker({ variant = "hero", limit = 3 }: { v
     );
   }
 
+  // 고정 높이 슬롯 — 항목 추가/제거에도 컨테이너 크기 불변 (위아래 밀림 방지)
+  const ROW_H = 36; // px (py-1.5 + text)
+  const GAP = 6;
+  const containerH = ROW_H * limit + GAP * Math.max(0, limit - 1);
+
   return (
-    <div className="w-full max-w-md mx-auto space-y-1.5">
-      <AnimatePresence initial={false}>
-        {feed.map((item) => (
-          <motion.div
-            key={item.id}
-            initial={{ opacity: 0, y: -12, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.94 }}
-            transition={{ duration: 0.35 }}
-            className="flex items-center gap-2 text-left text-sm font-bold text-white/90 px-3 py-1.5 rounded-lg border border-white/10 bg-black/30 backdrop-blur"
-          >
-            <span aria-hidden className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_hsl(var(--success)/0.6)] flex-shrink-0" />
-            <span className="text-base leading-none">{item.icon}</span>
-            <span className="truncate">{item.text}</span>
-          </motion.div>
-        ))}
-      </AnimatePresence>
+    <div
+      className="relative w-full max-w-md mx-auto overflow-hidden"
+      style={{ height: containerH, minHeight: containerH }}
+    >
+      <div className="absolute inset-0 flex flex-col gap-1.5">
+        <AnimatePresence initial={false}>
+          {feed.map((item) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-center gap-2 text-left text-sm font-bold text-white/90 px-3 rounded-lg border border-white/10 bg-black/30 backdrop-blur"
+              style={{ height: ROW_H, flex: "0 0 auto" }}
+            >
+              <span aria-hidden className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_hsl(var(--success)/0.6)] flex-shrink-0" />
+              <span className="text-base leading-none">{item.icon}</span>
+              <span className="truncate">{item.text}</span>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
