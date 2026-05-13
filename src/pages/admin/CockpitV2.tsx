@@ -255,6 +255,53 @@ export default function AdminCockpitV2() {
         </div>
       </section>
 
+      {/* PR-17 SLA Strip */}
+      {sla && (
+        <section className="glass-strong rounded-2xl p-3 border border-border/50">
+          <div className="flex items-center justify-between mb-2 px-1">
+            <h3 className="text-[10px] tracking-[0.3em] font-black text-muted-foreground uppercase">
+              SLA 카운트다운 · 평균 / 최장 대기 (분)
+            </h3>
+            <Link to="/admin/ops/thresholds" className="text-[10px] text-primary font-bold tracking-wider uppercase">
+              임계 설정 →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            {([
+              ["충전",   "deposits",    slaTargets.deposit_minutes],
+              ["출금",   "withdrawals", slaTargets.withdrawal_minutes],
+              ["AML",    "anomalies",   slaTargets.aml_minutes],
+              ["환불",   "refunds",     60],
+            ] as [string, string, number][]).map(([label, key, target]) => {
+              const s = (sla as any)?.[key] ?? { count: 0, avg_minutes: 0, oldest_minutes: 0 };
+              const oldest = s.oldest_minutes ?? 0;
+              const breach = oldest > target;
+              return (
+                <div
+                  key={key}
+                  className={`rounded-xl border px-3 py-2 ${
+                    breach ? "border-destructive/60 bg-destructive/5" : "border-border/40 bg-card/40"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black tracking-[0.2em] uppercase text-muted-foreground">{label}</span>
+                    <span className="text-[10px] tabular-nums opacity-60">SLA {target}m</span>
+                  </div>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <span className={`font-display font-black text-xl tabular-nums ${breach ? "text-destructive" : ""}`}>
+                      {oldest}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground tabular-nums">
+                      / 평균 {s.avg_minutes ?? 0}m · {s.count ?? 0}건
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* Today Treasury */}
       <section>
         <TodayKpiCards />
