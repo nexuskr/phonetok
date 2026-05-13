@@ -36,7 +36,7 @@ function AnomalyAckQueueBase() {
       .eq("acknowledged", false)
       .order("created_at", { ascending: false })
       .limit(100);
-    if (error) notify.error("이상 이벤트 로드 실패", error.message);
+    if (error) notify.fail("이상 이벤트 로드 실패", error);
     else setRows((data ?? []) as AnomalyRow[]);
     setLoading(false);
   }, []);
