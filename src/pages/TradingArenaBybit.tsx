@@ -43,7 +43,8 @@ function adaptPaperToLive(positions: ReturnType<typeof usePaperStore.getState>["
     fee_open: Math.floor(p.margin * p.leverage * FEE_RATE),
     status: "open" as const,
     opened_at: new Date(p.openedAt).toISOString(),
-    margin_mode: "isolated" as const,
+    margin_mode: (p.marginMode ?? "isolated") as "isolated" | "cross",
+    allocated_margin: p.allocatedMargin,
   }));
 }
 
@@ -155,13 +156,17 @@ export default function TradingArenaBybit() {
     try {
       if (mode === "paper") {
         const entry = applySlippage(args.side, price, true);
-        const pos = openPaper({ symbol, side: args.side, leverage: args.leverage, margin: args.margin, entry });
+        const pos = openPaper({
+          symbol, side: args.side, leverage: args.leverage, margin: args.margin, entry,
+          marginMode: args.marginMode,
+          allocatedMargin: args.allocatedMargin,
+        });
         if (!pos) {
           notify.error("주문 실패", { description: "Paper 잔액 부족" });
           try { navigator.vibrate?.([10, 40, 10]); } catch { /* noop */ }
         } else {
           notify.success(`${args.side.toUpperCase()} ${args.leverage}× 개시`, {
-            description: `${symbol} @ ${entry.toFixed(4)} · ${args.margin} USDT`,
+            description: `${symbol} @ ${entry.toFixed(4)} · ${args.margin} USDT · ${args.marginMode === "cross" ? "Cross" : "Iso"}`,
           });
           try { navigator.vibrate?.(15); } catch { /* noop */ }
         }
@@ -230,8 +235,14 @@ export default function TradingArenaBybit() {
       triggerFx({ kind: c.pnl >= 0 ? "win" : "loss", pnl: c.pnl, roi: c.roi, symbol: closed.symbol, unit: "USDT" });
       return { pnl: c.pnl, roi: c.roi, credit: paperCredit + closed.margin + c.pnl, exit: c.price };
     }
+    if (!mark || mark <= 0) {
+      notify.warning("가격 수신 대기 중", { description: "차트 가격이 들어오면 다시 시도하세요." });
+      return { error: "no price" };
+    }
     const r = await closeReal(id, mark);
-    if (!("error" in r)) {
+    if ("error" in r) {
+      notify.error("청산 실패", { description: r.error });
+    } else {
       triggerFx({ kind: r.pnl >= 0 ? "win" : "loss", pnl: r.pnl, roi: r.roi, symbol, unit: "KRW" });
     }
     return r;
@@ -243,10 +254,16 @@ export default function TradingArenaBybit() {
       return { liquidated: true as const, margin_lost: 0 };
     }
     const r = await liquidateReal(id, mark);
+    if ("error" in r) notify.error("강제청산 실패", { description: r.error });
     return r;
   }, [mode, closePaper, liquidateReal]);
 
   const handleCloseAll = useCallback(() => {
+    if (positions.length === 0) {
+      notify.info("열린 포지션이 없습니다");
+      return;
+    }
+    if (!window.confirm(`모든 포지션(${positions.length}건)을 청산합니다.`)) return;
     positions.forEach((p) => { void handleClose(p.id, prices[p.symbol] ?? p.entry); });
   }, [positions, prices, handleClose]);
 

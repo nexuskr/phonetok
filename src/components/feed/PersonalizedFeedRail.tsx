@@ -43,7 +43,15 @@ export default function PersonalizedFeedRail({ limit = 12 }: { limit?: number })
     }
   }
 
+  // Initial load + auto-generate when empty (one shot)
+  const [autoGenTried, setAutoGenTried] = useState(false);
   useEffect(() => { void load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (items && items.length === 0 && !autoGenTried) {
+      setAutoGenTried(true);
+      void generate();
+    }
+  }, [items, autoGenTried]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (items == null) {
     return (
@@ -60,8 +68,8 @@ export default function PersonalizedFeedRail({ limit = 12 }: { limit?: number })
         <Header onRefresh={generate} busy={generating} />
         <EmptyState
           icon={<Sparkles className="w-5 h-5" />}
-          title="아직 맞춤 피드가 없습니다"
-          description="잠시 후 다시 확인하거나, 지금 새로고침으로 생성해보세요."
+          title={generating ? "맞춤 피드를 생성하는 중…" : "곧 맞춤 피드가 준비됩니다"}
+          description="당신의 등급·미션·시청 이력을 분석해 가장 어울리는 영상을 골라드립니다. 새로고침으로 즉시 생성할 수 있어요."
           variant="gold"
           size="sm"
         />
@@ -89,7 +97,9 @@ function Header({ onRefresh, busy }: { onRefresh: () => void; busy: boolean }) {
       <div className="flex items-center gap-2">
         <Sparkles className="w-4 h-4 text-primary" />
         <h2 className="text-sm font-display font-black tracking-wide">For You</h2>
-        <span className="text-[10px] tracking-widest text-muted-foreground uppercase">개인화 피드</span>
+        <span className="text-[10px] tracking-widest text-muted-foreground uppercase hidden sm:inline">
+          AI 큐레이션 · 등급/미션/시청 기반
+        </span>
       </div>
       <button
         type="button"

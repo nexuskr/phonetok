@@ -1,5 +1,7 @@
 export type Side = "long" | "short";
 
+export type MarginMode = "isolated" | "cross";
+
 export interface Position {
   id: string;
   symbol: string;
@@ -8,6 +10,8 @@ export interface Position {
   margin: number;     // USDT (paper)
   entry: number;
   openedAt: number;
+  marginMode?: MarginMode;
+  allocatedMargin?: number;
   closed?: {
     price: number;
     at: number;

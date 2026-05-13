@@ -17,7 +17,7 @@ interface State {
   positions: Position[];
   history: Position[];
   comboWins: number;
-  open: (args: { symbol: string; side: Side; leverage: number; margin: number; entry: number }) => Position | null;
+  open: (args: { symbol: string; side: Side; leverage: number; margin: number; entry: number; marginMode?: "isolated" | "cross"; allocatedMargin?: number }) => Position | null;
   close: (id: string, price: number, reason?: "manual" | "liquidation") => Position | null;
   tick: (priceMap: Record<string, number>) => Position[]; // returns liquidated
   resetCredit: () => void;
@@ -30,7 +30,7 @@ export const usePaperStore = create<State>()(
       positions: [],
       history: [],
       comboWins: 0,
-      open: ({ symbol, side, leverage, margin, entry }) => {
+      open: ({ symbol, side, leverage, margin, entry, marginMode, allocatedMargin }) => {
         if (margin <= 0 || margin > get().paperCredit) return null;
         if (leverage < 1 || leverage > 100) return null;
         if (entry <= 0) return null;
@@ -38,6 +38,8 @@ export const usePaperStore = create<State>()(
           id: newId(),
           symbol, side, leverage, margin, entry,
           openedAt: Date.now(),
+          marginMode: marginMode ?? "isolated",
+          allocatedMargin: marginMode === "isolated" ? (allocatedMargin ?? margin) : undefined,
         };
         set((s) => ({ paperCredit: s.paperCredit - margin, positions: [...s.positions, pos] }));
         return pos;

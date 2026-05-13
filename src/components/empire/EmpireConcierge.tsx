@@ -27,7 +27,7 @@ const TONE_RING: Record<string, string> = {
 export default function EmpireConcierge() {
   const loc = useLocation();
   const nav = useNavigate();
-  const { suggestion, open, setOpen, fetchSuggestion, dismiss, click } = useConcierge();
+  const { suggestion, open, setOpen, loading, fetchSuggestion, dismiss, click } = useConcierge();
   const [authed, setAuthed] = useState(false);
 
   useEffect(() => {
@@ -52,8 +52,8 @@ export default function EmpireConcierge() {
 
   const handleBubble = () => {
     if (open) { setOpen(false); return; }
-    if (suggestion) { setOpen(true); return; }
-    void fetchSuggestion(true);
+    setOpen(true);
+    if (!suggestion) void fetchSuggestion(true);
   };
 
   return (
@@ -63,7 +63,7 @@ export default function EmpireConcierge() {
     >
       <div className="relative pointer-events-auto">
         <AnimatePresence>
-          {open && suggestion && (
+          {open && (
             <motion.div
               key="card"
               initial={{ opacity: 0, y: 16, scale: 0.92 }}
@@ -72,7 +72,6 @@ export default function EmpireConcierge() {
               transition={{ type: "spring", stiffness: 320, damping: 26 }}
               className="absolute bottom-16 left-0 w-[19rem] max-w-[calc(100vw-1.5rem)] rounded-2xl border border-border/60 bg-card/95 backdrop-blur-xl p-4 shadow-2xl"
             >
-              {/* Header */}
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-muted-foreground">
                   <Sparkles className="h-3.5 w-3.5 text-amber-400" />
@@ -87,46 +86,55 @@ export default function EmpireConcierge() {
                 </button>
               </div>
 
-              {/* Message */}
-              <p className="text-sm text-foreground leading-relaxed mb-3">
-                {suggestion.message}
-              </p>
+              {!suggestion && loading && (
+                <div className="py-6 flex flex-col items-center gap-2 text-xs text-muted-foreground">
+                  <span className="inline-block h-4 w-4 rounded-full border-2 border-amber-400/40 border-t-amber-400 animate-spin" />
+                  맞춤 제안을 준비하는 중…
+                </div>
+              )}
+              {!suggestion && !loading && (
+                <p className="text-sm text-muted-foreground py-4">
+                  지금은 추천할 항목이 없어요. 잠시 후 다시 확인해 주세요.
+                </p>
+              )}
 
-              {/* Mini context */}
-              <div className="flex items-center gap-2 mb-3 text-[11px] text-muted-foreground">
-                <span className="inline-flex items-center gap-1">
-                  <Crown className="h-3 w-3 text-amber-400" />
-                  Lv.{suggestion.ctx.level} · {suggestion.ctx.crown}₡
-                </span>
-                {suggestion.ctx.boosterActive && (
-                  <span className="inline-flex items-center gap-1 text-amber-300">
-                    <Zap className="h-3 w-3" />
-                    Booster {suggestion.ctx.boosterRemMin}m
-                  </span>
-                )}
-                {suggestion.ctx.crownToNext > 0 && (
-                  <span className="ml-auto">→ {suggestion.ctx.nextLevelName} {suggestion.ctx.crownToNext}₡</span>
-                )}
-              </div>
-
-              {/* CTA */}
-              <button
-                onClick={handleClick}
-                className="w-full relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-black font-semibold text-sm py-2.5 px-4 shadow-[0_0_24px_hsl(45_100%_55%/0.45)] hover:scale-[1.02] active:scale-[0.98] transition"
-              >
-                <span className="relative z-10">{CTA_LABEL[suggestion.cta] ?? "지금 시작"}</span>
-                <motion.span
-                  className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent"
-                  animate={{ x: ["-100%", "200%"] }}
-                  transition={{ duration: 2.4, repeat: Infinity, ease: "linear" }}
-                />
-              </button>
-              <button
-                onClick={() => void dismiss(true)}
-                className="w-full mt-2 text-[11px] text-muted-foreground/70 hover:text-muted-foreground transition"
-              >
-                오늘은 그만 보기
-              </button>
+              {suggestion && (
+                <>
+                  <p className="text-sm text-foreground leading-relaxed mb-3">{suggestion.message}</p>
+                  <div className="flex items-center gap-2 mb-3 text-[11px] text-muted-foreground">
+                    <span className="inline-flex items-center gap-1">
+                      <Crown className="h-3 w-3 text-amber-400" />
+                      Lv.{suggestion.ctx.level} · {suggestion.ctx.crown}₡
+                    </span>
+                    {suggestion.ctx.boosterActive && (
+                      <span className="inline-flex items-center gap-1 text-amber-300">
+                        <Zap className="h-3 w-3" />
+                        Booster {suggestion.ctx.boosterRemMin}m
+                      </span>
+                    )}
+                    {suggestion.ctx.crownToNext > 0 && (
+                      <span className="ml-auto">→ {suggestion.ctx.nextLevelName} {suggestion.ctx.crownToNext}₡</span>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleClick}
+                    className="w-full relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-black font-semibold text-sm py-2.5 px-4 shadow-[0_0_24px_hsl(45_100%_55%/0.45)] hover:scale-[1.02] active:scale-[0.98] transition"
+                  >
+                    <span className="relative z-10">{CTA_LABEL[suggestion.cta] ?? "지금 시작"}</span>
+                    <motion.span
+                      className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                      animate={{ x: ["-100%", "200%"] }}
+                      transition={{ duration: 2.4, repeat: Infinity, ease: "linear" }}
+                    />
+                  </button>
+                  <button
+                    onClick={() => void dismiss(true)}
+                    className="w-full mt-2 text-[11px] text-muted-foreground/70 hover:text-muted-foreground transition"
+                  >
+                    오늘은 그만 보기
+                  </button>
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
