@@ -38,6 +38,7 @@ export default function WithdrawRequestsAdmin() {
   const [filter, setFilter] = useState<"pending" | "all">("pending");
   const [modal, setModal] = useState<{ id: string; action: Action } | null>(null);
   const [openTimeline, setOpenTimeline] = useState<string | null>(null);
+  const highlightId = useDeepLinkHighlight();
 
   async function load() {
     setLoading(true);
