@@ -138,6 +138,34 @@ function AdminCommandTriggerBase() {
         <CommandList>
           <CommandEmpty>결과 없음</CommandEmpty>
 
+          {/* PR-23 Recents (only when query empty) */}
+          {query.trim().length === 0 && recents.length > 0 && (
+            <>
+              <CommandGroup
+                heading={
+                  <span className="flex items-center gap-2">
+                    <Clock className="w-3 h-3" /> 최근 액션
+                  </span>
+                }
+              >
+                {recents.map((r) => (
+                  <CommandItem
+                    key={`recent-${r.to}`}
+                    value={`recent ${r.name} ${r.to}`}
+                    onSelect={() => go(r.to, { name: r.name, section: r.section })}
+                  >
+                    <Clock className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                    <span className="flex-1 truncate">{r.name}</span>
+                    <span className="text-[9px] tracking-[0.2em] uppercase opacity-60">
+                      {r.section}
+                    </span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+              <CommandSeparator />
+            </>
+          )}
+
           {/* User results */}
           {query.trim().length >= 2 && (
             <>
