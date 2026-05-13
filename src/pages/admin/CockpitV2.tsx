@@ -16,24 +16,28 @@ import { ko } from "date-fns/locale";
 type ActionTone = "destructive" | "gold" | "primary" | "secondary";
 
 function ActionTile({
-  icon: Icon, label, count, hint, to, tone = "primary", sla,
+  icon: Icon, label, count, hint, to, tone = "primary", sla, threshold,
 }: {
   icon: any; label: string; count: number; hint?: string; to: string;
-  tone?: ActionTone; sla?: string;
+  tone?: ActionTone; sla?: string; threshold?: number;
 }) {
   const hot = count > 0;
+  const exceeds = threshold != null && count >= threshold;
   const toneClass: Record<ActionTone, string> = {
     destructive: "border-destructive/50 bg-destructive/5 text-destructive",
     gold:        "border-gold/50 bg-gold/5 text-gold",
     primary:     "border-primary/40 bg-primary/5 text-primary",
     secondary:   "border-secondary/40 bg-secondary/5 text-secondary",
   };
+  const cls = exceeds
+    ? "border-destructive bg-destructive/10 text-destructive animate-pulse"
+    : hot
+      ? toneClass[tone]
+      : "border-border/40 bg-card/40 text-muted-foreground";
   return (
     <Link
       to={to}
-      className={`group glass-strong rounded-2xl p-4 border transition hover:scale-[1.01] ${
-        hot ? toneClass[tone] : "border-border/40 bg-card/40 text-muted-foreground"
-      }`}
+      className={`group glass-strong rounded-2xl p-4 border transition hover:scale-[1.01] ${cls}`}
     >
       <div className="flex items-center justify-between mb-3">
         <Icon className="w-5 h-5" />
@@ -45,8 +49,10 @@ function ActionTile({
       </div>
       <div className="flex items-center justify-between mt-1">
         <div className="text-[10px] text-muted-foreground">{hint ?? ""}</div>
-        {sla && (
-          <div className="text-[10px] font-bold tabular-nums opacity-80">SLA {sla}</div>
+        {(sla || threshold != null) && (
+          <div className="text-[10px] font-bold tabular-nums opacity-80">
+            {exceeds ? "임계초과" : sla ? `SLA ${sla}` : `≥${threshold}`}
+          </div>
         )}
       </div>
     </Link>
