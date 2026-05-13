@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Bell, BellOff, Volume2 } from "lucide-react";
+import { Bell, BellOff, Volume2, Smartphone } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { NavLink } from "@/components/NavLink";
 import { ADMIN_NAV_FLAT } from "@/pages/admin/_nav";
