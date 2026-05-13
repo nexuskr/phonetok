@@ -1996,6 +1996,83 @@ export type Database = {
         }
         Relationships: []
       }
+      founding_season_seats: {
+        Row: {
+          claimed_at: string | null
+          claimed_by: string | null
+          created_at: string
+          display_label: string | null
+          id: string
+          season_id: string
+          seat_no: number
+        }
+        Insert: {
+          claimed_at?: string | null
+          claimed_by?: string | null
+          created_at?: string
+          display_label?: string | null
+          id?: string
+          season_id: string
+          seat_no: number
+        }
+        Update: {
+          claimed_at?: string | null
+          claimed_by?: string | null
+          created_at?: string
+          display_label?: string | null
+          id?: string
+          season_id?: string
+          seat_no?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "founding_season_seats_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "founding_seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      founding_seasons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          ends_at: string | null
+          id: string
+          perks: Json
+          starts_at: string
+          subtitle: string | null
+          title: string
+          total_seats: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          perks?: Json
+          starts_at?: string
+          subtitle?: string | null
+          title: string
+          total_seats: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          perks?: Json
+          starts_at?: string
+          subtitle?: string | null
+          title?: string
+          total_seats?: number
+        }
+        Relationships: []
+      }
       function_permissions_baseline: {
         Row: {
           allowed_roles: string[]
@@ -6309,6 +6386,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      _mask_nick: { Args: { _n: string }; Returns: string }
       _period_key: { Args: { _period: string }; Returns: string }
       accrue_jackpot: { Args: { p_deposit_amount: number }; Returns: Json }
       acknowledge_anomaly: {
@@ -6320,6 +6398,34 @@ export type Database = {
         Returns: Json
       }
       admin_cockpit_metrics: { Args: never; Returns: Json }
+      admin_create_founding_season: {
+        Args: {
+          _code: string
+          _ends_at: string
+          _perks: Json
+          _subtitle: string
+          _title: string
+          _total: number
+        }
+        Returns: {
+          active: boolean
+          code: string
+          created_at: string
+          ends_at: string | null
+          id: string
+          perks: Json
+          starts_at: string
+          subtitle: string | null
+          title: string
+          total_seats: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "founding_seasons"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_force_close_position:
         | {
             Args: {
@@ -6665,6 +6771,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      claim_founding_season_seat: { Args: never; Returns: Json }
       claim_founding_seat: { Args: { _purchase_id: string }; Returns: Json }
       claim_handbook_bonus: { Args: never; Returns: Json }
       claim_idle_growth: { Args: never; Returns: Json }
@@ -6953,6 +7060,16 @@ export type Database = {
           level: string
         }[]
       }
+      get_founding_season_grid: {
+        Args: { _season_id?: string }
+        Returns: {
+          claimed_at: string
+          is_mine: boolean
+          masked_nick: string
+          seat_no: number
+        }[]
+      }
+      get_founding_season_state: { Args: never; Returns: Json }
       get_function_permissions_overview: {
         Args: never
         Returns: {
