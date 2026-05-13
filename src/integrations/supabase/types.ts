@@ -2955,6 +2955,50 @@ export type Database = {
         }
         Relationships: []
       }
+      loss_protection_claims: {
+        Row: {
+          created_at: string
+          deposit_amount_krw: number
+          godmode_id: string
+          id: string
+          meta: Json
+          net_loss_krw: number
+          refunded_phon: number
+          remaining_phon_at_claim: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deposit_amount_krw: number
+          godmode_id: string
+          id?: string
+          meta?: Json
+          net_loss_krw: number
+          refunded_phon: number
+          remaining_phon_at_claim: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deposit_amount_krw?: number
+          godmode_id?: string
+          id?: string
+          meta?: Json
+          net_loss_krw?: number
+          refunded_phon?: number
+          remaining_phon_at_claim?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loss_protection_claims_godmode_id_fkey"
+            columns: ["godmode_id"]
+            isOneToOne: false
+            referencedRelation: "first_deposit_godmode"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mission_history: {
         Row: {
           base_reward: number
@@ -4020,6 +4064,42 @@ export type Database = {
           signup_bonus_paid?: boolean
           total_commission?: number
           window_expires_at?: string | null
+        }
+        Relationships: []
+      }
+      refund_requests: {
+        Row: {
+          admin_id: string | null
+          admin_memo: string | null
+          amount_krw: number
+          created_at: string
+          id: string
+          reason: string
+          resolved_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          admin_id?: string | null
+          admin_memo?: string | null
+          amount_krw: number
+          created_at?: string
+          id?: string
+          reason: string
+          resolved_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          admin_id?: string | null
+          admin_memo?: string | null
+          amount_krw?: number
+          created_at?: string
+          id?: string
+          reason?: string
+          resolved_at?: string | null
+          status?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -6335,6 +6415,26 @@ export type Database = {
             }
             Returns: Json
           }
+      admin_resolve_refund: {
+        Args: { _approve: boolean; _id: string; _memo: string }
+        Returns: {
+          admin_id: string | null
+          admin_memo: string | null
+          amount_krw: number
+          created_at: string
+          id: string
+          reason: string
+          resolved_at: string | null
+          status: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "refund_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_resolve_withdrawal:
         | {
             Args: { _action: string; _reason: string; _request_id: string }
@@ -6553,6 +6653,26 @@ export type Database = {
       claim_founding_seat: { Args: { _purchase_id: string }; Returns: Json }
       claim_handbook_bonus: { Args: never; Returns: Json }
       claim_idle_growth: { Args: never; Returns: Json }
+      claim_loss_protection: {
+        Args: never
+        Returns: {
+          created_at: string
+          deposit_amount_krw: number
+          godmode_id: string
+          id: string
+          meta: Json
+          net_loss_krw: number
+          refunded_phon: number
+          remaining_phon_at_claim: number
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "loss_protection_claims"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       claim_quest: { Args: { _quest_key: string }; Returns: Json }
       claim_season_reward: {
         Args: { _level: number; _track: string }
@@ -6985,6 +7105,16 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_recent_payouts_100: {
+        Args: never
+        Returns: {
+          amount_krw: number
+          completed_at: string
+          masked_nick: string
+          minutes_to_complete: number
+          tier: Database["public"]["Enums"]["user_tier"]
+        }[]
+      }
       get_recommended_missions: {
         Args: never
         Returns: {
@@ -7402,6 +7532,26 @@ export type Database = {
       redeem_real_coupon: { Args: { _code: string }; Returns: Json }
       redetect_anomaly: { Args: { _id: string }; Returns: Json }
       register_device: { Args: { _fp: string; _ua?: string }; Returns: Json }
+      request_refund: {
+        Args: { _reason: string }
+        Returns: {
+          admin_id: string | null
+          admin_memo: string | null
+          amount_krw: number
+          created_at: string
+          id: string
+          reason: string
+          resolved_at: string | null
+          status: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "refund_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       request_withdraw_otp: { Args: never; Returns: Json }
       request_withdrawal: {
         Args: {
