@@ -52,7 +52,7 @@ export default function Packages() {
     <Layout>
       <AdultOnlyBanner />
       <HubTabs hub="empire" />
-      <div className="container pt-6 pb-10 animate-liquid-in">
+      <div className="container pt-6 pb-32 md:pb-10 animate-liquid-in">
         {/* P6-2: Axie-style Empire Unit cards (XP/진화/스탯) */}
         <PackageUpgradeCards />
         <div className="mb-6">
