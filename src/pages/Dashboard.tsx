@@ -54,6 +54,7 @@ export default function Dashboard() {
   const [allowOnboardingV2, setAllowOnboardingV2] = useState(false);
   const online = useOnline();
   const today = useTodayPayout();
+  const betRef = useRef<BetPanelHandle>(null);
 
   useEffect(() => { void refreshWallet(); }, []);
   useWinback();
