@@ -17,7 +17,8 @@ export function useAchievementWatcher(trigger?: unknown) {
     async function check() {
       if (typeof window !== "undefined" && sessionStorage.getItem(ACHIEVEMENT_RPC_DISABLED_KEY) === "1") return;
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user ?? null;
         if (!user || cancelled) return;
         const { data, error } = await supabase.rpc("check_achievements", { _user_id: user.id });
         if (error || !data) {
