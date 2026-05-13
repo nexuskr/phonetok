@@ -17,6 +17,25 @@ import { SceneNetworkEffect } from "@/components/guide/SceneNetworkEffect";
 import { SceneGuildWar } from "@/components/guide/SceneGuildWar";
 import { SceneEmpireMap } from "@/components/guide/SceneEmpireMap";
 import { CinemaTransition } from "@/components/guide/EmpireFX";
+import LazyMount from "@/components/util/LazyMount";
+
+/** Lazy wrapper for full-screen guide scenes — only mounts current ± 1 viewport.
+ *  Keeps the snap-section min-height so the snap container math doesn't shift,
+ *  and shows a flat dark placeholder so unmount/remount is visually invisible. */
+function LazyScene({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="snap-start snap-always min-h-[calc(100dvh-56px)]">
+      <LazyMount
+        rootMargin="120% 0px"
+        unmountOnExit
+        minHeight="calc(100dvh - 56px)"
+        fallback={<div aria-hidden className="w-full bg-background" style={{ minHeight: "calc(100dvh - 56px)" }} />}
+      >
+        {children}
+      </LazyMount>
+    </div>
+  );
+}
 
 /**
  * 풀스크린 스토리텔링 가이드 — 7씬
