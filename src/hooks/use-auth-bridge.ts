@@ -76,6 +76,27 @@ async function assignPersonaSafely() {
   }
 }
 
+/**
+ * Stale-token guard: 토큰은 살아있지만 user fetch가 403 bad_jwt(missing sub claim)을
+ * 반환하는 도메인 cross-storage 케이스. 감지 시 로컬 세션만 정리하고 사용자에게
+ * 안내(즉시 무한 루프 회피).
+ */
+async function ensureValidSession(session: any): Promise<boolean> {
+  if (!session?.user) return false;
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    if (!error && data?.user?.id) return true;
+    const msg = String((error as any)?.message ?? "");
+    if (/sub claim|bad_jwt|JWT|invalid/i.test(msg)) {
+      try { await supabase.auth.signOut({ scope: "local" }); } catch { /* noop */ }
+      return false;
+    }
+    return true; // network blip — 다음 사이클에 재시도
+  } catch {
+    return true;
+  }
+}
+
 export function useAuthBridge() {
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
@@ -87,7 +108,9 @@ export function useAuthBridge() {
         setTimeout(() => { void assignPersonaSafely(); }, 800);
       }
     });
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
+      const ok = await ensureValidSession(data.session);
+      if (!ok) { syncFromSession(null); return; }
       syncFromSession(data.session);
       if (data.session?.user) {
         resetSessionCircuitBreakers();
@@ -98,3 +121,4 @@ export function useAuthBridge() {
     return () => sub.subscription.unsubscribe();
   }, []);
 }
+
