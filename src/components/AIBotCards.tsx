@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNowTick } from "@/hooks/use-now-tick";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -362,12 +363,12 @@ function TradingBotCard({ tier, runs, used, loading, dailyCap }: { tier: string;
     errorTitle: t("err.err"),
   });
 
-  // Realtime progress tick
+  // Realtime progress tick — global 2s clock, only ticks when an active boost exists
+  const _botTick = useNowTick(2000);
   useEffect(() => {
     if (!latest?.expires_at) return;
-    const i = setInterval(() => force(x => x + 1), 1000);
-    return () => clearInterval(i);
-  }, [latest?.expires_at]);
+    force((x) => x + 1);
+  }, [_botTick, latest?.expires_at]);
 
   const progress = useMemo(() => {
     if (!latest?.expires_at) return 0;

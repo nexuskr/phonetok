@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useNowTick } from "@/hooks/use-now-tick";
 
 export type ImperialState = {
   total_is: number;
@@ -64,21 +65,13 @@ export function useImperialState() {
 
 /** Returns "HH:MM:SS" remaining string, or null if expired/none. */
 export function useBoosterCountdown(expiresAt: string | null) {
-  const [text, setText] = useState<string | null>(null);
-  useEffect(() => {
-    if (!expiresAt) { setText(null); return; }
-    function tick() {
-      const ms = new Date(expiresAt!).getTime() - Date.now();
-      if (ms <= 0) { setText(null); return; }
-      const s = Math.floor(ms / 1000);
-      const h = Math.floor(s / 3600);
-      const m = Math.floor((s % 3600) / 60);
-      const sec = s % 60;
-      setText(`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`);
-    }
-    tick();
-    const id = window.setInterval(tick, 2000);
-    return () => window.clearInterval(id);
-  }, [expiresAt]);
-  return text;
+  const now = useNowTick(2000);
+  if (!expiresAt) return null;
+  const ms = new Date(expiresAt).getTime() - now;
+  if (ms <= 0) return null;
+  const s = Math.floor(ms / 1000);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 }

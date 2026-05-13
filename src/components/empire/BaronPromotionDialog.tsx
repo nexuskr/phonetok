@@ -1,6 +1,7 @@
 // PR-12: Baron FOMO Dialog v2 — pulsing countdown, 3 message variants, shimmer CTA.
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { useNowTick } from "@/hooks/use-now-tick";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -75,7 +76,7 @@ const ACCENT: Record<Variant["accent"], { ring: string; glow: string; cta: strin
 
 export default function BaronPromotionDialog() {
   const [row, setRow] = useState<FomoRow | null>(null);
-  const [now, setNow] = useState<number>(() => Date.now());
+  const now = useNowTick(2000);
   const nav = useNavigate();
 
   async function loadLatest() {
@@ -101,13 +102,6 @@ export default function BaronPromotionDialog() {
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, []);
-
-  // 1s tick for live countdown
-  useEffect(() => {
-    if (!row) return;
-    const t = setInterval(() => setNow(Date.now()), 2000);
-    return () => clearInterval(t);
-  }, [row]);
 
   async function dismiss() {
     if (!row) return;

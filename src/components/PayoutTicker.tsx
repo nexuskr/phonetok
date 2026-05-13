@@ -38,7 +38,7 @@ export default function PayoutTicker() {
   useEffect(() => {
     const tk = setInterval(() => {
       setItems(prev => [genReceipt(i18n.language), ...prev].slice(0, 6));
-    }, 1800);
+    }, 4000);
     return () => clearInterval(tk);
   }, [i18n.language]);
   return (

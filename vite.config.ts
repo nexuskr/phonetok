@@ -29,13 +29,19 @@ export default defineConfig(({ mode }) => ({
     modulePreload: { polyfill: true },
     rollupOptions: {
       output: {
-        manualChunks: {
-          "react-vendor": ["react", "react-dom", "react-router-dom"],
-          "supabase": ["@supabase/supabase-js"],
-          "query": ["@tanstack/react-query"],
-          "charts": ["recharts"],
-          "three": ["three", "@react-three/fiber", "@react-three/drei"],
-          "motion": ["framer-motion"],
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (/[\\/]react(?:-dom|-router-dom)?[\\/]/.test(id)) return "react-vendor";
+          if (id.includes("@supabase")) return "supabase";
+          if (id.includes("@tanstack")) return "query";
+          if (id.includes("recharts") || id.includes("d3-")) return "charts";
+          if (id.includes("three") || id.includes("@react-three")) return "three";
+          if (id.includes("framer-motion")) return "motion";
+          if (id.includes("@radix-ui")) return "radix";
+          if (id.includes("lucide-react")) return "icons";
+          if (id.includes("date-fns")) return "date";
+          if (id.includes("i18next") || id.includes("react-i18next")) return "i18n";
+          return "vendor";
         },
       },
     },

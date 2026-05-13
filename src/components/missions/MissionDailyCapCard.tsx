@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { Clock, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Tier } from "@/lib/store";
+import { useNowTick } from "@/hooks/use-now-tick";
 
 interface Props {
   playsUsed: number;
@@ -18,12 +19,8 @@ export default function MissionDailyCapCard({ playsUsed, playLimit, tier }: Prop
   const left = Math.max(0, playLimit - playsUsed);
   const pct = Math.min(100, Math.round((playsUsed / Math.max(1, playLimit)) * 100));
   const reached = left === 0;
-  const [countdown, setCountdown] = useState(getResetCountdown());
-
-  useEffect(() => {
-    const i = setInterval(() => setCountdown(getResetCountdown()), 1000);
-    return () => clearInterval(i);
-  }, []);
+  const tick = useNowTick(1000);
+  const countdown = useMemo(() => getResetCountdown(), [tick]);
 
   return (
     <div

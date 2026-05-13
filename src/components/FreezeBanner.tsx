@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNowTick } from "@/hooks/use-now-tick";
 import { supabase } from "@/integrations/supabase/client";
 import { Snowflake } from "lucide-react";
 
@@ -13,7 +14,7 @@ type Freeze = {
 
 export default function FreezeBanner() {
   const [f, setF] = useState<Freeze | null>(null);
-  const [now, setNow] = useState(Date.now());
+  const now = useNowTick(2000);
 
   useEffect(() => {
     async function load() {
@@ -23,12 +24,11 @@ export default function FreezeBanner() {
       setF((data && data[0]) || null);
     }
     load();
-    const t = setInterval(() => setNow(Date.now()), 2000);
     const ch = supabase
       .channel("freeze:self")
       .on("postgres_changes", { event: "*", schema: "public", table: "account_freezes" }, load)
       .subscribe();
-    return () => { clearInterval(t); supabase.removeChannel(ch); };
+    return () => { supabase.removeChannel(ch); };
   }, []);
 
   if (!f) return null;

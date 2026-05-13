@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
+import { useNowTick } from "@/hooks/use-now-tick";
 import { motion } from "framer-motion";
 import {
   Crown, Flame, Shield, Activity, Zap, ArrowDownToLine,
@@ -35,11 +36,7 @@ type Snapshot = {
 const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n || 0));
 
 function useCountdown(target?: string) {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, []);
+  const now = useNowTick(1000);
   if (!target) return null;
   const ms = new Date(target).getTime() - now;
   if (ms <= 0) return "정산 중";

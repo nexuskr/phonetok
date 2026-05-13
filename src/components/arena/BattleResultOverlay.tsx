@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, RotateCcw, Sparkles } from "lucide-react";
 import { formatKRW } from "@/lib/store";
 import type { Side } from "@/lib/trading/armyMapping";
+import { useNowTick } from "@/hooks/use-now-tick";
 
 type Result = "win" | "loss" | "near_miss";
 
@@ -24,12 +25,18 @@ const COPY: Record<Result, { emoji: string; title: (s: Side) => string; tone: st
 };
 
 export default function BattleResultOverlay({ open, result, side, pnlPct, size, entryPrice, onClose, onRecovery }: Props) {
+  const startRef = useRef<number>(0);
   const [counter, setCounter] = useState(30);
+  const tickNow = useNowTick(1000);
   useEffect(() => {
-    if (!open || result !== "near_miss") { setCounter(30); return; }
-    const t = setInterval(() => setCounter((c) => Math.max(0, c - 1)), 1000);
-    return () => clearInterval(t);
+    if (!open || result !== "near_miss") { setCounter(30); startRef.current = 0; return; }
+    if (!startRef.current) startRef.current = Date.now();
   }, [open, result]);
+  useEffect(() => {
+    if (!open || result !== "near_miss" || !startRef.current) return;
+    const elapsed = Math.floor((tickNow - startRef.current) / 1000);
+    setCounter(Math.max(0, 30 - elapsed));
+  }, [tickNow, open, result]);
 
   if (!result || !side) return null;
   const c = COPY[result];
