@@ -55,6 +55,10 @@ export default function Index() {
     // 0유저/비로그인 → Starter 가이드로 자연스럽게 유도 (?landing=1 이면 마케팅 랜딩 유지)
     const url = new URL(window.location.href);
     if (url.searchParams.get("landing") === "1") return;
+    // One-Time Guide: 이미 본 사용자는 가이드 우회
+    try {
+      if (localStorage.getItem("phonara_guide_seen_v1") === "1") return;
+    } catch { /* noop */ }
     const ref = url.searchParams.get("ref");
     nav(`/guide?tab=starter${ref ? `&ref=${encodeURIComponent(ref)}` : ""}`, { replace: true });
   }, [isReady, hasSession, nav]);

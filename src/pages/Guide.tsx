@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { ChevronDown, Flame, Crown, TrendingUp, Clock, Users, Shield, MessageCircle, Type, CheckCircle2 } from "lucide-react";
 import Layout from "@/components/Layout";
@@ -57,12 +57,49 @@ export default function Guide() {
     try { return localStorage.getItem("guide_large_text") === "1"; } catch { return false; }
   });
   const reduce = useReducedMotion();
+  const navigate = useNavigate();
 
   // Phase 4 — ?tab=starter (기본): 7씬 FOMO 풀스크롤, ?tab=detail: 기존 디테일 가이드
   const tab = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : null;
+  const force = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("force") === "1" : false;
   const isStarter = tab !== "detail";
 
   const sceneCount = isStarter ? 10 : 7;
+
+  // One-Time Guide gate — `?force=1` 이외에는 한 번 본 사용자 즉시 /command 리다이렉트
+  useEffect(() => {
+    if (!isStarter || force) return;
+    let alive = true;
+    (async () => {
+      try {
+        const seenLocal = typeof window !== "undefined" && localStorage.getItem("phonara_guide_seen_v1") === "1";
+        if (seenLocal) { if (alive) navigate("/command", { replace: true }); return; }
+        if (db.user?.id) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("has_seen_guide")
+            .eq("id", db.user.id)
+            .maybeSingle();
+          if (alive && (data as any)?.has_seen_guide) {
+            try { localStorage.setItem("phonara_guide_seen_v1", "1"); } catch {}
+            navigate("/command", { replace: true });
+          }
+        }
+      } catch { /* noop */ }
+    })();
+    return () => { alive = false; };
+  }, [isStarter, force, db.user?.id, navigate]);
+
+  // Mark seen on completion (last scene reached)
+  useEffect(() => {
+    if (!isStarter) return;
+    if (activeIdx >= sceneCount - 1) {
+      try { localStorage.setItem("phonara_guide_seen_v1", "1"); } catch {}
+      if (db.user?.id) {
+        void supabase.from("profiles").update({ has_seen_guide: true } as any).eq("id", db.user.id);
+      }
+    }
+  }, [activeIdx, isStarter, sceneCount, db.user?.id]);
 
   useEffect(() => { markLandingStart(); }, []);
 
