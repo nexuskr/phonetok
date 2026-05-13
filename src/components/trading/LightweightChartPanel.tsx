@@ -25,15 +25,16 @@ const INTERVAL_SECONDS: Record<KlineInterval, number> = {
 
 function bucket(ts: number, sec: number) { return Math.floor(ts / sec) * sec; }
 
-function LightweightChartPanelImpl({ symbol, price, overlays = [], height = 320, interval = "1" }: Props) {
+function LightweightChartPanelImpl({ symbol, price, overlays = [], height = 320, interval = "1", mode = "candle" }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
-  const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const seriesRef = useRef<ISeriesApi<"Candlestick"> | ISeriesApi<"Line"> | null>(null);
   const candlesRef = useRef<CandlestickData[]>([]);
   const linesRef = useRef<IPriceLine[]>([]);
   const overlaysSigRef = useRef<string>("");
   const klineActiveRef = useRef(false);
   const lastDevLogRef = useRef(0);
+  const modeRef = useRef(mode);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -53,19 +54,28 @@ function LightweightChartPanelImpl({ symbol, price, overlays = [], height = 320,
       width: ref.current.clientWidth,
       height,
     });
-    const series = chart.addSeries(CandlestickSeries, {
-      upColor: "#34d399",
-      downColor: "#f43f5e",
-      borderUpColor: "#34d399",
-      borderDownColor: "#f43f5e",
-      wickUpColor: "rgba(52,211,153,0.8)",
-      wickDownColor: "rgba(244,63,94,0.8)",
-      priceLineVisible: true,
-      priceLineColor: "rgba(244,180,55,0.7)",
-      priceLineStyle: LineStyle.Dotted,
-    });
+    modeRef.current = mode;
+    const series = mode === "line"
+      ? chart.addSeries(LineSeries, {
+          color: "#f4b437",
+          lineWidth: 2,
+          priceLineVisible: true,
+          priceLineColor: "rgba(244,180,55,0.7)",
+          priceLineStyle: LineStyle.Dotted,
+        })
+      : chart.addSeries(CandlestickSeries, {
+          upColor: "#34d399",
+          downColor: "#f43f5e",
+          borderUpColor: "#34d399",
+          borderDownColor: "#f43f5e",
+          wickUpColor: "rgba(52,211,153,0.8)",
+          wickDownColor: "rgba(244,63,94,0.8)",
+          priceLineVisible: true,
+          priceLineColor: "rgba(244,180,55,0.7)",
+          priceLineStyle: LineStyle.Dotted,
+        });
     chartRef.current = chart;
-    seriesRef.current = series;
+    seriesRef.current = series as any;
 
     const ro = new ResizeObserver(() => {
       if (ref.current && chartRef.current) chartRef.current.applyOptions({ width: ref.current.clientWidth });
@@ -73,7 +83,7 @@ function LightweightChartPanelImpl({ symbol, price, overlays = [], height = 320,
     ro.observe(ref.current);
 
     return () => { ro.disconnect(); chart.remove(); chartRef.current = null; seriesRef.current = null; };
-  }, [height]);
+  }, [height, mode]);
 
   // Symbol/interval load: REST history + kline subscribe
   useEffect(() => {
