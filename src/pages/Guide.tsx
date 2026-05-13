@@ -11,6 +11,7 @@ import { notify } from "@/lib/notify";
 import { markLandingStart } from "@/lib/funnel";
 import ThreeSecondHero from "@/components/landing/ThreeSecondHero";
 import FomoScrollHero from "@/components/guide/FomoScrollHero";
+import StarterFunnelV3 from "@/components/guide/StarterFunnelV3";
 import { SceneProblem, SceneSolution, SceneProof, ScenePersona, ScenePackage } from "@/components/guide/FomoScrollScenes";
 import FomoFinalCTA from "@/components/guide/FomoFinalCTA";
 import { SceneNetworkEffect } from "@/components/guide/SceneNetworkEffect";
