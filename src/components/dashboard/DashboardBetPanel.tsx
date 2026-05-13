@@ -245,18 +245,29 @@ const DashboardBetPanel = forwardRef<BetPanelHandle>(function DashboardBetPanel(
           <ButtonsRow flash={flash} onLong={() => submit("long")} onShort={() => submit("short")} />
         )}
 
-        {/* AUTO REPEAT */}
+        {/* 자동 반복 베팅 — 70대 친화 직관 라벨 */}
         <button
           type="button"
           onClick={() => setAutoOn(!autoOn)}
-          className={`w-full h-11 rounded-xl border font-bold text-sm flex items-center justify-center gap-2 transition press ${
+          aria-label={autoOn ? "자동 반복 베팅 끄기" : "자동 반복 베팅 켜기"}
+          className={`w-full h-14 rounded-xl border-2 font-black text-base flex items-center justify-center gap-2.5 transition press ${
             autoOn
               ? "bg-gradient-imperial text-primary-foreground border-primary glow-imperial animate-pulse"
-              : "border-border/60 text-muted-foreground hover:text-primary hover:border-primary/40"
+              : "border-border/60 text-foreground hover:text-primary hover:border-primary/60 bg-background/60"
           }`}
         >
-          <Repeat className={`w-4 h-4 ${autoOn ? "animate-spin" : ""}`} />
-          {autoOn ? "AUTO REPEAT 활성 · 3.5s 간격" : "♻️ AUTO REPEAT"}
+          <Repeat className={`w-5 h-5 ${autoOn ? "animate-spin" : ""}`} />
+          {autoOn ? (
+            <span className="flex flex-col items-start leading-tight">
+              <span>🟢 자동 베팅 작동중</span>
+              <span className="text-[11px] font-semibold opacity-90">3.5초마다 자동 반복 — 누르면 멈춤</span>
+            </span>
+          ) : (
+            <span className="flex flex-col items-start leading-tight">
+              <span>▶️ 자동으로 계속 베팅하기</span>
+              <span className="text-[11px] font-semibold text-muted-foreground">눌러서 켜기 · 3.5초마다 자동</span>
+            </span>
+          )}
         </button>
       </div>
 
