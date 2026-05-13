@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNowTick } from "@/hooks/use-now-tick";
+import { subscribePostgres } from "@/lib/realtime-bus";
 
 export type CrownWarLeader = {
   rnk: number;
@@ -52,16 +53,17 @@ export function useCrownWar(pollMs = 15000) {
     return () => clearInterval(t);
   }, [load, pollMs]);
 
-  // Realtime: refresh on any war state change
+  // Realtime: refresh on any war/crown state change (deduped via realtime bus)
   useEffect(() => {
-    let ch: ReturnType<typeof supabase.channel> | null = null;
-    try {
-      ch = supabase
-        .channel("crown-wars-live")
-        .on("postgres_changes", { event: "*", schema: "public", table: "crown_wars" }, () => void load())
-        .subscribe((_status: string, err?: unknown) => { if (err) { /* swallow */ } });
-    } catch { /* realtime endpoint unreachable */ }
-    return () => { if (ch) { try { supabase.removeChannel(ch); } catch { /* swallow */ } } };
+    const offWars = subscribePostgres(
+      { key: "crown-wars-live", table: "crown_wars", event: "*" },
+      () => void load(),
+    );
+    const offEvents = subscribePostgres(
+      { key: "crown-events-live", table: "crown_events", event: "INSERT" },
+      () => void load(),
+    );
+    return () => { offWars(); offEvents(); };
   }, [load]);
 
   const endsAt = snap?.war ? new Date(snap.war.ends_at).getTime() : 0;
