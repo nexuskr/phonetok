@@ -16,7 +16,7 @@ import {
 import Particles from "@/components/Particles";
 import PayoutTicker from "@/components/PayoutTicker";
 import WhaleStrikeRail from "@/components/empire/WhaleStrikeRail";
-import { useOnline, useTotalPayout, useTodayPayout, useMembers } from "@/components/LiveStats.tsx";
+import { useOnline, useTotalPayout, useTodayPayout, useTotalUsers } from "@/components/LiveStats.tsx";
 import { useAuthReady } from "@/hooks/use-auth-ready";
 import EmpireFoundingCounter from "@/components/EmpireFoundingCounter";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
