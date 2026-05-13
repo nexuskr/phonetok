@@ -171,25 +171,50 @@ export default function SecureAuth() {
     >
       <AdultOnlyBanner className="absolute top-0 left-0 right-0 z-30" />
 
-      {/* === Static minimal cinematic background (no animation) === */}
+      {/* === Static cinematic imperial background (no animation) === */}
       <div aria-hidden className="absolute inset-0 pointer-events-none">
         {/* deep gradient base */}
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-[hsl(var(--background))]" />
-        {/* faint gold grid */}
+        {/* large gold grid */}
         <div
-          className="absolute inset-0 opacity-[0.05]"
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              "linear-gradient(hsl(var(--gold)/0.7) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--gold)/0.7) 1px, transparent 1px)",
+            backgroundSize: "112px 112px",
+          }}
+        />
+        {/* fine gold grid */}
+        <div
+          className="absolute inset-0 opacity-[0.025]"
           style={{
             backgroundImage:
               "linear-gradient(hsl(var(--gold)/0.6) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--gold)/0.6) 1px, transparent 1px)",
-            backgroundSize: "56px 56px",
+            backgroundSize: "28px 28px",
           }}
         />
-        {/* center vignette */}
+        {/* double vignette for depth */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(70% 55% at 50% 30%, transparent 0%, hsl(var(--background)/0.78) 100%)",
+              "radial-gradient(60% 50% at 50% 30%, transparent 0%, hsl(var(--background)/0.65) 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(50% 35% at 50% 100%, transparent 0%, hsl(var(--background)/0.85) 100%)",
+          }}
+        />
+        {/* top-center static gold ray */}
+        <div
+          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[420px] opacity-[0.18]"
+          style={{
+            background:
+              "conic-gradient(from 270deg at 50% 100%, transparent 0deg, hsl(var(--gold)/0.55) 90deg, transparent 180deg, transparent 360deg)",
+            filter: "blur(40px)",
           }}
         />
         {/* two corner gold glows — pure CSS, no animation */}
