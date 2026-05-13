@@ -1,17 +1,24 @@
 /**
- * Stub trigger for the global ⌘K Command Palette.
- * Full cmdk integration ships in PR-3. For now this exposes the keyboard
- * affordance so users build the muscle memory and the header stays final.
+ * ⌘K Command Palette — section/page jump powered by cmdk (shadcn).
+ * Groups by IA section, marks AAL2 routes, prefetch on hover via NavLink.
  */
-import { useEffect, useState, memo } from "react";
+import { useEffect, useState, useMemo, memo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { NavLink } from "react-router-dom";
-import { ADMIN_NAV_FLAT } from "@/pages/admin/_nav";
+import {
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandShortcut,
+} from "@/components/ui/command";
+import { ADMIN_NAV } from "@/pages/admin/_nav";
 
 function AdminCommandTriggerBase() {
   const [open, setOpen] = useState(false);
-  const [q, setQ] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -24,9 +31,16 @@ function AdminCommandTriggerBase() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const matches = ADMIN_NAV_FLAT.filter((i) =>
-    !q ? true : (i.name + " " + i.sectionLabel).toLowerCase().includes(q.toLowerCase()),
-  ).slice(0, 12);
+  const go = useCallback(
+    (to: string) => {
+      setOpen(false);
+      // small defer so dialog close animation doesn't fight router transition
+      requestAnimationFrame(() => navigate(to));
+    },
+    [navigate],
+  );
+
+  const groups = useMemo(() => ADMIN_NAV, []);
 
   return (
     <>
@@ -47,51 +61,37 @@ function AdminCommandTriggerBase() {
         <Search className="w-4 h-4 text-muted-foreground" />
       </button>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg p-0 overflow-hidden">
-          <DialogHeader className="sr-only">
-            <DialogTitle>Command Palette</DialogTitle>
-          </DialogHeader>
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-border/40">
-            <Search className="w-4 h-4 text-muted-foreground" />
-            <input
-              autoFocus
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="섹션·페이지 검색…"
-              className="flex-1 bg-transparent outline-none text-sm"
-            />
-            <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-muted/60 font-mono">ESC</kbd>
-          </div>
-          <div className="max-h-80 overflow-y-auto p-2">
-            {matches.length === 0 ? (
-              <div className="text-xs text-muted-foreground text-center py-8">결과 없음</div>
-            ) : (
-              matches.map((i) => {
-                const Icon = i.icon;
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput placeholder="섹션·페이지 검색…" />
+        <CommandList>
+          <CommandEmpty>결과 없음</CommandEmpty>
+          {groups.map((section) => (
+            <CommandGroup
+              key={section.id}
+              heading={`${section.emoji}  ${section.label}${section.aal2 ? "  · AAL2" : ""}`}
+            >
+              {section.items.map((item) => {
+                const Icon = item.icon;
                 return (
-                  <NavLink
-                    key={i.id + i.to}
-                    to={i.to}
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-2 px-2 py-2 rounded-md text-xs hover:bg-muted/60"
+                  <CommandItem
+                    key={item.id}
+                    value={`${section.label} ${item.name} ${item.to}`}
+                    onSelect={() => go(item.to)}
                   >
-                    <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span className="text-muted-foreground/70 mr-1">{i.sectionLabel}</span>
-                    <span className="flex-1 truncate">{i.name}</span>
-                    {i.aal2 && (
-                      <span className="text-[9px] tracking-[0.2em] text-destructive/80 font-black">AAL2</span>
+                    <Icon className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                    <span>{item.name}</span>
+                    {section.aal2 && (
+                      <CommandShortcut className="text-[9px] tracking-[0.2em] text-destructive/80 font-black">
+                        AAL2
+                      </CommandShortcut>
                     )}
-                  </NavLink>
+                  </CommandItem>
                 );
-              })
-            )}
-          </div>
-          <div className="px-4 py-2 border-t border-border/40 text-[10px] text-muted-foreground">
-            v0 · 페이지 점프 · 다음 PR에서 유저/거래/액션 검색 추가
-          </div>
-        </DialogContent>
-      </Dialog>
+              })}
+            </CommandGroup>
+          ))}
+        </CommandList>
+      </CommandDialog>
     </>
   );
 }
