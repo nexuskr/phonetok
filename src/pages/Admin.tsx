@@ -37,16 +37,17 @@ import BetaInvitesAdmin from "@/components/admin/BetaInvitesAdmin";
 import EvHealthAdmin from "@/components/admin/EvHealthAdmin";
 import AbExperimentsAdmin from "@/components/admin/AbExperimentsAdmin";
 import CoinAddressAdmin from "@/components/admin/CoinAddressAdmin";
+import FoundingSeasonsAdmin from "@/components/admin/FoundingSeasonsAdmin";
 
 const SENSITIVE_ADMIN_TABS = [
   "server_wd", "server_dep", "users", "packages", "coin",
   "perms", "aml", "payout_audit", "security", "ops", "viral_forensics",
-  "accounting", "bot_mix", "trust_v2",
+  "accounting", "bot_mix", "trust_v2", "founding",
 ];
 import { Activity, Lock, Bot, Flame, FlaskConical, HeartPulse, Gauge, KeyRound, HeartHandshake } from "lucide-react";
 import TrustV2Admin from "@/components/admin/TrustV2Admin";
 
-type Tab = "dashboard" | "funnel" | "analytics" | "errors" | "security" | "ops" | "perms" | "viral_forensics" | "aml" | "ai_missions" | "payout_audit" | "referrals" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin" | "ugc" | "insurance" | "accounting" | "bots" | "bot_mix" | "ev_health" | "ab_experiments" | "beta" | "trust_v2";
+type Tab = "dashboard" | "funnel" | "analytics" | "errors" | "security" | "ops" | "perms" | "viral_forensics" | "aml" | "ai_missions" | "payout_audit" | "referrals" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin" | "ugc" | "insurance" | "accounting" | "bots" | "bot_mix" | "ev_health" | "ab_experiments" | "beta" | "trust_v2" | "founding";
 
 export default function Admin() {
   const [db, setDb] = useDB();
@@ -132,6 +133,7 @@ export default function Admin() {
     { id: "ab_experiments", label: "A/B 실험", icon: FlaskConical },
     { id: "beta", label: "베타 코드", icon: KeyRound },
     { id: "trust_v2", label: "Trust v2 (환불·손실보호)", icon: HeartHandshake },
+    { id: "founding", label: "Founding 시즌", icon: Crown },
   ];
 
   return (
@@ -193,6 +195,7 @@ export default function Admin() {
           {tab === "ab_experiments" && <AbExperimentsAdmin />}
           {tab === "beta" && <BetaInvitesAdmin />}
           {tab === "trust_v2" && <TrustV2Admin />}
+          {tab === "founding" && <FoundingSeasonsAdmin />}
         </AdminAal2Gate>
       </div>
     </Layout>

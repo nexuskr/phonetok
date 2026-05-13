@@ -165,7 +165,10 @@ export default function Empire() {
         </div>
 
         {/* Founding Season Hall (시즌 좌석/홀) */}
-        <div className="mb-6">
+        <div className="mb-6 space-y-2">
+          <div className="flex justify-end">
+            <Link to="/empire/my-seat" className="text-xs text-gold underline min-h-[44px] inline-flex items-center px-2">내 Founding 좌석 →</Link>
+          </div>
           <FoundingSeasonHall />
         </div>
 
