@@ -104,25 +104,25 @@ export default function Guide() {
       >
         {isStarter ? (
           <>
-            <FomoScrollHero isLoggedIn={isLoggedIn} large={largeText} />
+            <LazyScene><FomoScrollHero isLoggedIn={isLoggedIn} large={largeText} /></LazyScene>
             <CinemaTransition />
-            <SceneProblem large={largeText} />
+            <LazyScene><SceneProblem large={largeText} /></LazyScene>
             <CinemaTransition />
-            <SceneSolution large={largeText} />
+            <LazyScene><SceneSolution large={largeText} /></LazyScene>
             <CinemaTransition />
-            <SceneProof large={largeText} />
+            <LazyScene><SceneProof large={largeText} /></LazyScene>
             <CinemaTransition />
-            <ScenePersona large={largeText} />
+            <LazyScene><ScenePersona large={largeText} /></LazyScene>
             <CinemaTransition />
-            <SceneNetworkEffect large={largeText} isLoggedIn={isLoggedIn} />
+            <LazyScene><SceneNetworkEffect large={largeText} isLoggedIn={isLoggedIn} /></LazyScene>
             <CinemaTransition />
-            <SceneGuildWar large={largeText} />
+            <LazyScene><SceneGuildWar large={largeText} /></LazyScene>
             <CinemaTransition />
-            <SceneEmpireMap large={largeText} />
+            <LazyScene><SceneEmpireMap large={largeText} /></LazyScene>
             <CinemaTransition />
-            <ScenePackage large={largeText} />
+            <LazyScene><ScenePackage large={largeText} /></LazyScene>
             <CinemaTransition />
-            <FomoFinalCTA large={largeText} />
+            <LazyScene><FomoFinalCTA large={largeText} /></LazyScene>
           </>
         ) : (
           <>
