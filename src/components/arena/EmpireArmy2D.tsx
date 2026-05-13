@@ -17,7 +17,7 @@ const ENEMY_COLOR = "hsl(var(--destructive))";
 function Soldier({ x, y, color, size = 4 }: { x: number; y: number; color: string; size?: number }) {
   return (
     <g transform={`translate(${x} ${y})`}>
-      <circle r={size} fill={color} />
+      <circle r={Number.isFinite(size) ? size : 4} fill={color || "hsl(var(--gold))"} />
       <rect x={-size * 0.4} y={size * 0.6} width={size * 0.8} height={size * 1.4} fill={color} opacity={0.85} />
     </g>
   );
