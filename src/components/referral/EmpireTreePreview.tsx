@@ -74,18 +74,26 @@ export default function EmpireTreePreview() {
             const active = i < visibleNodes;
             return (
               <g key={i}>
-                <line x1={140} y1={30} x2={p.x} y2={p.y} stroke={active ? "hsl(var(--gold)/0.5)" : "hsl(var(--muted-foreground)/0.25)"} strokeWidth="1.5" strokeDasharray={active ? "0" : "3 3"} />
-                {!reduce && active && (
-                  <motion.circle r={3} cx={140} cy={30} fill="hsl(var(--gold))"
-                    style={{ filter: "drop-shadow(0 0 6px hsl(var(--gold)))" }}
-                    initial={{ cx: 140, cy: 30, opacity: 0 }}
-                    animate={{ cx: [140, p.x], cy: [30, p.y], opacity: [0, 1, 1, 0] }}
-                    transition={{ duration: 2.4, repeat: Infinity, delay: i * 0.3 }} />
-                )}
-                <circle cx={p.x} cy={p.y} r="11" fill={active ? "hsl(var(--card))" : "hsl(var(--muted)/0.5)"} stroke={active ? "hsl(var(--gold)/0.7)" : "hsl(var(--muted-foreground)/0.3)"} strokeWidth="1.5" />
-                <text x={p.x} y={p.y + 3} textAnchor="middle" fontSize="9" fill={active ? "hsl(var(--gold))" : "hsl(var(--muted-foreground))"}>
-                  {active ? "👤" : "?"}
-                </text>
+                {(() => {
+                  const px = Number.isFinite(p?.x) ? p.x : 0;
+                  const py = Number.isFinite(p?.y) ? p.y : 0;
+                  return (
+                    <>
+                      <line x1={140} y1={30} x2={px} y2={py} stroke={active ? "hsl(var(--gold)/0.5)" : "hsl(var(--muted-foreground)/0.25)"} strokeWidth="1.5" strokeDasharray={active ? "0" : "3 3"} />
+                      {!reduce && active && (
+                        <motion.circle r={3} cx={140} cy={30} fill="hsl(var(--gold))"
+                          style={{ filter: "drop-shadow(0 0 6px hsl(var(--gold)))" }}
+                          initial={{ cx: 140, cy: 30, opacity: 0 }}
+                          animate={{ cx: [140, px], cy: [30, py], opacity: [0, 1, 1, 0] }}
+                          transition={{ duration: 2.4, repeat: Infinity, delay: i * 0.3 }} />
+                      )}
+                      <circle cx={px} cy={py} r="11" fill={active ? "hsl(var(--card))" : "hsl(var(--muted)/0.5)"} stroke={active ? "hsl(var(--gold)/0.7)" : "hsl(var(--muted-foreground)/0.3)"} strokeWidth="1.5" />
+                      <text x={px} y={py + 3} textAnchor="middle" fontSize="9" fill={active ? "hsl(var(--gold))" : "hsl(var(--muted-foreground))"}>
+                        {active ? "👤" : "?"}
+                      </text>
+                    </>
+                  );
+                })()}
               </g>
             );
           })}

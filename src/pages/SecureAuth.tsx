@@ -171,25 +171,50 @@ export default function SecureAuth() {
     >
       <AdultOnlyBanner className="absolute top-0 left-0 right-0 z-30" />
 
-      {/* === Static minimal cinematic background (no animation) === */}
+      {/* === Static cinematic imperial background (no animation) === */}
       <div aria-hidden className="absolute inset-0 pointer-events-none">
         {/* deep gradient base */}
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-[hsl(var(--background))]" />
-        {/* faint gold grid */}
+        {/* large gold grid */}
         <div
-          className="absolute inset-0 opacity-[0.05]"
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              "linear-gradient(hsl(var(--gold)/0.7) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--gold)/0.7) 1px, transparent 1px)",
+            backgroundSize: "112px 112px",
+          }}
+        />
+        {/* fine gold grid */}
+        <div
+          className="absolute inset-0 opacity-[0.025]"
           style={{
             backgroundImage:
               "linear-gradient(hsl(var(--gold)/0.6) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--gold)/0.6) 1px, transparent 1px)",
-            backgroundSize: "56px 56px",
+            backgroundSize: "28px 28px",
           }}
         />
-        {/* center vignette */}
+        {/* double vignette for depth */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(70% 55% at 50% 30%, transparent 0%, hsl(var(--background)/0.78) 100%)",
+              "radial-gradient(60% 50% at 50% 30%, transparent 0%, hsl(var(--background)/0.65) 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(50% 35% at 50% 100%, transparent 0%, hsl(var(--background)/0.85) 100%)",
+          }}
+        />
+        {/* top-center static gold ray */}
+        <div
+          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[420px] opacity-[0.18]"
+          style={{
+            background:
+              "conic-gradient(from 270deg at 50% 100%, transparent 0deg, hsl(var(--gold)/0.55) 90deg, transparent 180deg, transparent 360deg)",
+            filter: "blur(40px)",
           }}
         />
         {/* two corner gold glows — pure CSS, no animation */}
@@ -203,15 +228,18 @@ export default function SecureAuth() {
       </div>
 
       <main className="relative z-10 flex flex-col items-center px-4 pt-16 pb-10 max-w-xl mx-auto">
-        {/* === Static gold wordmark seal === */}
+        {/* === Static gold wordmark seal — framed double hairline === */}
         <div className="mt-2 flex flex-col items-center select-none">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/35 bg-background/60">
+          <div className="h-px w-56 bg-gradient-to-r from-transparent via-gold/55 to-transparent" />
+          <div className="mt-1.5 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/40 bg-background/65 shadow-[0_0_24px_-8px_hsl(var(--gold)/0.5)]">
             <Crown className="w-3.5 h-3.5 text-gold" />
             <span className="text-[10px] tracking-[0.42em] text-gold font-black">
               PHONARA · EST. 2026
             </span>
           </div>
-          <div className="mt-3 h-px w-40 bg-gradient-to-r from-transparent via-gold/70 to-transparent" />
+          <div className="mt-1.5 h-px w-56 bg-gradient-to-r from-transparent via-gold/55 to-transparent" />
+          <div className="mt-2 h-[2px] w-32 bg-gradient-to-r from-transparent via-gold/80 to-transparent" />
+          <div className="mt-1 h-px w-20 border-t border-dashed border-gold/40" />
         </div>
 
         {/* === Hero title === */}
@@ -222,10 +250,19 @@ export default function SecureAuth() {
               SECURE V3 · AAL2 GUARDED
             </span>
           </div>
+          {/* Imperial kicker */}
+          <div className="inline-flex items-center gap-1.5 mb-3 text-gold/90">
+            <Crown className="w-4 h-4" />
+            <span className="font-imperial font-black text-[11px] sm:text-xs tracking-[0.32em] uppercase">
+              패키지 1회로 모든 미션이 자동 완료
+            </span>
+            <Crown className="w-4 h-4" />
+          </div>
           <h1
             className="font-imperial font-black text-gradient-gold leading-[1.05] text-[34px] sm:text-[56px]"
             style={{
               WebkitTextStroke: "1px hsl(var(--gold-stroke) / 0.45)",
+              textShadow: "0 0 28px hsl(var(--gold) / 0.22), 0 0 60px hsl(var(--gold) / 0.12)",
             }}
           >
             제국 입장을 위한
@@ -241,19 +278,28 @@ export default function SecureAuth() {
           </p>
         </div>
 
-        {/* === SIM strip — static numbers, SimBadge preserved === */}
+        {/* === SIM strip — framed numbers, SimBadge preserved === */}
         <div className="grid grid-cols-3 gap-2 mt-6 w-full">
           {[
-            { label: "지금 입장 중", value: "1,247", suffix: "명" },
-            { label: "오늘 가입", value: "384", suffix: "명" },
-            { label: "평균 입장", value: "22", suffix: "초" },
+            { label: "지금 입장 중", micro: "LIVE", value: "1,247", suffix: "명" },
+            { label: "오늘 가입", micro: "TODAY", value: "384", suffix: "명" },
+            { label: "평균 입장", micro: "AVG", value: "22", suffix: "초" },
           ].map((s, i) => (
             <div
               key={i}
-              className="relative rounded-xl border border-gold/25 bg-background/60 px-3 py-3 text-center"
+              className="relative rounded-xl border border-gold/30 bg-gradient-to-b from-background/80 to-background/55 px-3 py-3 text-center overflow-hidden"
             >
+              {/* gold cap line */}
+              <span aria-hidden className="absolute inset-x-3 top-0 h-[2px] bg-gradient-to-r from-transparent via-gold/70 to-transparent" />
+              {/* hairline divider on left (skip first) */}
+              {i > 0 && (
+                <span aria-hidden className="absolute left-0 top-3 bottom-3 w-px bg-gradient-to-b from-transparent via-gold/30 to-transparent" />
+              )}
               <SimBadge className="absolute top-1.5 right-1.5" />
-              <div className="text-[10px] tracking-widest text-muted-foreground font-bold">
+              <div className="text-[8px] tracking-[0.4em] text-gold/65 font-black">
+                {s.micro}
+              </div>
+              <div className="text-[10px] tracking-widest text-muted-foreground font-bold mt-0.5">
                 {s.label}
               </div>
               <div className="font-imperial text-gradient-gold text-xl sm:text-2xl mt-1 tabular-nums">
@@ -263,12 +309,31 @@ export default function SecureAuth() {
           ))}
         </div>
 
-        {/* === Main CTA card — solid, no blur, no shimmer === */}
+        {/* === Main CTA card — luxury watch frame === */}
         <div
-          className="relative w-full mt-7 rounded-3xl p-5 sm:p-6 border border-gold/40 bg-background/85 glow-gold-xl"
+          className="relative w-full mt-7 rounded-3xl p-5 sm:p-6 border-2 border-gold/45 bg-background/85 glow-gold-xl outline outline-1 outline-offset-[3px] outline-gold/15 overflow-hidden"
         >
+          {/* inner top hairline */}
+          <span aria-hidden className="absolute top-0 inset-x-6 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
+          {/* inner bottom hairline */}
+          <span aria-hidden className="absolute bottom-0 inset-x-6 h-px bg-gradient-to-r from-transparent via-gold/35 to-transparent" />
+          {/* static conic shine — no animation */}
+          <span
+            aria-hidden
+            className="absolute inset-0 pointer-events-none opacity-[0.06]"
+            style={{
+              background:
+                "conic-gradient(from 210deg at 50% 0%, transparent 0deg, hsl(var(--gold)) 60deg, transparent 140deg, transparent 360deg)",
+            }}
+          />
+          {/* 4 corner L-markers */}
+          <span aria-hidden className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-gold/70 rounded-tl-md" />
+          <span aria-hidden className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-gold/70 rounded-tr-md" />
+          <span aria-hidden className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-gold/70 rounded-bl-md" />
+          <span aria-hidden className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-gold/70 rounded-br-md" />
+
           {/* email input */}
-          <label className="block">
+          <label className="block relative">
             <span className="sr-only">이메일</span>
             <div className="flex items-center gap-3 px-4 h-14 rounded-2xl border border-gold/30 bg-background/80 focus-within:border-gold transition-colors">
               <Mail className="w-5 h-5 text-gold/80 shrink-0" />
@@ -292,9 +357,11 @@ export default function SecureAuth() {
             className={`relative w-full mt-4 rounded-2xl bg-gradient-imperial text-primary-foreground font-black tracking-wider transition-[transform,box-shadow] duration-200 disabled:opacity-50 disabled:cursor-not-allowed motion-safe:hover:scale-[1.01] active:scale-[0.99] glow-gold-xl ${senior.btnXl} min-h-[72px] text-xl sm:text-2xl flex items-center justify-center gap-3`}
             aria-label="매직링크로 제국 입장하기"
           >
+            <span aria-hidden className="text-gold-foreground/90">✦</span>
             <Sparkles className="w-6 h-6" />
             <span>매직링크로 제국 입장</span>
             <ArrowRight className="w-6 h-6" />
+            <span aria-hidden className="text-gold-foreground/90">✦</span>
           </button>
 
           <p className="mt-3 text-center text-sm text-foreground/75 break-keep">
@@ -489,21 +556,25 @@ export default function SecureAuth() {
         </div>
 
         {/* === Trust footer pills === */}
-        <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
-          {[
-            { icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "19+ AdultGate" },
-            { icon: <Clock className="w-3.5 h-3.5" />, label: "Magic Link 5분 유효" },
-            { icon: <LockIcon className="w-3.5 h-3.5" />, label: "AAL2 보안" },
-            { icon: <Crown className="w-3.5 h-3.5" />, label: "운영자 무손실" },
-          ].map((p, i) => (
-            <span
-              key={i}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold/30 bg-background/60 text-xs text-foreground/80"
-            >
-              <span className="text-gold">{p.icon}</span>
-              {p.label}
-            </span>
-          ))}
+        <div className="mt-7 flex flex-col items-center gap-3 w-full">
+          <div className="h-px w-40 bg-gradient-to-r from-transparent via-gold/55 to-transparent" />
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {[
+              { icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "19+ AdultGate" },
+              { icon: <Clock className="w-3.5 h-3.5" />, label: "Magic Link 5분 유효" },
+              { icon: <LockIcon className="w-3.5 h-3.5" />, label: "AAL2 보안" },
+              { icon: <Crown className="w-3.5 h-3.5" />, label: "운영자 무손실" },
+            ].map((p, i) => (
+              <span
+                key={i}
+                className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold/35 bg-gradient-to-b from-background/75 to-background/45 text-xs text-foreground/85 shadow-[0_0_18px_-10px_hsl(var(--gold)/0.5)]"
+              >
+                <span aria-hidden className="absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
+                <span className="text-gold">{p.icon}</span>
+                {p.label}
+              </span>
+            ))}
+          </div>
         </div>
 
         <p className="mt-6 text-center text-[11px] text-muted-foreground/80 max-w-sm break-keep">

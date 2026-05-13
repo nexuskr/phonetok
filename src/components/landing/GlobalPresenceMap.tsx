@@ -111,8 +111,8 @@ export default function GlobalPresenceMap() {
             return (
               <g key={r.key}>
                 <circle
-                  cx={r.cx}
-                  cy={r.cy}
+                  cx={r?.cx ?? 0}
+                  cy={r?.cy ?? 0}
                   r={isActive ? 28 : 18}
                   fill={isActive ? "url(#activeGlow)" : "url(#dotGlow)"}
                 >
@@ -124,8 +124,8 @@ export default function GlobalPresenceMap() {
                   />
                 </circle>
                 <circle
-                  cx={r.cx}
-                  cy={r.cy}
+                  cx={r?.cx ?? 0}
+                  cy={r?.cy ?? 0}
                   r={isActive ? 4.5 : 3}
                   fill={isActive ? "hsl(var(--gold))" : "hsl(var(--secondary))"}
                 />
