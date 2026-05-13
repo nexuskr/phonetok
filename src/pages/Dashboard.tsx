@@ -12,6 +12,7 @@ import { Flame, Zap, Trophy, ChevronRight, TrendingUp, Sparkles, Crown, Wallet, 
 import CommandHero from "@/components/CommandHero";
 import { FomoNotificationStrip } from "@/components/empire/FomoNotificationStrip";
 import WhaleStrikeRail from "@/components/empire/WhaleStrikeRail";
+import LiveRankingMarquee from "@/components/LiveRankingMarquee";
 import CrownWarHUD from "@/components/empire/CrownWarHUD";
 import EmpireSignature from "@/components/status/EmpireSignature";
 import { useWinback } from "@/hooks/use-winback";
