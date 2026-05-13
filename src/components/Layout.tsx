@@ -388,7 +388,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <ReplayShareGlobal />
           <CrownWarFinaleModal />
           <PowerHeader />
-          <FirstEmperorBurst />
+          <FirstEmperorBurst onCta={() => {
+            try {
+              if (typeof window !== "undefined") {
+                if (window.location.pathname !== "/dashboard") {
+                  window.location.href = "/dashboard?focus=bet";
+                } else {
+                  window.dispatchEvent(new CustomEvent("phonara:focus-bet"));
+                }
+              }
+            } catch {}
+          }} />
         </Suspense>
       )}
 
