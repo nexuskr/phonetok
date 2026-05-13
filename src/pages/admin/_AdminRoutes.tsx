@@ -38,6 +38,8 @@ const AnomalyAckQueue      = lazy(() => import("@/components/admin/AnomalyAckQue
 const SecurityAuditAdmin   = lazy(() => import("@/components/admin/SecurityAuditAdmin"));
 const CronJobsCard         = lazy(() => import("@/components/admin/CronJobsCard"));
 const OpsReport            = lazy(() => import("./OpsReport"));
+const PayConsole           = lazy(() => import("@/components/admin/PayConsole"));
+const AutoRulesAdmin       = lazy(() => import("@/components/admin/AutoRulesAdmin"));
 
 // Growth
 const AbExperimentsAdmin   = lazy(() => import("@/components/admin/AbExperimentsAdmin"));
