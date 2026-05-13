@@ -235,8 +235,14 @@ export default function TradingArenaBybit() {
       triggerFx({ kind: c.pnl >= 0 ? "win" : "loss", pnl: c.pnl, roi: c.roi, symbol: closed.symbol, unit: "USDT" });
       return { pnl: c.pnl, roi: c.roi, credit: paperCredit + closed.margin + c.pnl, exit: c.price };
     }
+    if (!mark || mark <= 0) {
+      notify.warning("가격 수신 대기 중", { description: "차트 가격이 들어오면 다시 시도하세요." });
+      return { error: "no price" };
+    }
     const r = await closeReal(id, mark);
-    if (!("error" in r)) {
+    if ("error" in r) {
+      notify.error("청산 실패", { description: r.error });
+    } else {
       triggerFx({ kind: r.pnl >= 0 ? "win" : "loss", pnl: r.pnl, roi: r.roi, symbol, unit: "KRW" });
     }
     return r;
@@ -248,10 +254,16 @@ export default function TradingArenaBybit() {
       return { liquidated: true as const, margin_lost: 0 };
     }
     const r = await liquidateReal(id, mark);
+    if ("error" in r) notify.error("강제청산 실패", { description: r.error });
     return r;
   }, [mode, closePaper, liquidateReal]);
 
   const handleCloseAll = useCallback(() => {
+    if (positions.length === 0) {
+      notify.info("열린 포지션이 없습니다");
+      return;
+    }
+    if (!window.confirm(`모든 포지션(${positions.length}건)을 청산합니다.`)) return;
     positions.forEach((p) => { void handleClose(p.id, prices[p.symbol] ?? p.entry); });
   }, [positions, prices, handleClose]);
 
