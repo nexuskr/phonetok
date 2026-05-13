@@ -18,12 +18,29 @@ export type ConciergeSuggestion = {
 };
 
 const COOLDOWN_MS = 25 * 60 * 1000; // 25 min between auto-fetches
-const FIRST_DELAY_MS = 18 * 1000;   // 18s after mount
+const FIRST_DELAY_MS = 2_500;       // 2.5s — prefetch suggestion eagerly so the bubble feels instant
 const STORAGE_KEY = "concierge_last_fetch";
 const DISMISS_KEY = "concierge_dismissed_until";
+const CACHE_KEY = "concierge_cache_v1";   // sessionStorage cache for current tab
+const CACHE_TTL_MS = 15 * 60 * 1000;
+
+type CacheEntry = { at: number; data: ConciergeSuggestion };
+
+function readCache(): ConciergeSuggestion | null {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as CacheEntry;
+    if (!parsed?.at || Date.now() - parsed.at > CACHE_TTL_MS) return null;
+    return parsed.data;
+  } catch { return null; }
+}
+function writeCache(data: ConciergeSuggestion) {
+  try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data })); } catch { /* noop */ }
+}
 
 export function useConcierge() {
-  const [suggestion, setSuggestion] = useState<ConciergeSuggestion | null>(null);
+  const [suggestion, setSuggestion] = useState<ConciergeSuggestion | null>(() => readCache());
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const fetchedRef = useRef(false);
@@ -54,7 +71,9 @@ export function useConcierge() {
         return;
       }
       setSuggestion(data as ConciergeSuggestion);
-      setOpen(true);
+      writeCache(data as ConciergeSuggestion);
+      // Don't auto-open if user just dismissed; only auto-open on first fresh load.
+      if (manual || !isDismissed()) setOpen(true);
       try { localStorage.setItem(STORAGE_KEY, String(Date.now())); } catch {}
       // log view
       await supabase.from("concierge_events").insert({
@@ -72,13 +91,14 @@ export function useConcierge() {
     }
   }, [loading, isDismissed]);
 
-  // Auto-fire once after mount delay
+  // Eagerly prefetch suggestion shortly after mount so opening the bubble is instant.
   useEffect(() => {
     if (fetchedRef.current) return;
     fetchedRef.current = true;
+    if (suggestion) return; // cache hit — nothing to do
     const t = setTimeout(() => { void fetchSuggestion(false); }, FIRST_DELAY_MS);
     return () => clearTimeout(t);
-  }, [fetchSuggestion]);
+  }, [fetchSuggestion, suggestion]);
 
   const dismiss = useCallback(async (long = false) => {
     setOpen(false);
