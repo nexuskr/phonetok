@@ -43,7 +43,8 @@ function adaptPaperToLive(positions: ReturnType<typeof usePaperStore.getState>["
     fee_open: Math.floor(p.margin * p.leverage * FEE_RATE),
     status: "open" as const,
     opened_at: new Date(p.openedAt).toISOString(),
-    margin_mode: "isolated" as const,
+    margin_mode: (p.marginMode ?? "isolated") as "isolated" | "cross",
+    allocated_margin: p.allocatedMargin,
   }));
 }
 
@@ -155,13 +156,17 @@ export default function TradingArenaBybit() {
     try {
       if (mode === "paper") {
         const entry = applySlippage(args.side, price, true);
-        const pos = openPaper({ symbol, side: args.side, leverage: args.leverage, margin: args.margin, entry });
+        const pos = openPaper({
+          symbol, side: args.side, leverage: args.leverage, margin: args.margin, entry,
+          marginMode: args.marginMode,
+          allocatedMargin: args.allocatedMargin,
+        });
         if (!pos) {
           notify.error("주문 실패", { description: "Paper 잔액 부족" });
           try { navigator.vibrate?.([10, 40, 10]); } catch { /* noop */ }
         } else {
           notify.success(`${args.side.toUpperCase()} ${args.leverage}× 개시`, {
-            description: `${symbol} @ ${entry.toFixed(4)} · ${args.margin} USDT`,
+            description: `${symbol} @ ${entry.toFixed(4)} · ${args.margin} USDT · ${args.marginMode === "cross" ? "Cross" : "Iso"}`,
           });
           try { navigator.vibrate?.(15); } catch { /* noop */ }
         }
