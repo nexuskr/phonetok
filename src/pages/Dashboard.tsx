@@ -162,6 +162,7 @@ export default function Dashboard() {
           <FomoNotificationStrip />
           <div className="mb-3"><CrownWarHUD /></div>
           <div className="mb-4"><WhaleStrikeRail /></div>
+          <div className="mb-4"><LiveRankingMarquee /></div>
           {/* 🏛️ Command Hero — 영웅 카드 (잔고 + 추천 미션 + 100석) */}
           <CommandHero />
 
