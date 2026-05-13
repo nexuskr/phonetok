@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { supabase } from "@/integrations/supabase/client";
 import { notify } from "@/lib/notify";
+import { subscribePostgres } from "@/lib/realtime-bus";
 import type { LivePosition, LiveTrade, MarginMode, Side } from "./types";
 
 function reasonLabel(reason: string): { title: string; variant: "success" | "error" | "info" } {
@@ -144,19 +145,33 @@ export const useRealStore = create<State>()((set, get) => ({
     return data as { liquidated: true; margin_lost: number };
   },
 
+  /**
+   * Realtime: 단일 connection을 realtime-bus가 fan-out.
+   * live_positions / live_trade_history 두 테이블 통합 구독.
+   */
   subscribe(userId) {
-    const ch = supabase.channel(`live:${userId}`)
-      .on("postgres_changes",
-        { event: "*", schema: "public", table: "live_positions", filter: `user_id=eq.${userId}` },
-        () => { get().load(); })
-      .on("postgres_changes",
-        { event: "INSERT", schema: "public", table: "live_trade_history", filter: `user_id=eq.${userId}` },
-        (payload) => {
-          notifyHistoryRow(payload.new);
-          get().load();
-          if (typeof window !== "undefined") window.dispatchEvent(new Event("wallet:refresh"));
-        })
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    const offPos = subscribePostgres(
+      {
+        key: `live_positions:${userId}`,
+        table: "live_positions",
+        event: "*",
+        filter: `user_id=eq.${userId}`,
+      },
+      () => { get().load(); },
+    );
+    const offHist = subscribePostgres(
+      {
+        key: `live_trade_history:${userId}`,
+        table: "live_trade_history",
+        event: "INSERT",
+        filter: `user_id=eq.${userId}`,
+      },
+      (payload: any) => {
+        notifyHistoryRow(payload?.new);
+        get().load();
+        if (typeof window !== "undefined") window.dispatchEvent(new Event("wallet:refresh"));
+      },
+    );
+    return () => { offPos(); offHist(); };
   },
 }));

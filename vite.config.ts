@@ -31,21 +31,18 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
-          // Keep React + anything that depends on React's module identity
-          // (radix, framer-motion, react-router, react-dom, scheduler, jsx-runtime)
-          // in ONE chunk to avoid "createContext of undefined" from out-of-order
-          // evaluation across split chunks.
+          // Three.js / R3F 제거 — chunk hint 더 이상 필요 없음.
           if (id.includes("@supabase")) return "supabase";
           if (id.includes("recharts") || id.includes("d3-")) return "charts";
-          if (id.includes("three") || id.includes("@react-three")) return "three";
+          if (id.includes("lightweight-charts")) return "lwcharts";
           if (id.includes("lucide-react")) return "icons";
           if (id.includes("date-fns")) return "date";
           if (id.includes("i18next")) return "i18n";
-          // everything else (react, react-dom, react-router, radix, motion,
-          // tanstack, etc.) falls into the default vendor chunk together.
+          // 나머지(react, react-dom, react-router, radix, motion, tanstack 등)는
+          // 단일 vendor chunk로 묶어 createContext 순서 문제를 회피.
         },
       },
     },
-    chunkSizeWarningLimit: 1200,
+    chunkSizeWarningLimit: 800,
   },
 }));

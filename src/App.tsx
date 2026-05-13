@@ -70,6 +70,7 @@ const LegalDoc = lazy(() => import("./pages/LegalDoc.tsx"));
 import { LegalConsentGate } from "./components/legal/LegalConsentGate";
 import { PracticeModeBanner } from "./components/practice/PracticeModeBanner";
 import { PracticeModeGate } from "./components/practice/PracticeModeGate";
+import SimGlobalBadge from "./components/SimGlobalBadge";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -106,6 +107,7 @@ const App = () => (
           <ReviewerBadge />
           <LegalConsentGate />
           <PracticeModeBanner />
+          <SimGlobalBadge />
           <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<Index />} />

@@ -50,9 +50,7 @@ export default function AMLGate({ open, level, onClose, onApproved, mode = "live
       onClose();
       return;
     }
-    if (level >= 2 && !selfiePath) {
-      toast({ title: "셀카가 필요합니다", variant: "destructive" }); return;
-    }
+    // Hybrid Emperor 원칙: 셀카는 선택. 미업로드 시 수동 검토(최대 24h)로 진행.
     if (level === 3 && !docSigned) {
       toast({ title: "서류 동의가 필요합니다", variant: "destructive" }); return;
     }
@@ -96,8 +94,8 @@ export default function AMLGate({ open, level, onClose, onApproved, mode = "live
             </div>
             <p className="text-xs text-muted-foreground">
               {level === 1 && "기본 PIN/인증번호로 즉시 통과됩니다."}
-              {level === 2 && "본인 얼굴이 잘 보이는 셀카 1장을 업로드해 주세요."}
-              {level === 3 && "셀카 + 자금세탁방지(AML) 서류 동의가 필요합니다."}
+              {level === 2 && "셀카는 선택입니다. 업로드 시 자동 승인, 미업로드 시 24시간 내 수동 검토."}
+              {level === 3 && "AML 서류 동의는 필수, 셀카는 선택(미업로드 시 수동 검토)."}
             </p>
           </div>
 

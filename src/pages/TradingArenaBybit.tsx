@@ -305,7 +305,10 @@ export default function TradingArenaBybit() {
   return (
     <Layout>
       <HubTabs hub="earn" />
-      <div className="container pt-3 pb-10 animate-fade-in space-y-3">
+      <div
+        className="container pt-3 animate-fade-in space-y-3"
+        style={{ paddingBottom: "max(env(safe-area-inset-bottom), 2.5rem)" }}
+      >
         {/* Title — matches ArenaHeader typography for design consistency */}
         <header className="flex items-end justify-between gap-3 flex-wrap">
           <div>
