@@ -228,7 +228,7 @@ export default function SecureAuth() {
         />
         {/* top-center static gold ray */}
         <div
-          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[420px] opacity-[0.22]"
+          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[420px] opacity-[0.24]"
           style={{
             background:
               "conic-gradient(from 270deg at 50% 100%, transparent 0deg, hsl(var(--gold)/0.6) 90deg, transparent 180deg, transparent 360deg)",
