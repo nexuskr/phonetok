@@ -76,7 +76,7 @@ const ACCENT: Record<Variant["accent"], { ring: string; glow: string; cta: strin
 
 export default function BaronPromotionDialog() {
   const [row, setRow] = useState<FomoRow | null>(null);
-  const [now, setNow] = useState<number>(() => Date.now());
+  const now = useNowTick(2000);
   const nav = useNavigate();
 
   async function loadLatest() {
@@ -102,13 +102,6 @@ export default function BaronPromotionDialog() {
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, []);
-
-  // 1s tick for live countdown
-  useEffect(() => {
-    if (!row) return;
-    const t = setInterval(() => setNow(Date.now()), 2000);
-    return () => clearInterval(t);
-  }, [row]);
 
   async function dismiss() {
     if (!row) return;
