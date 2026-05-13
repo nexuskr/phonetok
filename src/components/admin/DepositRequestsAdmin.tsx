@@ -61,7 +61,14 @@ export default function DepositRequestsAdmin() {
         />
       )}
       {rows.map(r => (
-        <div key={r.id} className="glass rounded-2xl p-3">
+        <div
+          key={r.id}
+          data-row-id={r.id}
+          className={cn(
+            "glass rounded-2xl p-3 transition-all",
+            highlightId === r.id && "ring-2 ring-primary shadow-lg shadow-primary/20",
+          )}
+        >
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <div className="min-w-0">
               <div className="font-display font-bold text-sm truncate">
