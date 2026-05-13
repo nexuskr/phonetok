@@ -62,8 +62,9 @@ const DashboardBetPanel = forwardRef<BetPanelHandle>(function DashboardBetPanel(
     try { return sessionStorage.getItem(FIRST_TRADE_KEY) === "1"; } catch { return false; }
   });
   const [flash, setFlash] = useState<Side | null>(null);
+  const [showLevCalc, setShowLevCalc] = useState(false);
   const amountInputRef = useRef<HTMLInputElement | null>(null);
-  const { maxLeverage: serverMaxLev } = useMyPower();
+  const { maxLeverage: serverMaxLev, boostPct: serverBoost } = useMyPower();
 
   const amountNum = Math.max(0, parseFloat(amount) || 0);
 
