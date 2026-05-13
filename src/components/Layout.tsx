@@ -68,16 +68,18 @@ type NavItem = {
   to: string;
   matches: string[];
   icon: typeof LayoutDashboard;
-  labelKey: "command" | "earn" | "empire" | "treasury" | "legacy";
+  label: string;
   fab?: boolean;
+  desktopOnly?: boolean;
 };
 
 const NAV: NavItem[] = [
-  { to: "/command",  matches: ["/command", "/dashboard"],                                                    icon: LayoutDashboard, labelKey: "command" },
-  { to: "/empire",   matches: ["/empire", "/packages"],                                                       icon: Crown,           labelKey: "empire" },
-  { to: "/earn",     matches: ["/earn", "/missions", "/quests", "/roulette", "/season-pass"],                 icon: Zap,             labelKey: "earn", fab: true },
-  { to: "/treasury", matches: ["/treasury", "/wallet", "/secure-wallet"],                                     icon: Wallet,          labelKey: "treasury" },
-  { to: "/legacy",   matches: ["/legacy", "/achievements"],                                                   icon: Trophy,          labelKey: "legacy" },
+  { to: "/command",  matches: ["/command", "/dashboard"],                                icon: LayoutDashboard, label: "제국 대시보드" },
+  { to: "/arena",    matches: ["/arena", "/trading-arena"],                              icon: TrendingUp,      label: "Long/Short 트레이딩" },
+  { to: "/roulette", matches: ["/roulette"],                                             icon: Zap,             label: "Imperial Zeus 슬롯", fab: true },
+  { to: "/empire",   matches: ["/empire", "/packages"],                                  icon: Crown,           label: "제국 광장" },
+  { to: "/missions", matches: ["/missions", "/quests", "/season-pass"],                  icon: Trophy,          label: "황제 미션", desktopOnly: true },
+  { to: "/profile",  matches: ["/profile", "/treasury", "/wallet", "/secure-wallet"],    icon: UserIcon,        label: "내 제국" },
 ];
 
 const SIDE_EXTRA: Array<{ to: string; icon: typeof MessageSquare; labelKey: any; gold?: boolean }> = [
