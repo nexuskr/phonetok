@@ -1,68 +1,96 @@
-## 진단 — 왜 렉이 심한가
+# 전 페이지 부드럽게 — Phase P (Mars-grade smoothness)
 
-`/dashboard` 한 화면에서 동시에 마운트되는 무거운 위젯이 **25개 이상**, 1초 단위 `setInterval`이 10개 이상, 실시간 채널/폴링이 합쳐서 끊임없이 리렌더를 일으키고 있습니다.
-
-대표적인 부하 원인 (코드 확인 완료):
-
-1. **Dashboard.tsx가 첫 페인트에 모든 카드를 한꺼번에 마운트**
-   - `Particles`(canvas RAF) + `CommandHero`(1920×1080 eager 이미지) + `EmpireP2EDashboard`(useEffect 1s tick + supabase 3쿼리) + `BoostHeroCard`(1s tick) + `JackpotBanner`(5s tick + 채널) + `LiveRanking`(60s 폴링) + `LivePurchaseTicker`(30s + 5s rotate) + `MachineFomoTicker`(3.2s) + `WhaleStrikeRail`(60s + framer-motion 마키) + `CrownWarHUD`(1s tick) + `PersonalizedFeedRail` + `RevenueWidget` + `ActiveBotsMini`(supabase 채널) + `AttendanceCard` + `TierComparisonCard` + `SevenDayChallengeCard` + `EmpireDayCountdown` + `OnboardingV2` + `SixtySecondFlow`(1s) 등등.
-
-2. **1초 setInterval 폭증** — `CrownWarHUD`, `EmpireBoosterTimer`, `Cockpit`, `BoostHeroCard`, `MachineDashboardCard`, `FreezeBanner`, `BaronPromotionDialog`, `AIBotCards`, `SixtySecondFlow` 등 9개 이상이 동시에 매초 setState → 매 초 전체 트리 리렌더.
-
-3. **Particles 캔버스**가 모바일 24개여도 다른 RAF (CommandHero count-up, framer-motion 마키 등) 와 겹치면서 CPU 점유.
-
-4. **Layout 자체 부하** — `useAdminNotifications`, `useUserNotifications`, `useAchievementWatcher`, `EmpirePopulationPulse`, `ImperialHud`, `FreezeBanner`(1s) 등 모든 페이지에서 항상 동작.
-
-5. **CommandHero 배경 이미지**가 `loading="eager"` + 1920×1080 → 첫 페인트 LCP 직격.
-
-`LazyMount` 컴포넌트는 이미 존재하는데 Dashboard에서는 **하나도 사용하지 않고 있음** — 가장 큰 쉬운 승리.
+기존 Step 1~3에서 Dashboard / Layout만 잡았다면, 이제 **앱 전체**를 같은 수준으로 끌어올린다. 시각·기능·문구·디자인 토큰 변경 0건. 오로지 "느낌"만 바꾼다.
 
 ---
 
-## 최적화 계획 (3단계)
+## 현황 (측정값)
 
-### Step 1 — Dashboard 즉시 마운트 컷 (가장 큰 효과, 안전)
-
-스크롤 다운 후에만 보이는 모든 섹션을 `LazyMount`(IntersectionObserver, `rootMargin: "300px"`)로 감싼다. **시각/기능 변경 0** — 표시 시점만 늦춰짐.
-
-지연 마운트 대상:
-- `EmpireP2EDashboard`
-- `BoostHeroCard` 아래 모든 카드: `PersonalizedFeedRail` + `RevenueWidget`, Balance hero 아래 `SevenDayChallengeCard`, `EmpireDayCountdown`, `MachineFomoTicker`, `AttendanceCard`, `TierComparisonCard`, Roulette 카드, Quests 그리드, `JackpotBanner`, `ActiveBotsMini`, Quick actions, Featured missions, `LiveRanking`
-- `LivePurchaseTicker`, `WhaleStrikeRail`, `CrownWarHUD`도 첫 페인트에서 빠질 수 있는 위치는 LazyMount
-
-화면 처음에 즉시 보이는 것만 남김: `FirstDepositTopBanner`, `EmpireSignature`, `CommandHero`, balance hero, `FomoNotificationStrip`.
-
-### Step 2 — 1초 tick 통합 + 이미지 최적화
-
-1. **글로벌 시계 훅** `useNowTick(intervalMs)` 신설 → `CrownWarHUD`, `EmpireBoosterTimer`, `BoostHeroCard`, `FreezeBanner`, `SixtySecondFlow`, `BaronPromotionDialog` 등이 매 컴포넌트마다 setInterval 돌리는 대신 **단일 1s 스토어 구독**. 또한 카운트다운 UI는 1s → **2s tick**으로 변경(시각적 차이 없음).
-2. `CommandHero` `<img>` `loading="eager"` → `loading="lazy"` + `fetchPriority="low"` (배경이라 LCP에 기여 안 함). 또는 CSS `background-image`로 변환 후 `image-set`.
-3. `Particles` density 모바일 캡 24 → 16, prefers-reduced-motion이면 완전 비활성.
-4. `JackpotBanner` 5s tick → 10s, `MachineFomoTicker` 3.2s → 6s.
-
-### Step 3 — Layout 전역 부하 정리
-
-1. `EmpirePopulationPulse`, `ImperialHud` → idle mount (이미 있는 `useIdleMount` 재사용).
-2. `useAdminNotifications`는 admin만 — `has_role` 체크 후에만 채널 subscribe (현재 모두에게 켜져 있는지 확인하고 가드).
-3. `FreezeBanner` 1s → 글로벌 시계 훅으로 통합.
+- `setInterval` 사용처: **62곳** (30+ 컴포넌트)
+- supabase realtime/subscribe: **76건**
+- 페이지 수: 39개, 코드 약 10,380줄
+- 모든 페이지 lazy-load 되어 있으나, **첫 진입 후 내부 컴포넌트가 동시 마운트 + 매초 setState** 패턴이 반복됨 → Dashboard와 동일 증상이 Wallet/Lounge/EmpireArena/Admin 등에서도 발생
 
 ---
 
-## 구현 순서 / 검증
+## 목표 결과
 
-1. Step 1 적용 → 프리뷰에서 `/dashboard` 진입 후 첫 1초 CPU profile 측정 (`browser--performance_profile`).
-2. Step 2 적용 → 동일 측정 + scroll 시 jank 확인.
-3. Step 3 적용 → 다른 페이지 (Wallet, Empire) 진입 속도 확인.
-
-각 단계 후 시각/기능 회귀 없음을 preview에서 확인. 디자인 토큰·레이아웃·문구 1픽셀도 변경하지 않음.
-
----
-
-## 기술 메모 (구현 시 참고)
-
-- `LazyMount`는 이미 `src/components/util/LazyMount.tsx`에 존재 — 그대로 사용, `minHeight`로 점프 방지.
-- 글로벌 시계는 `useSyncExternalStore` 기반(`priceStore.ts` 패턴) 으로 만들어 컴포넌트별 setState 비용 최소화.
-- 모바일 디바이스 우선 (현재 viewport 1122px이지만 실제 사용은 모바일이라고 가정).
+- 모든 라우트 진입 후 **첫 페인트 ≤ 1.0s**, INP ≤ 200ms
+- 매초 setState 컴포넌트: **앱 전체 0개** (모두 글로벌 tick 구독)
+- 같은 supabase 테이블에 대한 중복 채널: **0건** (싱글톤 채널)
+- 라우트 hover/visible 시 **prefetch** → 클릭 시 즉시 전환
+- 모바일 (저사양 안드로이드 기준)에서도 60fps 스크롤
 
 ---
 
-이 계획대로 진행해도 될까요? Step 1만 먼저 적용해서 체감 차이를 확인하고 Step 2/3로 갈지, 아니면 한 번에 다 갈지 알려주세요.
+## 작업 계획
+
+### Phase P1 — 글로벌 tick 통합 (effort: 중)
+
+`src/hooks/use-now-tick.ts` 신설 (이미 plan만 있음 → 실제 구현). 단일 store가 1초·2초·5초·10초 4개 채널로 broadcast.
+
+대상 (62개 interval 중 클럭성격만 치환, 비즈니스 로직 polling 제외):
+- 카운트다운: `ActiveBoostCounter`, `EmpireFoundingCounter`, `BaronPromotionDialog`, `CountdownLossAversion`, `MissionDailyCapCard`, `WithdrawQueueStatus`, `StepUpGate`, `BattleResultOverlay`, `SixtySecondFlow`, `TrustCounter`
+- 회전형 ticker는 P2에서 별도 처리
+
+**효과**: 매초 9~15개 컴포넌트가 각자 setState → 단일 store 1회 setState로 통합. 리렌더 트리 80%↓.
+
+### Phase P2 — Ticker / 회전형 컴포넌트 throttle (effort: 소)
+
+- `LivePulseStrip`, `PayoutTicker`, `LiveRanking`, `LiveStats`, `LiveCounterRow`, `JackpotEmpireBanner`, `WhaleStrikeRail`, `LivePurchaseTicker`, `MachineFomoTicker`(이미 6.5s) → 회전 주기 5s 미만은 모두 8s로 통일
+- `requestAnimationFrame` 기반 회전은 `IntersectionObserver`로 화면 밖이면 pause
+- `prefers-reduced-motion` 시 회전 정지·고정 첫 항목
+
+### Phase P3 — Realtime 채널 싱글톤화 (effort: 중)
+
+`src/lib/realtime-bus.ts` 신설. 같은 테이블/필터 조합은 하나의 채널만 열고 콜백을 fanout. 76개 subscribe 중 중복 ~30% 제거 예상.
+
+특히 빈도 높은 곳:
+- `chat_messages`, `whale_strikes`, `crown_events`, `fomo_notifications`, `purchase_events`
+- 관리자 채널은 `has_role` 검증 후에만 subscribe (Step 3에서 일부 처리됨, 나머지 admin 페이지에 확장)
+
+### Phase P4 — 무거운 페이지 내부 LazyMount 확장 (effort: 중)
+
+Dashboard에 적용한 `LazyMount` 패턴을 다음 페이지에 동일 적용:
+- `Wallet.tsx` (690줄): 거래내역/차트/관리자 도구 영역 viewport-defer
+- `EmpireArena.tsx`, `EmpireHall.tsx`, `Empire.tsx`: 랭킹/리플레이/통계 카드
+- `Lounge.tsx`: 길드 패널/주간 정산
+- `Admin.tsx` 탭 콘텐츠: 활성 탭 외 마운트 금지 (이미 일부 그러나 `useEffect` polling은 전부 살아있음)
+- `TradingArenaWithArmy/Bybit`, `UgcDashboard`, `Settlements`, `Whales`, `Achievements`, `SeasonPass`, `Roulette`
+
+### Phase P5 — 라우트 prefetch + 자산 최적화 (effort: 소)
+
+- `src/components/Layout.tsx` 내 `<Link>`에 `onMouseEnter`/`IntersectionObserver` → `import()` prefetch
+- 공용 무거운 자산 (`CommandHero` 1920×1080, Empire 배경) → `<link rel="preload" as="image" media="(min-width: 768px)">` + 모바일은 더 작은 변형
+- 모든 `<img>` 기본 `loading="lazy"`, `decoding="async"` 보장
+- vite `build.rollupOptions.output.manualChunks` — `framer-motion`, `recharts`, `lucide`, `@supabase`, `radix` 분리
+
+### Phase P6 — 검증
+
+- preview에서 `/dashboard`, `/wallet`, `/empire/hall`, `/lounge`, `/admin` 진입 후 Performance profile
+- Long task > 50ms 0건 확인
+- 콘솔 warning 0건
+- 시각·기능 회귀 0건 (스크린샷 비교)
+
+---
+
+## 기술 세부
+
+```
+src/
+  hooks/use-now-tick.ts      (신설: 글로벌 시계 store)
+  lib/realtime-bus.ts        (신설: 채널 싱글톤)
+  lib/lazy-mount.tsx         (기존 Dashboard 내부 → 공용으로 승격)
+  lib/route-prefetch.ts      (신설: Link 호버 prefetch)
+vite.config.ts               (manualChunks)
+```
+
+기존 컴포넌트는 **import 경로만 추가**, JSX/스타일은 건드리지 않는다 (`setInterval(fn, 1000)` → `useNowTick(1000, fn)` 1줄 치환).
+
+---
+
+## 산출물 / 보고
+
+완료 시 `GitHub sync 완료 (auto)` + 변경 파일 목록 + Before/After 측정값(첫 페인트, long task, 매초 setState 컴포넌트 수) 보고.
+
+승인하시면 Phase P1 → P6 순서대로 진행합니다.
