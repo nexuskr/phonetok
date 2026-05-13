@@ -234,6 +234,9 @@ export default function Profile() {
           <Row icon={Lock} label={u.withdrawPw ? t("rowPinChange") : t("rowPinSet")} sub={u.withdrawPw ? t("rowPinSubActive") : t("rowPinSubInactive")} onClick={() => setPwOpen(true)} statusGood={!!u.withdrawPw} statusActive={t("statusActive")} statusInactive={t("statusInactive")} />
           <Row icon={KeyRound} label={t("rowPinReset")} sub={t("rowPinResetSub")} onClick={() => setPinResetOpen(true)} />
 
+          <SectionTitle>화면 · 모션</SectionTitle>
+          <AppSettingsCard />
+
           <SectionTitle>{t("sectionGuide")}</SectionTitle>
           <Link to="/guide" className="block">
             <Row icon={BookOpen} label={t("rowGuide")} sub={t("rowGuideSub")} />
