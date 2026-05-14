@@ -48,11 +48,30 @@ const state: { enabled: boolean; overrides: Overrides; metrics: {
   },
 };
 
+type StressSnapshot = {
+  enabled: boolean;
+  overrides: Overrides;
+  metrics: typeof state.metrics;
+};
+
+function buildSnapshot(): StressSnapshot {
+  return {
+    enabled: state.enabled,
+    overrides: { ...state.overrides },
+    metrics: { ...state.metrics },
+  };
+}
+
 const listeners = new Set<() => void>();
-function emit() { listeners.forEach((l) => { try { l(); } catch {} }); }
+let snapshot: StressSnapshot = buildSnapshot();
+
+function emit() {
+  snapshot = buildSnapshot();
+  listeners.forEach((l) => { try { l(); } catch {} });
+}
 
 export function subscribeStress(fn: () => void) { listeners.add(fn); return () => listeners.delete(fn); }
-export function getStressState() { return { ...state, overrides: { ...state.overrides }, metrics: { ...state.metrics } }; }
+export function getStressState() { return snapshot; }
 export function isStressEnabled() { return state.enabled; }
 
 export function setStressEnabled(on: boolean) {
