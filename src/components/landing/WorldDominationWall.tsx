@@ -2,6 +2,10 @@ import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Crown, Globe2, Sparkles, TrendingUp, Users, Zap } from "lucide-react";
+import TopEmperorBanner from "./TopEmperorBanner";
+import CompetitorCompareTicker from "./CompetitorCompareTicker";
+
+type Headline = { text: string; tone: string; created_at: string };
 
 type Stats = {
   gmv_24h: number;
@@ -70,7 +74,9 @@ function StatCell({ icon, label, value, accent }: { icon: React.ReactNode; label
 export default function WorldDominationWall() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [feed, setFeed] = useState<Activity[]>([]);
-  const headline = useSessionHeadline();
+  const [headlines, setHeadlines] = useState<Headline[]>([]);
+  const [hIdx, setHIdx] = useState(0);
+  const sessionFallback = useSessionHeadline();
 
   useEffect(() => {
     let alive = true;
@@ -88,6 +94,27 @@ export default function WorldDominationWall() {
     return () => { alive = false; window.clearInterval(id); };
   }, []);
 
+  // AI 헤드라인 풀
+  useEffect(() => {
+    let alive = true;
+    async function load() {
+      const { data } = await supabase.rpc("get_daily_headlines" as any, { _locale: "any", _limit: 10 } as any);
+      if (alive && Array.isArray(data) && data.length > 0) setHeadlines(data as Headline[]);
+    }
+    load();
+    const id = window.setInterval(load, 5 * 60_000); // 5분마다 갱신
+    return () => { alive = false; window.clearInterval(id); };
+  }, []);
+
+  // 8초마다 헤드라인 회전
+  useEffect(() => {
+    if (headlines.length <= 1) return;
+    const id = window.setInterval(() => setHIdx((i) => (i + 1) % headlines.length), 8000);
+    return () => window.clearInterval(id);
+  }, [headlines.length]);
+
+  const activeHeadline = headlines[hIdx];
+
   // 빈 피드 시 시드(데모) — 실데이터 1건이라도 오면 즉시 교체
   const displayFeed: Activity[] = feed.length > 0 ? feed : [
     { kind: "crown_explosion", flag: "👑", title: "Crown Explosion", amount: 2341, user_mask: "Whale a3f1", created_at: new Date().toISOString() },
@@ -100,28 +127,42 @@ export default function WorldDominationWall() {
   return (
     <section className="relative w-full overflow-hidden border-y border-border/50 bg-gradient-to-b from-background via-background/95 to-background">
       {/* Tone overlay */}
-      <div className={`pointer-events-none absolute inset-0 bg-gradient-to-r ${headline.tone} opacity-30`} />
+      <div className={`pointer-events-none absolute inset-0 bg-gradient-to-r ${sessionFallback.tone} opacity-30`} />
 
       <div className="relative max-w-7xl mx-auto px-4 py-4 md:py-5 space-y-3">
-        {/* 헤드라인 */}
+        {/* AI 헤드라인 회전 + 세션 폴백 */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_currentColor]"
+              className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_currentColor] shrink-0"
             />
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">LIVE NOW</span>
-            <span className="text-base md:text-lg font-bold bg-gradient-to-r from-amber-300 via-amber-100 to-amber-300 bg-clip-text text-transparent">
-              {headline.title}
-            </span>
-            <span className="hidden sm:inline text-xs text-muted-foreground">· {headline.sub}</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400 shrink-0">LIVE NOW</span>
+            <div className="relative h-7 flex-1 min-w-0 overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={(activeHeadline?.text ?? sessionFallback.title) + hIdx}
+                  initial={{ y: 12, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -12, opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="absolute inset-0 flex items-center text-base md:text-lg font-bold bg-gradient-to-r from-amber-300 via-amber-100 to-amber-300 bg-clip-text text-transparent truncate"
+                  title={activeHeadline?.text ?? sessionFallback.title}
+                >
+                  {activeHeadline?.text ?? sessionFallback.title}
+                </motion.span>
+              </AnimatePresence>
+            </div>
           </div>
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Globe2 className="w-3.5 h-3.5" />
             <span>{stats?.active_users_24h ?? 0} 활성</span>
           </div>
         </div>
+
+        {/* Top Emperor of the Day (24h Crown 1위) */}
+        <TopEmperorBanner />
 
         {/* KPI 행 */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
@@ -200,6 +241,9 @@ export default function WorldDominationWall() {
             </div>
           </div>
         </div>
+
+        {/* vs CEX 비교 (공개 데이터, 출처 링크 포함) */}
+        <CompetitorCompareTicker />
       </div>
     </section>
   );
