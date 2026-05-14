@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { notify } from "@/lib/notify";
 import { markLandingStart } from "@/lib/funnel";
 import ThreeSecondHero from "@/components/landing/ThreeSecondHero";
+import SEOHead from "@/components/seo/SEOHead";
 import FomoScrollHero from "@/components/guide/FomoScrollHero";
 import StarterFunnelV3 from "@/components/guide/StarterFunnelV3";
 import { SceneProblem, SceneSolution, SceneProof, ScenePersona, ScenePackage } from "@/components/guide/FomoScrollScenes";
