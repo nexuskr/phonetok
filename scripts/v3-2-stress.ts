@@ -148,7 +148,7 @@ async function scenarioPriceDrift(): Promise<boolean> {
   const drifted = oracle.last_price * 1.01; // +1%, exceeds ±0.5%
 
   const r = await callOpen({ crid, markPrice: drifted });
-  const pass = !r.ok && /price_moved_resync/i.test(r.errMsg ?? "");
+  const pass = !r.ok && /(price_moved_resync|시장가와 차이가 너무 큽니다|가격이 크게 움직였습니다)/i.test(r.errMsg ?? "");
   console.log(`  result: ${r.ok ? "ok="+r.data : "err="+r.errMsg}`);
   console.log(pass ? "  ✅ PASS — server rejected drifted price" : "  ❌ FAIL");
   return pass;
