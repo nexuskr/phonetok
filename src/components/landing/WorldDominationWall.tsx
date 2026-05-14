@@ -241,6 +241,9 @@ export default function WorldDominationWall() {
             </div>
           </div>
         </div>
+
+        {/* vs CEX 비교 (공개 데이터, 출처 링크 포함) */}
+        <CompetitorCompareTicker />
       </div>
     </section>
   );
