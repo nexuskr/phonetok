@@ -3234,6 +3234,45 @@ export type Database = {
         }
         Relationships: []
       }
+      live_position_idempotency: {
+        Row: {
+          client_request_id: string
+          completed_at: string | null
+          created_at: string
+          error_code: string | null
+          lease_owner: string
+          lease_until: string
+          params_hash: string
+          result: Json | null
+          status: Database["public"]["Enums"]["live_idem_status"]
+          user_id: string
+        }
+        Insert: {
+          client_request_id: string
+          completed_at?: string | null
+          created_at?: string
+          error_code?: string | null
+          lease_owner: string
+          lease_until: string
+          params_hash: string
+          result?: Json | null
+          status?: Database["public"]["Enums"]["live_idem_status"]
+          user_id: string
+        }
+        Update: {
+          client_request_id?: string
+          completed_at?: string | null
+          created_at?: string
+          error_code?: string | null
+          lease_owner?: string
+          lease_until?: string
+          params_hash?: string
+          result?: Json | null
+          status?: Database["public"]["Enums"]["live_idem_status"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       live_positions: {
         Row: {
           allocated_margin: number | null
@@ -7772,6 +7811,7 @@ export type Database = {
       }
       finalize_weekly_pass: { Args: never; Returns: Json }
       gacha_pull: { Args: never; Returns: Json }
+      gc_live_position_idempotency: { Args: never; Returns: number }
       gc_rate_limit_buckets: { Args: never; Returns: number }
       gen_referral_code: { Args: never; Returns: string }
       gen_seed_activity: { Args: never; Returns: undefined }
@@ -8298,24 +8338,44 @@ export type Database = {
         Args: { p_mark_price: number; p_position_id: string }
         Returns: Json
       }
-      live_open_position: {
-        Args: {
-          p_allocated_margin?: number
-          p_leverage: number
-          p_margin: number
-          p_margin_mode?: string
-          p_mark_price: number
-          p_side: string
-          p_sl_pct?: number
-          p_sl_price?: number
-          p_symbol: string
-          p_tp_pct?: number
-          p_tp_price?: number
-          p_trailing_offset?: number
-          p_trailing_pct?: number
-        }
-        Returns: string
-      }
+      live_open_position:
+        | {
+            Args: {
+              p_allocated_margin?: number
+              p_leverage: number
+              p_margin: number
+              p_margin_mode?: string
+              p_mark_price: number
+              p_side: string
+              p_sl_pct?: number
+              p_sl_price?: number
+              p_symbol: string
+              p_tp_pct?: number
+              p_tp_price?: number
+              p_trailing_offset?: number
+              p_trailing_pct?: number
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_allocated_margin?: number
+              p_client_request_id?: string
+              p_leverage: number
+              p_margin: number
+              p_margin_mode?: string
+              p_mark_price: number
+              p_side: string
+              p_sl_pct?: number
+              p_sl_price?: number
+              p_symbol: string
+              p_tp_pct?: number
+              p_tp_price?: number
+              p_trailing_offset?: number
+              p_trailing_pct?: number
+            }
+            Returns: string
+          }
       live_pre_trade_validate: { Args: { p_symbol: string }; Returns: Json }
       live_set_position_triggers: {
         Args: {
@@ -8959,6 +9019,7 @@ export type Database = {
       app_role: "admin" | "user"
       deposit_method: "bank" | "coin" | "voucher"
       deposit_status: "pending" | "approved" | "rejected" | "cancelled"
+      live_idem_status: "reserved" | "completed" | "failed"
       package_status:
         | "pending"
         | "approved"
@@ -9125,6 +9186,7 @@ export const Constants = {
       app_role: ["admin", "user"],
       deposit_method: ["bank", "coin", "voucher"],
       deposit_status: ["pending", "approved", "rejected", "cancelled"],
+      live_idem_status: ["reserved", "completed", "failed"],
       package_status: [
         "pending",
         "approved",

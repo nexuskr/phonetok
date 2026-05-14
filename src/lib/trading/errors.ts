@@ -22,6 +22,17 @@ const RULES: Array<{ test: RegExp; out: string }> = [
   { test: /rate[_ ]?limit/i, out: "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요." },
   { test: /not authenticated|42501/i, out: "로그인이 필요합니다." },
   { test: /max[_ ]?open[_ ]?positions/i, out: "동시에 보유 가능한 최대 포지션 수에 도달했습니다." },
+  // v3.2 hardening
+  { test: /duplicate_in_flight/i, out: "이미 처리 중인 주문입니다. 잠시만 기다려 주세요." },
+  { test: /lease_lost_during_execution/i, out: "주문 처리 중 충돌이 감지되었습니다. 다시 시도해 주세요." },
+  { test: /crid_param_mismatch/i, out: "주문 파라미터가 일치하지 않습니다. 새로 주문해 주세요." },
+  { test: /crid_user_mismatch/i, out: "요청 식별자가 다른 계정과 충돌합니다. 새로고침 후 다시 시도해 주세요." },
+  { test: /lpi_claim_race/i, out: "주문 등록 중 충돌이 발생했습니다. 다시 시도해 주세요." },
+  { test: /lpi_terminal_state_immutable|lpi_invalid_transition|lpi_immutable_fields_changed/i, out: "주문 상태 충돌. 잠시 후 다시 시도해 주세요." },
+  { test: /oracle_unavailable/i, out: "시세를 가져올 수 없습니다. 잠시 후 다시 시도해 주세요." },
+  { test: /oracle_stale/i, out: "시세가 오래되었습니다. 새 시세로 다시 시도해 주세요." },
+  { test: /price_moved_resync/i, out: "가격이 크게 움직였습니다. 새 가격으로 다시 시도해 주세요." },
+  { test: /AbortError|timeout/i, out: "주문 응답이 지연되어 취소되었습니다. 다시 시도해 주세요." },
 ];
 
 export function mapTradingError(raw?: string | null): string {
