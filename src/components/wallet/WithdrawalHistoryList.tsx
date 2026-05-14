@@ -55,6 +55,7 @@ const PAGE_SIZE = 20;
 
 export default function WithdrawalHistoryList() {
   const { t } = useTranslation("withdrawHistory");
+  const [uid, setUid] = useState<string | null>(null);
   const [rows, setRows] = useState<WR[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Status | "all">("all");
