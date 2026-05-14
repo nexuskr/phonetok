@@ -19,7 +19,10 @@ export default function ManualCrownTrigger() {
   const [last, setLast] = useState<any>(null);
 
   const fire = async () => {
+    if (busy) return;
     if (!uid.trim()) return notify.warning("대상 UUID를 입력하세요");
+    if (base < 0 || base > 100000) return notify.warning("Base는 0~100,000 범위입니다");
+    if (mult < 0.1 || mult > 10) return notify.warning("Multiplier는 0.1~10 범위입니다");
     if (!confirm(`정말로 ${uid.slice(0, 8)}…에게 Crown ${base}×${mult} = ${Math.floor(base * mult)}₡ 를 발행할까요?`)) return;
     setBusy(true);
     const { data, error } = await supabase.rpc("admin_trigger_crown" as any, {
@@ -29,7 +32,15 @@ export default function ManualCrownTrigger() {
       _reason: reason,
     });
     setBusy(false);
-    if (error) return notify.error(error.message);
+    if (error) {
+      const msg = error.message || "";
+      const friendly = msg.includes("not_admin") ? "관리자 권한이 필요합니다"
+        : msg.includes("aal2_required") ? "관리자 보안 인증(TOTP)이 필요합니다"
+        : msg.includes("invalid_uid") || msg.includes("user_not_found") ? "존재하지 않는 사용자입니다"
+        : msg.includes("rate_limited") ? "잠시 후 다시 시도해주세요 (속도 제한)"
+        : msg;
+      return notify.error("Crown 발행 실패", { description: friendly });
+    }
     setLast(data);
     if ((data as any).duplicate) {
       notify.warning("동일 idem 키 — 중복 방지로 무시됨");
