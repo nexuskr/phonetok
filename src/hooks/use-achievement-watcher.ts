@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { notify } from "@/lib/notify";
+import { shouldTripCircuit, tripCircuit, isCircuitTripped } from "@/lib/rpc-circuit";
 
 const ACHIEVEMENT_RPC_DISABLED_KEY = "phonara_disable_achievement_rpc";
 
