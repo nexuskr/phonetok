@@ -52,7 +52,8 @@ export default {
       treasury: { title: "TREASURY", tagline: "Balance · Deposit · Withdraw · History",
         wallet: "Wallet", deposit: "Deposit", withdraw: "Withdraw", history: "History", settlements: "Settlements" },
       legacy: { title: "LEGACY", tagline: "What you build — stays forever",
-        ranking: "Ranking", achievements: "Achievements", referral: "Referral", ugc: "UGC stats", whales: "Whales" },
+        ranking: "Ranking", achievements: "Achievements", referral: "Referral", ugc: "UGC stats", whales: "Whales",
+        dynasty: "Dynasty Bequest", phonGuide: "PHON · NFT Guide" },
     },
     auth: {
       secureV3: "SECURE • V3",
