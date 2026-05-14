@@ -9002,6 +9002,15 @@ export type Database = {
         Args: { _reason: string; _target: string }
         Returns: string
       }
+      request_bequest: {
+        Args: {
+          _asset_kind: string
+          _link_id: string
+          _nft_id?: string
+          _phon_amount?: number
+        }
+        Returns: Json
+      }
       request_dynasty_link: { Args: { _child_email: string }; Returns: Json }
       request_refund: {
         Args: { _reason: string }
