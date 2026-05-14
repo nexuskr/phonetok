@@ -57,7 +57,8 @@ export function useFomoNotifications() {
 
   useEffect(() => {
     if (!user) return;
-    if (typeof window !== "undefined" && sessionStorage.getItem(FOMO_RPC_DISABLED_KEY) === "1") return;
+    if (isCircuitTripped(FOMO_RPC_DISABLED_KEY)) return;
+    if (typeof window !== "undefined" && window.location.pathname.startsWith("/guide")) return;
     return subscribePostgres(
       {
         key: `fomo:user:${user.id}`,
