@@ -6835,6 +6835,27 @@ export type Database = {
         }
         Relationships: []
       }
+      vip_arrivals: {
+        Row: {
+          arrived_at: string
+          id: string
+          source: string | null
+          user_id: string
+        }
+        Insert: {
+          arrived_at?: string
+          id?: string
+          source?: string | null
+          user_id: string
+        }
+        Update: {
+          arrived_at?: string
+          id?: string
+          source?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       vip_passes: {
         Row: {
           active: boolean
@@ -9575,6 +9596,7 @@ export type Database = {
           tier: Database["public"]["Enums"]["user_tier"]
         }[]
       }
+      get_recent_vip_arrivals: { Args: { _limit?: number }; Returns: Json }
       get_recommended_missions: {
         Args: never
         Returns: {
@@ -9656,6 +9678,10 @@ export type Database = {
       }
       get_whale_strike_funnel: { Args: never; Returns: Json }
       get_whale_strikes_24h: { Args: { _limit?: number }; Returns: Json }
+      get_whale_strikes_vip_preview: {
+        Args: { _limit?: number }
+        Returns: Json
+      }
       get_world_domination_stats: { Args: never; Returns: Json }
       ghost_cleanup_expired: { Args: never; Returns: undefined }
       ghost_pulse_run: { Args: never; Returns: undefined }
@@ -9904,6 +9930,7 @@ export type Database = {
         }
         Returns: number
       }
+      log_vip_arrival: { Args: never; Returns: Json }
       mark_fomo_notification_read: { Args: { _id: string }; Returns: boolean }
       mark_handbook_step: { Args: { _step: string }; Returns: Json }
       mask_nickname: { Args: { _nick: string }; Returns: string }
