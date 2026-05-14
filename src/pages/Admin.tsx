@@ -162,6 +162,7 @@ export default function Admin() {
     { id: "founding", label: "Founding 시즌", icon: Crown },
     { id: "kernel", label: "Kernel (v3.2)", icon: Cpu },
     { id: "oracle", label: "Oracle Fortress", icon: Radio },
+    { id: "economy", label: "PHON·NFT 경제", icon: Coins },
   ];
 
   return (
