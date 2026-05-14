@@ -17,6 +17,7 @@ import { ReviewerGuard } from "./components/ReviewerGuard";
 import { ReviewerMaskRoot } from "./components/ReviewerMaskRoot";
 import ReviewerBadge from "./components/ReviewerBadge";
 import { AdultGate } from "./components/AdultGate";
+import MaintenanceGate from "./components/MaintenanceGate";
 
 installGlobalErrorLogging();
 // Heavy instrumentation only when explicitly enabled — avoids per-fetch wrapping cost on every visit.
@@ -161,6 +162,7 @@ const App = () => (
           <ReviewerBadge />
           <GlobalOverlays />
           <Suspense fallback={<RouteFallback />}>
+            <MaintenanceGate>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
@@ -240,6 +242,7 @@ const App = () => (
               <Route path="/revenue" element={<Navigate to="/admin/revenue" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </MaintenanceGate>
           </Suspense>
         </BrowserRouter>
       </TooltipProvider>

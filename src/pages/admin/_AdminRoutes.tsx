@@ -75,6 +75,7 @@ const AdminRecovery       = lazy(() => import("./AdminRecovery"));
 const AdminAudit          = lazy(() => import("./AdminAudit"));
 const MarketingTools      = lazy(() => import("@/components/admin/growth/MarketingTools"));
 const SimRealConversion   = lazy(() => import("@/components/admin/growth/SimRealConversion"));
+const SelfHeal            = lazy(() => import("./ops/SelfHeal"));
 
 function Section({
   title,
@@ -179,6 +180,7 @@ export default function AdminRoutes() {
         <Route path="compliance/audit"  element={<Section title="Security Audit"><SecurityAuditAdmin /></Section>} />
 
         {/* OPERATIONS */}
+        <Route path="ops/self-heal"     element={<Suspense fallback={<LoadingList rows={4} />}><SelfHeal /></Suspense>} />
         <Route path="ops/observability" element={<Section title="Observability"><ObservabilityCockpit /></Section>} />
         <Route path="ops/errors"        element={<Section title="Errors / Anomalies"><AnomalyAckQueue /><div className="h-2" /><ErrorMonitorAdmin /></Section>} />
         <Route path="ops/audit"         element={<Section><AuditLogTable /></Section>} />
