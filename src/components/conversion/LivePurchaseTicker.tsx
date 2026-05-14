@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { isFlagOn } from "@/lib/conversion-flags";
@@ -6,6 +6,7 @@ import { trackClick } from "@/lib/telemetry";
 import { useBotFeed } from "@/hooks/use-bot-feed";
 import i18n from "@/lib/i18n";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
+import { FloatingSlot } from "@/components/ui/floating-dock";
 
 type Item = {
   id: string;
@@ -102,17 +103,33 @@ export default function LivePurchaseTicker() {
     return () => clearInterval(t);
   }, [merged.length]);
 
+  // Auto-hide on scroll-down (mobile UX), reveal on scroll-up
+  const [hiddenByScroll, setHiddenByScroll] = useState(false);
+  const lastY = useRef(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      const dy = y - lastY.current;
+      if (Math.abs(dy) < 8) return;
+      setHiddenByScroll(dy > 0 && y > 80);
+      lastY.current = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   if (!isFlagOn("livePurchaseTicker") || merged.length === 0) return null;
   const it = merged[idx % merged.length];
   if (!it) return null;
 
-
   return (
-    <div className="fixed bottom-24 md:bottom-6 left-3 z-30">
+    <FloatingSlot slot="bottomLeft" order={0}>
       <div
         key={it.id + idx}
         onClick={() => void trackClick("live_purchase_ticker", "default", { pkg: it.pkg })}
-        className="glass-strong rounded-full px-3 py-2 flex items-center gap-2 shadow-2xl border border-gold/30 animate-fade-up max-w-[260px] cursor-pointer"
+        className={`glass-strong rounded-full px-3 py-2 flex items-center gap-2 shadow-2xl border border-gold/30 max-w-[260px] cursor-pointer transition-all duration-300 ${
+          hiddenByScroll ? "opacity-0 translate-y-2 pointer-events-none" : "opacity-100 translate-y-0 animate-fade-up"
+        }`}
       >
         <Crown className="w-3.5 h-3.5 text-gold shrink-0" />
         <div className="text-[11px] truncate">
@@ -122,6 +139,6 @@ export default function LivePurchaseTicker() {
           <span className="text-muted-foreground"> · {it.ago}</span>
         </div>
       </div>
-    </div>
+    </FloatingSlot>
   );
 }
