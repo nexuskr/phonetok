@@ -61,6 +61,7 @@ const AuthCallback = lazy(() => import("./pages/AuthCallback.tsx"));
 const SecurityTotp = lazy(() => import("./pages/security/Totp.tsx"));
 const SecurityPasskey = lazy(() => import("./pages/security/Passkey.tsx"));
 const SecurityOverview = lazy(() => import("./pages/security/Overview.tsx"));
+const RecoverTotp = lazy(() => import("./pages/security/RecoverTotp.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const Achievements = lazy(() => import("./pages/Achievements.tsx"));
 const Empire = lazy(() => import("./pages/Empire.tsx"));
@@ -210,6 +211,7 @@ const App = () => (
               <Route path="/security" element={<SecurityOverview />} />
               <Route path="/security/totp" element={<SecurityTotp />} />
               <Route path="/security/passkey" element={<SecurityPasskey />} />
+              <Route path="/security/recover" element={<RecoverTotp />} />
               <Route path="/achievements" element={<Achievements />} />
               <Route path="/season-pass" element={<Navigate to="/missions?tab=daily" replace />} />
               <Route path="/quests" element={<Navigate to="/missions?tab=daily" replace />} />

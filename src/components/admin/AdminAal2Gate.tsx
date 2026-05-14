@@ -73,6 +73,12 @@ export default function AdminAal2Gate({ protectedTabs, currentTab, children }: P
               </Link>
             </Button>
           )}
+          <Button asChild size="lg" variant="outline">
+            <Link to="/security/recover">
+              <KeyRound className="w-4 h-4 mr-2" />
+              인증 앱 분실 — 백업 코드 사용
+            </Link>
+          </Button>
         </div>
       </div>
     </>
