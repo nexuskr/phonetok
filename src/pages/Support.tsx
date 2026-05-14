@@ -5,6 +5,7 @@ import Layout from "@/components/Layout";
 import { useDB } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { useRequireAuth } from "@/hooks/use-require-auth";
+import { useRealtimeChannel } from "@/hooks/use-realtime-channel";
 import { Send, MessageSquare, ChevronDown, BookOpen, Sparkles } from "lucide-react";
 import { LuxButton, LuxInput, LuxChip } from "@/components/ui/lux";
 
@@ -36,40 +37,43 @@ export default function Support() {
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages.length, aiBusy]);
 
-  // bootstrap thread + load messages + subscribe
+  // bootstrap thread + load messages
   useEffect(() => {
     if (!user) return;
-    let channel: any;
+    let cancelled = false;
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      setAuthUid(user.id);
+      const { data: { user: au } } = await supabase.auth.getUser();
+      if (!au || cancelled) return;
+      setAuthUid(au.id);
 
-      // upsert thread
-      const nickname = db.user?.nickname || user.email?.split("@")[0] || t("memberFallback");
+      const nickname = db.user?.nickname || au.email?.split("@")[0] || t("memberFallback");
       const { data: existing } = await supabase
-        .from("support_threads").select("*").eq("user_id", user.id).maybeSingle();
+        .from("support_threads").select("*").eq("user_id", au.id).maybeSingle();
       let tid = existing?.id;
       if (!tid) {
         const { data: created } = await supabase.from("support_threads")
-          .insert({ user_id: user.id, nickname }).select().single();
+          .insert({ user_id: au.id, nickname }).select().single();
         tid = created?.id;
       }
-      if (!tid) return;
+      if (!tid || cancelled) return;
       setThreadId(tid);
 
       const { data: msgs } = await supabase.from("support_messages")
         .select("id,sender,message,created_at").eq("thread_id", tid).order("created_at", { ascending: true });
-      setMessages((msgs as Msg[]) || []);
-
-      channel = supabase.channel(`support:${tid}:${Math.random().toString(36).slice(2)}`)
-        .on("postgres_changes",
-          { event: "INSERT", schema: "public", table: "support_messages", filter: `thread_id=eq.${tid}` },
-          (payload) => setMessages(prev => [...prev, payload.new as Msg])
-        ).subscribe();
+      if (!cancelled) setMessages((msgs as Msg[]) || []);
     })();
-    return () => { if (channel) supabase.removeChannel(channel); };
-  }, [nav, user, db.user?.nickname]);
+    return () => { cancelled = true; };
+  }, [nav, user, db.user?.nickname, t]);
+
+  // Idempotent realtime, keyed by thread — survives StrictMode double-mount.
+  useRealtimeChannel({
+    key: threadId ? `support:${threadId}` : "",
+    bindings: threadId
+      ? [{ event: "INSERT", table: "support_messages", filter: `thread_id=eq.${threadId}` }]
+      : [],
+    onEvent: (payload) => setMessages((prev) => [...prev, payload.new as unknown as Msg]),
+    enabled: !!threadId,
+  });
 
   async function send() {
     if (!text.trim() || !threadId || !authUid || aiBusy) return;

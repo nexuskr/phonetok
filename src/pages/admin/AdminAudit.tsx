@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useRealtimeChannel } from "@/hooks/use-realtime-channel";
 import { Search, Loader2, ChevronDown, ChevronRight, Download } from "lucide-react";
 import RlsSmokePanel from "@/components/admin/security/RlsSmokePanel";
 import KeyRotationPanel from "@/components/admin/security/KeyRotationPanel";
@@ -38,15 +39,13 @@ export default function AdminAudit() {
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [hours, actionFilter]);
 
-  // Realtime updates
-  useEffect(() => {
-    const ch = supabase.channel("admin-audit-live")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "admin_audit_log" }, (p) => {
-        setRows((r) => [p.new as Row, ...r].slice(0, 500));
-      })
-      .subscribe();
-    return () => { void supabase.removeChannel(ch); };
-  }, []);
+  useRealtimeChannel({
+    key: "admin-audit-live",
+    bindings: [{ event: "INSERT", table: "admin_audit_log" }],
+    onEvent: (p) => {
+      setRows((r) => [p.new as unknown as Row, ...r].slice(0, 500));
+    },
+  });
 
   const filtered = useMemo(() => {
     if (!q) return rows;

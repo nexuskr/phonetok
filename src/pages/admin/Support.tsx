@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useRequireAdmin } from "@/hooks/use-require-auth";
+import { useRealtimeChannel } from "@/hooks/use-realtime-channel";
 import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
 import { notify } from "@/lib/notify";
@@ -78,13 +79,15 @@ export default function AdminSupport() {
   }
 
   useEffect(() => {
-    loadThreads();
-    const ch = supabase.channel("admin-support-threads")
-      .on("postgres_changes", { event: "*", schema: "public", table: "support_threads" }, () => loadThreads())
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    void loadThreads();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
+
+  useRealtimeChannel({
+    key: "admin-support-threads",
+    bindings: [{ event: "*", table: "support_threads" }],
+    onEvent: () => void loadThreads(),
+  });
 
   useEffect(() => { if (tab === "kb") loadKb(); }, [tab]);
 

@@ -1,9 +1,10 @@
 // 사용자 티켓 상태 페이지: 본인 스레드의 상태/우선순위/마지막 메시지를 실시간으로 보여줍니다.
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useRequireAuth } from "@/hooks/use-require-auth";
+import { useRealtimeChannel } from "@/hooks/use-realtime-channel";
 import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
 import { MessageSquare, Clock, CheckCircle2, AlertTriangle, PauseCircle, ChevronRight } from "lucide-react";
@@ -39,35 +40,40 @@ export default function SupportTickets() {
   const user = useRequireAuth();
   const nav = useNavigate();
   const [threads, setThreads] = useState<Thread[] | null>(null);
+  const [uid, setUid] = useState<string | null>(null);
+
+  const reload = useCallback(async (forUid?: string) => {
+    const id = forUid ?? uid;
+    if (!id) return;
+    const { data } = await supabase
+      .from("support_threads")
+      .select("id,status,priority,last_message,last_message_at,ai_escalated,ai_last_category,unread_user,created_at")
+      .eq("user_id", id)
+      .order("last_message_at", { ascending: false });
+    setThreads((data as any[]) ?? []);
+  }, [uid]);
 
   useEffect(() => {
     if (!user) return;
-    let channel: any;
+    let cancelled = false;
     (async () => {
       const { data: { user: u } } = await supabase.auth.getUser();
-      if (!u) return;
-      const { data } = await supabase
-        .from("support_threads")
-        .select("id,status,priority,last_message,last_message_at,ai_escalated,ai_last_category,unread_user,created_at")
-        .eq("user_id", u.id)
-        .order("last_message_at", { ascending: false });
-      setThreads((data as any[]) ?? []);
-
-      channel = supabase.channel(`tickets:${u.id}`)
-        .on("postgres_changes",
-          { event: "*", schema: "public", table: "support_threads", filter: `user_id=eq.${u.id}` },
-          async () => {
-            const { data: d } = await supabase
-              .from("support_threads")
-              .select("id,status,priority,last_message,last_message_at,ai_escalated,ai_last_category,unread_user,created_at")
-              .eq("user_id", u.id)
-              .order("last_message_at", { ascending: false });
-            setThreads((d as any[]) ?? []);
-          })
-        .subscribe();
+      if (!u || cancelled) return;
+      setUid(u.id);
+      await reload(u.id);
     })();
-    return () => { if (channel) supabase.removeChannel(channel); };
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  useRealtimeChannel({
+    key: uid ? `tickets:${uid}` : "",
+    bindings: uid
+      ? [{ event: "*", table: "support_threads", filter: `user_id=eq.${uid}` }]
+      : [],
+    onEvent: () => void reload(),
+    enabled: !!uid,
+  });
 
   if (!user) return null;
 
