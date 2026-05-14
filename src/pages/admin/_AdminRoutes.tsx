@@ -75,6 +75,7 @@ const AdminRecovery       = lazy(() => import("./AdminRecovery"));
 const AdminAudit          = lazy(() => import("./AdminAudit"));
 const MarketingTools      = lazy(() => import("@/components/admin/growth/MarketingTools"));
 const SimRealConversion   = lazy(() => import("@/components/admin/growth/SimRealConversion"));
+const SelfHeal            = lazy(() => import("./ops/SelfHeal"));
 
 function Section({
   title,
