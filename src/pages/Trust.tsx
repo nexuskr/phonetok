@@ -8,6 +8,7 @@ import LiveWithdrawalsTable from "@/components/empire/LiveWithdrawalsTable";
 import TrustGuaranteeBadges from "@/components/empire/TrustGuaranteeBadges";
 import RefundRequestPanel from "@/components/empire/RefundRequestPanel";
 import LossProtectionGate from "@/components/empire/LossProtectionGate";
+import SEOHead from "@/components/seo/SEOHead";
 
 type PayoutStats = {
   window: string;
@@ -55,6 +56,11 @@ export default function Trust() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Trust — 출금 SLA · 환불 · 손실보호"
+        description="실시간 출금 통계, 30일 출금 라이브, 환불 신청, 손실보호 — Phonara가 약속하는 모든 신뢰 지표."
+        path="/trust"
+      />
       <header className="container py-6 flex items-center justify-between">
         <Link to="/" className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 min-h-[36px]">
           <ArrowLeft className="w-3.5 h-3.5" /> 홈

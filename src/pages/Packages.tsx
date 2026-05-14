@@ -10,6 +10,7 @@ import { useRequireAuth } from "@/hooks/use-require-auth";
 import PackageBoostPreview from "@/components/PackageBoostPreview";
 import ActiveBoostCounter from "@/components/ActiveBoostCounter";
 import EmpireFoundingCounter from "@/components/EmpireFoundingCounter";
+import SEOHead from "@/components/seo/SEOHead";
 import EmpireDayCountdown from "@/components/EmpireDayCountdown";
 import PaywallStarter from "@/components/conversion/PaywallStarter";
 import { isFlagOn } from "@/lib/conversion-flags";
@@ -80,6 +81,11 @@ export default function Packages() {
 
   return (
     <Layout>
+      <SEOHead
+        title="Empire Packages — 황제 등극 패키지"
+        description="Founding Seat · Cosmos · Booster — Empire 티어 진입을 위한 모든 패키지를 한곳에서. 결제 즉시 PHON·NFT·Crown 보너스 자동 지급."
+        path="/packages"
+      />
       <AdultOnlyBanner />
       <HubTabs hub="empire" />
       <div className="container pt-6 pb-32 md:pb-10 animate-liquid-in">

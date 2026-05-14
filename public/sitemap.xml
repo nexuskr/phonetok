@@ -39,6 +39,15 @@
     <loc>https://phonara.world/packages</loc>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://phonara.world/packages?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://phonara.world/packages?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://phonara.world/packages?lang=ja"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://phonara.world/packages?lang=vi"/>
+  </url>
+  <url>
+    <loc>https://phonara.world/empire/hall</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.75</priority>
   </url>
   <url>
     <loc>https://phonara.world/empire</loc>
