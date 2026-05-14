@@ -23,7 +23,8 @@ type Founding = {
 /** 1M 카운터 — get_bot_total_users RPC + 60s 폴링 + 부드러운 카운트업 */
 function useTotalUsers() {
   const [n, setN] = useState<number>(0);
-  const mountedRef = (function(){ const r = useRef(true); useEffect(()=>()=>{r.current=false;},[]); return r; })();
+  const mountedRef = useRef(true);
+  useEffect(() => () => { mountedRef.current = false; }, []);
   const rafRef = useRef(0);
 
   const refresh = async () => {
