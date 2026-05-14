@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNowTick } from "@/hooks/use-now-tick";
+import { shouldTripCircuit, tripCircuit, isCircuitTripped } from "@/lib/rpc-circuit";
 
 export type ImperialState = {
   total_is: number;
