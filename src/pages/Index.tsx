@@ -93,6 +93,22 @@ export default function Index() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+      <SEOHead
+        title="Phonara — 살아있는 제국, 24시간 글로벌 트레이딩"
+        description="실시간 글로벌 KPI · 24h 황제 랭킹 · 가장 빠른 출금. CEX보다 빠르고 저렴한 차세대 트레이딩 제국."
+        path="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Phonara",
+          url: "https://phonara.world/",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://phonara.world/?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }}
+      />
       {/* Backdrop — imperial gold */}
       <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none" />
       <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-primary/25 blur-3xl animate-float" />
