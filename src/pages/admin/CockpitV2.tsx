@@ -161,9 +161,8 @@ export default function AdminCockpitV2() {
   useEffect(() => {
     if (!user?.isAdmin) return;
     load();
-    const id = setInterval(load, 45_000);
-    return () => clearInterval(id);
   }, [user?.isAdmin]);
+  useVisibleInterval(() => { if (user?.isAdmin) load(); }, 45_000, !!user?.isAdmin);
 
   const totalActions = useMemo(
     () =>
