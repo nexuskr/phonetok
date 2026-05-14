@@ -163,6 +163,42 @@ export default function NftGalleryDialog({ open, onOpenChange, onChanged }: Prop
           </div>
         )}
 
+        {isAdmin && (
+          <div className="space-y-2 pt-3 border-t border-border/40">
+            <div className="flex items-center gap-2 text-xs">
+              <Shield className="w-3.5 h-3.5 text-amber-400" />
+              <span className="font-imperial tracking-[0.2em] text-amber-400 uppercase">Admin Showcase</span>
+              <span className="text-muted-foreground">— 9종 전체 (무료 · 쿨다운 없음)</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {ADMIN_SHOWCASE.map(({ type, level }) => {
+                const key = `${type}:${level}`;
+                const img = getNftImage(type, level);
+                return (
+                  <button
+                    key={key}
+                    onClick={() => adminPick(type, level)}
+                    disabled={!!adminBusy}
+                    className={cn(
+                      "group relative rounded-xl overflow-hidden border border-amber-500/30 bg-card transition-all hover:scale-[1.03] hover:border-amber-400",
+                      adminBusy === key && "opacity-60",
+                    )}
+                  >
+                    <div className={cn("aspect-square overflow-hidden", getRarityRingClass(level))}>
+                      {img && <img src={img} alt={key} className="w-full h-full object-cover" loading="lazy" />}
+                    </div>
+                    <div className="p-1.5 text-left">
+                      <div className="text-[10px] font-bold uppercase">
+                        {getNftTypeLabel(type)} · {level}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="flex justify-end pt-2">
           <Button variant="ghost" onClick={() => onOpenChange(false)}>{t("common:cancel", "닫기")}</Button>
         </div>
