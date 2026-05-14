@@ -183,6 +183,7 @@ export default {
         "neon-flicker": "neon-flicker 1.2s infinite",
         "gentle-pulse": "gentle-pulse 2s ease-in-out infinite",
         "strong-shake": "strong-shake 0.7s cubic-bezier(0.36,0.07,0.19,0.97) both",
+        marquee: "marquee 30s linear infinite",
       },
     },
   },
