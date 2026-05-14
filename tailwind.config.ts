@@ -170,6 +170,10 @@ export default {
           "60%": { transform: "translate3d(-1px,0.5px,0) rotate(-0.3deg)" },
           "80%": { transform: "translate3d(1px,-0.5px,0) rotate(0.3deg)" },
         },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
 
       animation: {
