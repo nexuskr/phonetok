@@ -50,7 +50,7 @@ const TP_QUICK = [25, 50, 100, 200];
 
 function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit, busy }: Props) {
   const unit = unitForMode(mode);
-  const [leverage, setLeverage] = useState(20);
+  const [leverage, setLeverage] = useState(() => loadSymbolLeverage(symbol, 20));
   const [margin, setMargin] = useState(unit === "KRW" ? "100000" : "100");
   const [tpPct, setTpPct] = useState<string>("");
   const [slPct, setSlPct] = useState<string>("");
@@ -58,10 +58,32 @@ function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit,
   const [trailingPct, setTrailingPct] = useState<string>("10");
   // Margin mode + abs price toggles
   const [marginMode, setMarginMode] = useState<MarginMode>("isolated");
+  const [pendingMode, setPendingMode] = useState<MarginMode | null>(null);
   const [tpPriceMode, setTpPriceMode] = useState<"pct" | "price">("pct");
   const [slPriceMode, setSlPriceMode] = useState<"pct" | "price">("pct");
   const [tpPrice, setTpPrice] = useState<string>("");
   const [slPrice, setSlPrice] = useState<string>("");
+
+  // Per-symbol leverage memory: persist on change, restore on symbol switch
+  useEffect(() => { setLeverage(loadSymbolLeverage(symbol, 20)); }, [symbol]);
+  useEffect(() => { saveSymbolLeverage(symbol, leverage); }, [symbol, leverage]);
+
+  // Stale-price guard: if mark price hasn't changed for >5s, disable LONG/SHORT
+  const lastPriceChangeRef = useRef<number>(Date.now());
+  const lastPriceRef = useRef<number>(price);
+  const [stale, setStale] = useState(false);
+  useEffect(() => {
+    if (price !== lastPriceRef.current) {
+      lastPriceRef.current = price;
+      lastPriceChangeRef.current = Date.now();
+      if (stale) setStale(false);
+    }
+    const t = setInterval(() => {
+      const age = Date.now() - lastPriceChangeRef.current;
+      setStale(age > 5000);
+    }, 1000);
+    return () => clearInterval(t);
+  }, [price, stale]);
 
   useEffect(() => {
     setMargin(unit === "KRW" ? "100000" : "100");
