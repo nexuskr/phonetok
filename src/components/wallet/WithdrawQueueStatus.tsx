@@ -128,7 +128,7 @@ export default function WithdrawQueueStatus() {
         <div className="flex items-center gap-2">
           <Clock className="w-4 h-4 text-primary" />
           <span className="text-xs font-bold tracking-wider uppercase">{t("title")}</span>
-          <ConnBadge state={conn} onRetry={() => { void refresh(); void subscribe(); }} t={t} />
+          <ConnBadge state={conn} onRetry={() => { void refresh(); }} t={t} />
         </div>
         {isPriority && (
           <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-gold/20 border border-gold/40">
