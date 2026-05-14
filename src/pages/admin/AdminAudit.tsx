@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useRealtimeChannel } from "@/hooks/use-realtime-channel";
 import { Search, Loader2, ChevronDown, ChevronRight, Download } from "lucide-react";
 import RlsSmokePanel from "@/components/admin/security/RlsSmokePanel";
 import KeyRotationPanel from "@/components/admin/security/KeyRotationPanel";
