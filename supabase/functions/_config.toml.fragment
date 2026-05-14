@@ -1,5 +1,0 @@
-[functions.emperor-coach]
-verify_jwt = false
-
-[functions.daily-briefing-cron]
-verify_jwt = false
