@@ -59,6 +59,13 @@ const MissionTemplatesAdmin = lazy(() => import("@/components/admin/MissionTempl
 const FoundingSeasonsAdmin  = lazy(() => import("@/components/admin/FoundingSeasonsAdmin"));
 const BetaInvitesAdmin      = lazy(() => import("@/components/admin/BetaInvitesAdmin"));
 
+// Day 2 — Empire upgrades
+const UserDetail360         = lazy(() => import("@/components/admin/users/UserDetail360"));
+const ManualCrownTrigger    = lazy(() => import("@/components/admin/game/ManualCrownTrigger"));
+const WithdrawalQueueBulk   = lazy(() => import("@/components/admin/treasury/WithdrawalQueueBulk"));
+const RiskCenter            = lazy(() => import("@/components/admin/compliance/RiskCenter"));
+const GameConfigPanel       = lazy(() => import("@/components/admin/game/GameConfigPanel"));
+
 function Section({
   title,
   desc,
