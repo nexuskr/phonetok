@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { getMyFoundingSeat, getMyFoundingSeatHistory } from "@/lib/foundingSeason";
 import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
-import { supabase } from "@/integrations/supabase/client";
+import { useRealtimeChannel } from "@/hooks/use-realtime-channel";
 
 const EVENT_LABEL: Record<string, string> = {
   claim: "좌석 점유",
