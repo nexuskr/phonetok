@@ -58,17 +58,16 @@ export default function ReactivationOfferDialog() {
       if (error) throw error;
       const result = data as { ok: boolean; phon_credited?: number; reason?: string };
       if (!result?.ok) {
-        notify({ title: "보너스 만료", description: result?.reason === "expired" ? "오퍼가 만료되었습니다." : "이미 수령했습니다." });
+        notify.warning("보너스 만료", { description: result?.reason === "expired" ? "오퍼가 만료되었습니다." : "이미 수령했습니다." });
       } else {
-        notify({
-          title: `👑 +${result.phon_credited?.toLocaleString()} PHON 입금`,
+        notify.success(`👑 +${result.phon_credited?.toLocaleString()} PHON 입금`, {
           description: "복귀를 환영합니다, 황제여.",
         });
         track("reactivation_offer_claimed", { campaign: offer.campaign_key, phon: result.phon_credited });
       }
       setOpen(false);
     } catch (e) {
-      notify({ title: "오류", description: String((e as Error).message ?? e), variant: "destructive" });
+      notify.fail("오류", e);
     } finally {
       setBusy(false);
     }
