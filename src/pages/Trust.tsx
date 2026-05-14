@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useVisibleInterval } from "@/lib/util/visible-interval";
 import { Link } from "react-router-dom";
 import { ArrowLeft, ShieldCheck, Banknote, Activity, FileText, Scale, AlertTriangle, Radio } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
