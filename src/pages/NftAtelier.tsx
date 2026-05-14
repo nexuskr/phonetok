@@ -226,7 +226,7 @@ export default function NftAtelier() {
                   <span className="text-[11px] text-muted-foreground tabular-nums">{g.items.length}장</span>
                   {g.fusable && (
                     <span className="ml-auto text-[10px] tracking-wider px-2 py-0.5 rounded-md bg-amber-400/15 text-amber-300 ring-1 ring-amber-400/30 animate-pulse">
-                      합성 가능 → {LEVEL_LABEL[LEVEL_NEXT[g.level]!]}
+                      → {LEVEL_LABEL[LEVEL_NEXT[g.level]!]} · {g.level === "bronze" ? "250" : "750"} PHON
                     </span>
                   )}
                 </div>
