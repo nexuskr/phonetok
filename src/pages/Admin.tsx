@@ -43,12 +43,13 @@ import FoundingSeasonsAdmin from "@/components/admin/FoundingSeasonsAdmin";
 const SENSITIVE_ADMIN_TABS = [
   "server_wd", "server_dep", "users", "packages", "coin",
   "perms", "aml", "payout_audit", "security", "ops", "viral_forensics",
-  "accounting", "bot_mix", "trust_v2", "founding",
+  "accounting", "bot_mix", "trust_v2", "founding", "kernel",
 ];
-import { Activity, Lock, Bot, Flame, FlaskConical, HeartPulse, Gauge, KeyRound, HeartHandshake } from "lucide-react";
+import { Activity, Lock, Bot, Flame, FlaskConical, HeartPulse, Gauge, KeyRound, HeartHandshake, Cpu } from "lucide-react";
 import TrustV2Admin from "@/components/admin/TrustV2Admin";
+import KernelObservability from "@/components/admin/KernelObservability";
 
-type Tab = "dashboard" | "funnel" | "analytics" | "errors" | "security" | "ops" | "perms" | "viral_forensics" | "aml" | "ai_missions" | "payout_audit" | "referrals" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin" | "ugc" | "insurance" | "accounting" | "bots" | "bot_mix" | "ev_health" | "ab_experiments" | "beta" | "trust_v2" | "founding";
+type Tab = "dashboard" | "funnel" | "analytics" | "errors" | "security" | "ops" | "perms" | "viral_forensics" | "aml" | "ai_missions" | "payout_audit" | "referrals" | "server_dep" | "server_wd" | "packages" | "users" | "missions" | "chats" | "coin" | "ugc" | "insurance" | "accounting" | "bots" | "bot_mix" | "ev_health" | "ab_experiments" | "beta" | "trust_v2" | "founding" | "kernel";
 
 export default function Admin() {
   const [db, setDb] = useDB();
