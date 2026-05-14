@@ -28,6 +28,7 @@ import TradingEntryCard from "@/components/dashboard/v3/TradingEntryCard";
 import ImperialJourneyMap from "@/components/journey/ImperialJourneyMap";
 import ImperialStoryRail from "@/components/empire/ImperialStoryRail";
 const DailyBriefingCard = lazy(() => import("@/components/dashboard/DailyBriefingCard"));
+const VipWhalePreview = lazy(() => import("@/components/empire/VipWhalePreview"));
 import JourneyClaimPanel from "@/components/journey/JourneyClaimPanel";
 import KpiGridV3 from "@/components/dashboard/v3/KpiGridV3";
 import MoreSection, { type MoreSectionHandle } from "@/components/dashboard/v3/MoreSection";
