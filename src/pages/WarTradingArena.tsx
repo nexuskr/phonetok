@@ -7,6 +7,8 @@
  * - 모든 자금/상금은 SIM/PHON, 실제 KRW와 100% 분리
  */
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useVisibleInterval } from "@/lib/util/visible-interval";
+import { useNowTick } from "@/hooks/use-now-tick";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Crown, Flame, TrendingUp, TrendingDown, Trophy, Clock, Users, Loader2, ArrowLeft } from "lucide-react";
