@@ -11,6 +11,7 @@ import { useMyPower, topNftLevel } from "@/hooks/use-my-power";
 import CrownAura from "@/components/empire/CrownAura";
 import NftAvatar from "@/components/profile/NftAvatar";
 import { FloatingSlot } from "@/components/ui/floating-dock";
+import VipPassBadge from "@/components/empire/VipPassBadge";
 
 const LEVEL_TIER: Record<string, number> = { bronze: 5, gold: 7, diamond: 10 };
 const LEVEL_LABEL: Record<string, string> = { bronze: "BRONZE", gold: "GOLD", diamond: "DIAMOND" };
