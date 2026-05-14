@@ -215,6 +215,30 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_backup_codes: {
+        Row: {
+          code_hash: string
+          created_at: string
+          id: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          code_hash: string
+          created_at?: string
+          id?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          code_hash?: string
+          created_at?: string
+          id?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       admin_broadcasts: {
         Row: {
           audience: Json
@@ -254,6 +278,42 @@ export type Database = {
           sent_count?: number
           status?: string
           title?: string
+        }
+        Relationships: []
+      }
+      admin_recovery_requests: {
+        Row: {
+          approvals: Json
+          created_at: string
+          id: string
+          reason: string
+          requested_by: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          target_user_id: string
+        }
+        Insert: {
+          approvals?: Json
+          created_at?: string
+          id?: string
+          reason: string
+          requested_by: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          target_user_id: string
+        }
+        Update: {
+          approvals?: Json
+          created_at?: string
+          id?: string
+          reason?: string
+          requested_by?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          target_user_id?: string
         }
         Relationships: []
       }
@@ -7338,6 +7398,7 @@ export type Database = {
         Returns: number
       }
       apply_referral_code: { Args: { _code: string }; Returns: Json }
+      approve_admin_recovery: { Args: { _request_id: string }; Returns: Json }
       arena_join_duel: { Args: { p_round_id: string }; Returns: Json }
       arena_open_round: {
         Args: {
@@ -7457,10 +7518,12 @@ export type Database = {
       claim_weekly_pass_reward: { Args: { _level: number }; Returns: Json }
       cleanup_bot_activity: { Args: never; Returns: undefined }
       complete_guide_bonus: { Args: never; Returns: Json }
+      consume_admin_backup_code: { Args: { _code: string }; Returns: Json }
       contribute_guild_war: {
         Args: { _score: number; _war_id: string }
         Returns: boolean
       }
+      count_admin_backup_codes: { Args: never; Returns: number }
       create_crown_replay: { Args: { _event_id: string }; Returns: Json }
       create_crypto_deposit_intent: {
         Args: { _amount: number; _receive_address: string }
@@ -7624,6 +7687,7 @@ export type Database = {
       gc_rate_limit_buckets: { Args: never; Returns: number }
       gen_referral_code: { Args: never; Returns: string }
       gen_seed_activity: { Args: never; Returns: undefined }
+      generate_admin_backup_codes: { Args: never; Returns: string[] }
       generate_beta_invite: {
         Args: {
           _expires_in_days?: number
@@ -8051,6 +8115,26 @@ export type Database = {
       jsonb_object_keys_count: { Args: { _obj: Json }; Returns: number }
       latest_chaos_run: { Args: never; Returns: Json }
       leave_guild: { Args: never; Returns: boolean }
+      list_admin_recovery_requests: {
+        Args: { _limit?: number; _status?: string }
+        Returns: {
+          approvals: Json
+          created_at: string
+          id: string
+          reason: string
+          requested_by: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          target_user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "admin_recovery_requests"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       live_account_equity: { Args: { p_user_id: string }; Returns: Json }
       live_close_position: {
         Args: { p_mark_price: number; p_position_id: string }
@@ -8374,6 +8458,14 @@ export type Database = {
       redeem_real_coupon: { Args: { _code: string }; Returns: Json }
       redetect_anomaly: { Args: { _id: string }; Returns: Json }
       register_device: { Args: { _fp: string; _ua?: string }; Returns: Json }
+      reject_admin_recovery: {
+        Args: { _reason: string; _request_id: string }
+        Returns: undefined
+      }
+      request_admin_recovery: {
+        Args: { _reason: string; _target: string }
+        Returns: string
+      }
       request_refund: {
         Args: { _reason: string }
         Returns: {
