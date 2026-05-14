@@ -92,12 +92,13 @@ export default function Dashboard() {
     }
   }, [user]);
 
-  if (!user) return null;
-
   // Single shared subscription — passed down to Hero & KpiGrid as props
   // to eliminate duplicate RPC + realtime channels.
+  // IMPORTANT: must be called BEFORE any early return to keep hook order stable.
   const { phon, nfts } = useMyPower();
   const online = useOnline();
+
+  if (!user) return null;
 
   return (
     <Layout>
