@@ -42,7 +42,7 @@ export function FomoNotificationStrip() {
             >
               <div className="flex items-start gap-3">
                 <motion.div
-                  animate={{ scale: [1, 1.15, 1] }}
+                  animate={tabVisible ? { scale: [1, 1.15, 1] } : false}
                   transition={{ duration: 1.6, repeat: Infinity }}
                   className="mt-1 text-primary"
                 >
