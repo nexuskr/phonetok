@@ -81,6 +81,15 @@ function Section({
   );
 }
 
+function ComingSoon({ area }: { area: string }) {
+  return (
+    <div className="glass-strong rounded-2xl p-6 border border-dashed border-border/40 text-sm text-muted-foreground">
+      <div className="font-display font-bold text-foreground mb-1">🚧 {area}</div>
+      Day 2/3 일정에 따라 출시됩니다. 백엔드 RPC와 권한 게이트는 이미 준비되어 있습니다.
+    </div>
+  );
+}
+
 function PayPlaceholder() {
   return (
     <Section title="Phonara Pay (TRC20)" desc="USDT 결제 콘솔 — 곧 출시">
