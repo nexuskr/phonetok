@@ -19,6 +19,8 @@ import { LuxButton } from "@/components/ui/lux";
 import { AdultOnlyBanner } from "@/components/AdultOnlyBanner";
 import PackageUpgradeCards from "@/components/empire/PackageUpgradeCards";
 import BankPayInstructionCard from "@/components/packages/BankPayInstructionCard";
+import { CosmosPackageCard, COSMOS_PACKAGES } from "@/components/packages/CosmosPackageCard";
+import { Rocket } from "lucide-react";
 
 const tierStyles: Record<Pkg["tier"], { ring: string; bg: string; label: string }> = {
   FREE:    { ring: "from-muted to-muted",                bg: "from-muted/30",      label: "FREE" },
@@ -81,6 +83,29 @@ export default function Packages() {
       <AdultOnlyBanner />
       <HubTabs hub="empire" />
       <div className="container pt-6 pb-32 md:pb-10 animate-liquid-in">
+        {/* 🌌 COSMOS SERIES — 우주 황제 패키지 3종 */}
+        <section className="mb-8" aria-label="Cosmos Series Packages">
+          <div className="flex items-center gap-2 mb-4">
+            <Rocket className="w-5 h-5 text-primary" />
+            <h2 className="font-imperial font-black text-xl sm:text-2xl tracking-[0.04em] text-gradient-imperial">
+              🌌 COSMOS SERIES
+            </h2>
+            <span className="text-[10px] tracking-[0.25em] font-black text-primary/80 px-2 py-1 rounded-full border border-primary/40 bg-primary/10">
+              지구 → 화성 → 은하
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4 break-keep">
+            수익률보다 <span className="text-primary font-bold">권한 잠금해제</span>가 핵심입니다. 황제로 가는 가장 빠른 항로.
+          </p>
+          <div className="grid md:grid-cols-3 gap-4">
+            {COSMOS_PACKAGES.map((p) => (
+              <div key={p.id} id={`pkg-${p.id}`}>
+                <CosmosPackageCard pkg={p} />
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* P6-2: Axie-style Empire Unit cards (XP/진화/스탯) */}
         <PackageUpgradeCards />
         <div className="mb-6">

@@ -8578,6 +8578,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_my_journey_progress: { Args: never; Returns: Json }
       get_my_legal_consent_status: { Args: never; Returns: Json }
       get_my_main_nft_status: { Args: never; Returns: Json }
       get_my_max_leverage: { Args: never; Returns: number }
