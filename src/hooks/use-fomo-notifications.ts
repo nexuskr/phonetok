@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { subscribePostgres } from "@/lib/realtime-bus";
+import { shouldTripCircuit, tripCircuit, isCircuitTripped } from "@/lib/rpc-circuit";
 
 const FOMO_RPC_DISABLED_KEY = "phonara_disable_fomo_rpc";
 
