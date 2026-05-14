@@ -283,6 +283,7 @@ export default function Wallet() {
         return;
       }
     }
+    setSubmitting(true);
     try {
       const { submitDeposit: rpcSubmitDeposit, validateDepositInput } = await import("@/lib/deposits-rpc");
       // Server-side validation (duplicates, network mismatch, bank length)
@@ -334,6 +335,8 @@ export default function Wallet() {
       toast({ title: tw("depositDone"), description: tw("depositDoneDesc") + bonusMsg });
     } catch (e: any) {
       toast({ title: tw("depositFail"), description: e.message ?? tw("depositFailDesc"), variant: "destructive" });
+    } finally {
+      setSubmitting(false);
     }
   }
 
