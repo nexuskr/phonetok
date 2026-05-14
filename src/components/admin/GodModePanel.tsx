@@ -249,7 +249,7 @@ function AnomalyFeed() {
         .select("id,rule,severity,created_at,user_id")
         .order("created_at", { ascending: false })
         .limit(8);
-      if (data) setItems(data as Anomaly[]);
+      if (data) setItems(data as unknown as Anomaly[]);
     })();
   }, []);
 
