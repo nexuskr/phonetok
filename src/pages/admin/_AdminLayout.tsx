@@ -21,8 +21,6 @@ export default function AdminLayout() {
   const { pathname } = useLocation();
   const pending = useAdminPending(!!user?.isAdmin);
 
-  if (!user) return null;
-
   // Active item label for breadcrumb-ish header.
   const active =
     ADMIN_NAV_FLAT.find((i) =>
@@ -54,6 +52,9 @@ export default function AdminLayout() {
       "/admin/ops/errors",
     ]);
   }, []);
+
+  // Hooks above must run on every render — gate render output AFTER hooks.
+  if (!user) return null;
 
   return (
     <SidebarProvider>
