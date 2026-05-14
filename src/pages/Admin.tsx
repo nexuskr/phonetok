@@ -227,6 +227,7 @@ export default function Admin() {
           {tab === "founding" && <FoundingSeasonsAdmin />}
           {tab === "kernel" && <KernelObservability />}
           {tab === "oracle" && <OracleFortress />}
+          {tab === "economy" && <EconomyDashboard />}
         </AdminAal2Gate>
       </div>
     </Layout>
