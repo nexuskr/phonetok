@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useRealtimeChannel } from "@/hooks/use-realtime-channel";
 import { useTranslation } from "react-i18next";
 import { Clock, CheckCircle2, XCircle, ArrowUpRight, Filter, X, Banknote, Coins, Shield, FileText, Inbox } from "lucide-react";
 import RequestTimeline from "@/components/RequestTimeline";
