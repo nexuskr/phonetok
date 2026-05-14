@@ -3740,6 +3740,10 @@ export type Database = {
           last_price: number
           participating_sources: string[] | null
           quorum_count: number
+          shadow_clamp_active: boolean
+          shadow_consensus: number | null
+          shadow_quorum: number | null
+          shadow_updated_at: string | null
           source: string
           symbol: string
           updated_at: string
@@ -3749,6 +3753,10 @@ export type Database = {
           last_price: number
           participating_sources?: string[] | null
           quorum_count?: number
+          shadow_clamp_active?: boolean
+          shadow_consensus?: number | null
+          shadow_quorum?: number | null
+          shadow_updated_at?: string | null
           source?: string
           symbol: string
           updated_at?: string
@@ -3758,6 +3766,10 @@ export type Database = {
           last_price?: number
           participating_sources?: string[] | null
           quorum_count?: number
+          shadow_clamp_active?: boolean
+          shadow_consensus?: number | null
+          shadow_quorum?: number | null
+          shadow_updated_at?: string | null
           source?: string
           symbol?: string
           updated_at?: string
@@ -3782,6 +3794,101 @@ export type Database = {
           source?: string
           symbol?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      oracle_shadow_drift: {
+        Row: {
+          clamp_active: boolean
+          drift_bps: number
+          id: number
+          live_price: number
+          quorum: number
+          shadow_price: number
+          symbol: string
+          ts: string
+        }
+        Insert: {
+          clamp_active?: boolean
+          drift_bps: number
+          id?: number
+          live_price: number
+          quorum: number
+          shadow_price: number
+          symbol: string
+          ts?: string
+        }
+        Update: {
+          clamp_active?: boolean
+          drift_bps?: number
+          id?: number
+          live_price?: number
+          quorum?: number
+          shadow_price?: number
+          symbol?: string
+          ts?: string
+        }
+        Relationships: []
+      }
+      oracle_source_health: {
+        Row: {
+          consec_high: number
+          consec_low: number
+          degraded: boolean
+          degraded_since: string | null
+          last_check: string
+          last_eff_weight: number | null
+          source: string
+        }
+        Insert: {
+          consec_high?: number
+          consec_low?: number
+          degraded?: boolean
+          degraded_since?: string | null
+          last_check?: string
+          last_eff_weight?: number | null
+          source: string
+        }
+        Update: {
+          consec_high?: number
+          consec_low?: number
+          degraded?: boolean
+          degraded_since?: string | null
+          last_check?: string
+          last_eff_weight?: number | null
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oracle_source_health_source_fkey"
+            columns: ["source"]
+            isOneToOne: true
+            referencedRelation: "oracle_source_weights"
+            referencedColumns: ["source"]
+          },
+        ]
+      }
+      oracle_source_weights: {
+        Row: {
+          max_lag_ms: number
+          notes: string | null
+          source: string
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          max_lag_ms: number
+          notes?: string | null
+          source: string
+          updated_at?: string
+          weight: number
+        }
+        Update: {
+          max_lag_ms?: number
+          notes?: string | null
+          source?: string
+          updated_at?: string
+          weight?: number
         }
         Relationships: []
       }
@@ -7171,6 +7278,7 @@ export type Database = {
       admin_get_kernel_summary: { Args: never; Returns: Json }
       admin_get_monthly_revenue_progress: { Args: never; Returns: Json }
       admin_get_oracle_health: { Args: never; Returns: Json }
+      admin_get_oracle_swap_readiness: { Args: never; Returns: Json }
       admin_get_recent_errors: {
         Args: { _limit?: number; _only_unresolved?: boolean }
         Returns: {
@@ -7504,6 +7612,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_set_source_weight: {
+        Args: { _max_lag_ms?: number; _source: string; _weight: number }
+        Returns: undefined
+      }
       admin_set_tier: {
         Args: {
           _target: string
@@ -7769,6 +7881,10 @@ export type Database = {
       cleanup_bot_activity: { Args: never; Returns: undefined }
       complete_guide_bonus: { Args: never; Returns: Json }
       compute_oracle_consensus: { Args: { _symbol: string }; Returns: Json }
+      compute_oracle_consensus_weighted: {
+        Args: { _symbol: string }
+        Returns: Json
+      }
       consume_admin_backup_code: { Args: { _code: string }; Returns: Json }
       contribute_guild_war: {
         Args: { _score: number; _war_id: string }
