@@ -92,6 +92,22 @@ export default function EmpireCollection() {
         )}
       </Card>
 
+      {/* Atelier CTA */}
+      <Link to="/empire/atelier" className="block mb-4">
+        <Card className="p-4 border-amber-400/40 bg-gradient-to-r from-amber-500/10 via-background to-yellow-500/10 hover:border-amber-300/70 transition group">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-300 to-amber-600 text-black flex items-center justify-center shadow-[0_0_20px_hsl(45_100%_55%/0.5)]">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-bold">제국의 NFT 공방 → Atelier</div>
+              <div className="text-[11px] text-muted-foreground">같은 등급 3장으로 다음 티어 주조 (Bronze → Gold → Diamond)</div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-amber-300 group-hover:translate-x-1 transition" />
+          </div>
+        </Card>
+      </Link>
+
       {/* Collection grid */}
       <section>
         <div className="flex items-center justify-between mb-3">
