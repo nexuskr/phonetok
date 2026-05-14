@@ -162,6 +162,7 @@ const App = () => (
           <ReviewerBadge />
           <GlobalOverlays />
           <Suspense fallback={<RouteFallback />}>
+            <MaintenanceGate>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
