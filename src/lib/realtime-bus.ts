@@ -1,21 +1,15 @@
 /**
- * Realtime bus — dedupes supabase channels.
+ * realtime-bus — back-compat 진입점.
  *
- * If two components subscribe to the same (channel, table, event, filter)
- * combo, only one underlying channel is opened and callbacks are fanned out.
+ * 실제 구현은 `@/hooks/use-realtime-channel`의 `subscribeRealtime`로 이전됨.
+ * 모든 채널 dedup·재연결·상태 관리가 단일 레지스트리에서 처리된다.
  *
- * Usage:
- *   const off = subscribePostgres({
- *     key: "fomo:user:" + uid,
- *     table: "fomo_notifications",
- *     event: "INSERT",
- *     filter: `user_id=eq.${uid}`,
- *   }, (payload) => { ... });
- *   // later: off()
+ * 새 코드는 React 컨텍스트면 `useRealtimeChannel`,
+ * 비-React 컨텍스트(스토어/모듈)면 `subscribeRealtime`를 직접 사용할 것.
  */
-import { supabase } from "@/integrations/supabase/client";
+import { subscribeRealtime, type ChannelBinding } from "@/hooks/use-realtime-channel";
 
-type PgEvent = "INSERT" | "UPDATE" | "DELETE" | "*";
+type PgEvent = ChannelBinding["event"];
 
 interface SubKey {
   key: string;
@@ -25,53 +19,15 @@ interface SubKey {
   filter?: string;
 }
 
-interface ChannelEntry {
-  channel: ReturnType<typeof supabase.channel>;
-  listeners: Set<(payload: unknown) => void>;
-}
-
-const channels = new Map<string, ChannelEntry>();
-
 export function subscribePostgres(
   { key, table, event = "*", schema = "public", filter }: SubKey,
   onChange: (payload: unknown) => void,
 ): () => void {
-  let entry = channels.get(key);
-  if (!entry) {
-    try {
-      const ch = supabase
-        .channel(key)
-        .on(
-          // @ts-ignore - supabase realtime typing
-          "postgres_changes",
-          { event, schema, table, ...(filter ? { filter } : {}) },
-          (payload: unknown) => {
-            const e = channels.get(key);
-            if (!e) return;
-            e.listeners.forEach((l) => {
-              try { l(payload); } catch { /* swallow */ }
-            });
-          },
-        )
-        .subscribe((_status: string, err?: unknown) => {
-          // Swallow CHANNEL_ERROR / TIMED_OUT / network failures; UI stays on fallback data.
-          if (err) { /* no-op */ }
-        });
-      entry = { channel: ch, listeners: new Set() };
-      channels.set(key, entry);
-    } catch {
-      // Realtime endpoint unreachable (NAME_NOT_RESOLVED, 404). Return inert unsubscribe.
-      return () => {};
-    }
-  }
-  entry.listeners.add(onChange);
-  return () => {
-    const e = channels.get(key);
-    if (!e) return;
-    e.listeners.delete(onChange);
-    if (e.listeners.size === 0) {
-      try { void supabase.removeChannel(e.channel); } catch { /* swallow */ }
-      channels.delete(key);
-    }
-  };
+  return subscribeRealtime({
+    key,
+    bindings: [{ event, schema, table, filter }],
+    onEvent: (p) => onChange(p as unknown),
+  });
 }
+
+export { subscribeRealtime };
