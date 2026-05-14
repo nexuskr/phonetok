@@ -85,6 +85,7 @@ const LiveOverlay = lazy(() => import("./pages/LiveOverlay.tsx"));
 const InfluencerLanding = lazy(() => import("./pages/InfluencerLanding.tsx"));
 const Vip = lazy(() => import("./pages/Vip.tsx"));
 const ForcedShareDialog = lazy(() => import("./components/share/ForcedShareDialog.tsx"));
+const VipArrivalAnnouncer = lazy(() => import("./components/empire/VipArrivalAnnouncer.tsx"));
 import { PracticeModeBanner } from "./components/practice/PracticeModeBanner";
 import { PracticeModeGate } from "./components/practice/PracticeModeGate";
 import SimGlobalBadge from "./components/SimGlobalBadge";
@@ -154,6 +155,7 @@ function GlobalOverlays() {
       <Suspense fallback={null}><EmpireMomentToast /></Suspense>
       <Suspense fallback={null}><FloatingCashLoopWidget /></Suspense>
       <Suspense fallback={null}><ForcedShareDialog /></Suspense>
+      <Suspense fallback={null}><VipArrivalAnnouncer /></Suspense>
     </>
   );
 }

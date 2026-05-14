@@ -20,6 +20,7 @@ import WhaleStrikeRail from "@/components/empire/WhaleStrikeRail";
 const WhaleStrikeRailV3 = lazy(() => import("@/components/empire/WhaleStrikeRailV3"));
 const ImperialStoryRail = lazy(() => import("@/components/empire/ImperialStoryRail"));
 const WorldDominationWall = lazy(() => import("@/components/landing/WorldDominationWall"));
+const VipArrivalsTicker = lazy(() => import("@/components/empire/VipArrivalsTicker"));
 const TournamentCountdownBar = lazy(() => import("@/components/landing/TournamentCountdownBar"));
 const LiveCounterStrip = lazy(() => import("@/components/empire/LiveCounterStrip"));
 const GhostPulseGlobe = lazy(() => import("@/components/empire/GhostPulseGlobe"));
@@ -274,7 +275,8 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Phase D Week 1 — World Domination Wall */}
+      {/* Phase D Week 1 — World Domination Wall + VIP Arrivals */}
+      <Suspense fallback={null}><VipArrivalsTicker /></Suspense>
       <Suspense fallback={null}><WorldDominationWall /></Suspense>
 
       {/* Live payout ticker + Council */}
