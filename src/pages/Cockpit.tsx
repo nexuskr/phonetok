@@ -96,9 +96,9 @@ export default function Cockpit() {
   useEffect(() => {
     if (!user) return;
     fetchSnap();
-    const t = setInterval(() => fetchSnap(true), 5000);
-    return () => clearInterval(t);
   }, [user, fetchSnap]);
+  // 5s 폴링 — 탭 숨김 시 정지 (Empire Cockpit는 admin이 보고있을 때만 의미있음).
+  useVisibleInterval(() => { if (user) fetchSnap(true); }, 5000, !!user);
 
   // Realtime nudges on critical tables
   useEffect(() => {
