@@ -224,6 +224,7 @@ export default function Admin() {
           {tab === "trust_v2" && <TrustV2Admin />}
           {tab === "founding" && <FoundingSeasonsAdmin />}
           {tab === "kernel" && <KernelObservability />}
+          {tab === "oracle" && <OracleFortress />}
         </AdminAal2Gate>
       </div>
     </Layout>
