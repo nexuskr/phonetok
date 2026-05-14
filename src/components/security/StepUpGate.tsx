@@ -74,6 +74,8 @@ export default function StepUpGate({ open, scope = "민감 작업", onClose, onV
       if (chErr) throw chErr;
       const { error } = await supabase.auth.mfa.verify({ factorId, challengeId: ch.id, code });
       if (error) throw error;
+      // Force session token to reflect new AAL2 immediately
+      try { await supabase.auth.refreshSession(); } catch { /* noop */ }
       notify.success("강력 인증 완료");
       setCode("");
       onVerified();
@@ -145,7 +147,10 @@ export default function StepUpGate({ open, scope = "민감 작업", onClose, onV
         )}
 
         {!loading && method === "totp" && (
-          <div className="space-y-3">
+          <form
+            className="space-y-3"
+            onSubmit={(e) => { e.preventDefault(); void verifyTotp(); }}
+          >
             <Input
               inputMode="numeric"
               maxLength={6}
@@ -155,11 +160,11 @@ export default function StepUpGate({ open, scope = "민감 작업", onClose, onV
               className="text-center text-2xl tracking-[0.5em] font-bold"
               autoFocus
             />
-            <Button onClick={verifyTotp} disabled={busy || code.length !== 6} className="w-full">
+            <Button type="submit" disabled={busy || code.length !== 6} className="w-full">
               {busy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <KeyRound className="w-4 h-4 mr-2" />}
               확인
             </Button>
-          </div>
+          </form>
         )}
 
         {!loading && method === "email" && (
