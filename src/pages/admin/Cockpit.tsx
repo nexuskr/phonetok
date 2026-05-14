@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useVisibleInterval } from "@/lib/util/visible-interval";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import { useRequireAdmin } from "@/hooks/use-require-auth";
@@ -80,9 +81,8 @@ export default function AdminCockpit() {
   useEffect(() => {
     if (!user?.isAdmin) return;
     load();
-    const id = setInterval(load, 60_000);
-    return () => clearInterval(id);
   }, [user?.isAdmin]);
+  useVisibleInterval(() => { if (user?.isAdmin) load(); }, 60_000, !!user?.isAdmin);
 
   if (!user) return null;
   if (!user.isAdmin) {

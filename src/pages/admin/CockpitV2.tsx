@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useVisibleInterval } from "@/lib/util/visible-interval";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminPending } from "@/hooks/use-admin-pending";
@@ -160,9 +161,8 @@ export default function AdminCockpitV2() {
   useEffect(() => {
     if (!user?.isAdmin) return;
     load();
-    const id = setInterval(load, 45_000);
-    return () => clearInterval(id);
   }, [user?.isAdmin]);
+  useVisibleInterval(() => { if (user?.isAdmin) load(); }, 45_000, !!user?.isAdmin);
 
   const totalActions = useMemo(
     () =>

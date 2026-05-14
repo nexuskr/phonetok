@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useVisibleInterval } from "@/lib/util/visible-interval";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, RefreshCw, ShieldCheck, AlertTriangle, Activity } from "lucide-react";
@@ -40,10 +41,9 @@ export default function Status() {
       document.head.appendChild(el);
     }
     void load();
-    const id = setInterval(load, 60_000);
-    return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18n.language]);
+  useVisibleInterval(() => { void load(); }, 60_000);
 
   const tone = !s ? "muted" : s.status === "operational" ? "secondary" : s.status === "degraded" ? "gold" : "destructive";
   const label = !s ? "—" : s.status === "operational" ? t("operational") : s.status === "degraded" ? t("degraded") : t("outage");

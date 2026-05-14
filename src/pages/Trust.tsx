@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useVisibleInterval } from "@/lib/util/visible-interval";
 import { Link } from "react-router-dom";
 import { ArrowLeft, ShieldCheck, Banknote, Activity, FileText, Scale, AlertTriangle, Radio } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,12 +44,14 @@ export default function Trust() {
       if (!error && data) setStats(data as unknown as PayoutStats);
       setLoading(false);
     })();
-    const id = setInterval(async () => {
-      const { data } = await supabase.rpc("get_payout_ops_stats_24h");
-      if (alive && data) setStats(data as unknown as PayoutStats);
-    }, 60_000);
-    return () => { alive = false; clearInterval(id); };
+    return () => { alive = false; };
   }, []);
+
+  // 60s 갱신 — 탭 숨김 시 일시정지, 재가시 즉시 catch-up.
+  useVisibleInterval(async () => {
+    const { data } = await supabase.rpc("get_payout_ops_stats_24h");
+    if (data) setStats(data as unknown as PayoutStats);
+  }, 60_000);
 
   return (
     <div className="min-h-screen bg-background">

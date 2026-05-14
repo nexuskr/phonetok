@@ -1,5 +1,6 @@
 // V17 /admin/revenue — daily KPI roll-up of revenue_events (admin only).
 import { useEffect, useState } from "react";
+import { useVisibleInterval } from "@/lib/util/visible-interval";
 import { TrendingUp, RefreshCw, BadgeDollarSign, Megaphone, Coins, Sparkles } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -47,9 +48,8 @@ export default function AdminRevenue() {
   useEffect(() => {
     if (!user?.isAdmin) return;
     void load();
-    const id = window.setInterval(load, 60_000);
-    return () => window.clearInterval(id);
   }, [user?.isAdmin]);
+  useVisibleInterval(() => { if (user?.isAdmin) void load(); }, 60_000, !!user?.isAdmin);
 
   if (!user) return null;
   if (!user.isAdmin) {
