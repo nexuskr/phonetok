@@ -94,7 +94,7 @@ export function getMainNft(uid: string): Promise<MainNftRow | null> {
 export async function getMainNftStatus(): Promise<MainNftStatus | null> {
   const { data, error } = await supabase.rpc("get_my_main_nft_status");
   if (error) return null;
-  return data as MainNftStatus;
+  return data as unknown as MainNftStatus;
 }
 
 export async function setMainNft(nftId: string | null): Promise<{ ok: boolean; error?: string; cost?: number; free_remaining?: number }> {
