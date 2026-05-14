@@ -59,6 +59,13 @@ const MissionTemplatesAdmin = lazy(() => import("@/components/admin/MissionTempl
 const FoundingSeasonsAdmin  = lazy(() => import("@/components/admin/FoundingSeasonsAdmin"));
 const BetaInvitesAdmin      = lazy(() => import("@/components/admin/BetaInvitesAdmin"));
 
+// Day 2 — Empire upgrades
+const UserDetail360         = lazy(() => import("@/components/admin/users/UserDetail360"));
+const ManualCrownTrigger    = lazy(() => import("@/components/admin/game/ManualCrownTrigger"));
+const WithdrawalQueueBulk   = lazy(() => import("@/components/admin/treasury/WithdrawalQueueBulk"));
+const RiskCenter            = lazy(() => import("@/components/admin/compliance/RiskCenter"));
+const GameConfigPanel       = lazy(() => import("@/components/admin/game/GameConfigPanel"));
+
 function Section({
   title,
   desc,
@@ -158,12 +165,12 @@ export default function AdminRoutes() {
         <Route path="compliance/viral"  element={<Section title="Viral Forensics"><ViralForensics /></Section>} />
         <Route path="compliance/perms"  element={<Section title="Permissions"><PermissionsAudit /></Section>} />
         <Route path="compliance/rules"  element={<Section><AutoRulesAdmin /></Section>} />
-        <Route path="compliance/risk"   element={<Section title="🚨 리스크 알림 센터" desc="Day 2 출시 — anomaly_events 통합 대시보드"><ComingSoon area="Risk Center" /></Section>} />
+        <Route path="compliance/risk"   element={<Section><RiskCenter /></Section>} />
 
         {/* OPERATIONS */}
         <Route path="ops/observability" element={<Section title="Observability"><ObservabilityCockpit /></Section>} />
         <Route path="ops/errors"        element={<Section title="Errors / Anomalies"><AnomalyAckQueue /><div className="h-2" /><ErrorMonitorAdmin /></Section>} />
-        <Route path="ops/audit"         element={<Section title="📜 감사 로그" desc="Day 2 — admin_audit_log 검색·필터"><ComingSoon area="Audit Log" /></Section>} />
+        <Route path="ops/audit"         element={<Section title="📜 감사 로그" desc="Day 3 — admin_audit_log 검색·필터"><ComingSoon area="Audit Log" /></Section>} />
         <Route path="ops/notify"        element={<Section title="🔔 공지 센터" desc="Day 3 — Push / Telegram / In-App 브로드캐스트"><ComingSoon area="Notification Center" /></Section>} />
         <Route path="ops/security"      element={<Section title="Security Audit"><SecurityAuditAdmin /></Section>} />
         <Route path="ops/cron"          element={<CronCombined />} />
@@ -180,18 +187,22 @@ export default function AdminRoutes() {
         <Route path="growth/referrals"  element={<Section title="Referral Window"><ReferralsAdmin /></Section>} />
         <Route path="growth/whales"     element={<Section title="Whale Strike Funnel"><WhaleStrikeFunnelPanel /></Section>} />
 
+        {/* TREASURY (Day 2 bulk) */}
+        <Route path="treasury/withdrawals/bulk" element={<Section><WithdrawalQueueBulk /></Section>} />
+
         {/* GAME CONFIG (AAL2) */}
-        <Route path="game/bias"          element={<Section title="🎮 Demo Bias 슬라이더" desc="Day 2 — 게임별 편향 강도 실시간 조정"><ComingSoon area="Demo Bias" /></Section>} />
-        <Route path="game/nearmiss"      element={<Section title="🎯 Near-Miss 확률" desc="Day 2 — 슬롯/딜러 니어미스 확률"><ComingSoon area="Near-Miss" /></Section>} />
-        <Route path="game/particles"     element={<Section title="✨ Crown 파티클 강도" desc="Day 2 — 폭발 시각 효과 강도 0~100"><ComingSoon area="Particle Intensity" /></Section>} />
-        <Route path="game/crown-trigger" element={<Section title="👑 Manual Crown Trigger" desc="Day 2 — 특정 유저에게 즉시 Crown 부여 (idempotency 강제)"><ComingSoon area="Manual Crown Trigger" /></Section>} />
+        <Route path="game/bias"          element={<Section><GameConfigPanel mode="bias" /></Section>} />
+        <Route path="game/nearmiss"      element={<Section><GameConfigPanel mode="nearmiss" /></Section>} />
+        <Route path="game/particles"     element={<Section><GameConfigPanel mode="particles" /></Section>} />
+        <Route path="game/crown-trigger" element={<Section><ManualCrownTrigger /></Section>} />
 
         {/* PRODUCT */}
-        <Route path="product/users"    element={<Section title="Users"><ServerUserAdmin /></Section>} />
-        <Route path="product/support"  element={<Suspense fallback={<LoadingList rows={4} />}><Support /></Suspense>} />
-        <Route path="product/missions" element={<Section title="AI Missions"><MissionTemplatesAdmin /></Section>} />
-        <Route path="product/founding" element={<Section title="Founding Seasons"><FoundingSeasonsAdmin /></Section>} />
-        <Route path="product/beta"     element={<Section title="Beta Codes"><BetaInvitesAdmin /></Section>} />
+        <Route path="product/users"      element={<Section title="Users"><ServerUserAdmin /></Section>} />
+        <Route path="product/users/:uid" element={<Section><UserDetail360 /></Section>} />
+        <Route path="product/support"    element={<Suspense fallback={<LoadingList rows={4} />}><Support /></Suspense>} />
+        <Route path="product/missions"   element={<Section title="AI Missions"><MissionTemplatesAdmin /></Section>} />
+        <Route path="product/founding"   element={<Section title="Founding Seasons"><FoundingSeasonsAdmin /></Section>} />
+        <Route path="product/beta"       element={<Section title="Beta Codes"><BetaInvitesAdmin /></Section>} />
 
         {/* Escape hatch — legacy single-page admin */}
         <Route path="legacy" element={<Suspense fallback={<LoadingList rows={4} />}><LegacyAdmin /></Suspense>} />
