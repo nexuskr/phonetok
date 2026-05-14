@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
+import { useVisibleInterval } from "@/lib/util/visible-interval";
 import { useNowTick } from "@/hooks/use-now-tick";
 import { motion } from "framer-motion";
 import {
