@@ -2,6 +2,7 @@
 import { Crown, Zap, Timer } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEmpireBooster, formatHMS } from "@/hooks/use-empire-booster";
+import { FloatingSlot } from "@/components/ui/floating-dock";
 
 export default function EmpireBoosterTimer() {
   const { active, booster, remainingMs } = useEmpireBooster();
@@ -15,12 +16,13 @@ export default function EmpireBoosterTimer() {
   const mult = booster.crown_multiplier;
 
   return (
-    <motion.div
-      initial={{ y: -16, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      className="fixed top-2 right-2 z-50 select-none"
-      aria-label="Empire Booster active"
-    >
+    <FloatingSlot slot="topRight" order={1}>
+      <motion.div
+        initial={{ y: -16, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="select-none"
+        aria-label="Empire Booster active"
+      >
       <div className="relative">
         {/* Pulse halo */}
         <motion.div
@@ -65,7 +67,8 @@ export default function EmpireBoosterTimer() {
             style={{ width: `${Math.max(2, Math.min(100, ratio * 100))}%` }}
           />
         </div>
-      </div>
-    </motion.div>
+        </div>
+      </motion.div>
+    </FloatingSlot>
   );
 }

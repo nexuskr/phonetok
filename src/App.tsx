@@ -77,6 +77,7 @@ const LegalDoc = lazy(() => import("./pages/LegalDoc.tsx"));
 import { PracticeModeBanner } from "./components/practice/PracticeModeBanner";
 import { PracticeModeGate } from "./components/practice/PracticeModeGate";
 import SimGlobalBadge from "./components/SimGlobalBadge";
+import { FloatingDockHost } from "./components/ui/floating-dock";
 const EmpireMomentToast = lazy(() => import("./components/empire/EmpireMomentToast"));
 const FloatingCashLoopWidget = lazy(() => import("./components/empire/FloatingCashLoopWidget"));
 
@@ -136,6 +137,7 @@ function GlobalOverlays() {
   if (!ready) return null;
   return (
     <>
+      <FloatingDockHost />
       <PracticeModeBanner />
       <SimGlobalBadge />
       <Suspense fallback={null}><EmpireMomentToast /></Suspense>
