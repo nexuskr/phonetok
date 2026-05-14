@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { TrendingUp, TrendingDown, Zap, Flame, ShieldCheck, Target } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { ARENA_SYMBOLS, MAX_LEVERAGE, FEE_RATE, type Mode } from "@/lib/trading/
 import { applySlippage, computeSize, liquidationPrice, openFee } from "@/lib/trading/engine";
 import { sfx } from "@/lib/trading/sounds";
 import { unitForMode, fmtMoney, approxCross } from "@/lib/trading/currency";
+import { loadSymbolLeverage, saveSymbolLeverage } from "@/lib/trading/errors";
+import MarginModeDialog from "./MarginModeDialog";
 
 export interface OrderTriggers {
   /** Take-profit ROI percent (e.g. 50 means +50% ROI). */
@@ -48,7 +50,7 @@ const TP_QUICK = [25, 50, 100, 200];
 
 function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit, busy }: Props) {
   const unit = unitForMode(mode);
-  const [leverage, setLeverage] = useState(20);
+  const [leverage, setLeverage] = useState(() => loadSymbolLeverage(symbol, 20));
   const [margin, setMargin] = useState(unit === "KRW" ? "100000" : "100");
   const [tpPct, setTpPct] = useState<string>("");
   const [slPct, setSlPct] = useState<string>("");
@@ -56,10 +58,32 @@ function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit,
   const [trailingPct, setTrailingPct] = useState<string>("10");
   // Margin mode + abs price toggles
   const [marginMode, setMarginMode] = useState<MarginMode>("isolated");
+  const [pendingMode, setPendingMode] = useState<MarginMode | null>(null);
   const [tpPriceMode, setTpPriceMode] = useState<"pct" | "price">("pct");
   const [slPriceMode, setSlPriceMode] = useState<"pct" | "price">("pct");
   const [tpPrice, setTpPrice] = useState<string>("");
   const [slPrice, setSlPrice] = useState<string>("");
+
+  // Per-symbol leverage memory: persist on change, restore on symbol switch
+  useEffect(() => { setLeverage(loadSymbolLeverage(symbol, 20)); }, [symbol]);
+  useEffect(() => { saveSymbolLeverage(symbol, leverage); }, [symbol, leverage]);
+
+  // Stale-price guard: if mark price hasn't changed for >5s, disable LONG/SHORT
+  const lastPriceChangeRef = useRef<number>(Date.now());
+  const lastPriceRef = useRef<number>(price);
+  const [stale, setStale] = useState(false);
+  useEffect(() => {
+    if (price !== lastPriceRef.current) {
+      lastPriceRef.current = price;
+      lastPriceChangeRef.current = Date.now();
+      if (stale) setStale(false);
+    }
+    const t = setInterval(() => {
+      const age = Date.now() - lastPriceChangeRef.current;
+      setStale(age > 5000);
+    }, 1000);
+    return () => clearInterval(t);
+  }, [price, stale]);
 
   useEffect(() => {
     setMargin(unit === "KRW" ? "100000" : "100");
@@ -151,7 +175,7 @@ function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit,
             {(["isolated","cross"] as const).map((m) => (
               <button
                 key={m}
-                onClick={() => setMarginMode(m)}
+                onClick={() => { if (m !== marginMode) setPendingMode(m); }}
                 className={`px-2 py-1 rounded-md transition ${
                   marginMode === m
                     ? "bg-primary/20 text-primary"
@@ -352,26 +376,36 @@ function MegaOrderPanelImpl({ mode, symbol, setSymbol, price, balance, onSubmit,
       {/* Big buttons */}
       <div className="grid grid-cols-2 gap-3">
         <Button
-          disabled={busy}
+          disabled={busy || !price || stale}
           onClick={() => doSubmit("long")}
           className="h-20 text-xl font-display font-black bg-gradient-to-b from-emerald-400 to-emerald-600 hover:from-emerald-300 hover:to-emerald-500 text-emerald-50 shadow-[0_0_40px_rgba(52,211,153,0.5)] border border-emerald-300/40 disabled:opacity-60"
         >
           <TrendingUp className="w-6 h-6 mr-2" />
-          {busy ? "처리 중…" : !price ? "LONG (가격 대기)" : "LONG"}
+          {busy ? "처리 중…" : !price ? "LONG (가격 대기)" : stale ? "가격 동기화 중…" : "LONG"}
         </Button>
         <Button
-          disabled={busy}
+          disabled={busy || !price || stale}
           onClick={() => doSubmit("short")}
           className="h-20 text-xl font-display font-black bg-gradient-to-b from-rose-500 to-rose-700 hover:from-rose-400 hover:to-rose-600 text-rose-50 shadow-[0_0_40px_rgba(244,63,94,0.5)] border border-rose-400/40 disabled:opacity-60"
         >
           <TrendingDown className="w-6 h-6 mr-2" />
-          {busy ? "처리 중…" : !price ? "SHORT (가격 대기)" : "SHORT"}
+          {busy ? "처리 중…" : !price ? "SHORT (가격 대기)" : stale ? "가격 동기화 중…" : "SHORT"}
         </Button>
       </div>
 
       <p className="text-[10px] text-muted-foreground/80 text-center">
         Slippage 0.06% · Insurance Fund 25% · Max 5 open · 단축키 L/S
+        {stale && <span className="ml-2 text-amber-300">· 시장가 동기화 대기 중</span>}
       </p>
+
+      <MarginModeDialog
+        open={pendingMode !== null}
+        onOpenChange={(v) => { if (!v) setPendingMode(null); }}
+        current={marginMode}
+        next={pendingMode ?? marginMode}
+        mode={mode}
+        onConfirm={(m) => { setMarginMode(m); setPendingMode(null); }}
+      />
     </section>
   );
 }

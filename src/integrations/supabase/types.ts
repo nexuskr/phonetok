@@ -8183,10 +8183,15 @@ export type Database = {
         }
       }
       live_account_equity: { Args: { p_user_id: string }; Returns: Json }
+      live_adjust_isolated_margin: {
+        Args: { p_delta_margin: number; p_position_id: string }
+        Returns: Json
+      }
       live_close_position: {
         Args: { p_mark_price: number; p_position_id: string }
         Returns: Json
       }
+      live_get_cross_summary: { Args: never; Returns: Json }
       live_get_history: {
         Args: { p_limit?: number }
         Returns: {

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { supabase } from "@/integrations/supabase/client";
 import { notify } from "@/lib/notify";
 import { subscribePostgres } from "@/lib/realtime-bus";
+import { mapTradingError } from "@/lib/trading/errors";
 import type { LivePosition, LiveTrade, MarginMode, Side } from "./types";
 
 function reasonLabel(reason: string): { title: string; variant: "success" | "error" | "info" } {
@@ -101,7 +102,7 @@ export const useRealStore = create<State>()((set, get) => ({
       p_sl_price: args.slPrice ?? null,
       p_trailing_offset: args.trailingOffset ?? null,
     } as never);
-    if (error) return { error: error.message };
+    if (error) return { error: mapTradingError(error.message) };
     await get().load();
     if (typeof window !== "undefined") window.dispatchEvent(new Event("wallet:refresh"));
     return { id: data as string };
@@ -117,7 +118,7 @@ export const useRealStore = create<State>()((set, get) => ({
       p_sl_price: t.slPrice ?? null,
       p_trailing_offset: t.trailingOffset ?? null,
     } as never);
-    if (error) return { error: error.message };
+    if (error) return { error: mapTradingError(error.message) };
     await get().load();
     return { ok: true };
   },
@@ -126,7 +127,7 @@ export const useRealStore = create<State>()((set, get) => ({
     const { data, error } = await supabase.rpc("live_close_position", {
       p_position_id: id, p_mark_price: mark,
     });
-    if (error) return { error: error.message };
+    if (error) return { error: mapTradingError(error.message) };
     const r = data as { pnl: number; roi: number; credit: number; exit: number };
     set((s) => ({ comboWins: r.pnl > 0 ? s.comboWins + 1 : 0 }));
     await get().load();
@@ -138,7 +139,7 @@ export const useRealStore = create<State>()((set, get) => ({
     const { data, error } = await supabase.rpc("live_liquidate_position", {
       p_position_id: id, p_mark_price: mark,
     });
-    if (error) return { error: error.message };
+    if (error) return { error: mapTradingError(error.message) };
     set({ comboWins: 0 });
     await get().load();
     if (typeof window !== "undefined") window.dispatchEvent(new Event("wallet:refresh"));
