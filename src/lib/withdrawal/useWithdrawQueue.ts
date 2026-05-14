@@ -20,7 +20,7 @@ export type WithdrawalStatus =
   | "approved"
   | "completed"
   | "rejected"
-  | "canceled";
+  | "cancelled";
 
 export interface WithdrawalRow {
   id: string;
