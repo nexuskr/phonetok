@@ -71,7 +71,7 @@ export default function CrownAura({ level, size = 48, className = "", children }
             background: `conic-gradient(from 0deg, transparent 0%, rgba(${glow}) 25%, transparent 50%, rgba(${glow}) 75%, transparent 100%)`,
             filter: "blur(4px)",
           }}
-          animate={{ rotate: 360 }}
+          animate={tabVisible ? { rotate: 360 } : false}
           transition={{ duration: 8, ease: "linear", repeat: Infinity }}
         />
       )}
