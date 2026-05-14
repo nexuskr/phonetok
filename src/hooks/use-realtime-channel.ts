@@ -110,12 +110,14 @@ function bindAndSubscribe(e: Entry) {
       if (cur.listeners.size > 0 && !cur.retryTimer) {
         const delay = Math.min(30_000, 1_000 * Math.pow(2, cur.retryAttempts++));
         dbg(e.key, "reconnect in", delay, "ms");
-        cur.retryTimer = setTimeout(() => {
+        cur.retryTimer = setTimeout(async () => {
           cur.retryTimer = null;
           if (REGISTRY.get(e.key) !== cur || cur.status === "removed") return;
-          // 기존 채널 정리 후 새로 구독
-          try { void supabase.removeChannel(cur.channel!); } catch { /* swallow */ }
+          // 기존 채널을 완전히 정리한 후에 새로 구독해야
+          // Supabase가 같은 이름의 이전 채널 핸들을 재사용해 ".on() after subscribe()" 에러를 던지는 것을 방지한다.
+          try { if (cur.channel) await supabase.removeChannel(cur.channel); } catch { /* swallow */ }
           cur.channel = null;
+          if (REGISTRY.get(e.key) !== cur || cur.status === "removed") return;
           bindAndSubscribe(cur);
         }, delay);
       }
