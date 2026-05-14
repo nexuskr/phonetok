@@ -54,10 +54,11 @@ export async function awardCrown(
 
   // Reward Prediction Error toast — bigger surprise = bigger dopamine
   const ratio = r.rpe;
-  let title = `+${r.awarded.toLocaleString()} Crown`;
-  if (ratio >= 0.8)      title = `🔥 JACKPOT +${r.awarded.toLocaleString()} Crown`;
-  else if (ratio >= 0.3) title = `✨ 보너스 +${r.awarded.toLocaleString()} Crown`;
-  else if (ratio <= -0.3) title = `+${r.awarded.toLocaleString()} Crown (다음을 노려보세요)`;
+  const vipPrefix = r.vip_bonus ? "👑VIP " : "";
+  let title = `${vipPrefix}+${r.awarded.toLocaleString()} Crown`;
+  if (ratio >= 0.8)      title = `🔥 ${vipPrefix}JACKPOT +${r.awarded.toLocaleString()} Crown`;
+  else if (ratio >= 0.3) title = `✨ ${vipPrefix}보너스 +${r.awarded.toLocaleString()} Crown`;
+  else if (ratio <= -0.3) title = `${vipPrefix}+${r.awarded.toLocaleString()} Crown (다음을 노려보세요)`;
 
   notify.success(title, {
     description: r.level_up
