@@ -88,9 +88,9 @@ export default function Marketplace() {
 
   // 본인이 마켓에 안 올린 NFT만 노출
   const sellableNfts = useMemo(() => {
-    const listedSet = new Set(listings.filter((l) => l.seller_id === selectedNft?.id).map((l) => l.nft_id));
-    return nfts.filter((n) => !listedSet.has(n.id));
-  }, [nfts, listings, selectedNft]);
+    const myListedNftIds = new Set(listings.filter((l) => l.seller_id === uid).map((l) => l.nft_id));
+    return nfts.filter((n) => !myListedNftIds.has(n.id));
+  }, [nfts, listings, uid]);
 
   const submitList = useCallback(async () => {
     if (!selectedNft) return;
