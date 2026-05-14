@@ -32,6 +32,8 @@ import { useStepUp } from "@/hooks/use-step-up";
 import { AdultOnlyBanner } from "@/components/AdultOnlyBanner";
 import BankAppDeeplinks from "@/components/wallet/BankAppDeeplinks";
 import AmountPresetChips from "@/components/wallet/AmountPresetChips";
+import PhonSpendPanel from "@/components/wallet/PhonSpendPanel";
+import PhonFeeDiscountToggle from "@/components/wallet/PhonFeeDiscountToggle";
 
 type AssetTab = "bank" | "coin";
 type ActionTab = "withdraw" | "deposit" | "history";
