@@ -3481,6 +3481,81 @@ export type Database = {
         }
         Relationships: []
       }
+      influencer_clicks: {
+        Row: {
+          code: string
+          created_at: string
+          fingerprint: string | null
+          id: number
+          referrer: string | null
+          ua: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          fingerprint?: string | null
+          id?: number
+          referrer?: string | null
+          ua?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          fingerprint?: string | null
+          id?: number
+          referrer?: string | null
+          ua?: string | null
+        }
+        Relationships: []
+      }
+      influencer_codes: {
+        Row: {
+          active: boolean
+          bonus_crown: number
+          bonus_phon: number
+          channel: string | null
+          clicks_count: number
+          code: string
+          created_at: string
+          deposits_count: number
+          deposits_total_phon: number
+          display_name: string
+          owner_user_id: string | null
+          signups_count: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          bonus_crown?: number
+          bonus_phon?: number
+          channel?: string | null
+          clicks_count?: number
+          code: string
+          created_at?: string
+          deposits_count?: number
+          deposits_total_phon?: number
+          display_name: string
+          owner_user_id?: string | null
+          signups_count?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          bonus_crown?: number
+          bonus_phon?: number
+          channel?: string | null
+          clicks_count?: number
+          code?: string
+          created_at?: string
+          deposits_count?: number
+          deposits_total_phon?: number
+          display_name?: string
+          owner_user_id?: string | null
+          signups_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       insurance_fund: {
         Row: {
           accumulated: number
@@ -5772,6 +5847,36 @@ export type Database = {
         }
         Relationships: []
       }
+      share_events: {
+        Row: {
+          action: string
+          channel: string | null
+          created_at: string
+          id: number
+          payload: Json
+          trigger: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          channel?: string | null
+          created_at?: string
+          id?: number
+          payload?: Json
+          trigger: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          channel?: string | null
+          created_at?: string
+          id?: number
+          payload?: Json
+          trigger?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       spans: {
         Row: {
           created_at: string
@@ -6038,6 +6143,54 @@ export type Database = {
           daily_max_missions?: number
           daily_max_reward?: number
           tier?: string
+        }
+        Relationships: []
+      }
+      tournament_schedule: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          metadata: Json
+          overlay_token: string
+          prize_crown: number
+          prize_phon: number
+          slug: string
+          starts_at: string
+          status: string
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          metadata?: Json
+          overlay_token?: string
+          prize_crown?: number
+          prize_phon?: number
+          slug: string
+          starts_at: string
+          status?: string
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          metadata?: Json
+          overlay_token?: string
+          prize_crown?: number
+          prize_phon?: number
+          slug?: string
+          starts_at?: string
+          status?: string
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -7844,6 +7997,29 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_create_influencer_code: {
+        Args: {
+          _bonus_crown?: number
+          _bonus_phon?: number
+          _channel?: string
+          _code: string
+          _display_name: string
+          _owner_user_id?: string
+        }
+        Returns: string
+      }
+      admin_create_tournament: {
+        Args: {
+          _ends_at: string
+          _prize_crown?: number
+          _prize_phon?: number
+          _slug: string
+          _starts_at: string
+          _subtitle: string
+          _title: string
+        }
+        Returns: string
+      }
       admin_end_founding_season: { Args: { _id: string }; Returns: Json }
       admin_exec_readonly_sql: { Args: { _sql: string }; Returns: Json }
       admin_force_close_position:
@@ -7996,6 +8172,16 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_get_share_funnel: {
+        Args: { _hours?: number }
+        Returns: {
+          ctr: number
+          dismissed: number
+          shared: number
+          shown: number
+          trigger: string
+        }[]
+      }
       admin_get_sim_real_conversion: { Args: { _days?: number }; Returns: Json }
       admin_get_stress_test_stats: { Args: never; Returns: Json }
       admin_get_table_counts: { Args: never; Returns: Json }
@@ -8094,6 +8280,30 @@ export type Database = {
           title: string
           total_seats: number
         }[]
+      }
+      admin_list_influencer_codes: {
+        Args: { _limit?: number }
+        Returns: {
+          active: boolean
+          bonus_crown: number
+          bonus_phon: number
+          channel: string | null
+          clicks_count: number
+          code: string
+          created_at: string
+          deposits_count: number
+          deposits_total_phon: number
+          display_name: string
+          owner_user_id: string | null
+          signups_count: number
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "influencer_codes"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       admin_list_refund_requests: {
         Args: { _limit?: number; _offset?: number; _status?: string }
@@ -8978,6 +9188,16 @@ export type Database = {
           subline: string
         }[]
       }
+      get_influencer_public: {
+        Args: { _code: string }
+        Returns: {
+          bonus_crown: number
+          bonus_phon: number
+          channel: string
+          code: string
+          display_name: string
+        }[]
+      }
       get_live_activity_60s: {
         Args: { _limit?: number }
         Returns: {
@@ -9173,6 +9393,23 @@ export type Database = {
       get_my_weekly_referral_rank: { Args: never; Returns: Json }
       get_next_empire_day: { Args: never; Returns: string }
       get_next_nft_threshold: { Args: never; Returns: Json }
+      get_next_tournament: {
+        Args: never
+        Returns: {
+          ends_at: string
+          id: string
+          overlay_token: string
+          prize_crown: number
+          prize_phon: number
+          seconds_until_end: number
+          seconds_until_start: number
+          slug: string
+          starts_at: string
+          status: string
+          subtitle: string
+          title: string
+        }[]
+      }
       get_pay_receive_address: { Args: never; Returns: string }
       get_payout_ops_stats_24h: { Args: never; Returns: Json }
       get_permission_change_log: {
@@ -9278,6 +9515,15 @@ export type Database = {
           total_balance: number
           total_earned: number
           user_id: string
+        }[]
+      }
+      get_tournament_leaderboard: {
+        Args: { _limit?: number; _overlay_token: string }
+        Returns: {
+          crown_count: number
+          masked_name: string
+          rank: number
+          score: number
         }[]
       }
       get_weekly_pass_overview: { Args: never; Returns: Json }
@@ -9540,6 +9786,15 @@ export type Database = {
           p_meta?: Json
         }
         Returns: string
+      }
+      log_share_event: {
+        Args: {
+          _action: string
+          _channel?: string
+          _payload?: Json
+          _trigger: string
+        }
+        Returns: number
       }
       mark_fomo_notification_read: { Args: { _id: string }; Returns: boolean }
       mark_handbook_step: { Args: { _step: string }; Returns: Json }
@@ -10006,9 +10261,14 @@ export type Database = {
         Args: { _enabled: boolean; _reason: string }
         Returns: Json
       }
+      tournament_tick: { Args: never; Returns: number }
       track_campaign_click: {
         Args: { _anon_id?: string; _slug: string }
         Returns: string
+      }
+      track_influencer_click: {
+        Args: { _code: string; _fingerprint?: string; _referrer?: string }
+        Returns: boolean
       }
       transition_ai_circuit: {
         Args: { _meta?: Json; _new_state: string; _reason: string }
