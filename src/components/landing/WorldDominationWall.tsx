@@ -161,6 +161,9 @@ export default function WorldDominationWall() {
           </div>
         </div>
 
+        {/* Top Emperor of the Day (24h Crown 1위) */}
+        <TopEmperorBanner />
+
         {/* KPI 행 */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
           <StatCell
