@@ -9,6 +9,7 @@ import { ADMIN_LEGACY_REDIRECTS } from "./_nav";
 import { LoadingList } from "@/components/ui/loading-state";
 
 // COMMAND
+const EmpireOverview = lazy(() => import("@/components/admin/empire/EmpireOverview"));
 const CockpitV2 = lazy(() => import("./CockpitV2"));
 const Revenue   = lazy(() => import("./Revenue"));
 const Funnel    = lazy(() => import("./Kpi"));
@@ -127,7 +128,8 @@ export default function AdminRoutes() {
 
       <Route element={<AdminLayout />}>
         {/* COMMAND */}
-        <Route index element={<Suspense fallback={<LoadingList rows={4} />}><CockpitV2 /></Suspense>} />
+        <Route index element={<Suspense fallback={<LoadingList rows={4} />}><EmpireOverview /></Suspense>} />
+        <Route path="cockpit" element={<Suspense fallback={<LoadingList rows={4} />}><CockpitV2 /></Suspense>} />
         <Route path="funnel"  element={<Suspense fallback={<LoadingList rows={4} />}><Funnel /></Suspense>} />
         <Route path="revenue" element={<Suspense fallback={<LoadingList rows={4} />}><Revenue /></Suspense>} />
 
