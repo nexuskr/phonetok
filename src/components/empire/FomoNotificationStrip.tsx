@@ -20,6 +20,7 @@ const kindAccent: Record<string, string> = {
 export function FomoNotificationStrip() {
   const nav = useNavigate();
   const { unread, markRead } = useFomoNotifications();
+  const tabVisible = useDocumentVisible();
   const top = unread.slice(0, 3);
 
   if (top.length === 0) return null;
