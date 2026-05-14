@@ -179,6 +179,7 @@ const App = () => (
               <Route path="/empire/collection" element={<EmpireCollection />} />
               <Route path="/empire/atelier" element={<NftAtelier />} />
               <Route path="/trade/net" element={<HybridNetPage />} />
+              <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/dynasty" element={<Dynasty />} />
               <Route path="/treasury" element={<Navigate to="/wallet" replace />} />
               <Route path="/treasury/settlements" element={<Settlements />} />
