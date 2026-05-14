@@ -751,6 +751,69 @@ export type Database = {
         }
         Relationships: []
       }
+      bequest_requests: {
+        Row: {
+          asset_kind: string
+          cancelled_at: string | null
+          child_id: string
+          cooldown_until: string
+          created_at: string
+          executed_at: string | null
+          id: string
+          link_id: string
+          nft_id: string | null
+          notes: string | null
+          parent_id: string
+          phon_amount: number | null
+          status: string
+        }
+        Insert: {
+          asset_kind: string
+          cancelled_at?: string | null
+          child_id: string
+          cooldown_until: string
+          created_at?: string
+          executed_at?: string | null
+          id?: string
+          link_id: string
+          nft_id?: string | null
+          notes?: string | null
+          parent_id: string
+          phon_amount?: number | null
+          status?: string
+        }
+        Update: {
+          asset_kind?: string
+          cancelled_at?: string | null
+          child_id?: string
+          cooldown_until?: string
+          created_at?: string
+          executed_at?: string | null
+          id?: string
+          link_id?: string
+          nft_id?: string | null
+          notes?: string | null
+          parent_id?: string
+          phon_amount?: number | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bequest_requests_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "dynasty_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bequest_requests_nft_id_fkey"
+            columns: ["nft_id"]
+            isOneToOne: false
+            referencedRelation: "nft_collection"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beta_invites: {
         Row: {
           code: string
@@ -1759,6 +1822,42 @@ export type Database = {
           tone?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      dynasty_links: {
+        Row: {
+          accepted_at: string | null
+          child_email: string
+          child_id: string | null
+          created_at: string
+          id: string
+          invite_token: string
+          parent_id: string
+          revoked_at: string | null
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          child_email: string
+          child_id?: string | null
+          created_at?: string
+          id?: string
+          invite_token: string
+          parent_id: string
+          revoked_at?: string | null
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          child_email?: string
+          child_id?: string | null
+          created_at?: string
+          id?: string
+          invite_token?: string
+          parent_id?: string
+          revoked_at?: string | null
+          status?: string
         }
         Relationships: []
       }
@@ -3646,30 +3745,42 @@ export type Database = {
       }
       nft_collection: {
         Row: {
+          bequeathed_from: string | null
           boost_pct: number
           created_at: string
+          external_chain: string | null
+          external_token_id: string | null
           id: string
           level: string
+          locked_for_migration: boolean
           source: string
           source_ref: string
           type: string
           user_id: string
         }
         Insert: {
+          bequeathed_from?: string | null
           boost_pct?: number
           created_at?: string
+          external_chain?: string | null
+          external_token_id?: string | null
           id?: string
           level: string
+          locked_for_migration?: boolean
           source: string
           source_ref?: string
           type: string
           user_id: string
         }
         Update: {
+          bequeathed_from?: string | null
           boost_pct?: number
           created_at?: string
+          external_chain?: string | null
+          external_token_id?: string | null
           id?: string
           level?: string
+          locked_for_migration?: boolean
           source?: string
           source_ref?: string
           type?: string
@@ -4126,16 +4237,22 @@ export type Database = {
       phon_balances: {
         Row: {
           balance: number
+          snapshot_at: string | null
+          snapshot_balance: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           balance?: number
+          snapshot_at?: string | null
+          snapshot_balance?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           balance?: number
+          snapshot_at?: string | null
+          snapshot_balance?: number | null
           updated_at?: string
           user_id?: string
         }
