@@ -43,6 +43,7 @@ const TYPE_ICON = { crown: Crown, emperor: Sword, founder: Star } as const;
 export default function Marketplace() {
   const navigate = useNavigate();
   const { nfts, refresh: refreshPower } = useMyPower();
+  const [uid, setUid] = useState<string | null>(null);
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "crown" | "emperor" | "founder">("all");
@@ -52,6 +53,10 @@ export default function Marketplace() {
   const [listPrice, setListPrice] = useState<string>("100");
   const [busy, setBusy] = useState(false);
   const [confirmBuy, setConfirmBuy] = useState<Listing | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUid(data.user?.id ?? null));
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
