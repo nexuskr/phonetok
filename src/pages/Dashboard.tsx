@@ -25,6 +25,7 @@ import { useState } from "react";
 // V3 — 우주 끝판왕 핵심
 import DashboardHeroV3 from "@/components/dashboard/v3/DashboardHeroV3";
 import TradingEntryCard from "@/components/dashboard/v3/TradingEntryCard";
+import ImperialJourneyMap from "@/components/journey/ImperialJourneyMap";
 import KpiGridV3 from "@/components/dashboard/v3/KpiGridV3";
 import MoreSection, { type MoreSectionHandle } from "@/components/dashboard/v3/MoreSection";
 import { useMyPower } from "@/hooks/use-my-power";
@@ -115,6 +116,9 @@ export default function Dashboard() {
       <DashboardHeroV3 phon={phon} nfts={nfts} online={online} />
 
       <div className="container relative pt-6 pb-12 space-y-6">
+        {/* 👑 Imperial Journey — 100단계 진행 + 다음 행동 1개 */}
+        <ImperialJourneyMap />
+
         {/* ⚡ 핵심 베팅 진입 카드 */}
         <TradingEntryCard />
 
