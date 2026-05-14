@@ -31,9 +31,14 @@ export function useMfaLevel() {
     }
     refresh();
     const { data: sub } = supabase.auth.onAuthStateChange(() => refresh());
+    const handleMfaVerified = () => {
+      void refresh();
+    };
+    window.addEventListener("phonara:mfa-verified", handleMfaVerified);
     return () => {
       active = false;
       sub.subscription.unsubscribe();
+      window.removeEventListener("phonara:mfa-verified", handleMfaVerified);
     };
   }, []);
 
