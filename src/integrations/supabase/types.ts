@@ -1684,6 +1684,39 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_briefings: {
+        Row: {
+          briefing_date: string
+          cards: Json
+          context: Json
+          generated_at: string
+          id: number
+          model: string | null
+          refreshed_count: number
+          user_id: string
+        }
+        Insert: {
+          briefing_date: string
+          cards?: Json
+          context?: Json
+          generated_at?: string
+          id?: number
+          model?: string | null
+          refreshed_count?: number
+          user_id: string
+        }
+        Update: {
+          briefing_date?: string
+          cards?: Json
+          context?: Json
+          generated_at?: string
+          id?: number
+          model?: string | null
+          refreshed_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_combo_progress: {
         Row: {
           date: string
@@ -8223,6 +8256,16 @@ export type Database = {
           uses: number
         }[]
       }
+      admin_list_briefing_targets: {
+        Args: { _limit?: number }
+        Returns: {
+          crown_24h: number
+          level: number
+          nickname: string
+          phon: number
+          user_id: string
+        }[]
+      }
       admin_list_broadcasts: {
         Args: { _limit?: number }
         Returns: {
@@ -9248,6 +9291,16 @@ export type Database = {
           status: string
         }[]
       }
+      get_my_daily_briefing: {
+        Args: never
+        Returns: {
+          briefing_date: string
+          cards: Json
+          generated_at: string
+          model: string
+          refreshed_count: number
+        }[]
+      }
       get_my_dashboard_state: { Args: never; Returns: Json }
       get_my_dynasty_links: {
         Args: never
@@ -10009,6 +10062,7 @@ export type Database = {
         Returns: Json
       }
       request_dynasty_link: { Args: { _child_email: string }; Returns: Json }
+      request_my_briefing_context: { Args: never; Returns: Json }
       request_refund: {
         Args: { _reason: string }
         Returns: {
@@ -10290,6 +10344,10 @@ export type Database = {
       unfreeze_expired: { Args: never; Returns: Json }
       unlock_achievement: { Args: { _key: string }; Returns: Json }
       update_bot_ratio_phase: { Args: never; Returns: undefined }
+      upsert_daily_briefing: {
+        Args: { _cards: Json; _context: Json; _model: string; _user_id: string }
+        Returns: number
+      }
       validate_deposit_input: {
         Args: {
           _bank_account?: string
