@@ -119,6 +119,9 @@ export default function Dashboard() {
       <DashboardHeroV3 phon={phon} nfts={nfts} online={online} />
 
       <div className="container relative pt-6 pb-12 space-y-6">
+        {/* 🌅 Daily AI Briefing — 5장 카드 */}
+        <Suspense fallback={null}><DailyBriefingCard /></Suspense>
+
         {/* 📣 Imperial Stories — 자동 서사 라이브 */}
         <ImperialStoryRail />
 
