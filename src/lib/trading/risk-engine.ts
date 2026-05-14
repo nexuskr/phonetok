@@ -144,8 +144,8 @@ export async function preTradeValidate(args: {
       p_rpi: result.rpi,
       p_safety_distance: result.safetyDistance,
       p_leverage: args.leverage,
-      p_reason: result.reason ?? null,
-    } as never).then(() => {}, () => {});
+      p_reason: result.reason ?? undefined,
+    }).then(() => {}, () => {});
   }
 
   return { ...result, markPrice, equity };
