@@ -260,6 +260,7 @@ export default function Wallet() {
   }
 
   async function submitDeposit() {
+    if (submitting) return;
     const a = Number(amount);
     if (!a || a < 10000) { toast({ title: tw("minDeposit") }); return; }
     if (sentCode !== authCode) { toast({ title: tw("codeMismatch") }); return; }
