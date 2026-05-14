@@ -37,24 +37,32 @@ export function WhaleStrikeRail({ compact = false }: { compact?: boolean } = {})
   // PR-10: 노출 추적 (마운트 시 1회)
   useTrackView("whale_rail", "rail");
 
-  useEffect(() => {
-    let alive = true;
-    async function load() {
-      try {
-        const { data, error } = await supabase.rpc("get_whale_strikes_24h", { _limit: 24 });
-        if (!alive) return;
-        if (!error && Array.isArray(data)) setItems(data as unknown as Strike[]);
-      } catch {
-        /* network/realtime unreachable — keep last items */
-      }
-      if (alive) setLoaded(true);
+  const aliveRef = useRef(true);
+  useEffect(() => () => { aliveRef.current = false; }, []);
+
+  const load = async () => {
+    try {
+      const { data, error } = await supabase.rpc("get_whale_strikes_24h", { _limit: 24 });
+      if (!aliveRef.current) return;
+      if (!error && Array.isArray(data)) setItems(data as unknown as Strike[]);
+    } catch {
+      /* network/realtime unreachable — keep last items */
     }
-    void load();
-    const id = setInterval(load, 60_000);
-    return () => { alive = false; clearInterval(id); };
-  }, []);
+    if (aliveRef.current) setLoaded(true);
+  };
+
+  // Initial fetch (once)
+  useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  // 60s refresh — pauses while tab hidden, catches up on visible.
+  useVisibleInterval(() => { void load(); }, 60_000, true, { catchUpOnVisible: true });
 
   const doubled = useMemo(() => (items.length ? [...items, ...items] : []), [items]);
+
+  // Pause the marquee when tab hidden OR rail is offscreen.
+  const railRef = useRef<HTMLDivElement>(null);
+  const inView = useInViewport(railRef, { rootMargin: "200px" });
+  const tabVisible = useDocumentVisible();
+  const animating = inView && tabVisible;
 
   if (!loaded || items.length === 0) return null;
 
