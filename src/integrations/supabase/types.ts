@@ -6618,6 +6618,10 @@ export type Database = {
         Args: { _delta: number; _reason: string; _target: string }
         Returns: Json
       }
+      admin_ban_user: {
+        Args: { _reason?: string; _user_id: string }
+        Returns: boolean
+      }
       admin_cockpit_metrics: { Args: never; Returns: Json }
       admin_create_founding_season: {
         Args: {
@@ -6747,6 +6751,29 @@ export type Database = {
           resolved_at: string
           status: string
           user_id: string
+        }[]
+      }
+      admin_list_users_full: {
+        Args: { _limit?: number; _offset?: number; _q?: string }
+        Returns: {
+          auth_provider: string
+          available_balance: number
+          banned_until: string
+          birth_date: string
+          created_at: string
+          email: string
+          freeze_reason: string
+          frozen_until: string
+          id: string
+          is_banned: boolean
+          is_deleted: boolean
+          is_frozen: boolean
+          nickname: string
+          phone: string
+          profile_completed: boolean
+          real_name: string
+          tier: string
+          total_balance: number
         }[]
       }
       admin_operator_pnl: {
@@ -6903,6 +6930,11 @@ export type Database = {
         Args: { _key: string; _value: Json }
         Returns: Json
       }
+      admin_soft_delete_user: {
+        Args: { _reason?: string; _user_id: string }
+        Returns: boolean
+      }
+      admin_unban_user: { Args: { _user_id: string }; Returns: boolean }
       admin_unfreeze_user: { Args: { _user_id: string }; Returns: number }
       admin_update_founding_season: {
         Args: {

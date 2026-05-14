@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { useRequireAdmin } from "@/hooks/use-require-auth";
@@ -10,7 +10,8 @@ import AdminCommandTrigger from "./_AdminCommandTrigger";
 import AdminAal2Gate from "@/components/admin/AdminAal2Gate";
 import { isAal2Path, ADMIN_NAV_FLAT } from "./_nav";
 import { schedulePrefetch } from "@/lib/route-prefetch";
-import { Crown } from "lucide-react";
+import { Crown, KeyRound } from "lucide-react";
+import PinResetDialog from "@/components/PinResetDialog";
 
 /**
  * Admin shell — Sidebar + sticky header + AAL2-route gating.
@@ -20,6 +21,18 @@ export default function AdminLayout() {
   const user = useRequireAdmin();
   const { pathname } = useLocation();
   const pending = useAdminPending(!!user?.isAdmin);
+  const [pinDialog, setPinDialog] = useState(false);
+  const [adminEmail, setAdminEmail] = useState<string>("");
+
+  useEffect(() => {
+    let alive = true;
+    import("@/integrations/supabase/client").then(({ supabase }) =>
+      supabase.auth.getSession().then(({ data }) => {
+        if (alive) setAdminEmail(data.session?.user?.email ?? "");
+      }),
+    );
+    return () => { alive = false; };
+  }, []);
 
   // Active item label for breadcrumb-ish header.
   const active =
@@ -79,9 +92,20 @@ export default function AdminLayout() {
             </div>
             <div className="flex-1" />
             <AdminCommandTrigger />
+            <button
+              onClick={() => setPinDialog(true)}
+              title="출금 PIN(6자리) 재설정"
+              className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg glass border border-border text-[10px] font-bold text-muted-foreground hover:text-foreground"
+            >
+              <KeyRound className="w-3 h-3" /> PIN 재설정
+            </button>
             <AdminAal2Chip />
             <AdminPendingBell pending={pending} />
           </header>
+
+          {pinDialog && adminEmail && (
+            <PinResetDialog email={adminEmail} onClose={() => setPinDialog(false)} />
+          )}
 
           {/* Body */}
           <main className="flex-1 overflow-y-auto">
