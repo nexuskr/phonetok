@@ -8338,24 +8338,44 @@ export type Database = {
         Args: { p_mark_price: number; p_position_id: string }
         Returns: Json
       }
-      live_open_position: {
-        Args: {
-          p_allocated_margin?: number
-          p_leverage: number
-          p_margin: number
-          p_margin_mode?: string
-          p_mark_price: number
-          p_side: string
-          p_sl_pct?: number
-          p_sl_price?: number
-          p_symbol: string
-          p_tp_pct?: number
-          p_tp_price?: number
-          p_trailing_offset?: number
-          p_trailing_pct?: number
-        }
-        Returns: string
-      }
+      live_open_position:
+        | {
+            Args: {
+              p_allocated_margin?: number
+              p_leverage: number
+              p_margin: number
+              p_margin_mode?: string
+              p_mark_price: number
+              p_side: string
+              p_sl_pct?: number
+              p_sl_price?: number
+              p_symbol: string
+              p_tp_pct?: number
+              p_tp_price?: number
+              p_trailing_offset?: number
+              p_trailing_pct?: number
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_allocated_margin?: number
+              p_client_request_id?: string
+              p_leverage: number
+              p_margin: number
+              p_margin_mode?: string
+              p_mark_price: number
+              p_side: string
+              p_sl_pct?: number
+              p_sl_price?: number
+              p_symbol: string
+              p_tp_pct?: number
+              p_tp_price?: number
+              p_trailing_offset?: number
+              p_trailing_pct?: number
+            }
+            Returns: string
+          }
       live_pre_trade_validate: { Args: { p_symbol: string }; Returns: Json }
       live_set_position_triggers: {
         Args: {
