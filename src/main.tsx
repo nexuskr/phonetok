@@ -30,5 +30,7 @@ installLayoutShiftMonitor();
 
 // P5 — wait for active locale chunk to resolve before first paint to avoid
 // flash-of-keys. Fail-open: if it errors, render anyway (i18n returns keys).
-const boot = () => createRoot(document.getElementById("root")!).render(<App />);
+const boot = () => createRoot(document.getElementById("root")!).render(
+  <HelmetProvider><App /></HelmetProvider>
+);
 i18nReady.then(boot, boot);
