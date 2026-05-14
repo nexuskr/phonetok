@@ -1,6 +1,8 @@
 import { memo, useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { sfx } from "@/lib/trading/sounds";
+import { FloatingSlot } from "@/components/ui/floating-dock";
+import { Z } from "@/lib/ui/floating-slots";
 
 type FxKind = "win" | "legendary" | "liquidate" | "loss" | null;
 type FxUnit = "USDT" | "KRW";
