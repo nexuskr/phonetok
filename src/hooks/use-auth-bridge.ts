@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { loadDB, saveDB, type Tier } from "@/lib/store";
 import { registerCurrentDevice } from "@/lib/deviceFingerprint";
+import { getVerifiedUser, hasVerifiedSession } from "@/lib/auth-recovery";
 
 const RESETTABLE_SESSION_FLAGS = [
   "phonara_disable_dashboard_state_rpc",
@@ -65,8 +66,8 @@ function resetSessionCircuitBreakers() {
 async function assignPersonaSafely() {
   try {
     if (sessionStorage.getItem("phonara_disable_persona_rpc") === "1") return;
-    const { data } = await supabase.auth.getSession();
-    if (!data.session?.user) return;
+    const user = await getVerifiedUser();
+    if (!user) return;
     const { error } = await supabase.rpc("assign_persona" as any);
     if (error && ((error as { code?: string }).code === "PGRST301" || /401|400|unauthorized|bad request/i.test(error.message ?? ""))) {
       sessionStorage.setItem("phonara_disable_persona_rpc", "1");
@@ -83,18 +84,7 @@ async function assignPersonaSafely() {
  */
 async function ensureValidSession(session: any): Promise<boolean> {
   if (!session?.user) return false;
-  try {
-    const { data, error } = await supabase.auth.getUser();
-    if (!error && data?.user?.id) return true;
-    const msg = String((error as any)?.message ?? "");
-    if (/sub claim|bad_jwt|JWT|invalid/i.test(msg)) {
-      try { await supabase.auth.signOut({ scope: "local" }); } catch { /* noop */ }
-      return false;
-    }
-    return true; // network blip — 다음 사이클에 재시도
-  } catch {
-    return true;
-  }
+  return hasVerifiedSession();
 }
 
 function isOnGuide(): boolean {
@@ -106,7 +96,7 @@ export function useAuthBridge() {
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       // Defer to avoid deadlock
       setTimeout(() => { if (!isOnGuide()) syncFromSession(session); }, 0);
-      if (event === "SIGNED_IN" && session?.user && !isOnGuide()) {
+      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session?.user && !isOnGuide()) {
         resetSessionCircuitBreakers();
         setTimeout(() => { if (!isOnGuide()) void registerCurrentDevice(); }, 500);
         setTimeout(() => { if (!isOnGuide()) void assignPersonaSafely(); }, 800);

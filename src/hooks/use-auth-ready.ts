@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { hasVerifiedSession } from "@/lib/auth-recovery";
 
 export function useAuthReady() {
   const [isReady, setIsReady] = useState(false);
@@ -10,26 +11,23 @@ export function useAuthReady() {
 
     const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
       if (!active) return;
-      // Clear stale state on token errors
-      if (event === "TOKEN_REFRESHED" && !session) {
+      if (event === "SIGNED_OUT" || !session?.user) {
         setHasSession(false);
         setIsReady(true);
         return;
       }
-      setHasSession(!!session?.user);
-      setIsReady(true);
+
+      void hasVerifiedSession().then((ok) => {
+        if (!active) return;
+        setHasSession(ok);
+        setIsReady(true);
+      });
     });
 
-    supabase.auth.getSession()
-      .then(({ data, error }) => {
+    hasVerifiedSession()
+      .then((ok) => {
         if (!active) return;
-        if (error) {
-          // Invalid refresh token → wipe and continue
-          supabase.auth.signOut().catch(() => {});
-          setHasSession(false);
-        } else {
-          setHasSession(!!data.session?.user);
-        }
+        setHasSession(ok);
         setIsReady(true);
       })
       .catch(() => {
