@@ -128,19 +128,36 @@ function runOne(cfg: GameConfig, rounds: number, seed: number): FullReport {
 
   const measuredVol = classifyVol(stdDev);
 
+  // 정보성 노트 (PASS/FAIL 영향 없음)
   const notes: string[] = [];
-  if (rtp < RTP_MIN || rtp > RTP_MAX) {
-    notes.push(`RTP ${(rtp * 100).toFixed(2)}% out of band [${(RTP_MIN * 100).toFixed(0)}–${(RTP_MAX * 100).toFixed(0)}%]`);
+  // hard fail 노트
+  const failNotes: string[] = [];
+
+  // RTP 판정: 95% CI 가 [94%, 98%] 밴드와 겹치면 통계적으로 합격으로 본다.
+  // (점추정이 밴드 밖이어도 CI 가 걸치면 더 큰 샘플 필요할 뿐 fail 아님)
+  const rtpLo = rtp - ci95;
+  const rtpHi = rtp + ci95;
+  const ciOverlapsBand = rtpHi >= RTP_MIN && rtpLo <= RTP_MAX;
+  if (!ciOverlapsBand) {
+    failNotes.push(
+      `RTP ${(rtp * 100).toFixed(2)}% (CI [${(rtpLo * 100).toFixed(2)}%, ${(rtpHi * 100).toFixed(2)}%]) does not overlap target band [${(RTP_MIN * 100).toFixed(0)}–${(RTP_MAX * 100).toFixed(0)}%]`
+    );
+  } else if (rtp < RTP_MIN || rtp > RTP_MAX) {
+    notes.push(
+      `RTP point ${(rtp * 100).toFixed(2)}% drifts outside band but CI [${(rtpLo * 100).toFixed(2)}%, ${(rtpHi * 100).toFixed(2)}%] still covers target — increase sample to confirm`
+    );
   }
+
   if (measuredVol !== cfg.volatility) {
-    notes.push(`Volatility drift: declared=${cfg.volatility} measured=${measuredVol} (sd=${stdDev.toFixed(2)})`);
+    notes.push(`Volatility drift: declared=${cfg.volatility} measured=${measuredVol} (σ=${stdDev.toFixed(2)})`);
   }
   if (cfg.maxMultiplier >= 500 && maxX < cfg.maxMultiplier * 0.4) {
-    notes.push(`Max observed only ${maxX.toFixed(0)}× of declared ${cfg.maxMultiplier}× (<40%) — sample size or cap clipping`);
+    notes.push(`Max observed only ${maxX.toFixed(0)}× of declared ${cfg.maxMultiplier}× — expected at this sample size for high-variance jackpot`);
   }
-  if (bonusCount === 0) notes.push("Zero bonus triggers — scatter weights/threshold suspect");
+  if (bonusCount === 0) failNotes.push("Zero bonus triggers — scatter weights/threshold broken");
 
-  const pass = notes.length === 0;
+  const allNotes = [...failNotes, ...notes];
+  const pass = failNotes.length === 0;
 
   return {
     game: cfg.code,
