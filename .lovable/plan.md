@@ -1,179 +1,111 @@
-# Phonara Slot MVP — "Olympus 1000 by Phonara"
+## 확인 결과
 
-Stake.com 스타일 체험판/실제 토글이 붙은 5릴 비디오 슬롯 1개를 자체 테마로 구현합니다. 그래픽은 AI 생성, 수학 모델은 자체 설계, RNG는 서버 검증.
+현재 상태는 사용자가 승인한 계획과 완전히 일치하지 않습니다.
 
-> **법적 안전 원칙**: Uppercut Gaming의 Zeus 1000을 픽셀 단위로 카피하지 않습니다. UI 레이아웃과 게임 흐름의 "느낌"만 차용하고, 모든 심볼/배경/사운드는 자체 제작합니다.
+### 확정된 오류 원인
+- `src/lib/slots-rpc.ts`
+  - `const rpc = supabase.rpc as any` 로 메서드를 떼어 호출하고 있어 `this` 바인딩이 깨집니다.
+  - 그 결과 보충/스핀 시 내부적으로 `Cannot read properties of undefined (reading 'rest')` 가 발생합니다.
+  - 즉, 보충 실패/스핀 실패는 백엔드 자체보다 클라이언트 호출 방식 버그입니다.
 
----
+### 계획 대비 실제 어긋난 점
+- 원 계획: PixiJS 기반 슬롯 엔진
+- 실제 구현: React state + interval 기반 간이 애니메이션
+- 원 계획: `SlotCanvas`, `SlotControls`, `SlotHeader`, `SlotFooter`, `SlotGameInfo`, `ModeToggle`, `WinOverlay`, `FreeSpinWheel`, `BuyBonusButton`, `useSlotGame`, `useFakePlayerCount`
+- 실제 구현: 대부분 단일 `OlympusSlot.tsx`에 뭉쳐 있음
+- 원 계획: Bonus Wheel 8세그먼트 UI 포함
+- 실제 구현: 휠 UI 없음
+- 원 계획: `/dashboard` 에 카지노 진입 카드 추가
+- 실제 구현: 라우트/메뉴는 생겼지만 대시보드 진입 카드는 없음
+- 원 계획: 모바일 60fps QA 반영
+- 실제 구현: 슬롯 페이지에서도 전역 오버레이/위젯이 그대로 마운트되어 초기 로드가 무거움
 
-## 1. 게임 사양 — "Olympus 1000 by Phonara"
+### 렉 원인
+- 슬롯 애니메이션이 80ms interval로 전체 그리드를 계속 리렌더함
+- 슬롯 페이지가 일반 `Layout`을 그대로 써서 카지노와 무관한 전역 위젯/오버레이/실시간 영역까지 함께 로드함
+- 브라우저 측정 기준:
+  - DOMContentLoaded 약 7.3s
+  - FCP 약 9.5s
+- 즉, 렉은 슬롯 자체만의 문제가 아니라 “슬롯 + 전체 레이아웃 과적재” 문제입니다.
 
-- **레이아웃**: **5릴 × 3행** (MVP) — `ROWS` 상수화로 Phase 1.5에서 5×4 즉시 전환
-- **20 고정 페이라인**
-- **심볼 9종** (모두 imagegen 자체 생성):
-  - Premium 4종: 황제(Phonara crown), 여신, 황금 반지, 헬멧
-  - Low 5종: A · K · Q · J · 10 (자체 폰트)
-  - Wild: "PHONARA W" 로고
-  - Scatter/Bonus: 신전 아이콘
-- **테마**: 그리스 신전 + 오로라 배경, 황금 기둥 프레임
-- **수학 모델**:
-  - RTP 96.0% (Cosmic Emperor NFT 보유 시 +0.5%)
-  - 변동성 Medium-High
-  - 최대 배수 1,000×
-  - **Bonus Wheel 8 세그먼트**: 2× / 3× / 5× / 10× / 20× / 50× / 100× / **1000×** (극소 확률, FOMO 코어)
-  - **Buy Bonus**: MVP는 ×100 고정. 버튼 라벨은 `Buy Bonus {multiplier}×` 동적 — Phase 1.5에서 80×/100×/150× 옵션 활성화 시 코드 수정 불필요
+### 메뉴 구조 확인
+- 기존 `Imperial Zeus`는 현재 코드 검색상 남아 있지 않습니다.
+- 별도 `슬롯` 메뉴와 하위 `슬롯 로비` / `Olympus 1000` 구조는 이미 들어가 있습니다.
 
----
+## 수정 계획
 
-## 2. 두 가지 모드 (Stake.com 방식)
+### 1) 슬롯 오류 즉시 복구
+- `src/lib/slots-rpc.ts`
+  - 분리된 `rpc` 참조 제거
+  - 모든 호출을 `supabase.rpc(...)` 직접 호출로 교체
+  - 응답 타입/에러 매핑 정리
+- `src/components/slots/OlympusSlot.tsx`
+  - 보충/스핀 실패 메시지 세분화
+  - `auth_required`, `game_not_found`, `bet_invalid` 등 누락 케이스 추가
 
-| 모드 | 베팅 통화 | 결과 저장 | 배지 |
-|------|----------|----------|------|
-| **체험판 플레이** | 가상 칩 (10,000 무료, 1일 1회 충전) | `slot_demo_balances` | 회색 "DEMO" |
-| **실제 플레이** | PHON 토큰 (`phon_balances`) | DB `slot_spins` 전수 감사 | 골드 "REAL" |
+### 2) 슬롯 페이지를 전용 경량 레이아웃으로 분리
+- 목표: 슬롯 페이지에서 불필요한 HUD, 오버레이, 실시간 위젯, 플로팅 요소를 제거
+- 변경 방향
+  - `Layout` 재사용을 줄이거나
+  - 슬롯 전용 `CasinoLayout` / `GameShell`을 만들어 `/casino`, `/casino/olympus-1000`에 적용
+- 효과
+  - 초기 로드 단축
+  - 슬롯 화면 집중도 상승
+  - unrelated RPC/렌더 비용 제거
 
-상단 우측 토글로 즉시 전환. 실제 모드에서 PHON 0이면 자동 잠금 + "충전" CTA.
+### 3) 슬롯 UI를 계획한 구조로 재정렬
+- `OlympusSlot.tsx`를 분해해 원 계획 구조에 가깝게 재구성
+  - `SlotHeader`
+  - `SlotControls`
+  - `ModeToggle`
+  - `WinOverlay`
+  - `BuyBonusButton`
+  - `SlotGameInfo`
+- MVP 범위만 유지
+  - Epic Win만 유지
+  - Buy Bonus는 100x만 노출하되 prop 구조는 다중 옵션 확장 가능하게 정리
 
----
+### 4) 렌더링 구조 최적화
+- 릴 애니메이션 중 전체 그리드 재생성 방식 제거
+- 최소 변경 원칙
+  - reel/row 셀을 memo 처리
+  - spinning 중에는 시각 효과만 움직이고 실제 결과 반영은 마지막 1회만 적용
+  - 불필요한 `reelKey` 전체 재마운트 축소
+- `prefers-reduced-motion` 반영
+- 과한 glow/overlay 연산 정리
 
-## 3. 화면 구성
+### 5) 계획 누락분 보완
+- `FreeSpinWheel` MVP UI 추가
+  - 8 세그먼트 표시
+  - 실제 당첨 multiplier와 연결
+- `useFakePlayerCount` 분리
+  - 현재 인라인 로직을 훅으로 이동
+- `/dashboard`에 카지노 진입 카드 추가
+  - `/casino`로 연결
+  - 현재 IA와 일관되게 배치
 
-```text
-┌─────────────────────────────────────────────────┐
-│ 시간 · Olympus 1000              PHONARA GAMING │
-├─────────────────────────────────────────────────┤
-│  ╔══════[황금 신전 프레임]══════╗                │
-│  ║                              ║                │
-│ LOGO  [ 5×3 릴 그리드 + 심볼 ]  ║   배경          │
-│  ║                              ║                │
-│  ╚══════════════════════════════╝                │
-├─────────────────────────────────────────────────┤
-│ [Buy     [ ⓘ 잔액      [베팅       [SPIN]       │
-│  Bonus    $1,866.50 ]   $5.00 ▲▼]   ⚡          │
-│  100×]                                           │
-├─────────────────────────────────────────────────┤
-│ ⛶ ▢ 📈 ↗     오직 Phonara에서   [체험판][실제]  │
-└─────────────────────────────────────────────────┘
-   Phonara Gaming · {N} 플레이 중       ♡ 팔로우
-   Olympus 1000 [VIP 2배]               🏆 1,000.00×
-```
+### 6) 계획과 실제 구현 차이 정리
+- 승인된 계획 기준으로 “완료 / 부분완료 / 미완료”를 코드 기준 체크리스트로 정리
+- 사용자가 다시 확인할 수 있게 결과를 명확히 보고
 
-- "플레이 중 N": MVP는 **200~300 랜덤 시드**(`useMemo` + 30s마다 ±2 드리프트). Phase 2에서 Realtime presence 채널로 교체.
+## 기술 상세
+- 수정 파일 후보
+  - `src/lib/slots-rpc.ts`
+  - `src/components/slots/OlympusSlot.tsx`
+  - `src/components/Layout.tsx` 또는 신규 `src/components/casino/CasinoLayout.tsx`
+  - `src/pages/Casino.tsx`
+  - `src/pages/casino/Olympus1000.tsx`
+  - `src/pages/Dashboard.tsx`
+  - 신규 보조 컴포넌트/훅 파일들
+- 백엔드 상태
+  - 슬롯 관련 RPC는 실제로 존재함
+  - 호스팅 백엔드는 정상 응답 상태
+  - 이번 핵심 오류는 프론트 호출 방식이 원인
 
----
-
-## 4. 기술 스택
-
-- **렌더링**: PixiJS v8 (Canvas + WebGL, 모바일 60fps)
-- **애니메이션**: `requestAnimationFrame` + `document.hidden` 가드, blur/backdrop-filter 절대 금지, idle 시 `ticker.stop()`
-- **사운드**: Howler.js (옵션, 기본 OFF)
-- **상태**: zustand (`useSlotGame`)
-- **라우트**: `/casino` (로비) + `/casino/olympus-1000`
-
----
-
-## 5. 백엔드 (Lovable Cloud)
-
-### 새 테이블
-- `slot_games` — 메타 (코드, 이름, RTP, 최대배수, 활성)
-- `slot_spins` — 실제 플레이 전수 감사 (user_id, game_code, bet_phon, payout_phon, symbols jsonb, mode, server_seed_hash, server_seed_revealed, client_seed, nonce, created_at)
-- `slot_demo_balances` — 데모 칩 잔액 + 마지막 충전 시각
-
-### 새 RPC (SECURITY DEFINER, internal `auth.uid()` 가드, permission baseline 등록)
-- `spin_slot_real(_game_code, _bet_phon, _client_seed)` — PHON 차감 → 서버 RNG → payout 지급 → 감사 기록 → seed reveal
-  - 가드: `is_account_frozen()`, kill switch `trading_halt`, 베팅 한도, Cosmic Emperor RTP +0.5%
-- `spin_slot_demo(_game_code, _bet_chips, _client_seed)` — 동일 RNG, 데모 칩만 차감, DB 미기록
-- `claim_demo_refill()` — 잔액 < 5,000이면 10,000 충전 (1일 1회)
-
-### Provably-Fair RNG
-- 서버 Mulberry32 + crypto-secure seed
-- 스핀 전 `server_seed_hash` 공개 → 스핀 후 `server_seed` reveal → 사용자 검증 가능
-
----
-
-## 6. UI 컴포넌트 (모두 신규)
-
-```
-src/pages/casino/
-  CasinoLobby.tsx          — 게임 목록 (현재 1개)
-  OlympusSlot.tsx          — 메인 게임 페이지
-src/components/casino/
-  SlotCanvas.tsx           — PixiJS 마운트 + ROWS 상수
-  SlotControls.tsx         — Buy Bonus / 잔액 / 베팅 / Spin
-  SlotHeader.tsx           — 시간 + 게임명 + 스튜디오
-  SlotFooter.tsx           — 줌·차트 아이콘 + 모드 토글
-  SlotGameInfo.tsx         — Phonara Gaming · 플레이중 · 팔로우
-  ModeToggle.tsx           — 체험판/실제
-  WinOverlay.tsx           — Epic Win만 (MVP), Big/Mega는 Phase 1.5
-  FreeSpinWheel.tsx        — 8 세그먼트 휠 (1000× 포함)
-  BuyBonusButton.tsx       — `Buy Bonus {multiplier}×` 동적 라벨
-src/lib/slot/
-  reels.ts                 — 릴 strip + ROWS 상수
-  paytable.ts              — 페이라인 + 배당표
-  rng.ts                   — 서버 시드 검증
-src/hooks/
-  useSlotGame.ts           — zustand
-  useFakePlayerCount.ts    — 200~300 드리프트 (Phase 2에서 realtime 교체)
-```
-
----
-
-## 7. 자산 생성 (imagegen)
-
-**1단계 (MVP)**: 12장 모두 **standard** 생성
-- 배경 1: "그리스 신전 + 워터폴 + 오로라, 시네마틱, 가로"
-- 황금 프레임 1: 투명 PNG, 페디먼트 + 양 기둥
-- 심볼 9: 정사각 256×256, 통일된 광택
-- 로고 1: **"OLYMPUS 1000 by Phonara"** 황금 엠블럼
-
-**2단계 (QA 후)**: 마음에 안 드는 3~4개만 **premium** 재생성
-
----
-
-## 8. Empire / NFT 시너지 (MVP)
-
-- Cosmic Emperor NFT 보유 → 실제 모드 RTP +0.5% (`spin_slot_real`이 `get_my_total_boost_pct()` 참조)
-- Phase 1.5: Bonus 트리거 +X%, Buy Bonus 가격 -10% 등 강한 부스트로 확장
-
----
-
-## 9. 모바일 성능 가드
-
-- `backdrop-filter` 일체 금지
-- 무한 blur/glow 금지 — 정적 그라디언트만
-- PixiJS `resolution: Math.min(devicePixelRatio, 2)` 캡
-- 탭 비활성/모달 오픈 시 `ticker.stop()`
-- 릴 회전 중에만 rAF, idle 시 캔버스 freeze
-- 텍스처 스프라이트시트 1장으로 합쳐 드로우콜 최소화
-
----
-
-## 10. 진입 경로
-
-`/dashboard`에 **"카지노" 카드** 추가 → `/casino` 로비 → `Olympus 1000` 카드 → 게임 진입
-
----
-
-## 11. MVP에서 안 하는 것
-
-- ❌ Uppercut 에셋/사운드 직접 사용
-- ❌ 라이선스 받지 않은 슬롯 엔진
-- ❌ 5×4 업그레이드 (Phase 1.5)
-- ❌ Buy Bonus 다중 가격 노출 (Phase 1.5, UI prop은 준비)
-- ❌ Big Win / Mega Win 연출 (Phase 1.5, Epic Win만 MVP)
-- ❌ 실시간 플레이어 수 (Phase 2, MVP는 가짜 드리프트)
-- ❌ 2번째 게임 (Phase 2)
-- ❌ 실제 카지노 라이선스 (사업 결정)
-
----
-
-## 12. 작업 순서
-
-1. DB 마이그레이션 (3 테이블 + 3 RPC + RLS + permission baseline 등록)
-2. PixiJS / Howler 설치
-3. imagegen 12개 자산 생성 (standard, ~3분)
-4. SlotCanvas 엔진 + 컨트롤 UI
-5. Practice/Real 토글 + Buy Bonus + Free Spin Wheel + Epic Win 오버레이
-6. `/casino` + `/casino/olympus-1000` 라우트 + Dashboard 카드
-7. 모바일 60fps QA (릴 / Epic Win / 모드 전환 / 휠)
-8. QA 후 자산 3~4개 premium 재생성
+## 완료 기준
+- DEMO 보충 정상 동작
+- DEMO 스핀 정상 동작
+- REAL 스핀 호출 오류 제거
+- 슬롯 진입 시 초기 로드/프레임 저하 눈에 띄게 감소
+- 승인된 MVP 계획과 실제 구조 차이를 최소화
+- 대시보드 → 카지노 → Olympus 1000 진입 동선 완성

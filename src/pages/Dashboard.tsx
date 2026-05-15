@@ -138,6 +138,28 @@ export default function Dashboard() {
         {/* ⚡ 핵심 베팅 진입 카드 */}
         <TradingEntryCard />
 
+        {/* 🎰 카지노 진입 — Olympus 1000 by Phonara */}
+        <a
+          href="/casino"
+          className="block rounded-2xl border-2 border-primary/40 hover:border-primary glow-imperial transition press p-4 bg-gradient-to-br from-amber-950/30 via-background to-stone-950/40 relative overflow-hidden"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-[10px] tracking-[0.3em] text-primary/80 font-bold">PHONARA SLOTS</div>
+              <div className="font-imperial text-lg text-gradient-imperial tracking-[0.18em] mt-1">
+                Olympus 1000
+              </div>
+              <div className="text-[11px] text-muted-foreground mt-1">
+                자체 슬롯 엔진 · DEMO 무료 · REAL은 PHON · RTP 96.0%
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] text-muted-foreground tracking-wider">MAX</div>
+              <div className="font-mono text-xl font-black text-primary">1000×</div>
+            </div>
+          </div>
+        </a>
+
         {/* 📊 KPI 4개 */}
         <KpiGridV3 nfts={nfts} online={online} />
 

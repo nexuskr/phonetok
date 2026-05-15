@@ -17,18 +17,18 @@ export type SpinResult = {
   rtp_boost_pct?: number;
 };
 
-const rpc = supabase.rpc as any;
-
 function genClientSeed() {
   return crypto.getRandomValues(new Uint32Array(2)).join("-");
 }
 
+// IMPORTANT: never destructure / detach `supabase.rpc` — `this` binding breaks
+// inside the postgrest client and triggers `Cannot read properties of undefined (reading 'rest')`.
 export async function spinReal(
   gameCode: string,
   betPhon: number,
   isBuyBonus = false
 ): Promise<SpinResult> {
-  const { data, error } = await rpc("spin_slot_real", {
+  const { data, error } = await supabase.rpc("spin_slot_real" as any, {
     _game_code: gameCode,
     _bet_phon: betPhon,
     _client_seed: genClientSeed(),
@@ -43,7 +43,7 @@ export async function spinDemo(
   betChips: number,
   isBuyBonus = false
 ): Promise<SpinResult> {
-  const { data, error } = await rpc("spin_slot_demo", {
+  const { data, error } = await supabase.rpc("spin_slot_demo" as any, {
     _game_code: gameCode,
     _bet_chips: betChips,
     _client_seed: genClientSeed(),
@@ -54,15 +54,16 @@ export async function spinDemo(
 }
 
 export async function getDemoBalance(): Promise<number> {
-  const { data } = await (supabase as any)
+  const { data, error } = await (supabase as any)
     .from("slot_demo_balances")
     .select("balance_chips")
     .maybeSingle();
+  if (error) return 10000;
   return data?.balance_chips ?? 10000;
 }
 
 export async function claimDemoRefill() {
-  const { data, error } = await rpc("claim_demo_refill");
+  const { data, error } = await supabase.rpc("claim_demo_refill" as any);
   if (error) throw error;
   return data as { refilled: boolean; balance_chips: number; reason?: string };
 }
