@@ -8530,6 +8530,18 @@ export type Database = {
         }
         Returns: string
       }
+      admin_cron_status: {
+        Args: never
+        Returns: {
+          active: boolean
+          jobid: number
+          jobname: string
+          last_duration_ms: number
+          last_run_at: string
+          last_status: string
+          schedule: string
+        }[]
+      }
       admin_dismiss_inbound_hit: { Args: { _id: string }; Returns: undefined }
       admin_end_founding_season: { Args: { _id: string }; Returns: Json }
       admin_exec_readonly_sql: { Args: { _sql: string }; Returns: Json }
