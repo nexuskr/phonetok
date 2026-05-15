@@ -62,10 +62,11 @@ export default function SpinHistorySheet({ gameCode }: { gameCode: string }) {
       server_seed_hash: row.server_seed_hash,
       server_seed_revealed: row.server_seed_revealed,
     });
-    setVerdicts((m) => ({ ...m, [row.id]: v.ok ? "ok" : "bad" }));
     if (v.ok) {
+      setVerdicts((m) => ({ ...m, [row.id]: "ok" }));
       notify.success("Provably Fair 검증 통과", { description: "서버 시드 해시 = 공개 시드의 SHA-256" });
     } else {
+      setVerdicts((m) => ({ ...m, [row.id]: "bad" }));
       notify.error("검증 실패", { description: v.reason });
     }
   };
