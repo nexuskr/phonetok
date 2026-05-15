@@ -32,7 +32,7 @@ export const GAMES: GameConfig[] = [
     maxMultiplier: 5000,
     reels: 5, rows: 3,
     symbolWeights: W_HIGH,
-    paytable: pt(0.69, 1.72, 3.45, 6.90),
+    paytable: pt(0.665, 1.66, 3.32, 6.65),
     scatterTrigger: 3,
     bonus: {
       kind: "sticky_multi",
@@ -56,9 +56,9 @@ export const GAMES: GameConfig[] = [
       kind: "hold88",
       spins: 3,
       respinReset: 3,
-      coinChance: 0.063,
+      coinChance: 0.067,
       coinWeights: [
-        [2, 54], [4, 28], [8, 12.5], [15, 4.8], [40, 1.5], [88, 0.55], ["GRAND", 0.035],
+        [2, 53], [4, 28], [8, 12.5], [15, 4.9], [40, 1.55], [88, 0.6], ["GRAND", 0.045],
       ],
       grandValue: 8888,
       cells: 15,
@@ -134,7 +134,7 @@ export const GAMES: GameConfig[] = [
       kind: "cluster_tumble",
       spins: 8,
       cellMultLadder: [2, 3, 5, 8, 16, 32],
-      tumbleClearMult: 0.74,
+      tumbleClearMult: 0.78,
     },
   },
   {
