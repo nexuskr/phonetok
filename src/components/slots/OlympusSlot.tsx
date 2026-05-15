@@ -17,6 +17,7 @@ import BonusRouter, { type BonusKind } from "./overlays/BonusRouter";
 import AutoSpinControls, { type AutoSpinSettings } from "./AutoSpinControls";
 import GameInfoSheet from "./GameInfoSheet";
 import SpinHistorySheet from "./SpinHistorySheet";
+import SlotLeaderboard from "./SlotLeaderboard";
 import { useCurrencyPref } from "@/hooks/use-currency-pref";
 import { formatFromPhon } from "@/lib/displayCurrency";
 import { getSymbolImages, type SymbolPack } from "./symbolMap";
@@ -610,6 +611,9 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
             </div>
           )}
         </div>
+
+        {/* Leaderboard — 24h/7d, 누적/최고/순이익 */}
+        <SlotLeaderboard gameCode={GAME_CODE} />
       </div>
     </div>
   );
