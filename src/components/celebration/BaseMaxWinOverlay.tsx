@@ -156,6 +156,22 @@ export default function BaseMaxWinOverlay({
       }
     }
 
+    // Phase 3 — Empire/Crown 연동: legendary trigger 1회 호출 (idempotent).
+    // sound 호출 직후, confetti 와 병행하여 비동기 RPC 발사.
+    if (onMaxWinTriggered && slotId) {
+      try {
+        onMaxWinTriggered({
+          multiplier: data.multiplier,
+          totalWin: data.totalWin,
+          slotId,
+          themeKey: themeKey ?? data.themeKey,
+          startedAt: data.startedAt,
+        });
+      } catch {
+        /* */
+      }
+    }
+
     if (!reduced) {
       const isMobile =
         typeof window !== "undefined" &&
