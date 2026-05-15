@@ -73,6 +73,8 @@ export default function GhostPulseGlobe() {
 
     function draw(t: number) {
       if (!canvas || !ctx) return;
+      // Pause entirely when tab is hidden.
+      if (document.hidden) { raf = 0; return; }
       // Throttle to 30fps
       if (t - last < 33) {
         raf = requestAnimationFrame(draw);
@@ -147,10 +149,15 @@ export default function GhostPulseGlobe() {
       raf = requestAnimationFrame(draw);
     }
 
+    const onVis = () => {
+      if (!document.hidden && !raf) { last = 0; raf = requestAnimationFrame(draw); }
+    };
+    document.addEventListener("visibilitychange", onVis);
     raf = requestAnimationFrame(draw);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", onVis);
     };
   }, []);
 
