@@ -1,5 +1,6 @@
 import { Trophy } from "lucide-react";
 import type { Top5Item } from "@/hooks/use-auth-live-data";
+import { flagSvgUrl } from "@/lib/countryFlag";
 
 interface Props { rows: Top5Item[] }
 
@@ -14,14 +15,21 @@ export default function AuthTop5Card({ rows }: Props) {
         <span className="text-[9px] tracking-widest text-muted-foreground">실시간</span>
       </div>
       <ul className="divide-y divide-border/30">
-        {rows.map((r) => (
-          <li key={r.rank} className="flex items-center gap-2 py-2 text-[12px] sm:text-sm">
-            <span className="w-4 text-center font-imperial text-gold">{r.rank}</span>
-            <span className="text-base leading-none">{r.flag}</span>
-            <span className="flex-1 min-w-0 truncate font-bold text-foreground/90">{r.nick}</span>
-            <span className="tabular-nums text-foreground/75">{r.score.toLocaleString()} <span className="text-[10px] text-muted-foreground">Crown</span></span>
-          </li>
-        ))}
+        {rows.map((r) => {
+          const url = flagSvgUrl(r.cc, 40);
+          return (
+            <li key={r.rank} className="flex items-center gap-2 py-2 text-[12px] sm:text-sm">
+              <span className="w-4 text-center font-imperial text-gold">{r.rank}</span>
+              {url ? (
+                <img src={url} width={18} height={12} loading="lazy" decoding="async" alt="" className="rounded-[2px] shadow-[0_0_0_1px_hsl(var(--gold)/0.25)]" />
+              ) : (
+                <span className="text-base leading-none">{r.flag}</span>
+              )}
+              <span className="flex-1 min-w-0 truncate font-bold text-foreground/90">{r.nick}</span>
+              <span className="tabular-nums text-foreground/75">{r.score.toLocaleString()} <span className="text-[10px] text-muted-foreground">Crown</span></span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
