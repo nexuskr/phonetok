@@ -55,6 +55,8 @@ export function usePositionWatcher({ enabled, userId, crossWarnRatio = 0.01 }: A
     let last = 0;
 
     const tick = async (ts: number) => {
+      // Pause when tab hidden — server-side SL/TP/liq still enforce.
+      if (typeof document !== "undefined" && document.hidden) { raf = 0; return; }
       raf = requestAnimationFrame(tick);
       if (ts - last < TICK_MS) return;
       last = ts;
@@ -108,9 +110,14 @@ export function usePositionWatcher({ enabled, userId, crossWarnRatio = 0.01 }: A
       }
     };
 
+    const onVis = () => {
+      if (!document.hidden && !raf) { last = 0; raf = requestAnimationFrame(tick); }
+    };
+    document.addEventListener("visibilitychange", onVis);
     raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
+      document.removeEventListener("visibilitychange", onVis);
       closingRef.current.clear();
     };
   }, [enabled, userId, close, crossWarnRatio]);
