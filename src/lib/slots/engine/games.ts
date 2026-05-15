@@ -109,14 +109,14 @@ export const GAMES: GameConfig[] = [
     maxMultiplier: 4000,
     reels: 5, rows: 3,
     symbolWeights: W_HIGH,
-    paytable: pt(0.7, 1.7, 3.5, 7.0),
+    paytable: pt(0.85, 2.0, 4.2, 8.5),
     scatterTrigger: 3,
     bonus: {
       kind: "three_path",
       paths: [
-        { name: "Asgard", spins: 8, startMult: 8, wildBoostX: 2.0 },
-        { name: "Midgard", spins: 12, startMult: 3, wildBoostX: 1.2 },
-        { name: "Helheim", spins: 18, startMult: 1, wildBoostX: 0.6, xbombChance: 0.10 },
+        { name: "Asgard", spins: 8, startMult: 10, wildBoostX: 2.5 },
+        { name: "Midgard", spins: 12, startMult: 4, wildBoostX: 1.5 },
+        { name: "Helheim", spins: 18, startMult: 1, wildBoostX: 0.8, xbombChance: 0.12 },
       ],
     },
   },
