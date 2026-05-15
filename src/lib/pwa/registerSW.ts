@@ -57,10 +57,9 @@ export function registerSW() {
       });
   };
 
-  // @ts-expect-error requestIdleCallback non-standard
-  if (typeof window.requestIdleCallback === "function") {
-    // @ts-expect-error
-    window.requestIdleCallback(run, { timeout: 4000 });
+  const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback;
+  if (typeof ric === "function") {
+    ric(run, { timeout: 4000 });
   } else {
     setTimeout(run, 2500);
   }

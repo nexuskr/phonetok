@@ -18,8 +18,10 @@ import { ReviewerMaskRoot } from "./components/ReviewerMaskRoot";
 import ReviewerBadge from "./components/ReviewerBadge";
 import { AdultGate } from "./components/AdultGate";
 import MaintenanceGate from "./components/MaintenanceGate";
+import { registerSW } from "./lib/pwa/registerSW";
 
 installGlobalErrorLogging();
+registerSW();
 // Heavy instrumentation only when explicitly enabled — avoids per-fetch wrapping cost on every visit.
 const __dev = (import.meta as any).env?.DEV;
 const __debugPerf =

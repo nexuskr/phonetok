@@ -2,7 +2,7 @@
   "name": "Phonara — 임페리얼 엠파이어",
   "short_name": "Phonara",
   "description": "Phonara — 임페리얼 골드 엠파이어. 폰 하나로 시작하는 글로벌 수익 플랫폼.",
-  "start_url": "/dashboard",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
