@@ -145,7 +145,7 @@ export const GAMES: GameConfig[] = [
     maxMultiplier: 500,
     reels: 5, rows: 3,
     symbolWeights: W_LOW,
-    paytable: pt(0.7, 2.0, 4.2, 8.5),
+    paytable: pt(0.74, 2.1, 4.4, 8.8),
     scatterTrigger: 3,
     bonus: {
       kind: "mission_trail",
