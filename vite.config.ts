@@ -39,8 +39,28 @@ export default defineConfig(({ mode }) => ({
           if (id.includes("/src/locales/en")) return "locale-en";
           if (id.includes("/src/locales/ja")) return "locale-ja";
           if (id.includes("/src/locales/vi")) return "locale-vi";
+
+          // Phase 4 — Signature Slot 코드 분리
+          // 슬롯별 전용 Canvas/Overlay는 슬롯 페이지 청크에 자연스럽게 포함됨.
+          // 공통 엔진(SlotSignatureWrapper, OlympusSlot core, Base overlay, useAnimatedCanvas)은
+          // 7개 슬롯이 공유하므로 별도 청크로 분리.
+          if (
+            id.includes("/src/components/slots/SlotSignatureWrapper") ||
+            id.includes("/src/components/slots/OlympusSlot") ||
+            id.includes("/src/components/celebration/BaseMaxWinOverlay") ||
+            id.includes("/src/hooks/useAnimatedCanvas") ||
+            id.includes("/src/hooks/useSlotSound") ||
+            id.includes("/src/hooks/useEmpireCrown") ||
+            id.includes("/src/lib/empireConfig")
+          ) return "signature-engine";
+
+          // 사운드 매니저(소스) — 7개 슬롯이 공유
+          if (id.includes("/src/lib/sounds/") || id.includes("/src/lib/sound/")) return "audio";
+
           if (!id.includes("node_modules")) return;
-          // Three.js / R3F 제거 — chunk hint 더 이상 필요 없음.
+
+          // howler — audio 청크에 함께 포함
+          if (id.includes("howler")) return "audio";
           if (id.includes("@supabase")) return "supabase";
           if (id.includes("recharts") || id.includes("d3-")) return "charts";
           if (id.includes("lightweight-charts")) return "lwcharts";
