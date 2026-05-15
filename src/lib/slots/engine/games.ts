@@ -32,7 +32,7 @@ export const GAMES: GameConfig[] = [
     maxMultiplier: 5000,
     reels: 5, rows: 3,
     symbolWeights: W_HIGH,
-    paytable: pt(0.70, 1.74, 3.48, 6.96),
+    paytable: pt(0.65, 1.62, 3.24, 6.47),
     scatterTrigger: 3,
     bonus: {
       kind: "sticky_multi",
