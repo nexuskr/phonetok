@@ -47,10 +47,10 @@ export type WinTier = "big" | "mega" | "epic" | "legendary";
 
 /** 베팅 대비 멀티플라이어 컷오프 (포함 이상). */
 export const WIN_TIER_THRESHOLDS: Record<WinTier, number> = {
-  big: 10,
-  mega: 50,
-  epic: 200,
-  legendary: 500,
+  big: 50,
+  mega: 150,
+  epic: 500,
+  legendary: 1500,
 };
 
 export function classifyWinTier(multiplier: number): WinTier | null {
@@ -60,3 +60,17 @@ export function classifyWinTier(multiplier: number): WinTier | null {
   if (multiplier >= WIN_TIER_THRESHOLDS.big) return "big";
   return null;
 }
+
+export const TIER_DURATION_MS: Record<WinTier, number> = {
+  big: 2500,
+  mega: 3500,
+  epic: 4000,
+  legendary: 4500,
+};
+
+export const TIER_LABEL: Record<WinTier, string> = {
+  big: "BIG WIN",
+  mega: "MEGA WIN",
+  epic: "EPIC WIN",
+  legendary: "LEGENDARY WIN",
+};
