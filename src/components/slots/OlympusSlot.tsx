@@ -491,6 +491,9 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
           </div>
         </div>
 
+        {/* Progressive Jackpot meter — public, realtime, count-up animated */}
+        <JackpotMeter gameCode={GAME_CODE} />
+
         {/* Reels */}
         <div className="relative">
           <div className={`relative overflow-hidden ${reelFrameClass}`}>
