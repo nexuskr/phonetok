@@ -1,7 +1,28 @@
 // PharaohMaxWinOverlay — Golden ankh spin + hieroglyph storm + sarcophagus open + emerald particle rain on BaseMaxWinOverlay.
 import { motion } from "framer-motion";
-import { Ankh } from "lucide-react";
 import BaseMaxWinOverlay from "@/components/celebration/BaseMaxWinOverlay";
+
+/** Inline Ankh SVG — lucide-react에 없는 고대 이집트 심볼 */
+function AnkhIcon({ className = "", style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      style={style}
+      aria-hidden
+    >
+      <path d="M12 2v20" />
+      <path d="M12 6c2.5 0 4.5-1.5 4.5-3.5S14.5 0 12 0 7.5 1.5 7.5 3.5 9.5 6 12 6z" />
+      <path d="M8 10c-3 2-5 5-5 9h18c0-4-2-7-5-9" />
+    </svg>
+  );
+}
+
 
 const STORM_GLYPHS = ["𓂀", "𓃭", "𓆣", "𓇳", "𓈖", "𓋹", "𓌂", "𓊝"];
 
