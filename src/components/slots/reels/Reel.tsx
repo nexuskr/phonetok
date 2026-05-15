@@ -2,7 +2,7 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { SYMBOL_IMAGES, PREMIUM_INDICES } from "../symbolMap";
 
 const CELL = 72; // px — actual rendered cell height (responsive via container)
-const BUFFER = 18; // extra random symbols above the final 3
+const BUFFER = 8; // extra random symbols above the final 3 (mobile perf: was 18)
 
 /**
  * Single reel column. Sequentially decelerates to target 3 symbols.
