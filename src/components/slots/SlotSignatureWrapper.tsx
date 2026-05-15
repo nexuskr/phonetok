@@ -13,6 +13,8 @@ import Disclaimer from "@/components/Disclaimer";
 import DevWinCheats from "@/components/slots/DevWinCheats";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useSlotSound } from "@/hooks/useSlotSound";
+import { useEmpireCrown } from "@/hooks/useEmpireCrown";
+import type { MaxWinTriggeredPayload } from "@/components/celebration/BaseMaxWinOverlay";
 import type { SlotTheme } from "@/components/slots/OlympusSlot";
 
 export interface SlotSignatureWrapperProps {
@@ -24,7 +26,12 @@ export interface SlotSignatureWrapperProps {
   /** 헤더 우측에 마운트되는 Paytable 트리거 컴포넌트(자체 버튼 포함). */
   PaytableSheet?: ComponentType;
   /** maxMultiplier 도달 시 발동하는 풀스크린 cinematic. */
-  MaxWinOverlay?: ComponentType<{ triggerAt: number }>;
+  MaxWinOverlay?: ComponentType<{
+    triggerAt: number;
+    onMaxWinTriggered?: (payload: MaxWinTriggeredPayload) => void;
+    slotId?: string;
+    themeKey?: string;
+  }>;
   /** 좌우 edge flare 색상 (hex/rgba). 기본은 보라/시안. */
   flareColors?: { left: string; right: string };
   /** 헤더 좌측 라벨. ex) "Cosmic Forge · Signature". */
@@ -58,6 +65,7 @@ export default function SlotSignatureWrapper({
 }: SlotSignatureWrapperProps) {
   const user = useRequireAuth();
   useSlotSound(slotId);
+  const { handleMaxWinTriggered } = useEmpireCrown(slotId);
 
   // 위임형 햅틱 — Spin/Bet 영역 버튼 누름에만 navigator.vibrate(8).
   // 메모리 누수 0 — root 단일 listener.
@@ -156,7 +164,14 @@ export default function SlotSignatureWrapper({
         </div>
 
         {/* MAX WIN cinematic */}
-        {MaxWinOverlay && <MaxWinOverlay triggerAt={triggerAt} />}
+        {MaxWinOverlay && (
+          <MaxWinOverlay
+            triggerAt={triggerAt}
+            slotId={slotId}
+            themeKey={themeKey ?? theme.symbolPack}
+            onMaxWinTriggered={handleMaxWinTriggered}
+          />
+        )}
 
         {/* DEV cheats — production 자동 제거 */}
         <DevWinCheats

@@ -1,17 +1,23 @@
 // CosmicMaxWinOverlay — Cosmic Emperor cinematic on BaseMaxWinOverlay.
 import { Crown } from "lucide-react";
-import BaseMaxWinOverlay from "@/components/celebration/BaseMaxWinOverlay";
+import BaseMaxWinOverlay, { type MaxWinTriggeredPayload } from "@/components/celebration/BaseMaxWinOverlay";
 
 interface Props {
   triggerAt?: number;
   durationMs?: number;
+  onMaxWinTriggered?: (payload: MaxWinTriggeredPayload) => void;
+  slotId?: string;
+  themeKey?: string;
 }
 
-export default function CosmicMaxWinOverlay({ triggerAt = 5000, durationMs = 3000 }: Props) {
+export default function CosmicMaxWinOverlay({ triggerAt = 5000, durationMs = 3000, onMaxWinTriggered, slotId, themeKey }: Props) {
   return (
     <BaseMaxWinOverlay
       triggerAt={triggerAt}
       durationMs={durationMs}
+      onMaxWinTriggered={onMaxWinTriggered}
+      slotId={slotId}
+      themeKey={themeKey}
       ariaLabel="Cosmic Max Win"
       soundKeys={{ primary: "legendary_win", voice: "emperor_voice" }}
       titleText="COSMIC EMPEROR"

@@ -1,6 +1,6 @@
 // PharaohMaxWinOverlay — Golden ankh spin + hieroglyph storm + sarcophagus open + emerald particle rain on BaseMaxWinOverlay.
 import { motion } from "framer-motion";
-import BaseMaxWinOverlay from "@/components/celebration/BaseMaxWinOverlay";
+import BaseMaxWinOverlay, { type MaxWinTriggeredPayload } from "@/components/celebration/BaseMaxWinOverlay";
 
 /** Inline Ankh SVG — lucide-react에 없는 고대 이집트 심볼 */
 function AnkhIcon({ className = "", style }: { className?: string; style?: React.CSSProperties }) {
@@ -127,13 +127,19 @@ function PharaohCinematic() {
 interface Props {
   triggerAt?: number;
   durationMs?: number;
+  onMaxWinTriggered?: (payload: MaxWinTriggeredPayload) => void;
+  slotId?: string;
+  themeKey?: string;
 }
 
-export default function PharaohMaxWinOverlay({ triggerAt = 2500, durationMs = 3400 }: Props) {
+export default function PharaohMaxWinOverlay({ triggerAt = 2500, durationMs = 3400, onMaxWinTriggered, slotId, themeKey }: Props) {
   return (
     <BaseMaxWinOverlay
       triggerAt={triggerAt}
       durationMs={durationMs}
+      onMaxWinTriggered={onMaxWinTriggered}
+      slotId={slotId}
+      themeKey={themeKey}
       ariaLabel="Pharaoh's Vault Max Win"
       soundKeys={{ primary: "legendary_win", voice: "pharaoh_voice" }}
       titleText="PHARAOH'S VAULT"

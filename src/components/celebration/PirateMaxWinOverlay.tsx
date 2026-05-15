@@ -1,7 +1,7 @@
 // PirateMaxWinOverlay — Cannon flash + Skull/Coin storm + Treasure eruption on BaseMaxWinOverlay.
 import { motion } from "framer-motion";
 import { Skull } from "lucide-react";
-import BaseMaxWinOverlay from "@/components/celebration/BaseMaxWinOverlay";
+import BaseMaxWinOverlay, { type MaxWinTriggeredPayload } from "@/components/celebration/BaseMaxWinOverlay";
 
 const STORM_GLYPHS = ["💀", "🪙", "💀", "⚔️", "🪙", "💎"];
 
@@ -73,13 +73,19 @@ function PirateCinematic() {
 interface Props {
   triggerAt?: number;
   durationMs?: number;
+  onMaxWinTriggered?: (payload: MaxWinTriggeredPayload) => void;
+  slotId?: string;
+  themeKey?: string;
 }
 
-export default function PirateMaxWinOverlay({ triggerAt = 1500, durationMs = 3300 }: Props) {
+export default function PirateMaxWinOverlay({ triggerAt = 1500, durationMs = 3300, onMaxWinTriggered, slotId, themeKey }: Props) {
   return (
     <BaseMaxWinOverlay
       triggerAt={triggerAt}
       durationMs={durationMs}
+      onMaxWinTriggered={onMaxWinTriggered}
+      slotId={slotId}
+      themeKey={themeKey}
       ariaLabel="Pirate's Curse Max Win"
       soundKeys={{ primary: "legendary_win", voice: "pirate_laugh" }}
       titleText="PIRATE'S CURSE"

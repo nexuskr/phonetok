@@ -1,7 +1,7 @@
 // WizardMaxWinOverlay — Pentagram sweep + rune storm on BaseMaxWinOverlay.
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
-import BaseMaxWinOverlay from "@/components/celebration/BaseMaxWinOverlay";
+import BaseMaxWinOverlay, { type MaxWinTriggeredPayload } from "@/components/celebration/BaseMaxWinOverlay";
 
 const RUNE_GLYPHS = ["ᚠ", "ᚢ", "ᚦ", "ᚨ", "ᚱ", "ᚲ", "ᚷ", "ᚹ", "ᚺ", "ᛁ"];
 
@@ -90,13 +90,19 @@ function PentagramRuneCinematic() {
 interface Props {
   triggerAt?: number;
   durationMs?: number;
+  onMaxWinTriggered?: (payload: MaxWinTriggeredPayload) => void;
+  slotId?: string;
+  themeKey?: string;
 }
 
-export default function WizardMaxWinOverlay({ triggerAt = 2000, durationMs = 3400 }: Props) {
+export default function WizardMaxWinOverlay({ triggerAt = 2000, durationMs = 3400, onMaxWinTriggered, slotId, themeKey }: Props) {
   return (
     <BaseMaxWinOverlay
       triggerAt={triggerAt}
       durationMs={durationMs}
+      onMaxWinTriggered={onMaxWinTriggered}
+      slotId={slotId}
+      themeKey={themeKey}
       ariaLabel="Wizard Max Win"
       soundKeys={{ primary: "legendary_win", voice: "wizard_decree" }}
       titleText="WIZARD'S DECREE"
