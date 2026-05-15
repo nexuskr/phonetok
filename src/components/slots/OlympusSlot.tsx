@@ -399,6 +399,13 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
                 </div>
               )}
             </div>
+            <button
+              onClick={() => { const v = !muted; setMuted(v); setSlotMuted(v); if (!v) unlockSlotAudio(); }}
+              aria-label={muted ? "사운드 켜기" : "사운드 끄기"}
+              className="p-2 rounded-lg border border-border/40 hover:bg-muted/40 transition text-muted-foreground"
+            >
+              {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            </button>
             <GameInfoSheet />
           </div>
         </div>
@@ -433,7 +440,7 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
 
         {/* Reels */}
         <div className="relative">
-          <div className="rounded-2xl border-2 border-primary/40 bg-gradient-to-b from-amber-950/40 to-stone-950/60 p-2 sm:p-3 shadow-[inset_0_0_40px_rgba(255,200,80,0.15)]">
+          <div className={reelFrameClass}>
             <div className="grid grid-cols-5 gap-1 sm:gap-1.5">
               {reelTargets.map((target, c) => (
                 <Reel
@@ -443,6 +450,9 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
                   delayMs={REEL_DELAYS[c]}
                   durationMs={REEL_DURATIONS[c]}
                   highlightWin={!spinning && !!lastResult?.win_lines?.length}
+                  images={symbolImages}
+                  cardFilter={cardFilter}
+                  spinStreakClass={theme.spinStreakClass}
                 />
               ))}
             </div>
