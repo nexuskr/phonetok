@@ -178,6 +178,13 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
     setShowBonusIntro(false);
     setBonusWheel(null);
 
+    // Sound: spin start + reel-stop staccato (best-effort, never blocks gameplay)
+    unlockSlotAudio();
+    playSlotCue(soundPack, "spin");
+    REEL_DELAYS.forEach((d, i) => {
+      setTimeout(() => playSlotCue(soundPack, "stop"), d + REEL_DURATIONS[i] - 60);
+    });
+
     // Immediate balance debit animation
     setBalancePulse("down");
     setDisplayBalance((b) => b - cost);
