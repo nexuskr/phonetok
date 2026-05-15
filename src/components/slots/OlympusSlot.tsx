@@ -385,6 +385,21 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
     autoActiveRef.current = autoActive;
   }, [autoActive]);
 
+  // Keyboard: Space / Enter triggers spin (when not typing in an input)
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== " " && e.key !== "Enter") return;
+      const tgt = e.target as HTMLElement | null;
+      const tag = tgt?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tgt?.isContentEditable) return;
+      if (spinning || autoActive) return;
+      e.preventDefault();
+      performSpin(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [spinning, autoActive, performSpin]);
+
   const startAuto = useCallback(() => {
     setAutoActive(true);
     setAutoRemaining(autoSettings.rounds);
@@ -612,9 +627,11 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
           <button
             onClick={() => performSpin(false)}
             disabled={spinning || autoActive}
-            className="h-12 sm:h-14 rounded-xl bg-gradient-imperial text-primary-foreground font-imperial tracking-[0.25em] text-sm font-black glow-imperial press flex items-center justify-center gap-2 disabled:opacity-50"
+            aria-label={spinning ? "스핀 진행 중" : `${bet} ${balanceLabel}로 스핀`}
+            aria-busy={spinning}
+            className="h-12 sm:h-14 rounded-xl bg-gradient-imperial text-primary-foreground font-imperial tracking-[0.25em] text-sm font-black glow-imperial press flex items-center justify-center gap-2 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
-            {spinning ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5" />}
+            {spinning ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden /> : <Play className="w-5 h-5" aria-hidden />}
             SPIN
           </button>
           <AutoSpinControls
@@ -628,9 +645,10 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
           <button
             onClick={() => performSpin(true)}
             disabled={spinning || autoActive}
-            className="h-12 sm:h-14 px-3 rounded-xl border-2 border-primary/60 text-primary font-bold text-xs flex items-center justify-center gap-1 hover:bg-primary/10 press disabled:opacity-50"
+            aria-label={`보너스 즉시 구매 — ${(bet * 100).toLocaleString()} ${balanceLabel}`}
+            className="h-12 sm:h-14 px-3 rounded-xl border-2 border-primary/60 text-primary font-bold text-xs flex items-center justify-center gap-1 hover:bg-primary/10 press disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
-            <Zap className="w-4 h-4" />
+            <Zap className="w-4 h-4" aria-hidden />
             BUY 100×
             <span className="text-[10px] opacity-70 ml-1">{(bet * 100).toLocaleString()}</span>
           </button>
