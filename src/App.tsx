@@ -53,6 +53,13 @@ const CasinoLobby = lazy(() => import("./pages/Casino.tsx"));
 const Olympus1000 = lazy(() => import("./pages/casino/Olympus1000.tsx"));
 const Wizard2000 = lazy(() => import("./pages/casino/Wizard2000.tsx"));
 const DragonEmpire = lazy(() => import("./pages/casino/DragonEmpire.tsx"));
+const CosmicForge5000 = lazy(() => import("./pages/casino/CosmicForge5000.tsx"));
+const NeonTokyo88 = lazy(() => import("./pages/casino/NeonTokyo88.tsx"));
+const PiratesCurse1500 = lazy(() => import("./pages/casino/PiratesCurse1500.tsx"));
+const PharaohsVault2500 = lazy(() => import("./pages/casino/PharaohsVault2500.tsx"));
+const VikingThunder4000 = lazy(() => import("./pages/casino/VikingThunder4000.tsx"));
+const AztecSun1200 = lazy(() => import("./pages/casino/AztecSun1200.tsx"));
+const CherrySakura500 = lazy(() => import("./pages/casino/CherrySakura500.tsx"));
 const Missions = lazy(() => import("./pages/Missions.tsx"));
 const Packages = lazy(() => import("./pages/Packages.tsx"));
 const Wallet = lazy(() => import("./pages/Wallet.tsx"));
@@ -228,6 +235,13 @@ const App = () => (
               <Route path="/casino/olympus-1000" element={<Olympus1000 />} />
               <Route path="/casino/wizard-2000" element={<Wizard2000 />} />
               <Route path="/casino/dragon-empire" element={<DragonEmpire />} />
+              <Route path="/casino/cosmic-forge-5000" element={<CosmicForge5000 />} />
+              <Route path="/casino/neon-tokyo-88" element={<NeonTokyo88 />} />
+              <Route path="/casino/pirates-curse-1500" element={<PiratesCurse1500 />} />
+              <Route path="/casino/pharaohs-vault-2500" element={<PharaohsVault2500 />} />
+              <Route path="/casino/viking-thunder-4000" element={<VikingThunder4000 />} />
+              <Route path="/casino/aztec-sun-1200" element={<AztecSun1200 />} />
+              <Route path="/casino/cherry-sakura-500" element={<CherrySakura500 />} />
               {/* /wallet 는 이미 존재 */}
 
               {/* 기존 라우트 — 그대로 작동 (HubTabs 통해 통합 UX) */}
