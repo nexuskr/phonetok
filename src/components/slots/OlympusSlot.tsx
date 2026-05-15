@@ -23,6 +23,7 @@ import { playSlotCue, unlockSlotAudio, isSlotMuted, setSlotMuted, type SoundPack
 import { SoundManager } from "@/lib/sound/SoundManager";
 import { GAME_TO_THEME } from "@/lib/sound/themes";
 import { logSlotAnomaly } from "@/lib/slots/anomaly";
+import { haptics } from "@/lib/haptics";
 
 import bgOlympus from "@/assets/slots/olympus/bg.jpg";
 import logoOlympus from "@/assets/slots/olympus/logo.png";
@@ -200,8 +201,13 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
     SoundManager.unlock();
     SoundManager.playReelSpin("normal");
     playSlotCue(soundPack, "spin");
+    haptics.spinStart();
     REEL_DELAYS.forEach((d, i) => {
-      setTimeout(() => { SoundManager.playReelStop(); playSlotCue(soundPack, "stop"); }, d + REEL_DURATIONS[i] - 60);
+      setTimeout(() => {
+        SoundManager.playReelStop();
+        playSlotCue(soundPack, "stop");
+        haptics.reelStop();
+      }, d + REEL_DURATIONS[i] - 60);
     });
 
     // Immediate balance debit animation
@@ -304,6 +310,7 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
         // Sound: tier-aware win cue (Howler asset → procedural fallback)
         SoundManager.playWinTier(payout, bet);
         playSlotCue(soundPack, mult >= 50 ? "bigwin" : "win");
+        if (mult >= 50) haptics.bigWin(); else haptics.win();
         if (tier) {
           setWinOverlay({ tier, amount: payout });
         } else {
@@ -539,7 +546,7 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
           {BET_OPTIONS.map((b) => (
             <button
               key={b}
-              onClick={() => setBet(b)}
+              onClick={() => { setBet(b); haptics.tick(); }}
               disabled={spinning || autoActive}
               className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition disabled:opacity-50 ${
                 bet === b
