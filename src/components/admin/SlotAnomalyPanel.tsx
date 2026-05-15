@@ -100,7 +100,7 @@ export default function SlotAnomalyPanel() {
           <div className="p-3"><LoadingList rows={4} /></div>
         ) : rows.length === 0 ? (
           <EmptyState
-            icon={AlertTriangle}
+            icon={<AlertTriangle className="w-5 h-5" />}
             title="이상 없음"
             description="최근 24시간 동안 적재된 슬롯 이상치가 없습니다."
           />
