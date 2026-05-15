@@ -6244,6 +6244,8 @@ export type Database = {
       slot_games: {
         Row: {
           active: boolean
+          bonus_frequency: number
+          bonus_table: Json | null
           buy_bonus_multiplier: number
           created_at: string
           game_code: string
@@ -6253,13 +6255,18 @@ export type Database = {
           min_bet_phon: number
           name: string
           paylines: number
+          paytable: Json | null
           reels: number
           rows: number
           rtp: number
           studio: string
+          symbol_weights: Json | null
+          volatility_class: string
         }
         Insert: {
           active?: boolean
+          bonus_frequency?: number
+          bonus_table?: Json | null
           buy_bonus_multiplier?: number
           created_at?: string
           game_code: string
@@ -6269,13 +6276,18 @@ export type Database = {
           min_bet_phon?: number
           name: string
           paylines?: number
+          paytable?: Json | null
           reels?: number
           rows?: number
           rtp?: number
           studio?: string
+          symbol_weights?: Json | null
+          volatility_class?: string
         }
         Update: {
           active?: boolean
+          bonus_frequency?: number
+          bonus_table?: Json | null
           buy_bonus_multiplier?: number
           created_at?: string
           game_code?: string
@@ -6285,10 +6297,13 @@ export type Database = {
           min_bet_phon?: number
           name?: string
           paylines?: number
+          paytable?: Json | null
           reels?: number
           rows?: number
           rtp?: number
           studio?: string
+          symbol_weights?: Json | null
+          volatility_class?: string
         }
         Relationships: []
       }
@@ -8427,16 +8442,31 @@ export type Database = {
       }
       _mask_nick: { Args: { _n: string }; Returns: string }
       _period_key: { Args: { _period: string }; Returns: string }
-      _slot_compute_spin: {
-        Args: {
-          _client_seed: string
-          _is_buy_bonus: boolean
-          _nonce: number
-          _rtp_boost_pct?: number
-          _server_seed: string
-        }
-        Returns: Json
-      }
+      _slot_compute_spin:
+        | {
+            Args: {
+              _client_seed: string
+              _is_buy_bonus: boolean
+              _nonce: number
+              _rtp_boost_pct?: number
+              _server_seed: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _bonus_table?: Json
+              _client_seed: string
+              _is_buy_bonus: boolean
+              _max_mult?: number
+              _nonce: number
+              _paytable?: Json
+              _rtp_boost_pct?: number
+              _server_seed: string
+              _symbol_weights?: Json
+            }
+            Returns: Json
+          }
       _slot_demo_classify: {
         Args: { _bet: number; _result: Json }
         Returns: string
