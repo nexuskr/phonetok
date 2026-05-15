@@ -1,18 +1,29 @@
 // localStorage volume persistence + cross-tab sync.
-// Single source of truth for master / sfx / bgm / muted.
+// Single source of truth for master / sfx / bgm / voice / muted / reducedMotionRespect.
 import { Howler } from "howler";
 import { SoundManager } from "@/lib/sound/SoundManager";
 
-const KEY = "phonara:sound_volume:v1";
+const KEY_V1 = "phonara:sound_volume:v1";
+const KEY = "phonara:audio:v2";
 
 export interface VolumeState {
   master: number; // 0..1
   sfx: number;    // 0..1
   bgm: number;    // 0..1
+  voice: number;  // 0..1
   muted: boolean;
+  /** prefers-reduced-motion 일 때 voice 채널을 자동 mute. */
+  reducedMotionRespect: boolean;
 }
 
-const DEFAULTS: VolumeState = { master: 0.8, sfx: 1.0, bgm: 0.6, muted: false };
+const DEFAULTS: VolumeState = {
+  master: 0.8,
+  sfx: 1.0,
+  bgm: 0.6,
+  voice: 0.95,
+  muted: false,
+  reducedMotionRespect: true,
+};
 
 const SSR = typeof window === "undefined";
 
@@ -22,14 +33,31 @@ function read(): VolumeState {
   if (SSR) return { ...DEFAULTS };
   try {
     const raw = window.localStorage.getItem(KEY);
-    if (!raw) return { ...DEFAULTS };
-    const p = JSON.parse(raw);
-    return {
-      master: typeof p.master === "number" ? clamp(p.master) : DEFAULTS.master,
-      sfx: typeof p.sfx === "number" ? clamp(p.sfx) : DEFAULTS.sfx,
-      bgm: typeof p.bgm === "number" ? clamp(p.bgm) : DEFAULTS.bgm,
-      muted: !!p.muted,
-    };
+    if (raw) {
+      const p = JSON.parse(raw);
+      return {
+        master: typeof p.master === "number" ? clamp(p.master) : DEFAULTS.master,
+        sfx: typeof p.sfx === "number" ? clamp(p.sfx) : DEFAULTS.sfx,
+        bgm: typeof p.bgm === "number" ? clamp(p.bgm) : DEFAULTS.bgm,
+        voice: typeof p.voice === "number" ? clamp(p.voice) : DEFAULTS.voice,
+        muted: !!p.muted,
+        reducedMotionRespect: p.reducedMotionRespect !== false,
+      };
+    }
+    // v1 마이그레이션
+    const legacy = window.localStorage.getItem(KEY_V1);
+    if (legacy) {
+      const p = JSON.parse(legacy);
+      return {
+        master: typeof p.master === "number" ? clamp(p.master) : DEFAULTS.master,
+        sfx: typeof p.sfx === "number" ? clamp(p.sfx) : DEFAULTS.sfx,
+        bgm: typeof p.bgm === "number" ? clamp(p.bgm) : DEFAULTS.bgm,
+        voice: DEFAULTS.voice,
+        muted: !!p.muted,
+        reducedMotionRespect: true,
+      };
+    }
+    return { ...DEFAULTS };
   } catch { return { ...DEFAULTS }; }
 }
 
@@ -44,14 +72,12 @@ function persist() {
 function applyToEngines() {
   if (SSR) return;
   try { Howler.volume(state.master); } catch { /* */ }
-  // 기존 SoundManager 채널 볼륨 동기화 (있으면 호출)
   try { SoundManager.setMasterVolume?.(state.master); } catch { /* */ }
   try { SoundManager.setChannelVolume?.("bgm", state.bgm); } catch { /* */ }
-  // SFX는 win/reel/scatter/stop 등 다수 채널에 적용
-  for (const ch of ["reel", "stop", "win", "bigwin", "scatter", "bonus_trigger", "bonus_loop", "mech", "vo"] as const) {
+  for (const ch of ["reel", "stop", "win", "bigwin", "scatter", "bonus_trigger", "bonus_loop", "mech"] as const) {
     try { SoundManager.setChannelVolume?.(ch, state.sfx); } catch { /* */ }
   }
-  // mute 동기화는 SoundManager.setMuted가 localStorage(phonara:slot_mute)도 함께 다룸
+  try { SoundManager.setChannelVolume?.("vo", state.voice); } catch { /* */ }
   try { SoundManager.setMuted(state.muted); } catch { /* */ }
 }
 
@@ -66,7 +92,12 @@ export const volumeStore = {
       master: patch.master !== undefined ? clamp(patch.master) : state.master,
       sfx: patch.sfx !== undefined ? clamp(patch.sfx) : state.sfx,
       bgm: patch.bgm !== undefined ? clamp(patch.bgm) : state.bgm,
+      voice: patch.voice !== undefined ? clamp(patch.voice) : state.voice,
       muted: patch.muted !== undefined ? !!patch.muted : state.muted,
+      reducedMotionRespect:
+        patch.reducedMotionRespect !== undefined
+          ? !!patch.reducedMotionRespect
+          : state.reducedMotionRespect,
     };
     persist();
     applyToEngines();
@@ -76,11 +107,9 @@ export const volumeStore = {
     listeners.add(fn);
     return () => { listeners.delete(fn); };
   },
-  /** 외부 페이지/엔진 초기화 시 1회 호출. */
   hydrate() { applyToEngines(); emit(); },
 };
 
-// 다른 탭에서 변경 시 동기화
 if (!SSR) {
   window.addEventListener("storage", (e) => {
     if (e.key !== KEY || !e.newValue) return;
@@ -90,12 +119,13 @@ if (!SSR) {
         master: clamp(p.master ?? DEFAULTS.master),
         sfx: clamp(p.sfx ?? DEFAULTS.sfx),
         bgm: clamp(p.bgm ?? DEFAULTS.bgm),
+        voice: clamp(p.voice ?? DEFAULTS.voice),
         muted: !!p.muted,
+        reducedMotionRespect: p.reducedMotionRespect !== false,
       };
       applyToEngines();
       emit();
     } catch { /* */ }
   });
-  // 초기 적용 (Howler ctx가 lazy라 안전)
   applyToEngines();
 }

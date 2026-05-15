@@ -1,12 +1,14 @@
 // Thin facade over the existing SoundManager (src/lib/sound/SoundManager.ts).
-// 요청된 API 표면 — getInstance / loadCommonSounds / loadSlotSounds / play /
-// playWinSound / BGM 제어 / 볼륨 제어 / mute — 를 제공하면서, 자산이 없으면
-// 자동으로 procedural fallback 으로 라우팅한다.
+// Surface: getInstance / loadCommonSounds / loadSlotSounds / play /
+// playWinSound / BGM 제어 / 볼륨 제어 / mute / duckBgm / restoreBgm /
+// setReducedMotionMute. Asset 미존재 시 procedural fallback 자동 라우팅.
 import { Howl } from "howler";
 import { SoundManager } from "@/lib/sound/SoundManager";
 import {
   SOUND_PATHS,
   SLOT_ID_TO_THEME,
+  SLOT_SOUND_MAP,
+  SLOT_ID_TO_SOUND_KEY,
   classifyWinTier,
   type WinTier,
 } from "./soundConfig";
@@ -19,7 +21,7 @@ const SSR = typeof window === "undefined";
 const WIN_TO_PROC: Record<WinTier, ProcCue> = {
   big: "win_big",
   mega: "win_mega",
-  epic: "win_huge", // procedural에는 epic 컷이 win_epic, 1단계 위가 mega → 의도적 매핑
+  epic: "win_huge",
   legendary: "win_epic",
 };
 
@@ -35,7 +37,14 @@ const KEY_TO_PROC: Record<string, ProcCue | undefined> = {
   legendary_win: "win_epic",
 };
 
-type SlotEntry = { key: string; howl: Howl; loaded: boolean; failed: boolean };
+type Channel = "sfx" | "voice";
+type SlotEntry = {
+  key: string;
+  howl: Howl;
+  loaded: boolean;
+  failed: boolean;
+  channel: Channel;
+};
 
 class SlotSoundManagerImpl {
   private slotId = "";
@@ -45,16 +54,24 @@ class SlotSoundManagerImpl {
   private slotHowls = new Map<string, SlotEntry>();
   private bgmStarted = false;
 
-  /** 공통 SFX 로드 — 첫 슬롯 진입 시 1회. */
+  // Ducking 상태 — 다중 호출 시 baseline 보존
+  private duckActive = false;
+  private duckBaselineBgm = 0.6;
+  private duckTween: number | null = null;
+
+  // reduced-motion mute (voice 채널 한정)
+  private reducedMotionMute = false;
+
+  /** 공통 SFX 로드 — 앱 시작 시 1회. */
   loadCommonSounds() {
     if (SSR || this.commonLoaded) return;
     this.commonLoaded = true;
     for (const [key, path] of Object.entries(SOUND_PATHS.common)) {
-      this.registerHowl(this.commonHowls, key, path);
+      this.registerHowl(this.commonHowls, key, path, { channel: "sfx" });
     }
   }
 
-  /** 슬롯 진입 시 — 테마 매칭 + 슬롯 전용 자산 로드 + 기존 SoundManager 위임. */
+  /** 슬롯 진입 시 — 테마 매칭 + 슬롯 전용 SFX/voice 자산 lazy 로드. */
   async loadSlotSounds(slotId: string) {
     if (SSR) return;
     if (this.slotId === slotId) return;
@@ -63,22 +80,43 @@ class SlotSoundManagerImpl {
     const theme = SLOT_ID_TO_THEME[slotId] ?? null;
     this.themeKey = theme;
     if (theme) {
-      // 기존 엔진: Supabase RPC pack + procedural fallback 자동
       try { await SoundManager.loadPack(theme); } catch { /* */ }
     }
-    // 슬롯별 BGM (정적 자산 시도 — 실패 시 SoundManager가 procedural BGM으로 폴백)
+
+    // 슬롯 BGM (정적 자산 — 실패 시 SoundManager가 procedural BGM으로 폴백)
     const paths = SOUND_PATHS.slot(slotId);
-    this.registerHowl(this.slotHowls, "static_bgm", paths.bgm, { loop: true });
+    this.registerHowl(this.slotHowls, "static_bgm", paths.bgm, {
+      loop: true,
+      channel: "sfx",
+    });
+
+    // SLOT_SOUND_MAP — slotId alias 정규화 후 SFX/Voice 자동 register
+    const mapKey = SLOT_ID_TO_SOUND_KEY[slotId];
+    const entry = mapKey ? SLOT_SOUND_MAP[mapKey] : undefined;
+    if (entry) {
+      for (const sfx of entry.sfx) {
+        this.registerHowl(this.slotHowls, sfx, paths.sfx(sfx), { channel: "sfx" });
+      }
+      for (const v of entry.voice) {
+        this.registerHowl(this.slotHowls, v, paths.voice(v), { channel: "voice" });
+      }
+    }
   }
 
   private registerHowl(
     map: Map<string, SlotEntry>,
     key: string,
     src: string,
-    opts: { loop?: boolean } = {},
+    opts: { loop?: boolean; channel: Channel },
   ) {
     if (map.has(key)) return;
-    const entry: SlotEntry = { key, howl: null as unknown as Howl, loaded: false, failed: false };
+    const entry: SlotEntry = {
+      key,
+      howl: null as unknown as Howl,
+      loaded: false,
+      failed: false,
+      channel: opts.channel,
+    };
     const howl = new Howl({
       src: [src],
       loop: !!opts.loop,
@@ -93,40 +131,119 @@ class SlotSoundManagerImpl {
     map.set(key, entry);
   }
 
-  /** 단발 cue 재생. 자산 실패/미존재 → procedural 폴백. */
-  play(key: string, volumeMultiplier = 1.0) {
+  private resolveEntry(key: string) {
+    return this.slotHowls.get(key) ?? this.commonHowls.get(key);
+  }
+
+  /** 단발 cue 재생. opts.channel 명시 시 reduced-motion voice 가드 적용.
+   *  자산 실패/미존재 → procedural 폴백. */
+  play(key: string, volumeMultiplier = 1.0, opts?: { channel?: Channel }) {
     if (SSR) return;
     if (this.isMuted()) return;
-    const entry = this.slotHowls.get(key) ?? this.commonHowls.get(key);
+    const entry = this.resolveEntry(key);
+    const channel = opts?.channel ?? entry?.channel ?? "sfx";
+    if (channel === "voice" && this.shouldMuteVoice()) return;
+
     if (entry && entry.loaded && !entry.failed) {
       try {
-        const base = volumeStore.get().sfx * volumeStore.get().master;
+        const v = volumeStore.get();
+        const channelVol = channel === "voice" ? v.voice : v.sfx;
+        const base = channelVol * v.master;
         entry.howl.volume(Math.max(0, Math.min(1, base * volumeMultiplier)));
         entry.howl.play();
         return;
       } catch { /* fall through */ }
     }
-    // Procedural fallback
     const proc = KEY_TO_PROC[key];
     if (proc && this.themeKey) {
       playSlotCue(this.themeKey as ProcPack, proc);
     }
   }
 
-  /** Win-tier 자동 분기. */
-  playWinSound(tier: WinTier, multiplier = 1.0) {
-    const tierKey = ({ big: "big_win_trigger", mega: "mega_win", epic: "epic_win", legendary: "legendary_win" } as const)[tier];
-    const vol = tier === "legendary" ? 1.15 : 1.0;
-    this.play(tierKey, vol * multiplier);
+  private shouldMuteVoice() {
+    if (!this.reducedMotionMute) return false;
+    return volumeStore.get().reducedMotionRespect;
   }
 
-  /** 멀티플라이어 입력으로 자동 tier 분류 + 재생 (편의 메서드). */
+  /** Win-tier 자동 분기. legendary 는 BGM ducking 자동 트리거. */
+  playWinSound(tier: WinTier, multiplier = 1.0) {
+    const tierKey = ({
+      big: "big_win_trigger",
+      mega: "mega_win",
+      epic: "epic_win",
+      legendary: "legendary_win",
+    } as const)[tier];
+    const vol = tier === "legendary" ? 1.15 : 1.0;
+    this.play(tierKey, vol * multiplier);
+    if (tier === "legendary") {
+      this.duckBgm(-6, 400);
+      window.setTimeout(() => this.restoreBgm(400), 2400);
+    }
+  }
+
   playWinByMultiplier(multiplier: number) {
     const tier = classifyWinTier(multiplier);
     if (tier) this.playWinSound(tier, 1.0);
   }
 
-  // BGM은 기존 SoundManager에 위임 — 자산 없으면 procedural BGM 자동 시작.
+  // ===== BGM Ducking =====
+  /** targetDb (예: -6) 만큼 BGM 채널 볼륨을 부드럽게 낮춘다. */
+  duckBgm(targetDb = -6, rampMs = 400) {
+    if (SSR) return;
+    const baseline = this.duckActive ? this.duckBaselineBgm : volumeStore.get().bgm;
+    if (!this.duckActive) {
+      this.duckBaselineBgm = baseline;
+      this.duckActive = true;
+    }
+    const factor = Math.pow(10, targetDb / 20); // -6dB ≈ 0.501
+    const target = Math.max(0, Math.min(1, baseline * factor));
+    this.tweenBgm(target, rampMs);
+  }
+
+  /** 원래 BGM 볼륨으로 복귀. */
+  restoreBgm(rampMs = 400) {
+    if (SSR || !this.duckActive) return;
+    const baseline = this.duckBaselineBgm;
+    this.tweenBgm(baseline, rampMs, () => {
+      this.duckActive = false;
+    });
+  }
+
+  private tweenBgm(target: number, rampMs: number, onDone?: () => void) {
+    if (SSR) return;
+    if (this.duckTween) {
+      window.clearInterval(this.duckTween);
+      this.duckTween = null;
+    }
+    let current = 0;
+    try {
+      // 현재 적용된 channel volume을 추정하기 어려우므로 baseline에서 시작
+      current = volumeStore.get().bgm;
+    } catch { current = target; }
+    const start = current;
+    const t0 = performance.now();
+    const tick = () => {
+      const t = (performance.now() - t0) / Math.max(1, rampMs);
+      if (t >= 1) {
+        try { SoundManager.setChannelVolume?.("bgm", target); } catch { /* */ }
+        if (this.duckTween) window.clearInterval(this.duckTween);
+        this.duckTween = null;
+        onDone?.();
+        return;
+      }
+      const v = start + (target - start) * t;
+      try { SoundManager.setChannelVolume?.("bgm", v); } catch { /* */ }
+    };
+    this.duckTween = window.setInterval(tick, 24);
+  }
+
+  // ===== Reduced-motion mute =====
+  /** voice 채널 mute on/off. BaseMaxWinOverlay 가 prefers-reduced-motion 매치 시 호출. */
+  setReducedMotionMute(enabled: boolean) {
+    this.reducedMotionMute = enabled;
+  }
+
+  // ===== BGM 위임 =====
   playBGM() {
     if (SSR || this.isMuted()) return;
     SoundManager.playBGM({ fadeMs: 800 });
@@ -136,7 +253,6 @@ class SlotSoundManagerImpl {
   resumeBGM() { if (!SSR) SoundManager.resumeAll(); }
   stopBGM() { if (!SSR) SoundManager.stopBGM(600); this.bgmStarted = false; }
 
-  /** 슬롯 전환 — 슬롯 전용 자산만 unload, common 캐시 유지. */
   unloadSlot() {
     for (const e of this.slotHowls.values()) {
       try { e.howl.unload(); } catch { /* */ }
@@ -144,6 +260,7 @@ class SlotSoundManagerImpl {
     this.slotHowls.clear();
     this.slotId = "";
     this.themeKey = null;
+    if (this.duckActive) this.restoreBgm(120);
   }
 
   unloadAll() {
@@ -157,16 +274,16 @@ class SlotSoundManagerImpl {
     this.themeKey = null;
   }
 
-  // Volume / mute — single source = volumeStore
+  // Volume / mute
   setMasterVolume(v: number) { volumeStore.set({ master: v }); }
   setSfxVolume(v: number) { volumeStore.set({ sfx: v }); }
   setBgmVolume(v: number) { volumeStore.set({ bgm: v }); }
+  setVoiceVolume(v: number) { volumeStore.set({ voice: v }); }
   mute() { volumeStore.set({ muted: true }); }
   unmute() { volumeStore.set({ muted: false }); }
   isMuted() { return volumeStore.get().muted; }
   toggleMute() { this.isMuted() ? this.unmute() : this.mute(); }
 
-  /** 첫 사용자 제스처 — Web Audio unlock (기존 엔진 위임). */
   unlock() { if (!SSR) SoundManager.unlock(); }
 }
 
