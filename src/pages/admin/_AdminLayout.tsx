@@ -69,7 +69,22 @@ export default function AdminLayout() {
   }, []);
 
   // Hooks above must run on every render — gate render output AFTER hooks.
-  if (!user) return null;
+  // Hooks above must run on every render — gate render output AFTER hooks.
+  // user === undefined: still verifying admin via server-side has_role RPC.
+  // The hook itself redirects non-admins to /dashboard, so a brief loading
+  // state here is safe and prevents the "blank flash" UX seen previously.
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+          <Crown className="w-8 h-8 text-gold animate-pulse" />
+          <span className="text-[11px] tracking-[0.3em] uppercase font-black">
+            관리자 인증 확인 중…
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
