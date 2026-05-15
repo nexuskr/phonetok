@@ -10284,6 +10284,12 @@ export type Database = {
         Args: { _nft_id: string; _price_phon: number }
         Returns: Json
       }
+      list_public_function_names: {
+        Args: never
+        Returns: {
+          proname: string
+        }[]
+      }
       live_account_equity: { Args: { p_user_id: string }; Returns: Json }
       live_adjust_isolated_margin: {
         Args: { p_delta_margin: number; p_position_id: string }
