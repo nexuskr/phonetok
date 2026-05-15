@@ -293,7 +293,8 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
 
         const mult = bet > 0 ? payout / bet : 0;
         const tier = classifyWin(mult);
-        // Sound: bigwin for ≥50× else regular win
+        // Sound: tier-aware win cue (Howler asset → procedural fallback)
+        SoundManager.playWinTier(payout, bet);
         playSlotCue(soundPack, mult >= 50 ? "bigwin" : "win");
         if (tier) {
           setWinOverlay({ tier, amount: payout });
