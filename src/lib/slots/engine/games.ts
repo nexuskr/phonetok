@@ -89,7 +89,7 @@ export const GAMES: GameConfig[] = [
     maxMultiplier: 2500,
     reels: 5, rows: 3,
     symbolWeights: W_MID,
-    paytable: pt(0.90, 2.13, 4.49, 8.96),
+    paytable: pt(0.92, 2.17, 4.58, 9.14),
     scatterTrigger: 3,
     bonus: {
       kind: "pick_reveal",
