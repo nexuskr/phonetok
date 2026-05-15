@@ -3,6 +3,10 @@ import { Link } from "react-router-dom";
 import { Crown, Lock, Sparkles } from "lucide-react";
 import logoImage from "@/assets/slots/olympus/logo.png";
 import bgImage from "@/assets/slots/olympus/bg.jpg";
+import bgWizard from "@/assets/slots/wizard/bg.jpg";
+import logoWizard from "@/assets/slots/wizard/logo.png";
+import bgDragon from "@/assets/slots/dragon/bg.jpg";
+import logoDragon from "@/assets/slots/dragon/logo.png";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 
 type GameCard = {
@@ -29,24 +33,24 @@ const GAMES: GameCard[] = [
     logo: logoImage,
   },
   {
-    to: "#",
+    to: "/casino/wizard-2000",
     code: "wizard_2000",
     title: "Wizard 2000",
-    subtitle: "곧 출시",
-    rtp: "RTP 96.5%",
+    subtitle: "고변동 · 보너스 폭발형",
+    rtp: "RTP 95.3%",
     max: "MAX 2000×",
-    bg: bgImage,
-    comingSoon: true,
+    bg: bgWizard,
+    logo: logoWizard,
   },
   {
-    to: "#",
+    to: "/casino/dragon-empire",
     code: "dragon_500",
     title: "Dragon Empire",
-    subtitle: "곧 출시",
-    rtp: "RTP 95.5%",
+    subtitle: "저변동 · 연속 당첨형",
+    rtp: "RTP 95.6%",
     max: "MAX 500×",
-    bg: bgImage,
-    comingSoon: true,
+    bg: bgDragon,
+    logo: logoDragon,
   },
 ];
 
