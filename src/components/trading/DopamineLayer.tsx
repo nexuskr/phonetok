@@ -36,11 +36,26 @@ function readReducedMotion(): boolean {
   return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 }
 
+/** Mobile / low-end gate: cap GPU+battery cost on phones (C-4).
+ *  - viewport <= 768px OR coarse pointer OR <=4 logical cores → mobile
+ *  - On mobile we apply 0.4× particle multiplier and skip side-bursts entirely
+ */
+function isMobileOrLowEnd(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const narrow = window.innerWidth <= 768;
+    const coarse = window.matchMedia?.("(pointer: coarse)").matches ?? false;
+    const lowCore = (navigator.hardwareConcurrency ?? 8) <= 4;
+    return narrow || coarse || lowCore;
+  } catch { return false; }
+}
+
 function DopamineLayerImpl() {
   const [fx, setFx] = useState<Fx | null>(null);
   const busyRef = useRef(false);
   const localQueueRef = useRef<Fx[]>([]);
   const reducedRef = useRef<boolean>(readReducedMotion());
+  const mobileRef = useRef<boolean>(isMobileOrLowEnd());
 
   useEffect(() => {
     try { localStorage.setItem(RM_KEY, reducedRef.current ? "1" : "0"); } catch {}
@@ -64,18 +79,23 @@ function DopamineLayerImpl() {
 
     if (!reduced && (fx.kind === "win" || fx.kind === "legendary")) {
       const big = fx.kind === "legendary";
+      const mobile = mobileRef.current;
+      const mult = mobile ? 0.4 : 1; // C-4: mobile particle cap (0.4×)
       confetti({
-        particleCount: big ? 240 : 120,
-        spread: 100,
+        particleCount: Math.round((big ? 240 : 120) * mult),
+        spread: mobile ? 80 : 100,
         origin: { y: 0.4 },
-        scalar: big ? 1.4 : 1,
+        scalar: big ? (mobile ? 1.1 : 1.4) : 1,
+        ticks: mobile ? 120 : 200, // shorter lifetime → less paint
         colors: ["#f4b437","#fde68a","#a7f3d0","#34d399","#fbbf24"],
       });
-      if (big) {
+      if (big && !mobile) {
+        // Skip side-bursts entirely on mobile (C-4)
         setTimeout(() => confetti({ particleCount: 200, angle: 60, spread: 70, origin: { x: 0, y: 0.5 } }), 200);
         setTimeout(() => confetti({ particleCount: 200, angle: 120, spread: 70, origin: { x: 1, y: 0.5 } }), 400);
         sfx.legendary();
-      } else { sfx.win(); }
+      } else if (big) { sfx.legendary(); }
+      else { sfx.win(); }
     } else if (fx.kind === "win" || fx.kind === "legendary") {
       // reduced-motion: sound only
       if (fx.kind === "legendary") sfx.legendary(); else sfx.win();

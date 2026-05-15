@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import crownPhone from "@/assets/login-crown-phone.png";
+import crownPhone from "@/assets/login-crown-phone.jpg";
 
 const KEY = "phonara_cinema_played_v1";
 
