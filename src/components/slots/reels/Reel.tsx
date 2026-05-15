@@ -60,12 +60,13 @@ function ReelInner({
     >
       <div
         key={seed}
-        className="will-change-transform"
+        className={`will-change-transform ${spinning ? "reel-spinning" : ""}`}
         style={{
-          transform: spinning ? `translateY(0px)` : `translateY(${finalY}px)`,
+          transform: spinning ? undefined : `translateY(${finalY}px)`,
           transition: spinning
             ? `none`
             : `transform ${durationMs}ms cubic-bezier(.18,.85,.30,1) ${delayMs}ms`,
+          ["--reel-final-y" as any]: `${finalY}px`,
         }}
       >
         {strip.map((sym, i) => {
