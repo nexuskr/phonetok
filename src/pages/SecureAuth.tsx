@@ -169,18 +169,13 @@ export default function SecureAuth() {
           </div>
 
           <h2
-            className="mt-6 sm:mt-8 font-imperial text-foreground leading-[1.04] text-[28px] sm:text-[44px] lg:text-[56px]"
-          >
-            지금, 당신이 합류할 때
-          </h2>
-          <h2
-            className="font-imperial text-gradient-gold leading-[1.04] text-[32px] sm:text-[52px] lg:text-[64px]"
+            className="mt-6 sm:mt-8 font-imperial text-gradient-gold leading-[1.06] text-[28px] sm:text-[44px] lg:text-[56px]"
             style={{ textShadow: "0 0 32px hsl(var(--gold)/0.35)" }}
           >
-            제국은 완성됩니다
+            폰 하나로 시작하는<br className="sm:hidden" /> 새로운 수익 경험
           </h2>
-          <p className="mt-3 text-[12px] sm:text-base text-foreground/85 break-keep">
-            전 세계 황제들이 실시간으로 경쟁하고, <span className="text-gold font-bold">Crown</span>을 쟁취하라.
+          <p className="mt-3 text-[13px] sm:text-base text-foreground/85 break-keep">
+            오늘도 전세계 사람들이 잔고를 축적하고 있습니다.
           </p>
         </section>
 
@@ -216,14 +211,41 @@ export default function SecureAuth() {
 
               <div className="text-center">
                 <div className="inline-flex items-center gap-2">
-                  <span className="text-gold text-2xl sm:text-3xl">⚡</span>
-                  <h3 className="font-imperial text-2xl sm:text-3xl text-gradient-gold">5초 만에 제국 입성</h3>
+                  <Zap className="text-gold w-6 h-6 sm:w-7 sm:h-7" />
+                  <h3 className="font-imperial text-2xl sm:text-3xl text-gradient-gold">
+                    {mode === "magic" ? "5초 만에 제국 입성" : mode === "signup" ? "이메일로 회원가입" : "이메일로 로그인"}
+                  </h3>
                 </div>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">비밀번호 없이, 즉시 시작</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                  {mode === "magic" ? "비밀번호 없이, 즉시 시작" : mode === "signup" ? "추가 정보는 가입 후 입력합니다" : "기존 계정으로 입장"}
+                </p>
+              </div>
+
+              {/* Mode tabs */}
+              <div role="tablist" className="mt-4 grid grid-cols-3 gap-1 p-1 rounded-xl bg-background/60 border border-gold/25 text-[11px] sm:text-xs">
+                {([
+                  { k: "magic",  l: "매직링크" },
+                  { k: "signup", l: "회원가입" },
+                  { k: "signin", l: "로그인" },
+                ] as const).map((it) => (
+                  <button
+                    key={it.k}
+                    role="tab"
+                    aria-selected={mode === it.k}
+                    onClick={() => setMode(it.k)}
+                    className={`min-h-[40px] rounded-lg font-bold tracking-wider transition-colors ${
+                      mode === it.k
+                        ? "bg-gradient-imperial text-primary-foreground shadow-[0_0_18px_hsl(var(--gold)/0.45)]"
+                        : "text-foreground/70 hover:text-foreground"
+                    }`}
+                  >
+                    {it.l}
+                  </button>
+                ))}
               </div>
 
               {/* Email input */}
-              <label className="block mt-4 sm:mt-5">
+              <label className="block mt-4">
                 <div className="flex items-center gap-3 px-4 h-13 sm:h-14 rounded-2xl border border-gold/30 bg-background/80 focus-within:border-gold transition-colors">
                   <Mail className="w-5 h-5 text-gold/80 shrink-0" />
                   <input
@@ -232,16 +254,52 @@ export default function SecureAuth() {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="이메일 또는 휴대폰 번호 입력"
+                    placeholder="이메일 주소 입력"
                     className="bg-transparent w-full focus:outline-none text-base placeholder:text-muted-foreground/60"
                   />
                 </div>
               </label>
 
-              {/* Magic link CTA */}
+              {/* Password fields (signup / signin) */}
+              {mode !== "magic" && (
+                <label className="block mt-3">
+                  <div className="flex items-center gap-3 px-4 h-13 sm:h-14 rounded-2xl border border-gold/30 bg-background/80 focus-within:border-gold transition-colors">
+                    <Lock className="w-5 h-5 text-gold/80 shrink-0" />
+                    <input
+                      type="password"
+                      autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder={mode === "signup" ? "비밀번호 (8자 이상)" : "비밀번호"}
+                      className="bg-transparent w-full focus:outline-none text-base placeholder:text-muted-foreground/60"
+                    />
+                  </div>
+                </label>
+              )}
+              {mode === "signup" && (
+                <label className="block mt-3">
+                  <div className="flex items-center gap-3 px-4 h-13 sm:h-14 rounded-2xl border border-gold/30 bg-background/80 focus-within:border-gold transition-colors">
+                    <Lock className="w-5 h-5 text-gold/80 shrink-0" />
+                    <input
+                      type="password"
+                      autoComplete="new-password"
+                      value={password2}
+                      onChange={(e) => setPassword2(e.target.value)}
+                      placeholder="비밀번호 확인"
+                      className="bg-transparent w-full focus:outline-none text-base placeholder:text-muted-foreground/60"
+                    />
+                  </div>
+                </label>
+              )}
+
+              {/* Primary CTA */}
               <button
-                onClick={sendMagicLink}
-                disabled={busy || !email}
+                onClick={
+                  mode === "magic" ? sendMagicLink
+                  : mode === "signup" ? signUpWithPassword
+                  : signInWithPassword
+                }
+                disabled={busy || !email || (mode !== "magic" && !password) || (mode === "signup" && !password2)}
                 className="
                   relative w-full mt-4 rounded-2xl bg-gradient-imperial text-primary-foreground
                   font-black tracking-wider min-h-[60px] sm:min-h-[68px] text-lg sm:text-xl
@@ -250,11 +308,19 @@ export default function SecureAuth() {
                   transition-transform motion-safe:hover:scale-[1.01] active:scale-[0.99]
                 "
               >
-                <Crown className="w-5 h-5 sm:w-6 sm:h-6" />
-                <span>원클릭 제국 입장</span>
+                {mode === "magic" ? <Crown className="w-5 h-5 sm:w-6 sm:h-6" />
+                  : mode === "signup" ? <UserPlus className="w-5 h-5 sm:w-6 sm:h-6" />
+                  : <LogIn className="w-5 h-5 sm:w-6 sm:h-6" />}
+                <span>
+                  {mode === "magic" ? "원클릭 제국 입장"
+                    : mode === "signup" ? "회원가입 후 입장"
+                    : "로그인"}
+                </span>
               </button>
               <p className="text-center text-[11px] sm:text-xs text-muted-foreground mt-2">
-                Magic Link가 5초 안에 도착합니다.
+                {mode === "magic" ? "Magic Link가 5초 안에 도착합니다."
+                  : mode === "signup" ? "가입 후 추가 정보(이름·연락처·생년월일) 입력 화면으로 이동합니다."
+                  : "비밀번호를 잊으셨다면 매직링크 탭을 사용하세요."}
               </p>
 
               {/* Divider */}
