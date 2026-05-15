@@ -26,7 +26,12 @@ export interface SlotSignatureWrapperProps {
   /** 헤더 우측에 마운트되는 Paytable 트리거 컴포넌트(자체 버튼 포함). */
   PaytableSheet?: ComponentType;
   /** maxMultiplier 도달 시 발동하는 풀스크린 cinematic. */
-  MaxWinOverlay?: ComponentType<{ triggerAt: number }>;
+  MaxWinOverlay?: ComponentType<{
+    triggerAt: number;
+    onMaxWinTriggered?: (payload: MaxWinTriggeredPayload) => void;
+    slotId?: string;
+    themeKey?: string;
+  }>;
   /** 좌우 edge flare 색상 (hex/rgba). 기본은 보라/시안. */
   flareColors?: { left: string; right: string };
   /** 헤더 좌측 라벨. ex) "Cosmic Forge · Signature". */
