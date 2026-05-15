@@ -168,9 +168,11 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
   }, [rawBalance, spinning]);
 
   // Load Howler theme pack for this game (assets fall back to procedural if missing)
+  // BGM은 첫 사용자 제스처(SPIN/뮤트 토글)에서 시작 — autoplay 정책 회피.
   useEffect(() => {
     const themeKey = GAME_TO_THEME[GAME_CODE];
     if (themeKey) SoundManager.loadPack(themeKey);
+    return () => { SoundManager.stopBGM(300); };
   }, [GAME_CODE]);
 
   useEffect(() => {
