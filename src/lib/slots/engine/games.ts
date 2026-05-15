@@ -36,10 +36,10 @@ export const GAMES: GameConfig[] = [
     scatterTrigger: 3,
     bonus: {
       kind: "sticky_multi",
-      spins: 13,
-      multWeights: [[2, 47], [3, 28], [5, 15], [10, 7.5], [25, 2.5], [100, 0.5]],
-      collectChance: 0.43,
-      maxCells: 13,
+      spins: 12,
+      multWeights: [[2, 49], [3, 28], [5, 14.5], [10, 6.8], [25, 2.2], [100, 0.4]],
+      collectChance: 0.40,
+      maxCells: 12,
     },
   },
   {
@@ -56,9 +56,9 @@ export const GAMES: GameConfig[] = [
       kind: "hold88",
       spins: 3,
       respinReset: 3,
-      coinChance: 0.067,
+      coinChance: 0.062,
       coinWeights: [
-        [2, 53], [4, 28], [8, 12.5], [15, 4.9], [40, 1.55], [88, 0.6], ["GRAND", 0.045],
+        [2, 55], [4, 28], [8, 12], [15, 4.7], [40, 1.45], [88, 0.55], ["GRAND", 0.030],
       ],
       grandValue: 8888,
       cells: 15,
