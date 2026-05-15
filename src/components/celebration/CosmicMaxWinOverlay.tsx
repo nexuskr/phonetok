@@ -13,7 +13,7 @@ export default function CosmicMaxWinOverlay({ triggerAt = 5000, durationMs = 300
       triggerAt={triggerAt}
       durationMs={durationMs}
       ariaLabel="Cosmic Max Win"
-      soundKeys={{ primary: "legendary_win" }}
+      soundKeys={{ primary: "legendary_win", voice: "emperor_voice" }}
       titleText="COSMIC EMPEROR"
       icon={
         <Crown

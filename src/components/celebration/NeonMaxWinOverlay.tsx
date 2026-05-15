@@ -73,7 +73,7 @@ export default function NeonMaxWinOverlay({ triggerAt = 8888, durationMs = 3200 
       triggerAt={triggerAt}
       durationMs={durationMs}
       ariaLabel="Neon Max Win"
-      soundKeys={{ primary: "legendary_win" }}
+      soundKeys={{ primary: "legendary_win", voice: "cyber_announce" }}
       titleText="SYSTEM HACKED"
       icon={
         <Zap

@@ -81,7 +81,7 @@ export default function PirateMaxWinOverlay({ triggerAt = 1500, durationMs = 330
       triggerAt={triggerAt}
       durationMs={durationMs}
       ariaLabel="Pirate's Curse Max Win"
-      soundKeys={{ primary: "legendary_win", voice: "voice_pirate_curse" }}
+      soundKeys={{ primary: "legendary_win", voice: "pirate_laugh" }}
       titleText="PIRATE'S CURSE"
       titleDelayMs={600}
       icon={

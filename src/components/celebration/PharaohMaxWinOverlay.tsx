@@ -135,7 +135,7 @@ export default function PharaohMaxWinOverlay({ triggerAt = 2500, durationMs = 34
       triggerAt={triggerAt}
       durationMs={durationMs}
       ariaLabel="Pharaoh's Vault Max Win"
-      soundKeys={{ primary: "legendary_win", voice: "voice_pharaoh_vault" }}
+      soundKeys={{ primary: "legendary_win", voice: "pharaoh_voice" }}
       titleText="PHARAOH'S VAULT"
       titleDelayMs={550}
       icon={

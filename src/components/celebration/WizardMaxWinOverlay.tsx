@@ -98,7 +98,7 @@ export default function WizardMaxWinOverlay({ triggerAt = 2000, durationMs = 340
       triggerAt={triggerAt}
       durationMs={durationMs}
       ariaLabel="Wizard Max Win"
-      soundKeys={{ primary: "legendary_win", voice: "voice_wizard_decree" }}
+      soundKeys={{ primary: "legendary_win", voice: "wizard_decree" }}
       titleText="WIZARD'S DECREE"
       titleDelayMs={900}
       icon={

@@ -45,7 +45,7 @@ export default function DragonMaxWinOverlay({ triggerAt = 500, durationMs = 3200
       triggerAt={triggerAt}
       durationMs={durationMs}
       ariaLabel="Dragon Max Win"
-      soundKeys={{ primary: "legendary_win", voice: "voice_dragon_roar" }}
+      soundKeys={{ primary: "legendary_win", voice: "dragon_roar" }}
       titleText="DRAGON ROAR"
       icon={
         <Flame
