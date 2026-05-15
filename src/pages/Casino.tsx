@@ -19,6 +19,8 @@ import bgAztec from "@/assets/slots/aztec/bg.jpg";
 import logoAztec from "@/assets/slots/aztec/logo.png";
 import bgSakura from "@/assets/slots/sakura/bg.jpg";
 import logoSakura from "@/assets/slots/sakura/logo.png";
+import bgDragon from "@/assets/slots/dragon/bg.jpg";
+import logoDragon from "@/assets/slots/dragon/logo.png";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 
 type GameCard = {
