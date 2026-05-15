@@ -25,7 +25,7 @@ import JackpotMeter from "./JackpotMeter";
 import { useCurrencyPref } from "@/hooks/use-currency-pref";
 import { formatFromPhon } from "@/lib/displayCurrency";
 import { getSymbolImages, type SymbolPack } from "./symbolMap";
-import { playSlotCue, unlockSlotAudio, isSlotMuted, setSlotMuted, type SoundPack } from "@/lib/slotSound";
+import { playSlotCue, unlockSlotAudio, isSlotMuted, type SoundPack } from "@/lib/slotSound";
 import { SoundManager } from "@/lib/sound/SoundManager";
 import { GAME_TO_THEME } from "@/lib/sound/themes";
 import { logSlotAnomaly } from "@/lib/slots/anomaly";
