@@ -31,6 +31,7 @@ const KIND_META: Record<Strike["kind"], { icon: React.ComponentType<{ className?
  * Whale Strike 라이브 피드 — 24h 고임팩트 이벤트 마키 + 클릭 시 합류 깔때기 추적.
  */
 export function WhaleStrikeRail({ compact = false }: { compact?: boolean } = {}) {
+  const reduce = useReducedMotionPref();
   const [items, setItems] = useState<Strike[]>([]);
   const [loaded, setLoaded] = useState(false);
   const navigate = useNavigate();
