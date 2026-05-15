@@ -20,6 +20,7 @@ import AutoSpinControls, { type AutoSpinSettings } from "./AutoSpinControls";
 import GameInfoSheet from "./GameInfoSheet";
 import SpinHistorySheet from "./SpinHistorySheet";
 import SlotLeaderboard from "./SlotLeaderboard";
+import SlotTournamentBanner from "./SlotTournamentBanner";
 import JackpotMeter from "./JackpotMeter";
 import { useCurrencyPref } from "@/hooks/use-currency-pref";
 import { formatFromPhon } from "@/lib/displayCurrency";
@@ -655,6 +656,9 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
             </div>
           )}
         </div>
+
+        {/* Weekly tournament — prize pool + top 5 + countdown */}
+        <SlotTournamentBanner />
 
         {/* Leaderboard — 24h/7d, 누적/최고/순이익 */}
         <SlotLeaderboard gameCode={GAME_CODE} />
