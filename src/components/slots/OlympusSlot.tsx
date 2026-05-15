@@ -307,7 +307,9 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
         return true;
       }
     } catch (e: any) {
-      notify.error(describeError(String(e?.message ?? e)));
+      const msg = String(e?.message ?? e);
+      notify.error(describeError(msg));
+      logSlotAnomaly("spin_failed", GAME_CODE, bet, 0, { error: msg, mode, buyBonus });
       // Restore balance on failure
       setDisplayBalance(rawBalance);
       return false;
