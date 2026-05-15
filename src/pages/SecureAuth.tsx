@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { Crown, ShieldCheck, Mountain, Sparkles, Mail } from "lucide-react";
+import { Crown, ShieldCheck, Mountain, Sparkles, Mail, Lock, UserPlus, LogIn, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "@/hooks/use-toast";
