@@ -1,59 +1,58 @@
-# Sound System 통합 계획
+# Cosmic Forge 5000 — Signature Slot 마감 플랜
 
-## 현재 상태 (먼저 알아두실 것)
+OlympusSlot 공용 엔진은 그대로 두고, Cosmic Forge 5000 페이지 위에 **테마 전용 레이어**를 얹어 시그니처 슬롯으로 마감합니다. 다른 슬롯에 영향 없음.
 
-이 프로젝트에는 이미 풀스펙 사운드 시스템이 살아있습니다.
+## 범위 (이번 작업에서 할 것)
 
-- `src/lib/sound/SoundManager.ts` — Howler 기반 싱글톤. 테마별 자산 로딩(`get_slot_sound_pack` RPC) + 자산 0개여도 들리는 절차(procedural) 폴백, 모바일 unlock, mute persistence, BGM fade, win-tier 자동 분기, `visibilitychange` 백그라운드 일시정지까지 구현됨.
-- `src/lib/slotSound.ts` — 10개 테마용 Web Audio 절차 엔진(팔레트/스케일/드럼/BGM 루프).
-- 7개 슬롯 모두 `OlympusSlot.tsx`를 베이스 엔진으로 사용하고 있어, 그곳에서 `SoundManager.loadPack(theme.key)` + 첫 제스처 unlock + `playBGM()` 트리거가 이미 동작.
-- Howler 설치 완료(`^2.2.4`). `/public/sounds/` 디렉토리는 **존재하지 않음** — 사용자가 보낸 코드대로 그대로 깔면 모든 mp3가 404가 나서 오히려 현재 들리는 절차 사운드까지 같이 죽습니다.
+1. **Cosmic Visual Skin (페이지 전용)**
+   - `CosmicForge5000.tsx`를 wrapper화: 배경 nebula 캔버스(드리프트하는 별 + 보라/시안 글로우), Logo 위 펄싱 코로나, 좌우 가장자리 cosmic light flare(저강도, 항상 ON).
+   - `OlympusSlot`은 그대로 사용. `COSMIC_FORGE_THEME`에 reel border/spinStreak를 보라-시안 듀얼톤으로 미세 강화 (다른 테마 무영향).
+   - GPU 친화: `transform3d/will-change` 사용, `prefers-reduced-motion` 시 정지.
 
-따라서 "보내주신 코드를 그대로 새로 만든다"가 아니라, **요청하신 API 표면(`soundManager`, `useSlotSound`, `SoundController`, 볼륨 persistence)을 기존 엔진 위에 얇게 얹는** 방향으로 통합합니다. 자산이 나중에 `/sounds/...`에 올라오면 자동으로 그쪽을 우선 사용하도록 라우팅도 같이 넣습니다.
+2. **Cosmic Symbol & Paytable 정리**
+   - 기존 `src/assets/slots/cosmic/sym_*.png` 6종 + 저가 카드 4종(A/K/Q/J — 공통)으로 일관 표기.
+   - 신규 컴포넌트 `src/components/slots/CosmicPaytableSheet.tsx`: 모바일 친화 Sheet(테마 전용), 심볼/배당/와일드/스캐터/보너스 설명. 페이지 우측 상단 "배당표" 버튼으로 오픈.
 
-## 만들/바꿀 것
+3. **Win Celebration — Cosmic 전용 레이어**
+   - 기존 `WinCelebrationOverlay`는 그대로 둠.
+   - 신규 `src/components/celebration/CosmicMaxWinOverlay.tsx`: 5000× 도달 또는 multiplier ≥ maxMultiplier 시 추가 풀스크린 cinematic (Galaxy Explosion + Emperor 칭호 + Cosmic Edge Flare 강화). `useWinCelebration` 구독해서 mult≥theme.maxMultiplier일 때만 트리거.
+   - 3초 cap, 모바일은 파티클 수 절반.
 
-### 신규 파일
+4. **Cosmic Forge 페이지 통합**
+   - 위 컴포넌트를 `CosmicForge5000.tsx`에 마운트. `useSlotSound("cosmic_forge")` 유지.
+   - Paytable 버튼은 OlympusSlot 외부 헤더 영역에 둠 (엔진 변경 없음).
 
-1. **`src/lib/sounds/SlotSoundManager.ts`** — 요청하신 API를 가진 싱글톤 facade.
-   - `getInstance()`, `loadCommonSounds()`, `loadSlotSounds(slotId)`, `play(key, mult)`, `playWinSound(tier, mult)`, `playBGM/pause/resume/stop`, `unloadAll()`, `setMasterVolume/setSfxVolume/setBgmVolume`, `mute/unmute`.
-   - 내부 구현은 기존 `SoundManager`로 위임 + Cosmic 같은 슬롯 전용 voice/sfx만 자체 Howl 캐시로 보유.
-   - `slotId → SlotThemeKey` 매핑 테이블 포함(`cosmic_forge → cosmic` 등).
-   - 자산 로딩 실패(`onloaderror`) 시 자동으로 procedural cue로 폴백 — 404 나도 무음 안 됨.
+5. **Dev Cheat Panel (production 자동 숨김)**
+   - 신규 `src/components/slots/DevWinCheats.tsx`: `import.meta.env.DEV`일 때만 렌더. Big/Mega/Epic/Legendary/MAX 5000× 버튼 → `WinCelebrationManager.triggerWin(...)` 직접 호출 (실제 베팅 미발생, 데모 검증용).
 
-2. **`src/lib/sounds/soundConfig.ts`** — `SOUND_PATHS` 상수 + `SLOT_ID_TO_THEME` 매핑 + `WIN_TIER_THRESHOLDS`(big/mega/epic/legendary 멀티플라이어 컷).
+6. **터치 피드백**
+   - `CosmicForge5000.tsx` Spin/Bet 등 외곽 컨트롤 영역에 `active:scale-[0.98]` + `navigator.vibrate(8)` (지원 시).
 
-3. **`src/hooks/useSlotSound.ts`** — 요청하신 시그니처(`useSlotSound(slotId)`).
-   - mount: `loadCommonSounds()` + `loadSlotSounds()` + 첫 제스처 unlock 후 `playBGM()`.
-   - unmount: `stopBGM()` + 슬롯 전용 캐시 unload(공통은 유지). 메모리 누수 방지를 위해 effect deps 정리.
+## 손대지 않는 것
 
-4. **`src/components/sound/SoundController.tsx`** — 마스터/SFX/BGM 슬라이더 + 음소거 토글 UI. 디자인 토큰(`bg-card`, `text-foreground`)만 사용, 작은 floating panel 형태(우상단 토글 버튼 → drawer). Layout이나 Slot wrapper 어디든 1줄로 마운트 가능.
+- `OlympusSlot.tsx` 코어 엔진 (다른 9개 슬롯 공유 — 회귀 위험).
+- RPC/RTP/페이아웃 로직 (서버 권한 — Demo/Real RTP는 백엔드 RPC가 결정. 이번 작업은 클라 표기/연출만).
+- 다른 슬롯 페이지 / 공용 SoundManager / 공용 WinCelebrationManager.
 
-5. **`src/lib/sounds/volumeStore.ts`** — localStorage persistence.
-   - 키: `phonara:sound_volume:v1` → `{ master, sfx, bgm, muted }`.
-   - 변경 시 `Howler.volume()` + `SoundManager` 채널 게인 동기화. 다른 탭 동기화를 위해 `storage` 이벤트 구독.
+## 기술 메모
 
-### 수정 파일
+- Nebula 캔버스: `requestAnimationFrame` + 페이지 hidden 시 일시정지(`visibilitychange`), 60 별 cap, devicePixelRatio 1로 고정.
+- MaxWin 트리거 조건: `mult >= theme.maxMultiplier * 0.999` (서버 라운딩 안전마진).
+- Cheat 버튼: production 빌드에서 트리 셰이킹되도록 `if (!import.meta.env.DEV) return null` 최상단 가드.
+- 사운드/셀러브레이션 시스템은 facade 통해서만 호출 — 기존 계약 유지.
 
-6. **`src/lib/sound/SoundManager.ts`** — 채널 볼륨을 외부에서 조정 가능하도록 `setChannelVolume(ch, v)` + `setMasterVolume(v)` 메서드 노출. 기존 동작은 유지.
+## 결과물 (신규/수정 파일)
 
-7. **`src/pages/casino/CosmicForge5000.tsx`** — `useSlotSound("cosmic_forge")` 호출 추가(데모 + 실제로 Cosmic 전용 voice 트리거 가능하게). 기존 `OlympusSlot` 마운트는 유지.
+신규:
+- `src/components/slots/CosmicPaytableSheet.tsx`
+- `src/components/celebration/CosmicMaxWinOverlay.tsx`
+- `src/components/slots/DevWinCheats.tsx`
+- `src/components/slots/CosmicNebulaCanvas.tsx`
 
-8. **`src/App.tsx` 또는 `src/components/casino/CasinoLayout.tsx`** — `<SoundController />`를 카지노 레이아웃에만 마운트(전역 노출 X — 다른 페이지 노이즈 방지).
+수정:
+- `src/pages/casino/CosmicForge5000.tsx` (wrapper 구성)
+- `src/components/slots/themes.ts` (COSMIC_FORGE_THEME 보라-시안 톤 미세 조정만)
 
-## 기술 디테일
+## 다음 단계 (이번 작업 외)
 
-- **싱글톤 안전성**: `SlotSoundManager`는 SSR 가드(`typeof window`) 후 인스턴스 생성. 두 entry(facade vs 기존 SoundManager) 사이 mute/volume은 항상 `volumeStore`를 단일 소스로 사용해 분기 동기화.
-- **모바일 최적화**:
-  - 모든 Howl `html5: false`(Web Audio 사용) 유지 → iOS Safari에서도 sprite/미세 cue 안정.
-  - `pointerdown`/`touchstart` 한 번에 `Howler.ctx.resume()` + procedural `AudioContext.resume()` 동시 호출(이미 구현됨, 재확인).
-  - `loadCommonSounds()`는 lazy — 첫 슬롯 진입 시 1회. 페이지 전환 시 슬롯 전용만 unload, 공통은 캐시.
-- **메모리 누수 방지**: `useSlotSound` cleanup에서 슬롯 전용 sounds만 `unload()`. 라우트 변경 시 BGM stop. `visibilitychange` 핸들러는 SoundManager가 이미 보유 — 중복 등록 금지.
-- **TypeScript strict**: `WinTier` 유니온, `as const` config, Howl 옵셔널 체이닝 일관 적용. `noUncheckedIndexedAccess` 안전.
-- **자산 라우팅 우선순위**: ① Supabase `get_slot_sound_pack` 결과 → ② `/sounds/{slotId}/...` → ③ procedural cue(`slotSound.ts`). 어느 한 단계가 실패해도 다음으로 자동 폴백.
-
-## 마감 후 답변에 포함할 것
-
-- 수정/추가 파일 목록
-- `useSlotSound` + `SoundController` 사용 예시(Cosmic Forge 코드 스니펫)
-- 추가 개선 제안: (a) `/public/sounds/` 자산 업로드 가이드(파일명 규칙·코덱·길이), (b) Supabase Storage CDN 라우팅, (c) Howler 대신 `AudioWorklet` 기반 ducking — BGM이 win cue 동안 자동 -6dB
+- 동일 패턴(테마 wrapper + 전용 MaxWin overlay + Paytable Sheet)을 Neon Tokyo 88로 복제할 수 있도록 `SlotSignatureWrapper` 추출 — 본 작업 완료 검증 후 별도 작업으로 분리.
