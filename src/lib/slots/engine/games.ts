@@ -50,7 +50,7 @@ export const GAMES: GameConfig[] = [
     maxMultiplier: 8888,
     reels: 5, rows: 3,
     symbolWeights: W_VERY_HIGH,
-    paytable: pt(1.07, 2.75, 5.5, 10.45),
+    paytable: pt(1.11, 2.86, 5.72, 10.87),
     scatterTrigger: 3,
     bonus: {
       kind: "hold88",
