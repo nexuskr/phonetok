@@ -1,605 +1,278 @@
-import { useState, useEffect, useMemo } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { Trans, useTranslation } from "react-i18next";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import { Crown, ShieldCheck, Mountain, Sparkles, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "@/hooks/use-toast";
 import { useAuthReady } from "@/hooks/use-auth-ready";
-import {
-  ShieldCheck, Mail, Lock, Sparkles, ArrowRight,
-  User as UserIcon, Calendar, Phone, ChevronDown, Crown, Clock, Lock as LockIcon,
-} from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { AdultOnlyBanner } from "@/components/AdultOnlyBanner";
-import { SimBadge, GoldDivider, senior } from "@/components/guide/EmpireFX";
 import { AuthSeoulBackdrop } from "@/components/auth/AuthSeoulBackdrop";
-import { LiveFeedPulses, type PulseEvent } from "@/components/auth/LiveFeedPulses";
-import { AuthSocialProof, AuthTrustChips } from "@/components/auth/AuthSocialProof";
-
-function checkAge19(birth: string) {
-  if (!birth) return false;
-  const d = new Date(birth);
-  const age = (Date.now() - d.getTime()) / (365.25 * 24 * 3600 * 1000);
-  return age >= 19;
-}
+import { useAuthLiveData } from "@/hooks/use-auth-live-data";
+import AuthLiveNowBar from "@/components/auth/AuthLiveNowBar";
+import AuthLiveFeedTicker from "@/components/auth/AuthLiveFeedTicker";
+import AuthGlobalMap from "@/components/auth/AuthGlobalMap";
+import AuthTop5Card from "@/components/auth/AuthTop5Card";
+import AuthCrownExplosionCard from "@/components/auth/AuthCrownExplosionCard";
+import AuthFeatureGrid from "@/components/auth/AuthFeatureGrid";
+import AuthBottomTrustStrip from "@/components/auth/AuthBottomTrustStrip";
 
 export default function SecureAuth() {
   const nav = useNavigate();
   const { t } = useTranslation("auth");
-  const { t: tc } = useTranslation("common");
-  const reduce = useReducedMotion();
   const { isReady, hasSession } = useAuthReady();
-  const [mode, setMode] = useState<"login" | "signup">("login");
   const [busy, setBusy] = useState(false);
-  const [advancedOpen, setAdvancedOpen] = useState(false);
-  const [form, setForm] = useState({
-    email: "", password: "", nickname: "", realName: "", phone: "", birth: "",
-    agreeTerms: false, agreeAge: false,
-  });
-  const set = <K extends keyof typeof form>(k: K, v: any) => setForm(f => ({ ...f, [k]: v }));
-  const [pulses, setPulses] = useState<PulseEvent[]>([]);
-
-  const signupSchema = useMemo(() => z.object({
-    email: z.string().trim().email(t("validEmail")).max(255),
-    password: z.string().min(8, t("validPasswordMin")).max(72),
-    nickname: z.string().trim().min(2, t("validNickname")).max(20),
-    realName: z.string().trim().min(2, t("validRealName")).max(40),
-    phone: z.string().trim().regex(/^01[0-9]{8,9}$/, t("validPhone")).optional().or(z.literal("")),
-    birth: z.string().min(1, t("validBirth")),
-    agreeTerms: z.literal(true, { errorMap: () => ({ message: t("validTerms") }) }),
-    agreeAge: z.literal(true, { errorMap: () => ({ message: t("validAge") }) }),
-  }), [t]);
-
-  const loginSchema = useMemo(() => z.object({
-    email: z.string().trim().email(t("validEmail")),
-    password: z.string().min(1, t("validPasswordRequired")),
-  }), [t]);
+  const [email, setEmail] = useState("");
+  const live = useAuthLiveData();
 
   useEffect(() => {
     if (isReady && hasSession) nav("/dashboard", { replace: true });
   }, [hasSession, isReady, nav]);
 
-  async function submit() {
+  const emailSchema = useMemo(() => z.string().trim().email(), []);
+
+  async function sendMagicLink() {
+    const e = email.trim();
+    if (!emailSchema.safeParse(e).success) {
+      toast({ title: "이메일을 확인해 주세요", description: "유효한 이메일을 입력해 주세요.", variant: "destructive" });
+      return;
+    }
     setBusy(true);
     try {
-      if (mode === "signup") {
-        const parsed = signupSchema.safeParse(form);
-        if (!parsed.success) {
-          toast({ title: t("errInputCheck"), description: parsed.error.errors[0].message, variant: "destructive" });
-          return;
-        }
-        if (!checkAge19(form.birth)) {
-          toast({ title: "만 19세 이상만 이용 가능합니다", description: "본 서비스는 만 19세 이상 성인 전용입니다.", variant: "destructive" });
-          return;
-        }
-        const redirectUrl = `${window.location.origin}/packages?welcome=1`;
-        const { data, error } = await supabase.auth.signUp({
-          email: form.email, password: form.password,
-          options: {
-            emailRedirectTo: redirectUrl,
-            data: {
-              nickname: form.nickname,
-              real_name: form.realName,
-              phone: form.phone,
-              birth_date: form.birth,
-            },
-          },
-        });
-        if (error) throw error;
-        if (data.user) {
-          await supabase.from("profiles").update({
-            real_name: form.realName, phone: form.phone, birth_date: form.birth,
-            terms_agreed_at: new Date().toISOString(), age_confirmed: true,
-            profile_completed: true, auth_provider: "email",
-          }).eq("id", data.user.id);
-
-          const refCode = new URLSearchParams(window.location.search).get("ref")
-            ?? localStorage.getItem("pm_ref_code");
-          if (refCode && refCode.length === 8) {
-            try {
-              await supabase.rpc("apply_referral_code", { _code: refCode.toUpperCase() });
-              localStorage.removeItem("pm_ref_code");
-            } catch { /* silent */ }
-          }
-        }
-        toast({ title: t("toastSignupDone"), description: t("toastVerifyEmail") });
-        setMode("login");
-      } else {
-        const parsed = loginSchema.safeParse(form);
-        if (!parsed.success) {
-          toast({ title: t("errInputCheck"), description: parsed.error.errors[0].message, variant: "destructive" });
-          return;
-        }
-        const { data: signedIn, error } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
-        if (error) throw error;
-        let firstEntry = false;
-        if (signedIn?.user?.created_at) {
-          const ageMs = Date.now() - new Date(signedIn.user.created_at).getTime();
-          firstEntry = ageMs < 24 * 60 * 60 * 1000;
-        }
-        toast({ title: firstEntry ? t("toastFirstEntry") : t("toastWelcome") });
-        nav(firstEntry ? "/packages?welcome=1" : "/dashboard", { replace: true });
-        return;
-      }
-    } catch (e: any) {
-      const msg = e.message?.includes("Invalid login") ? t("errInvalidLogin")
-        : e.message?.includes("already registered") ? t("errAlreadyRegistered")
-        : e.message;
-      toast({ title: t("errInputCheck"), description: msg, variant: "destructive" });
+      const { error } = await supabase.auth.signInWithOtp({
+        email: e,
+        options: { shouldCreateUser: true, emailRedirectTo: `${window.location.origin}/auth/callback` },
+      });
+      if (error) throw error;
+      toast({ title: "✨ 매직링크 발송 완료", description: `${e} 로 5분 유효 입장 링크를 보냈습니다.` });
+    } catch (err: any) {
+      toast({ title: "발송 실패", description: err.message, variant: "destructive" });
     } finally { setBusy(false); }
   }
 
   async function social(provider: "google" | "apple") {
     setBusy(true);
     try {
-      const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: `${window.location.origin}/complete-profile` });
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: `${window.location.origin}/complete-profile`,
+      });
       if (result.error) throw result.error;
       if (result.redirected) return;
       nav("/complete-profile");
     } catch (e: any) {
-      toast({ title: t("errLoginFail"), description: e.message, variant: "destructive" });
+      toast({ title: "로그인 실패", description: e.message, variant: "destructive" });
     } finally { setBusy(false); }
   }
 
-  async function sendMagicLink() {
-    const email = form.email.trim();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast({ title: t("errInputCheck"), description: t("validEmail"), variant: "destructive" });
-      return;
-    }
+  async function kakao() {
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          shouldCreateUser: true,
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "kakao" as any,
+        options: { redirectTo: `${window.location.origin}/complete-profile` },
       });
       if (error) throw error;
-      toast({
-        title: "✨ 매직링크 발송 완료",
-        description: `${email} 로 5분 유효 입장 링크를 보냈습니다.`,
-      });
     } catch (e: any) {
-      toast({ title: t("errLoginFail"), description: e.message, variant: "destructive" });
+      toast({
+        title: "Kakao 로그인 준비 중",
+        description: "관리자에서 Kakao Provider 설정 후 이용 가능합니다.",
+        variant: "destructive",
+      });
     } finally { setBusy(false); }
   }
 
   return (
-    <div
-      data-large={true}
-      className="relative min-h-screen overflow-hidden bg-background text-foreground"
-    >
-      <AdultOnlyBanner className="absolute top-0 left-0 right-0 z-30" />
+    <div className="relative min-h-[100dvh] overflow-x-hidden bg-background text-foreground">
+      <AuthSeoulBackdrop />
 
-      {/* === Seoul night cinematic backdrop + live global pulses === */}
-      <AuthSeoulBackdrop>
-        <LiveFeedPulses events={pulses} />
-      </AuthSeoulBackdrop>
-
-      {/* === Floating social-proof panels (LIVE FEED, TOP 5, CROWN counter, KPI bar) === */}
-      <AuthSocialProof onPulses={(p) => setPulses(p)} />
-
-      {/* Top-right language switcher */}
-      <div className="absolute top-3 right-3 z-20">
+      {/* Top system bar */}
+      <header className="relative z-20 flex items-center justify-between px-3 sm:px-6 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2 text-[11px]">
+        <div className="inline-flex items-center gap-1.5 text-muted-foreground">
+          <ShieldCheck className="w-3.5 h-3.5 text-gold" />
+          <span className="hidden xs:inline">본 서비스는 만 19세 이상만 이용 가능합니다.</span>
+          <span className="xs:hidden">19+ 성인 전용</span>
+        </div>
         <LanguageSwitcher variant="auth" />
-      </div>
+      </header>
 
-      <main className="relative z-10 flex flex-col items-center px-3 sm:px-4 pt-12 sm:pt-16 pb-10 max-w-xl mx-auto">
-        {/* === Static gold wordmark seal — framed double hairline === */}
-        <div className="mt-2 flex flex-col items-center select-none">
-          <div className="h-px w-56 bg-gradient-to-r from-transparent via-gold/55 to-transparent" />
-          <div
-            className="mt-1.5 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/55 bg-background/70"
-            style={{
-              boxShadow:
-                "0 0 28px -6px hsl(var(--gold)/0.55), inset 0 1px 0 hsl(var(--gold)/0.45), inset 0 -1px 0 hsl(var(--gold)/0.18)",
-            }}
-          >
-            <Crown className="w-4 h-4 text-gold drop-shadow-[0_0_6px_hsl(var(--gold)/0.7)]" />
-            <span
-              className="text-[10px] tracking-[0.42em] text-gold font-black"
-              style={{ textShadow: "0 0 10px hsl(var(--gold)/0.45)" }}
-            >
-              PHONARA · EST. 2026
-            </span>
+      <main className="relative z-10 mx-auto w-full max-w-[1024px] px-3 sm:px-6 pb-10">
+        {/* === Hero — wordmark + headline === */}
+        <section className="text-center pt-4 sm:pt-8">
+          <div className="inline-flex items-center justify-center mb-2">
+            <Crown className="w-7 h-7 sm:w-9 sm:h-9 text-gold drop-shadow-[0_0_12px_hsl(var(--gold)/0.7)]" />
           </div>
-          <div className="mt-1.5 h-px w-56 bg-gradient-to-r from-transparent via-gold/55 to-transparent" />
-          <div className="mt-2 h-[2px] w-32 bg-gradient-to-r from-transparent via-gold/80 to-transparent" />
-          <div className="mt-1 h-px w-20 border-t border-dashed border-gold/40" />
-        </div>
-
-        {/* === Hero title === */}
-        <div className="text-center mt-6">
-          <div className="inline-flex items-center gap-1.5 mb-3 px-3 py-1 rounded-full border border-gold/40 bg-background/50">
-            <ShieldCheck className="w-3.5 h-3.5 text-gold" />
-            <span className="text-[10px] tracking-[0.34em] text-gold/90 font-black">
-              SECURE V3 · AAL2 GUARDED
-            </span>
-          </div>
-          {/* Imperial kicker */}
-          <div className="inline-flex items-center gap-2 mb-3 text-gold">
-            <Crown className="w-[18px] h-[18px] drop-shadow-[0_0_9px_hsl(var(--gold)/0.7)]" />
-            <span
-              className="font-imperial font-black text-[11.5px] sm:text-[13px] tracking-[0.3em] sm:tracking-[0.34em] uppercase"
-              style={{ textShadow: "0 0 16px hsl(var(--gold)/0.45)" }}
-            >
-              패키지 1회로 모든 미션이 자동 완료
-            </span>
-            <Crown className="w-[18px] h-[18px] drop-shadow-[0_0_9px_hsl(var(--gold)/0.7)]" />
-          </div>
-          <h1
-            className="font-imperial font-black text-gradient-gold leading-[1.05] text-[32px] sm:text-[56px]"
-            style={{
-              WebkitTextStroke: "1px hsl(var(--gold-stroke) / 0.48)",
-              textShadow:
-                "0 0 32px hsl(var(--gold) / 0.28), 0 0 72px hsl(var(--gold) / 0.18)",
-            }}
-          >
-            제국 입장을 위한
-            <br />마지막 관문
+          <h1 className="font-imperial text-gradient-gold text-[28px] sm:text-[44px] leading-none tracking-[0.18em]">
+            PHONARA EMPIRE
           </h1>
-          <p
-            data-large={true}
-            className={`mt-4 text-foreground/85 break-keep ${senior.bodyXl} text-[16px] sm:text-[18px] leading-relaxed`}
-          >
-            폰 하나로 제국을 쌓는다.
-            <br className="sm:hidden" />
-            <span className="text-gold/95"> 비밀번호 없이, 5분 안에.</span>
-          </p>
-        </div>
-
-        {/* === SIM strip — framed numbers, SimBadge preserved === */}
-        <div className="grid grid-cols-3 gap-2 mt-6 w-full">
-          {[
-            { label: "지금 입장 중", micro: "LIVE", value: "1,247", suffix: "명" },
-            { label: "오늘 가입", micro: "TODAY", value: "384", suffix: "명" },
-            { label: "평균 입장", micro: "AVG", value: "22", suffix: "초" },
-          ].map((s, i) => (
-            <div
-              key={i}
-              className="relative rounded-xl border border-gold/35 bg-gradient-to-b from-background/85 to-background/55 px-2 sm:px-3 py-2.5 sm:py-3 text-center overflow-hidden"
-            >
-              {/* gold cap line */}
-              <span aria-hidden className="absolute inset-x-3 top-0 h-[2px] bg-gradient-to-r from-transparent via-gold/75 to-transparent" />
-              {/* hairline divider on left (skip first) */}
-              {i > 0 && (
-                <span aria-hidden className="absolute left-0 top-3 bottom-3 w-px bg-gradient-to-b from-transparent via-gold/35 to-transparent" />
-              )}
-              <SimBadge className="absolute top-1.5 right-1.5" />
-              <div className="text-[8px] tracking-[0.4em] text-gold/70 font-black">
-                {s.micro}
-              </div>
-              <div className="text-[10px] tracking-widest text-muted-foreground font-bold mt-0.5">
-                {s.label}
-              </div>
-              <div className="font-imperial text-gradient-gold text-[19px] sm:text-2xl mt-1 tabular-nums">
-                {s.value}<span className="text-sm">{s.suffix}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* === Vertical light ray between SIM strip and CTA card (static) === */}
-        <div className="relative w-full h-6 -my-1 pointer-events-none" aria-hidden>
-          <span className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-gold/55 to-transparent" />
-          <span
-            className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-8 opacity-60"
-            style={{
-              background:
-                "radial-gradient(50% 100% at 50% 50%, hsl(var(--gold)/0.22) 0%, transparent 70%)",
-              filter: "blur(6px)",
-            }}
-          />
-        </div>
-
-        {/* === Main CTA card — luxury watch frame === */}
-        <div
-          className="relative w-full mt-3 rounded-3xl p-4 sm:p-6 border-2 border-gold/55 bg-background/85 outline outline-1 outline-offset-[3px] outline-gold/22 overflow-hidden"
-          style={{
-            boxShadow:
-              "0 0 44px hsl(var(--gold)/0.28), 0 0 84px hsl(var(--gold)/0.14), inset 0 1px 0 hsl(var(--gold)/0.28), inset 0 -1px 0 hsl(var(--gold)/0.14)",
-          }}
-        >
-          {/* inner top hairline */}
-          <span aria-hidden className="absolute top-0 inset-x-6 h-px bg-gradient-to-r from-transparent via-gold/65 to-transparent" />
-          {/* inner bottom hairline */}
-          <span aria-hidden className="absolute bottom-0 inset-x-6 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
-          {/* static conic shine — no animation */}
-          <span
-            aria-hidden
-            className="absolute inset-0 pointer-events-none opacity-[0.09]"
-            style={{
-              background:
-                "conic-gradient(from 210deg at 50% 0%, transparent 0deg, hsl(var(--gold)) 60deg, transparent 140deg, transparent 360deg)",
-            }}
-          />
-          {/* 4 corner L-markers */}
-          <span aria-hidden className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-gold/80 rounded-tl-md" />
-          <span aria-hidden className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-gold/80 rounded-tr-md" />
-          <span aria-hidden className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-gold/80 rounded-bl-md" />
-          <span aria-hidden className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-gold/80 rounded-br-md" />
-
-          {/* email input */}
-          <label className="block relative">
-            <span className="sr-only">이메일</span>
-            <div className="flex items-center gap-3 px-4 h-14 rounded-2xl border border-gold/30 bg-background/80 focus-within:border-gold transition-colors">
-              <Mail className="w-5 h-5 text-gold/80 shrink-0" />
-              <input
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                value={form.email}
-                onChange={e => set("email", e.target.value)}
-                placeholder="your@email.com"
-                className="bg-transparent w-full focus:outline-none text-lg placeholder:text-muted-foreground/60"
-              />
-            </div>
-          </label>
-
-          {/* Magic Link MEGA button — solid gold gradient, no shimmer */}
-          <button
-            onClick={sendMagicLink}
-            disabled={busy || !form.email}
-            data-large={true}
-            className={`relative w-full mt-4 rounded-2xl bg-gradient-imperial text-primary-foreground font-black tracking-wider transition-[transform,box-shadow] duration-200 disabled:opacity-50 disabled:cursor-not-allowed motion-safe:hover:scale-[1.02] motion-safe:hover:shadow-[0_0_52px_hsl(var(--gold)/0.55),0_0_104px_hsl(var(--gold)/0.28)] active:scale-[0.99] glow-gold-xl ${senior.btnXl} min-h-[64px] sm:min-h-[72px] text-lg sm:text-2xl flex items-center justify-center gap-2 sm:gap-3`}
-            aria-label="매직링크로 제국 입장하기"
-          >
-            <span aria-hidden className="text-gold-foreground/90 hidden sm:inline">✦</span>
-            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
-            <span>매직링크로 제국 입장</span>
-            <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
-            <span aria-hidden className="text-gold-foreground/90 hidden sm:inline">✦</span>
-          </button>
-
-
-          <p className="mt-3 text-center text-sm text-foreground/75 break-keep">
-            비밀번호 불필요 · 5분 유효 · 메일함을 확인해 주세요
-          </p>
-
-          <GoldDivider />
-
-          {/* Advanced options toggle */}
-          <button
-            type="button"
-            onClick={() => setAdvancedOpen(v => !v)}
-            aria-expanded={advancedOpen}
-            aria-controls="advanced-options"
-            className="w-full flex items-center justify-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground transition"
-          >
-            <motion.span animate={{ rotate: advancedOpen ? 180 : 0 }} transition={{ duration: 0.25 }}>
-              <ChevronDown className="w-4 h-4" />
-            </motion.span>
-            {advancedOpen ? "고급 옵션 닫기" : "고급 옵션 (Google · Apple · 비밀번호)"}
-          </button>
-
-          <AnimatePresence initial={false}>
-            {advancedOpen && (
-              <motion.div
-                id="advanced-options"
-                key="adv"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="overflow-hidden"
-              >
-                <div className="pt-4 space-y-4">
-                  {/* Social */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      onClick={() => social("google")}
-                      disabled={busy}
-                      className="min-h-[56px] rounded-2xl bg-white text-black font-bold text-base hover:scale-[1.02] transition disabled:opacity-50"
-                    >
-                      Google
-                    </button>
-                    <button
-                      onClick={() => social("apple")}
-                      disabled={busy}
-                      className="min-h-[56px] rounded-2xl bg-foreground text-background font-bold text-base hover:scale-[1.02] transition disabled:opacity-50"
-                    >
-                      Apple
-                    </button>
-                  </div>
-
-                  {/* mode tabs */}
-                  <div className="grid grid-cols-2 gap-2">
-                    {(["login", "signup"] as const).map(m => (
-                      <button
-                        key={m}
-                        onClick={() => setMode(m)}
-                        className={`py-2.5 rounded-xl text-sm font-bold transition border ${
-                          mode === m
-                            ? "bg-gradient-imperial text-primary-foreground border-gold/60 glow-gold-xl"
-                            : "bg-background/60 text-muted-foreground border-border/60"
-                        }`}
-                      >
-                        {m === "login" ? t("tabLogin") : t("tabSignup")}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* password form */}
-                  <div className="space-y-3">
-                    {mode === "signup" && (
-                      <Field icon={<Sparkles className="w-4 h-4" />}>
-                        <input
-                          value={form.nickname}
-                          onChange={e => set("nickname", e.target.value)}
-                          placeholder={t("placeholderNickname")}
-                          maxLength={20}
-                          className="bg-transparent w-full focus:outline-none text-base"
-                        />
-                      </Field>
-                    )}
-                    <Field icon={<Lock className="w-4 h-4" />}>
-                      <input
-                        type="password"
-                        value={form.password}
-                        onChange={e => set("password", e.target.value)}
-                        placeholder={
-                          mode === "signup"
-                            ? t("placeholderPasswordSignup")
-                            : t("placeholderPasswordLogin")
-                        }
-                        className="bg-transparent w-full focus:outline-none text-base"
-                      />
-                    </Field>
-
-                    {mode === "signup" && (
-                      <>
-                        <Field icon={<UserIcon className="w-4 h-4" />}>
-                          <input
-                            value={form.realName}
-                            onChange={e => set("realName", e.target.value)}
-                            placeholder={t("placeholderRealName")}
-                            maxLength={40}
-                            className="bg-transparent w-full focus:outline-none text-base"
-                          />
-                        </Field>
-                        <Field icon={<Phone className="w-4 h-4" />}>
-                          <input
-                            value={form.phone}
-                            onChange={e => set("phone", e.target.value.replace(/\D/g, ""))}
-                            placeholder={`${t("placeholderPhone")} (선택)`}
-                            maxLength={11}
-                            className="bg-transparent w-full focus:outline-none text-base"
-                          />
-                        </Field>
-                        <Field icon={<Calendar className="w-4 h-4" />}>
-                          <input
-                            type="date"
-                            value={form.birth}
-                            onChange={e => set("birth", e.target.value)}
-                            className="bg-transparent w-full focus:outline-none text-base text-muted-foreground"
-                          />
-                        </Field>
-                        <p className="text-xs text-muted-foreground px-1 break-keep">
-                          본 서비스는 만 19세 이상 성인만 이용 가능합니다.
-                        </p>
-
-                        <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer px-1">
-                          <input
-                            type="checkbox"
-                            checked={form.agreeTerms}
-                            onChange={e => set("agreeTerms", e.target.checked)}
-                            className="mt-0.5 accent-primary"
-                          />
-                          <span>
-                            <Trans
-                              i18nKey="agreeTerms"
-                              ns="auth"
-                              components={{ 1: <span className="text-foreground" />, 3: <span className="text-foreground" /> }}
-                            />
-                          </span>
-                        </label>
-                        <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer px-1">
-                          <input
-                            type="checkbox"
-                            checked={form.agreeAge}
-                            onChange={e => set("agreeAge", e.target.checked)}
-                            className="mt-0.5 accent-primary"
-                          />
-                          <span>
-                            <Trans
-                              i18nKey="agreeAge"
-                              ns="auth"
-                              components={{ 1: <span className="text-foreground" /> }}
-                            />
-                          </span>
-                        </label>
-                      </>
-                    )}
-
-                    <button
-                      onClick={submit}
-                      disabled={busy}
-                      className="mt-2 w-full min-h-[56px] rounded-2xl bg-background/80 border border-gold/40 text-foreground font-bold text-base hover:border-gold hover:scale-[1.01] transition flex items-center justify-center gap-2 disabled:opacity-50"
-                    >
-                      {busy
-                        ? tc("processing")
-                        : (
-                          <>
-                            {mode === "login" ? t("btnLogin") : t("btnSignup")}
-                            <ArrowRight className="w-4 h-4" />
-                          </>
-                        )}
-                    </button>
-
-                    {mode === "login" && (
-                      <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                        <Link to="/forgot-password" className="hover:text-gold transition">
-                          {t("forgotPassword")}
-                        </Link>
-                        <button onClick={() => setMode("signup")} className="hover:text-gold transition">
-                          {t("noAccount")}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* === Trust footer pills === */}
-        <div className="relative mt-7 flex flex-col items-center gap-3 w-full">
-          {/* footer gold halo */}
-          <span
-            aria-hidden
-            className="absolute left-1/2 -translate-x-1/2 -top-4 w-[420px] h-24 pointer-events-none opacity-70"
-            style={{
-              background:
-                "radial-gradient(60% 80% at 50% 50%, hsl(var(--gold)/0.18) 0%, transparent 70%)",
-              filter: "blur(14px)",
-            }}
-          />
-          <div className="h-px w-40 bg-gradient-to-r from-transparent via-gold/65 to-transparent" />
-          <div className="relative flex flex-wrap items-center justify-center gap-2">
-            {[
-              { icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "19+ AdultGate" },
-              { icon: <Clock className="w-3.5 h-3.5" />, label: "Magic Link 5분 유효" },
-              { icon: <LockIcon className="w-3.5 h-3.5" />, label: "AAL2 보안" },
-              { icon: <Crown className="w-3.5 h-3.5" />, label: "운영자 무손실" },
-            ].map((p, i) => (
-              <span
-                key={i}
-                className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold/45 bg-gradient-to-b from-background/80 to-background/50 text-xs text-foreground/90"
-                style={{
-                  boxShadow:
-                    "0 0 22px -8px hsl(var(--gold)/0.55), inset 0 1px 0 hsl(var(--gold)/0.18)",
-                }}
-              >
-                <span aria-hidden className="absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
-                <span className="text-gold">{p.icon}</span>
-                {p.label}
-              </span>
-            ))}
+          <div className="mt-2 inline-flex items-center justify-center gap-3 text-[10px] sm:text-xs tracking-[0.32em] text-gold/85 font-black">
+            <span className="h-px w-8 bg-gold/50" />
+            EST. 2026 · WORLD #1 LIVE EMPIRE
+            <span className="h-px w-8 bg-gold/50" />
           </div>
-        </div>
 
+          <h2
+            className="mt-6 sm:mt-8 font-imperial text-foreground leading-[1.04] text-[28px] sm:text-[44px] lg:text-[56px]"
+          >
+            지금, 당신이 합류할 때
+          </h2>
+          <h2
+            className="font-imperial text-gradient-gold leading-[1.04] text-[32px] sm:text-[52px] lg:text-[64px]"
+            style={{ textShadow: "0 0 32px hsl(var(--gold)/0.35)" }}
+          >
+            제국은 완성됩니다
+          </h2>
+          <p className="mt-3 text-[12px] sm:text-base text-foreground/85 break-keep">
+            전 세계 황제들이 실시간으로 경쟁하고, <span className="text-gold font-bold">Crown</span>을 쟁취하라.
+          </p>
+        </section>
 
-        {/* === Strengthened trust chips (6) === */}
-        <AuthTrustChips />
+        {/* === LIVE NOW === */}
+        <section className="mt-6 sm:mt-8">
+          <AuthLiveNowBar kpi={live.kpi} />
+        </section>
 
-        <p className="mt-5 text-center text-[11px] text-muted-foreground/85 max-w-sm break-keep">
-          PHONARA EMPIRE는 만 19세 이상 성인만 이용 가능한 서비스입니다.
-        </p>
+        {/* === LIVE FEED === */}
+        <section className="mt-3 sm:mt-4">
+          <AuthLiveFeedTicker feed={live.feed} />
+        </section>
+
+        {/* === ENTRY + RIGHT-SIDE PANELS === */}
+        <section className="mt-5 sm:mt-7 grid grid-cols-1 lg:grid-cols-12 gap-4">
+          {/* Entry card */}
+          <div className="lg:col-span-7">
+            <div
+              className="
+                relative rounded-3xl p-4 sm:p-7 border-2 border-gold/55 bg-background/85
+                outline outline-1 outline-offset-[3px] outline-gold/20 overflow-hidden
+              "
+              style={{
+                boxShadow:
+                  "0 0 44px hsl(var(--gold)/0.28), 0 0 84px hsl(var(--gold)/0.14), inset 0 1px 0 hsl(var(--gold)/0.28)",
+              }}
+            >
+              {/* L corners */}
+              <span aria-hidden className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-gold/80 rounded-tl-md" />
+              <span aria-hidden className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-gold/80 rounded-tr-md" />
+              <span aria-hidden className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-gold/80 rounded-bl-md" />
+              <span aria-hidden className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-gold/80 rounded-br-md" />
+
+              <div className="text-center">
+                <div className="inline-flex items-center gap-2">
+                  <span className="text-gold text-2xl sm:text-3xl">⚡</span>
+                  <h3 className="font-imperial text-2xl sm:text-3xl text-gradient-gold">5초 만에 제국 입성</h3>
+                </div>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">비밀번호 없이, 즉시 시작</p>
+              </div>
+
+              {/* Email input */}
+              <label className="block mt-4 sm:mt-5">
+                <div className="flex items-center gap-3 px-4 h-13 sm:h-14 rounded-2xl border border-gold/30 bg-background/80 focus-within:border-gold transition-colors">
+                  <Mail className="w-5 h-5 text-gold/80 shrink-0" />
+                  <input
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="이메일 또는 휴대폰 번호 입력"
+                    className="bg-transparent w-full focus:outline-none text-base placeholder:text-muted-foreground/60"
+                  />
+                </div>
+              </label>
+
+              {/* Magic link CTA */}
+              <button
+                onClick={sendMagicLink}
+                disabled={busy || !email}
+                className="
+                  relative w-full mt-4 rounded-2xl bg-gradient-imperial text-primary-foreground
+                  font-black tracking-wider min-h-[60px] sm:min-h-[68px] text-lg sm:text-xl
+                  flex items-center justify-center gap-2
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                  transition-transform motion-safe:hover:scale-[1.01] active:scale-[0.99]
+                "
+              >
+                <Crown className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span>원클릭 제국 입장</span>
+              </button>
+              <p className="text-center text-[11px] sm:text-xs text-muted-foreground mt-2">
+                Magic Link가 5초 안에 도착합니다.
+              </p>
+
+              {/* Divider */}
+              <div className="flex items-center gap-3 my-5">
+                <span className="flex-1 h-px bg-border" />
+                <span className="text-[11px] tracking-widest text-muted-foreground">또는</span>
+                <span className="flex-1 h-px bg-border" />
+              </div>
+
+              {/* Social row */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                <button
+                  onClick={() => social("google")}
+                  disabled={busy}
+                  className="min-h-[48px] sm:min-h-[52px] rounded-xl bg-white text-black font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:scale-[1.02] transition disabled:opacity-50"
+                >
+                  <svg viewBox="0 0 48 48" className="w-4 h-4 sm:w-5 sm:h-5"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.4 4 9.8 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 10-2 13.6-5.2l-6.3-5.3C29.3 35 26.8 36 24 36c-5.3 0-9.7-3.4-11.3-8L6 32.7C9.4 39.4 16.1 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.7 2.1-2.1 4-3.9 5.4l6.3 5.3C41.7 35.5 44 30.1 44 24c0-1.3-.1-2.3-.4-3.5z"/></svg>
+                  Google
+                </button>
+                <button
+                  onClick={() => social("apple")}
+                  disabled={busy}
+                  className="min-h-[48px] sm:min-h-[52px] rounded-xl bg-foreground text-background font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:scale-[1.02] transition disabled:opacity-50"
+                >
+                  <svg viewBox="0 0 16 16" className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor"><path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18 7.79 2.337 7.953 3.66 7.978 3.69c.024.03 1.514.083 2.45-1.32.937-1.402.728-2.32.754-2.362zm3.243 11.115c-.052-.105-2.518-1.339-2.288-3.708.23-2.37 1.812-3.019 1.837-3.089.023-.07-.776-1.025-1.673-1.51-.661-.348-1.385-.502-2.118-.502-.926 0-1.526.244-1.962.404-.43.158-.812.299-1.347.299-.515 0-.836-.16-1.31-.337-.413-.155-.95-.353-1.717-.353-1.292 0-2.654.79-3.494 2.151-1.187 1.929-1.014 5.55.99 8.626.71 1.099 1.671 2.34 2.929 2.354.561.006.929-.158 1.32-.328.448-.196.93-.405 1.79-.41.86-.005 1.296.207 1.737.408.385.176.737.34 1.243.337 1.255-.013 2.27-1.398 2.978-2.493.815-1.265 1.144-2.491 1.171-2.553z"/></svg>
+                  Apple
+                </button>
+                <button
+                  onClick={kakao}
+                  disabled={busy}
+                  className="min-h-[48px] sm:min-h-[52px] rounded-xl bg-[#FEE500] text-[#191919] font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:scale-[1.02] transition disabled:opacity-50"
+                >
+                  <span className="text-lg leading-none">💬</span>
+                  카카오
+                </button>
+              </div>
+
+              <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-emerald-400">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>AAL2 최고 보안 · 100% 익명 · KYC 없음</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right column: Map + Top5 + Crown */}
+          <div className="lg:col-span-5 flex flex-col gap-4">
+            <AuthGlobalMap feed={live.feed} />
+            <AuthTop5Card rows={live.top5} />
+            <AuthCrownExplosionCard value={live.kpi.crown_explosion} />
+          </div>
+        </section>
+
+        {/* === Feature grid === */}
+        <section className="mt-8 sm:mt-12">
+          <AuthFeatureGrid />
+        </section>
+
+        {/* === Bottom trust strip === */}
+        <section className="mt-6 sm:mt-8">
+          <AuthBottomTrustStrip />
+        </section>
+
+        {/* Footer */}
+        <footer className="mt-6 sm:mt-8 text-center pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+          <p className="text-[11px] sm:text-xs text-muted-foreground/90 break-keep">
+            PHONARA EMPIRE는 만 19세 이상 성인만 이용 가능한 서비스입니다.
+          </p>
+          <p className="mt-1 inline-flex items-center gap-1.5 text-[11px] sm:text-xs text-gold/80 tracking-[0.28em] font-black">
+            MADE IN KOREA, FOR THE WORLD <span className="text-base leading-none">🇰🇷</span>
+          </p>
+          <div className="hidden">
+            <Sparkles /><Mountain />
+          </div>
+        </footer>
       </main>
-    </div>
-  );
-}
-
-function Field({ icon, children }: any) {
-  return (
-    <div className="flex items-center gap-2 px-4 min-h-[52px] rounded-xl bg-background/70 border border-gold/25 focus-within:border-gold transition">
-      <span className="text-gold/80">{icon}</span>
-      {children}
     </div>
   );
 }
