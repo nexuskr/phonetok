@@ -34,7 +34,7 @@ const AMBER_PALETTE = {
   multiplierTextClass: "text-amber-100",
   multiplierTextShadow: "0 0 14px rgba(255,196,90,0.85)",
   subTextClass: "text-amber-200",
-} as const;
+};
 
 export default function OlympusLegacyMaxWinOverlay({
   triggerAt = 5000,
