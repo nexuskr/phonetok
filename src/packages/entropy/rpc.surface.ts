@@ -207,10 +207,17 @@ export function installRpcSurface() {
         idle: idleWindow.idle,
       };
       const diff = diffReport(baseline, after);
-      const payload = { _pr: "PR-H", label, scenario: { activeMs, hiddenMs, idleMs }, ...diff };
+      const summary = {
+        activeRPC: baseline.foreground.count,
+        hiddenRPC: hiddenWindow.hidden.count,
+        idleRPC: idleWindow.idle.count,
+        verdict: diff.verdict,
+      };
+      const payload = { _pr: "PR-H", label, scenario: { activeMs, hiddenMs, idleMs }, ...summary, ...diff };
+      console.log("[rpc.surface] scenario summary", summary);
       console.log(JSON.stringify(payload, null, 2));
       download(`rpc.surface.scenario.${new Date().toISOString().slice(0,10)}.json`, payload);
-      return payload;
+      return summary;
     },
   };
 
