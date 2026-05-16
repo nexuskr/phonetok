@@ -68,12 +68,15 @@ function subscribeOnce() {
         () => refresh(),
       )
       .subscribe();
-    // Refresh every 60s as a safety net even if realtime drops
-    const id = setInterval(refresh, 60_000);
+    // Refresh every 60s as a safety net even if realtime drops.
+    // setVisibleInterval(category="admin") pauses while tab hidden or governor-idle.
+    const stop = setVisibleInterval(refresh, 60_000, {
+      meta: { owner: "use-kill-switches", category: "admin" },
+    });
     if (typeof window !== "undefined") {
       window.addEventListener("focus", refresh);
       (window as any).__killSwitchCleanup = () => {
-        clearInterval(id);
+        stop();
         window.removeEventListener("focus", refresh);
         try { (supabase as any).removeChannel(channel); } catch {}
       };
