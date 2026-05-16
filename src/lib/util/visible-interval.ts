@@ -9,21 +9,29 @@
 // `useDocumentVisible()` 훅을 함께 제공한다.
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { trackInterval, forgetInterval } from "@pkg/runtime";
+import type { RuntimeCategory } from "@pkg/runtime";
 
 type Cleanup = () => void;
+
+export type VisibleIntervalMeta = {
+  owner?: string;
+  category?: RuntimeCategory;
+};
 
 /**
  * setInterval 대체. document.hidden 이면 콜백을 skip 한다.
  * 옵션:
  *  - leading=true → 처음 1회 즉시 실행
  *  - catchUpOnVisible=true → 숨김→보임 전환 시 즉시 1회 실행
+ *  - meta → DEV ledger 분류 (owner/category). prod 영향 0.
  */
 export function setVisibleInterval(
   fn: () => void,
   ms: number,
-  opts: { leading?: boolean; catchUpOnVisible?: boolean } = {},
+  opts: { leading?: boolean; catchUpOnVisible?: boolean; meta?: VisibleIntervalMeta } = {},
 ): Cleanup {
-  const { leading = false, catchUpOnVisible = true } = opts;
+  const { leading = false, catchUpOnVisible = true, meta } = opts;
   if (typeof window === "undefined") return () => {};
 
   let lastRun = 0;
@@ -36,6 +44,14 @@ export function setVisibleInterval(
   if (leading) tick();
   const id = window.setInterval(tick, ms);
 
+  // Phase 2 Visibility — register as TRACKED (intentional). DEV-only side effect.
+  trackInterval(id, {
+    owner: meta?.owner ?? "anonymous:setVisibleInterval",
+    intervalMs: ms,
+    category: meta?.category ?? "cosmetic",
+    createdAt: Date.now(),
+  });
+
   const onVisible = () => {
     if (document.hidden) return;
     if (!catchUpOnVisible) return;
@@ -45,6 +61,7 @@ export function setVisibleInterval(
 
   return () => {
     window.clearInterval(id);
+    forgetInterval(id);
     document.removeEventListener("visibilitychange", onVisible);
   };
 }
