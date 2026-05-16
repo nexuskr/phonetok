@@ -1,0 +1,12 @@
+{
+  "_pr": "PR-F",
+  "_status": "baseline_scaffold",
+  "_note": "PR-F baseline: in-app DEV collector wired via src/packages/entropy/rpc.surface.ts (installed from main.tsx under import.meta.env.DEV). Run scenario [login → /dashboard active 5m → background 5m → idle 5m], then paste window.__phonaraSurface.report() output into this file under foreground/hidden/idle. PR-G/H gates compare against these counts.",
+  "scenario": "login → /dashboard active 5m → background 5m → idle 5m",
+  "capturedAt": null,
+  "currentMode": null,
+  "startedAt": null,
+  "foreground": { "count": 0, "byRpc": {} },
+  "hidden":     { "count": 0, "byRpc": {} },
+  "idle":       { "count": 0, "byRpc": {} }
+}

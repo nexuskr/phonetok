@@ -28,6 +28,12 @@ watchMotionClass();
 // Diagnose layout shifts (toasts in dev / when phonara:debug-cls=1).
 installLayoutShiftMonitor();
 
+// PR-F: DEV-only RPC 3-mode (foreground/hidden/idle) baseline collector.
+// Tree-shaken in production via import.meta.env.DEV guard.
+if (import.meta.env.DEV) {
+  import("./packages/entropy/rpc.surface").then((m) => m.installRpcSurface()).catch(() => {});
+}
+
 // P5 — wait for active locale chunk to resolve before first paint to avoid
 // flash-of-keys. Fail-open: if it errors, render anyway (i18n returns keys).
 const boot = () => createRoot(document.getElementById("root")!).render(
