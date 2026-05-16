@@ -109,7 +109,7 @@ export default function RecentActivity() {
     }
   }
 
-  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [range]);
+  useEffect(() => { load();   }, [range]);
 
   const filtered = useMemo(() => items.filter((i) => enabled[i.kind]), [items, enabled]);
 

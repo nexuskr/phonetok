@@ -52,7 +52,7 @@ export function registerSW() {
       .register("/sw.js", { scope: "/" })
       .catch((err) => {
         // 조용한 실패 — 콘솔만
-        // eslint-disable-next-line no-console
+         
         console.warn("[SW] register failed", err);
       });
   };

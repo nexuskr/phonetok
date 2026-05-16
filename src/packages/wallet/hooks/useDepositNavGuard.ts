@@ -23,6 +23,6 @@ export function useDepositNavGuard(active: boolean) {
 
 /** 모달 닫기 confirm helper. */
 export function confirmLeave(): boolean {
-  // eslint-disable-next-line no-alert
+   
   return window.confirm(g("depositLeaveConfirm"));
 }

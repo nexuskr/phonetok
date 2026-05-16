@@ -45,7 +45,7 @@ export default function PressCurationPanel() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [onlyUnreviewed]);
+  useEffect(() => { load();   }, [onlyUnreviewed]);
 
   const approve = async (hit: Hit) => {
     const display = window.prompt(`표시명 (예: TechCrunch)`, hit.domain.split(".")[0]);

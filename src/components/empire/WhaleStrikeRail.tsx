@@ -54,7 +54,7 @@ export function WhaleStrikeRail({ compact = false }: { compact?: boolean } = {})
   };
 
   // Initial fetch (once)
-  useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  useEffect(() => { void load();   }, []);
   // 60s refresh — pauses while tab hidden, catches up on visible.
   useVisibleInterval(() => { void load(); }, 60_000, true, { catchUpOnVisible: true });
 

@@ -55,7 +55,7 @@ function dbg(...args: unknown[]) {
   try {
     const on = (import.meta as any).env?.DEV || localStorage.getItem("phonara:debug-realtime") === "1";
     if (on) {
-      // eslint-disable-next-line no-console
+       
       console.debug("[useRealtimeChannel]", ...args);
     }
   } catch { /* noop */ }

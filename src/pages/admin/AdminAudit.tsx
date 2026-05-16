@@ -37,7 +37,7 @@ export default function AdminAudit() {
     setLoading(false);
   }
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [hours, actionFilter]);
+  useEffect(() => { load();   }, [hours, actionFilter]);
 
   useRealtimeChannel({
     key: "admin-audit-live",

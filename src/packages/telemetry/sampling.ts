@@ -38,7 +38,7 @@ function scheduleFlush() {
     // 현재는 DEV 콘솔 + window.dispatchEvent 로만 발행.
     // 추후 spans / error_logs 테이블로 보낼 때 이 지점만 교체.
     if (import.meta.env?.DEV) {
-      // eslint-disable-next-line no-console
+       
       console.debug("[telemetry]", batch);
     }
     try {

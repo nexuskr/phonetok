@@ -51,7 +51,7 @@ export default function SlotAnomalyPanel() {
     }
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [filter]);
+  useEffect(() => { load();   }, [filter]);
 
   const total = summary?.reduce((a, b) => a + Number(b.n), 0) ?? 0;
   const byKind = (k: string) =>

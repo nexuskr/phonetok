@@ -98,7 +98,7 @@ export default function AdminKpi() {
   useEffect(() => {
     if (!admin) return;
     void load();
-  }, [admin]); // eslint-disable-line
+  }, [admin]);  
   useVisibleInterval(() => { if (admin) void load(); }, 60_000, !!admin);
 
   if (!admin) return null;

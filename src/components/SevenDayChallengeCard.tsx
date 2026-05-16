@@ -15,7 +15,7 @@ export default function SevenDayChallengeCard() {
   const [row, setRow] = useState<Row | null>(null);
 
   useEffect(() => {
-    let mounted = true;
+    const mounted = true;
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;

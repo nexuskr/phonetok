@@ -6,7 +6,7 @@ export default function EmpireDayCountdown() {
   const [date, setDate] = useState<string | null>(null);
 
   useEffect(() => {
-    let mounted = true;
+    const mounted = true;
     (async () => {
       const { data } = await supabase.rpc("get_next_empire_day");
       if (mounted && typeof data === "string") setDate(data);

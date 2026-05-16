@@ -69,7 +69,7 @@ const isDev = typeof import.meta !== "undefined" && (import.meta as any).env?.DE
 
 function log(label: string, payload: Record<string, unknown>) {
   if (!isDev) return;
-  // eslint-disable-next-line no-console
+   
   console.info(`%c[prefetch] ${label}`, "color:#a78bfa", payload);
 }
 

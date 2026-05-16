@@ -69,7 +69,7 @@ export function track(event: string, props: Props = {}) {
     }
 
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
+       
       console.debug("[analytics]", event, props, `→ ${dispatched ?? "noop"}`);
     }
   } catch {

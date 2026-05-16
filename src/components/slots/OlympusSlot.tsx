@@ -199,7 +199,7 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
       setDemoBalance(b);
       if (mode === "demo") setDisplayBalance(b);
     }).catch(() => {});
-  }, [isReady, mode]); // eslint-disable-line
+  }, [isReady, mode]);  
 
   const performSpin = useCallback(async (buyBonus: boolean) => {
     if (spinning) return false;

@@ -141,7 +141,7 @@ function LightweightChartPanelImpl({ symbol, price, overlays = [], height = 320,
         const now = Date.now();
         if (now - lastDevLogRef.current >= 1000) {
           lastDevLogRef.current = now;
-          // eslint-disable-next-line no-console
+           
           console.debug("[KLINE]", interval, symbol, bar.close);
         }
       }

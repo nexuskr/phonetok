@@ -44,7 +44,7 @@ export function useDepositRealtime({ intentId, active, onFilled, onStatusUpdate 
       if (!row) return;
       // A3 ownership verification
       if (userIdRef.current && row.user_id && row.user_id !== userIdRef.current) {
-        // eslint-disable-next-line no-console
+         
         console.warn("[useDepositRealtime] ownership mismatch — dropped");
         return;
       }

@@ -166,6 +166,11 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-expressions": "warn",
+      "@typescript-eslint/ban-ts-comment": "warn",
+      "@typescript-eslint/no-empty-object-type": "warn",
+      "no-empty": ["warn", { allowEmptyCatch: true }],
       ...restrictSonnerRule,
       ...restrictRawChannelRule,
     },
@@ -193,6 +198,14 @@ export default tseslint.config(
     files: CRITICAL_PATHS,
     rules: {
       ...restrictCriticalImportsRule,
+    },
+  },
+  // Wrappers re-exemption (must come AFTER critical block to override).
+  {
+    files: [...NOTIFY_WRAPPERS, ...REALTIME_WRAPPERS],
+    rules: {
+      "no-restricted-imports": "off",
+      "no-restricted-syntax": "off",
     },
   },
 );

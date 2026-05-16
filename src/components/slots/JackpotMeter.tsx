@@ -18,7 +18,7 @@ function useOdometer(target: number) {
   const [shown, setShown] = useState(target);
   const raf = useRef<number | null>(null);
   useEffect(() => {
-    let from = shown;
+    const from = shown;
     const start = performance.now();
     const dur = 1500;
     const tick = (now: number) => {

@@ -49,7 +49,7 @@ export default function WarTradingArena() {
     const s = await warGetCurrentSession();
     setSession(s);
   };
-  useEffect(() => { void loadSession(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  useEffect(() => { void loadSession();   }, []);
   useVisibleInterval(() => { void loadSession(); }, 60_000);
 
   // 리더보드 로드 + Realtime

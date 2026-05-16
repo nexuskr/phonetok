@@ -61,7 +61,7 @@ export function installLayoutShiftMonitor() {
         ring.push(entry);
         if (ring.length > RING_MAX) ring.shift();
         if (entry.value > 0.05 && debugEnabled()) {
-          // eslint-disable-next-line no-console
+           
           console.warn("[CLS]", entry.value.toFixed(3), entry.sources.join(", "), "@", entry.path);
         }
       }
@@ -81,7 +81,7 @@ export function installLayoutShiftMonitor() {
     obs.observe({ type: "layout-shift", buffered: true } as any);
     (window as any).__phonaraCls = () => ring.slice();
   } catch (err) {
-    // eslint-disable-next-line no-console
+     
     console.warn("[CLS] monitor failed to install", err);
   }
 }

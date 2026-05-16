@@ -98,7 +98,7 @@ export default function NeonNotificationFeed() {
             }
             // dev debug log
             if (import.meta.env.DEV) {
-              // eslint-disable-next-line no-console
+               
               console.debug("[neon]", n.kind, n.title, n.payload);
             }
           },

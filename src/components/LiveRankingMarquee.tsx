@@ -38,7 +38,7 @@ export default function LiveRankingMarquee({ limit = 100 }: { limit?: number }) 
     }
   };
 
-  useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [limit]);
+  useEffect(() => { void load();   }, [limit]);
   // 60s refresh — pauses while tab hidden, catches up on visible.
   useVisibleInterval(() => { void load(); }, 60_000, true, { catchUpOnVisible: true });
 
