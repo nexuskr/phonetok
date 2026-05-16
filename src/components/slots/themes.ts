@@ -308,11 +308,15 @@ export const SUGAR_FEVER_THEME: SlotTheme = {
   rtpLabel: "96.0%",
   volatility: "high",
   maxMultiplier: 3000,
-  // Placeholder: reuses olympus symbol/sound pack until dedicated candy assets ship.
-  symbolPack: "olympus",
+  // Dedicated candy symbol pack (premium 1..4 = macaron/rainbow/chocolate/strawberry,
+  // wild = multiplier bomb, scatter = golden star lollipop). Sound stays on olympus
+  // pack until dedicated candy voice ships.
+  symbolPack: "sugar_fever",
   soundPack: "olympus",
-  // Strong pastel-pink hue shift over borrowed art (rotates olympus gold → pink)
-  cardFilter: "hue-rotate(310deg) saturate(1.35) brightness(1.15)",
+  // Card symbols (10/J/Q/K/A) are shared olympus art — keep the warm pink shift so
+  // they sit naturally next to the new pastel candy premiums. Premium symbols are
+  // already painted in the right palette, so the filter mostly affects cards.
+  cardFilter: "hue-rotate(310deg) saturate(1.20) brightness(1.10)",
   // Pastel pink frame on creamy backdrop with warm gold glow — never dark/cocoa
   reelFrameClass:
     "rounded-2xl border-2 border-pink-300/80 bg-gradient-to-b from-[#ffe4e8]/40 to-[#f8c8a0]/35 backdrop-blur-[2px] p-2 sm:p-3 shadow-[inset_0_0_60px_rgba(255,182,193,0.55)]",

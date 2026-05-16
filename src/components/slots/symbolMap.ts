@@ -88,6 +88,14 @@ import sLord from "@/assets/slots/sakura/sym_lord.png";
 import sWild from "@/assets/slots/sakura/sym_wild.png";
 import sScatter from "@/assets/slots/sakura/sym_scatter.png";
 
+// --- Sugar Fever premium (Warm Sugar Luxury — pastel candy dessert) ---
+import sfMacaron from "@/assets/slots/sugar-fever/sym_macaron.png";
+import sfRainbow from "@/assets/slots/sugar-fever/sym_rainbow_swirl.png";
+import sfChocolate from "@/assets/slots/sugar-fever/sym_chocolate.png";
+import sfStrawberry from "@/assets/slots/sugar-fever/sym_strawberry.png";
+import sfWild from "@/assets/slots/sugar-fever/sym_wild.png";
+import sfScatter from "@/assets/slots/sugar-fever/sym_scatter.png";
+
 const CARD_PACK = [sym10, symJ, symQ, symK, symA] as const;
 
 export type SymbolPack =
@@ -100,7 +108,8 @@ export type SymbolPack =
   | "pharaoh"
   | "viking"
   | "aztec"
-  | "sakura";
+  | "sakura"
+  | "sugar_fever";
 
 export const SYMBOL_PACKS: Record<SymbolPack, string[]> = {
   olympus: [...CARD_PACK, oHelmet, oRing, oGoddess, oEmperor, oWild, oScatter],
@@ -113,6 +122,9 @@ export const SYMBOL_PACKS: Record<SymbolPack, string[]> = {
   viking: [...CARD_PACK, vRune, vHammer, vValkyrie, vThor, vWild, vScatter],
   aztec: [...CARD_PACK, aCorn, aJaguar, aPriest, aEmperor, aWild, aScatter],
   sakura: [...CARD_PACK, sLantern, sFan, sGeisha, sLord, sWild, sScatter],
+  // Sugar Fever — premium 1..4 are macaron → rainbow swirl → chocolate → strawberry
+  // (ascending pay). Wild = colorful multiplier bomb, Scatter = golden star lollipop.
+  sugar_fever: [...CARD_PACK, sfMacaron, sfRainbow, sfChocolate, sfStrawberry, sfWild, sfScatter],
 };
 
 export function getSymbolImages(pack: SymbolPack = "olympus"): string[] {
