@@ -1,121 +1,109 @@
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Gift } from "lucide-react";
 import { Link } from "react-router-dom";
 import SlimShell from "@/components/layout/SlimShell";
 import { useRequireAuth } from "@/hooks/use-require-auth";
-import {
-  CalendarCheck, Target, UserPlus, Sparkles, Share2, Gift,
-} from "lucide-react";
+import { useEarnHub } from "@/hooks/use-earn-hub";
+import StreakCard from "@/components/earn/StreakCard";
+import MissionsCard from "@/components/earn/MissionsCard";
+import ReferralCard from "@/components/earn/ReferralCard";
+import PlayToEarnCard from "@/components/earn/PlayToEarnCard";
+import ShareRewardCard from "@/components/earn/ShareRewardCard";
 
-/**
- * /earn — Earn Hub (Sprint 1에서 본격 RPC 연결).
- * Sprint 0: 5카드 셸 + 기존 페이지로 라우팅.
- */
-
-const EARN_CARDS = [
-  {
-    to: "/missions?tab=daily",
-    icon: CalendarCheck,
-    title: "일일 출석",
-    desc: "D1 100 → D7 1,500 보너스 포인트",
-    cta: "오늘 출석",
-    accent: "from-amber-500/20 to-yellow-500/5 border-amber-500/40",
-  },
-  {
-    to: "/missions",
-    icon: Target,
-    title: "일일 미션",
-    desc: "매일 5~7개 자동 갱신",
-    cta: "미션 보러가기",
-    accent: "from-emerald-500/20 to-teal-500/5 border-emerald-500/40",
-  },
-  {
-    to: "/referral",
-    icon: UserPlus,
-    title: "친구 초대",
-    desc: "가입 +200, 첫 입금 양쪽 +2~3k",
-    cta: "초대 링크",
-    accent: "from-pink-500/20 to-rose-500/5 border-pink-500/40",
-  },
-  {
-    to: "/games",
-    icon: Sparkles,
-    title: "Play-to-Earn",
-    desc: "누적 베팅 10k 마다 +100 보너스",
-    cta: "게임하러 가기",
-    accent: "from-violet-500/20 to-fuchsia-500/5 border-violet-500/40",
-  },
-  {
-    to: "/missions?tab=rewards",
-    icon: Share2,
-    title: "공유 보상",
-    desc: "빅윈 자동 이미지·영상 + 추가 PHON",
-    cta: "공유하고 받기",
-    accent: "from-blue-500/20 to-cyan-500/5 border-blue-500/40",
-  },
-];
+function useCountUp(target: number, ms = 600) {
+  const [n, setN] = useState(target);
+  useEffect(() => {
+    if (n === target) return;
+    const start = n;
+    const startedAt = performance.now();
+    let raf = 0;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - startedAt) / ms);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setN(Math.round(start + (target - start) * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target]);
+  return n;
+}
 
 export default function Earn() {
   const user = useRequireAuth();
+  const { state, loading, claim, claimShare, claimAttendance } = useEarnHub();
+  const earned = useCountUp(state.today_earned);
+
   if (!user) return null;
 
   return (
     <SlimShell>
-
-      <div className="container py-5 space-y-5">
-        <header className="flex items-end justify-between gap-3">
-          <div>
-            <div className="text-[11px] tracking-[0.3em] font-black text-primary/80 uppercase">
-              💰 수익
+      <div className="container py-5 space-y-5 max-w-3xl">
+        <motion.header
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+          className="rounded-3xl border border-primary/30 bg-card p-6 relative overflow-hidden"
+        >
+          <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-primary/15 blur-3xl" aria-hidden />
+          <div className="flex items-end justify-between gap-3 relative">
+            <div>
+              <div className="text-[10px] tracking-[0.3em] font-black text-primary uppercase">매일 무료 수익</div>
+              <h1 className="text-2xl md:text-3xl font-black text-foreground mt-1">오늘 얼마 벌었나요?</h1>
+              <p className="text-xs text-muted-foreground mt-1">
+                아래 5가지만 다 하면 매일 4,000~6,000 PHON 확보
+              </p>
             </div>
-            <h1 className="font-imperial text-2xl md:text-3xl text-gradient-imperial mt-1">
-              매일 무료로 돈 버는 곳
-            </h1>
-            <p className="text-xs text-muted-foreground mt-1">
-              아래 5가지 다 하면 매일 평균 4,000~6,000 PHON 확보 가능.
-            </p>
+            <Link
+              to="/events"
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-primary/30 bg-background/40 text-xs font-bold text-primary"
+            >
+              <Gift className="w-3.5 h-3.5" /> 이벤트
+            </Link>
           </div>
-          <Link
-            to="/events"
-            className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl glass border border-primary/30 text-[11px] font-bold text-primary press"
-          >
-            <Gift className="w-3.5 h-3.5" />
-            이벤트
-          </Link>
-        </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {EARN_CARDS.map((c) => {
-            const Icon = c.icon;
-            return (
-              <Link
-                key={c.to + c.title}
-                to={c.to}
-                className={`group rounded-2xl border bg-gradient-to-br ${c.accent} p-4 press transition hover:border-primary/60`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="shrink-0 w-10 h-10 rounded-xl glass border border-border/40 flex items-center justify-center text-primary">
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-imperial text-base text-foreground">{c.title}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{c.desc}</div>
-                  </div>
-                </div>
-                <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold text-primary">
-                  {c.cta} →
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+          <div className="mt-5 flex items-end gap-2 relative">
+            <div className="text-5xl md:text-6xl font-black text-primary tabular-nums leading-none">
+              {earned.toLocaleString()}
+            </div>
+            <div className="text-lg font-bold text-foreground/70 pb-1">PHON</div>
+          </div>
+          <div className="text-[11px] text-muted-foreground mt-1">오늘 누적 적립</div>
+        </motion.header>
 
-        <div className="rounded-2xl border border-border/40 glass p-4 text-center">
-          <div className="text-[10px] tracking-[0.3em] font-black text-muted-foreground uppercase">
-            Sprint 1 예고
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-56 rounded-2xl border border-border/40 bg-card animate-pulse" />
+            ))}
           </div>
-          <div className="font-imperial text-sm text-foreground mt-1">
-            다음 업데이트(Week 3): 출석·미션·초대 RPC 연결 + 자동 공유 카드 생성
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <StreakCard
+              days={state.streak.days}
+              claimedToday={state.streak.claimed_today}
+              nextReward={state.streak.next_reward}
+              onClaim={claimAttendance}
+            />
+            <MissionsCard missions={state.missions} onClaim={claim} />
+            <ReferralCard
+              code={state.referral.code}
+              invited={state.referral.invited}
+              earnedTotal={state.referral.earned_total}
+            />
+            <PlayToEarnCard
+              claimed={state.play_today.claimed}
+              amount={state.play_today.amount}
+              onClaim={() => claim("play_today")}
+            />
+            <ShareRewardCard
+              claimedChannels={state.share_today.channels}
+              amountEach={state.share_today.amount_each}
+            />
           </div>
-        </div>
+        )}
       </div>
     </SlimShell>
   );
