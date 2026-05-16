@@ -302,62 +302,63 @@ depositDeltaPreview, depositTimelineStep1, depositTimelineStep2, depositTimeline
 depositLastChecked, depositInputsLocked
 ```
 
-## 14. 비포함
+## 14. Production Operating Layer (A3–E3)
+
+### A3. Intent Ownership Verification
+- realtime payload 수신 시 `payload.new.user_id === session.user.id` 검증. 불일치 시 silent drop + `console.warn` (subscription scope 사고 안전장치).
+
+### B3. Realtime Replay Protection
+- `useDeposit` 내부 `processedIntentIds: Set<string>` (모달 lifetime). 동일 intent_id `filled` 이벤트 재수신 시 무시 → duplicate toast / 중복 Step3 전환 차단.
+
+### C3. Countdown Drift Correction
+- 카운트다운은 `setInterval` tick이 아닌 `expiresAt - Date.now()` 매번 재계산.
+- `document.visibilitychange` → `visible` 시 즉시 재계산 + 1회 `get_my_pending_deposits` 동기화. 백그라운드 복귀 drift 0.
+
+### D3. Abandon Reason Classification
+- `deposit_abandon` payload에 `reason: 'close_button' | 'backdrop' | 'timeout' | 'refresh' | 'nav_away'` 추가.
+- close handler 분기, `beforeunload`/route change 시 'refresh'/'nav_away' 발사.
+
+### E3. "입금 진행 중" Navigation Guard
+- `step >= 2 && intentId && status === 'awaiting_payment'` 동안:
+  - 모달 X / backdrop → confirm `g('depositLeaveConfirm')` = "진행 중인 입금이 있습니다. 정말 나가시겠습니까?".
+  - `beforeunload` 핸들러로 새로고침/탭 닫기 경고.
+  - React Router `useBlocker`로 라우트 이탈 confirm.
+
+### Glossary 추가 (A3–E3)
+```
+depositLeaveConfirm, depositLeaveStay, depositLeaveExit
+```
+
+## 15. 비포함
 - 결제 PG / Stripe / 카카오 SDK 자동연동 (mem 제약)
 - 신규 DB / RPC / 트리거
 - 출금 흐름 변경
 - 백엔드 rate limit (no-backend-rate-limiting directive)
 
-## 15. 실행 순서 (4-Day Plan)
+## 16. 실행 순서 (4-Day Plan)
 
 **Day 1 — Foundation**
-- glossary 키 일괄 추가 (Sections 11+12+13)
-- `useDeposit` core state machine (step / method / draft resume / funnel id / beforeBalance / soft-freeze)
+- glossary 키 일괄 추가 (Sections 11+12+13+14)
+- `useDeposit` core state machine (step / method / draft resume / funnel id / beforeBalance / soft-freeze / processedIntentIds / ownership check)
 - realtime 채널 + polling fallback (`useRealtimeChannel` 재사용)
-- `sanitize.ts` 유틸
+- `sanitize.ts` 유틸 + `visibilitychange` drift correction
 
 **Day 2 — Modal UX**
 - DepositModal Step 1/2/3 + 3카드 그리드
 - USDT QR + copy verification (끝 6자리 칩)
-- regenerate + grace UI + soft-freeze lock 표시
+- regenerate + grace UI + soft-freeze lock + nav guard(confirm/beforeunload/useBlocker)
 
 **Day 3 — History & Ops**
 - DepositHistory (pending top + `updated_at DESC` + Warm Gold active badge + 3-step timeline)
-- Telemetry 6 이벤트 + `session_funnel_id` 첨부
-- Realtime disconnect banner + voucher fraud soft limit + safe-checking 카피 + heartbeat
+- Telemetry 6 이벤트 + `session_funnel_id` + abandon `reason` 분류
+- Realtime disconnect banner + voucher fraud soft limit + safe-checking + heartbeat
 - Step3 balance delta 카드
 
 **Day 4 — QA Gate**
 - 360px 모바일 QA (한 손, 44px+ 터치, 18px+ 텍스트)
 - `g()` 100% grep 검증 (하드코딩 0)
-- Race QA: filled vs expired grace, 더블탭 idempotency, 새로고침 resume
-- Duplicate QA: 같은 amount/메모 중복 차단, paste sanitize round-trip
+- Race QA: filled vs expired grace, 더블탭 idempotency, 새로고침 resume, replay duplicate, drift recovery
+- Duplicate QA: 같은 amount/메모 중복 차단, paste sanitize round-trip, nav guard 분기 5종
 
-## 16. 의미
-입금 모달이 아니라 **Production-minded Deposit Infrastructure v1.0**. 출금만 쉬우면 빠져나가고, 입금까지 쉬워야 다시 들어온다. State machine / realtime / recoverability / telemetry / senior UX / fraud soft protection / draft resume / grace / safe-checking / balance snapshot / timeline / sanitizer / heartbeat / soft-freeze까지 "내 돈이 안전하게 처리되고 있다"는 확신을 만든다.
-
-## 14. 실행 순서 (4-Day Plan)
-
-**Day 1 — Foundation**
-- glossary 키 일괄 추가 (Sections 11+12)
-- `useDeposit` core state machine (step / method / draft resume / funnel id)
-- realtime 채널 + polling fallback (`useRealtimeChannel` 재사용)
-
-**Day 2 — Modal UX**
-- DepositModal Step 1/2/3 + 3카드 그리드
-- USDT QR 렌더 + copy verification UX (끝 6자리 칩)
-- regenerate flow + grace UI
-
-**Day 3 — History & Ops**
-- DepositHistory (pending top + `updated_at DESC` + Warm Gold active badge)
-- Telemetry 6 이벤트 + `session_funnel_id` 첨부
-- Realtime disconnect banner + voucher fraud soft limit + safe-checking 카피
-
-**Day 4 — QA Gate**
-- 360px 모바일 QA (한 손, 44px+ 터치, 18px+ 텍스트)
-- `g()` 100% grep 검증 (하드코딩 0)
-- Race QA: filled vs expired, 더블탭, 새로고침 resume
-- Duplicate QA: 같은 amount/메모 중복 차단
-
-## 15. 의미
-입금 모달이 아니라 **Retention + Money Confidence Infrastructure v1.0**. 출금만 쉬우면 빠져나가고, 입금까지 쉬워야 다시 들어온다. State machine / realtime / recoverability / telemetry / senior UX / fraud soft protection / draft resume / grace / safe-checking 카피까지 모두 포함.
+## 17. 의미
+입금 모달이 아니라 **Production Deposit Operating Layer**. 출금만 쉬우면 빠져나가고, 입금까지 쉬워야 다시 들어온다. State machine / realtime / recoverability / telemetry / senior UX / fraud soft / draft resume / grace / safe-checking / balance snapshot / timeline / sanitizer / heartbeat / soft-freeze / ownership / replay protection / drift correction / abandon reason / nav guard — "내 돈이 안전하게 처리되고 있다"는 확신을 끝까지 지키는 시스템.
