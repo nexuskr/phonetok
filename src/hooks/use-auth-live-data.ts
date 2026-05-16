@@ -119,6 +119,8 @@ export function useAuthLiveData() {
   useEffect(() => {
     let alive = true;
     const fetchKpi = async () => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      if (isCategoryPaused("cosmetic")) return;
       try {
         const { data } = await supabase.rpc("get_world_domination_stats" as any);
         if (!alive || !data) return;
@@ -141,6 +143,8 @@ export function useAuthLiveData() {
   useEffect(() => {
     let alive = true;
     const load = async () => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      if (isCategoryPaused("cosmetic")) return;
       try {
         const { data } = await supabase.rpc("get_whale_strikes_24h" as any, { _limit: 30 });
         if (!alive || !Array.isArray(data) || data.length === 0) return;
@@ -174,6 +178,8 @@ export function useAuthLiveData() {
   useEffect(() => {
     let alive = true;
     const load = async () => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      if (isCategoryPaused("cosmetic")) return;
       try {
         const { data } = await supabase.rpc("get_weekly_referral_leaderboard" as any, { _limit: 5 });
         if (!alive || !Array.isArray(data) || data.length === 0) return;
