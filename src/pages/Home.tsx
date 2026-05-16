@@ -98,6 +98,16 @@ export default function Home() {
           <WhaleStrikeRail compact />
         </Suspense>
       </div>
+
+      {/* 하단 고정 실시간 티커 */}
+      <Suspense fallback={null}>
+        <LiveTicker />
+      </Suspense>
+
+      {/* 60초 온보딩 — 첫 방문 1회만 자동 노출 */}
+      <Suspense fallback={null}>
+        <Onboarding60s />
+      </Suspense>
     </SlimShell>
   );
 }
