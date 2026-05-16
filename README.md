@@ -55,6 +55,8 @@ bun install
 bun run dev
 ```
 
+> RPC surface runner (DEV 전용 3-mode 측정, `await __phonaraSurface.runScenario()`) 사용법은 [`docs/dev/rpc-surface-runner.md`](docs/dev/rpc-surface-runner.md) 참고.
+
 ### 자체 빌드 / 배포
 ```bash
 bun run build          # dist/ 생성 — 정적 호스팅 어디든 배포 가능 (Vercel / Cloudflare Pages / Netlify)
