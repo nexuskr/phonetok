@@ -6,10 +6,10 @@ import BasePaytableSheet, {
 } from "@/components/slots/BasePaytableSheet";
 
 const HIGH: SymRow[] = [
-  { emoji: "🍓", name: "Strawberry",   pay: "5x: ×300 · 4x: ×100 · 3x: ×30" },
-  { emoji: "🍫", name: "Chocolate Bar", pay: "5x: ×180 · 4x: ×60  · 3x: ×18" },
-  { emoji: "🌈", name: "Rainbow Candy", pay: "5x: ×140 · 4x: ×45  · 3x: ×14" },
-  { emoji: "🟢", name: "Mint Drop",     pay: "5x: ×90  · 4x: ×30  · 3x: ×9"  },
+  { emoji: "🍓", name: "Strawberry",          pay: "5x: ×300 · 4x: ×100 · 3x: ×30" },
+  { emoji: "🍫", name: "Chocolate Bar",        pay: "5x: ×180 · 4x: ×60  · 3x: ×18" },
+  { emoji: "🌀", name: "Rainbow Swirl Candy",  pay: "5x: ×140 · 4x: ×45  · 3x: ×14" },
+  { emoji: "🟢", name: "Mint Macaron",         pay: "5x: ×90  · 4x: ×30  · 3x: ×9"  },
 ];
 
 const LOW: SymRow[] = [
@@ -36,7 +36,7 @@ const SECTIONS: PaytableSection[] = [
     rows: [
       { emoji: "🍭", name: "Golden Lollipop (Scatter)",
         pay: "3개 이상 등장 시 Free Spins 발동. 등장 수에 따라 시작 멀티 상승." },
-      { emoji: "💣", name: "Multiplier Bomb",
+      { emoji: "🎀", name: "Colorful Multiplier Bomb",
         pay: "Tumble 중 무작위 등장. 화면 위 모든 멀티를 합산 — ×2 ~ ×100." },
     ],
   },
