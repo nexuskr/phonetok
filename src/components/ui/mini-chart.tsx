@@ -71,15 +71,10 @@ function computeChart(props: BaseProps & { width: number }) {
   const { data, xKey, series, width, height = 180, yFormatter = fmtCompact, yDomain } = props;
   const innerW = Math.max(1, width - PAD.l - PAD.r);
   const innerH = Math.max(1, height - PAD.t - PAD.b);
-  const allY = useMemo(
-    () => series.flatMap((s) => data.map((d) => Number(d[s.key] ?? 0))),
-    [data, series],
-  );
-  const [yMin, yMax] = useMemo(() => computeY(allY, yDomain), [allY, yDomain]);
-  const yTicks = useMemo(() => {
-    const steps = 4;
-    return Array.from({ length: steps + 1 }, (_, i) => yMin + ((yMax - yMin) * i) / steps);
-  }, [yMin, yMax]);
+  const allY = series.flatMap((s) => data.map((d) => Number(d[s.key] ?? 0)));
+  const [yMin, yMax] = computeY(allY, yDomain);
+  const steps = 4;
+  const yTicks = Array.from({ length: steps + 1 }, (_, i) => yMin + ((yMax - yMin) * i) / steps);
   const xPos = (i: number) => (data.length <= 1 ? innerW / 2 : (i / (data.length - 1)) * innerW);
   const yPos = (v: number) => innerH - ((v - yMin) / (yMax - yMin || 1)) * innerH;
   return { innerW, innerH, yMin, yMax, yTicks, xPos, yPos, yFormatter };
