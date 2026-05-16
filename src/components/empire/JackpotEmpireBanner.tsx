@@ -108,8 +108,8 @@ export function JackpotEmpireBanner() {
           ...prev,
         ].slice(0, 6));
       }
-    }, 1000);
-    return () => clearInterval(t);
+    }, 1000, { meta: { owner: "JackpotEmpireBanner", category: "cosmetic" } });
+    return () => t();
   }, []);
 
   // Real roulette_spins via unified realtime — 실유저 표기 + 봇 시드 종료.
