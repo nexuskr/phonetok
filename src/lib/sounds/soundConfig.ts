@@ -23,6 +23,8 @@ export const SOUND_PATHS = {
 export const SLOT_ID_TO_THEME: Record<string, SlotThemeKey> = {
   olympus_1000: "olympus",
   olympus: "olympus",
+  olympus_legacy: "olympus",
+  olympus_legacy_5000: "olympus",
   wizard_2000: "wizard",
   wizard: "wizard",
   dragon_empire: "dragon",
@@ -92,6 +94,12 @@ export const SLOT_SOUND_MAP: Record<
     voice: [], // 우아하게 voice 생략 — Low volatility 정책
     legendary: { primary: "legendary_win" },
   },
+  olympus_legacy: {
+    // Reuses olympus voice/sfx pack. zeus_decree is the legendary voice line.
+    sfx: ["zeus_strike", "marble_chime"],
+    voice: ["zeus_decree"],
+    legendary: { primary: "legendary_win", voice: "zeus_decree" },
+  },
 };
 
 /** URL slug aliases → canonical SLOT_SOUND_MAP key. */
@@ -107,6 +115,8 @@ export const SLOT_ID_TO_SOUND_KEY: Record<string, keyof typeof SLOT_SOUND_MAP> =
   pharaohs_vault_2500: "pharaoh_vault",
   cherry_sakura: "cherry_sakura",
   cherry_sakura_500: "cherry_sakura",
+  olympus_legacy: "olympus_legacy",
+  olympus_legacy_5000: "olympus_legacy",
 };
 
 export type WinTier = "big" | "mega" | "epic" | "legendary";
