@@ -5,7 +5,7 @@
 
 Phase 2 Pre-Flight (visibility instrumentation) 완료. 본 문서는 다음 8개 PR 의 **변경 불가 실행 계약**.
 
-**진행 상태:** PR-A ✅ · PR-B ✅ (78→62) · PR-C ✅ (62→21) · PR-D ✅ (21→13) · PR-E ✅ (1 잔여 cosmetic 마이그레이션 + 1 false_positive ignorelist 등재, 13→12 = money-flow FREEZE 12개만 잔존, triage.unknown=0, `reports/entropy.surface.2026-05-20.json`) · PR-F ⏳ 대기 (RPC surface baseline 계측).
+**진행 상태:** PR-A ✅ · PR-B ✅ (78→62) · PR-C ✅ (62→21) · PR-D ✅ (21→13) · PR-E ✅ (1 잔여 cosmetic 마이그레이션 + 1 false_positive ignorelist 등재, 13→12 = money-flow FREEZE 12개만 잔존, triage.unknown=0, `reports/entropy.surface.2026-05-20.json`) · PR-F ✅ (DEV-only RPC 3-mode collector `src/packages/entropy/rpc.surface.ts` + main.tsx DEV guard 마운트, money-flow diff=0, baseline scaffold `reports/rpc.surface.2026-05-21.json` — 시나리오 실행 후 report() 결과 붙여넣기) · PR-G ⏳ 대기 (governor.pauseCategory("cosmetic") on hidden tab).
 
 ## 0. System Definition (절대 고정)
 
