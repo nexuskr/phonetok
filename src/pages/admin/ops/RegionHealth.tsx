@@ -102,7 +102,7 @@ export default function RegionHealth() {
           <LoadingList rows={3} />
         ) : !rows || rows.length === 0 ? (
           <EmptyState
-            icon={AlertTriangle}
+            icon={<AlertTriangle className="w-5 h-5" />}
             title="아직 샘플이 없습니다"
             description="사용자가 realtime 채널을 마운트하면 자동으로 누적됩니다."
           />
