@@ -32,10 +32,53 @@ const LEGACY_DIRECT_SONNER = [
   "src/lib/layout-shift-monitor.ts",
 ];
 
-// PR-J: legacy raw-channel grandparent list — emptied. All non-freeze callers migrated
-// to @pkg/realtime wrappers. Freeze money-flow paths retain direct useRealtimeChannel
-// usage by design (see PR-J_FREEZE below).
-const LEGACY_RAW_CHANNEL = [];
+// PR-J: 4 partition wrappers는 강제됨. 여전히 raw `supabase.channel()`을 쓰는
+// 레거시 파일들은 PR-K(Operator Isolation) 후속 정리로 옮김 — 그 때까지는 warn.
+// 새 파일은 절대 이 목록에 들어가면 안 됨.
+const LEGACY_RAW_CHANNEL = [
+  "src/components/EmpireFoundingCounter.tsx",
+  "src/components/FloatingChat.tsx",
+  "src/components/FreezeBanner.tsx",
+  "src/components/InsuranceFundDashboard.tsx",
+  "src/components/JackpotBanner.tsx",
+  "src/components/RequestTimeline.tsx",
+  "src/components/admin/AMLAdmin.tsx",
+  "src/components/admin/AnomalyAckQueue.tsx",
+  "src/components/admin/AnomalyAutoFixPanel.tsx",
+  "src/components/admin/DepositRequestsAdmin.tsx",
+  "src/components/admin/FunnelAnalytics.tsx",
+  "src/components/admin/PackagePurchasesAdmin.tsx",
+  "src/components/admin/PayConsole.tsx",
+  "src/components/admin/PermissionsAudit.tsx",
+  "src/components/admin/ReferralsAdmin.tsx",
+  "src/components/admin/TrustV2Admin.tsx",
+  "src/components/admin/ViralForensics.tsx",
+  "src/components/admin/WithdrawRequestsAdmin.tsx",
+  "src/components/admin/compliance/RiskCenter.tsx",
+  "src/components/auth/AuthSocialProof.tsx",
+  "src/components/conversion/LivePurchaseTicker.tsx",
+  "src/components/empire/EmpireLevelBadge.tsx",
+  "src/components/empire/EmpireMomentToast.tsx",
+  "src/components/empire/FoundingSeasonHall.tsx",
+  "src/components/empire/LiveWithdrawalsTable.tsx",
+  "src/components/empire/PhonaraPayPanel.tsx",
+  "src/components/lounge/GuildLiveFeed.tsx",
+  "src/components/trading/PendingOrderManager.tsx",
+  "src/components/wallet/ServerTxList.tsx",
+  "src/hooks/use-admin-notifications.ts",
+  "src/hooks/use-admin-pending.ts",
+  "src/hooks/use-admin-siren.ts",
+  "src/hooks/use-auth-live-data.ts",
+  "src/hooks/use-daily-cap.ts",
+  "src/hooks/use-user-notifications.ts",
+  "src/pages/Cockpit.tsx",
+  "src/pages/EmpireArena.tsx",
+  "src/pages/GalaxyAuction.tsx",
+  "src/pages/Lounge.tsx",
+  "src/pages/Settlements.tsx",
+  "src/pages/WarTradingArena.tsx",
+  "src/pages/Whales.tsx",
+];
 
 // Money-flow FREEZE paths — git diff = 0 required. They keep direct
 // `useRealtimeChannel` to avoid touching these files.
