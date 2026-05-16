@@ -1,66 +1,37 @@
-# Sugar Fever 3000 — New Signature Slot
+# Sugar Fever 3000 — 캔디 테마 완전 정리
 
-Add a new flagship-style slot "Sugar Fever 3000" following the exact same architecture pattern as Olympus Legacy 5000. Zero regression to existing 8 slots. All differences expressed via theme + Canvas + PaytableSheet + MaxWinOverlay only.
+Olympus 잔재를 모두 제거하고 파스텔 캔디 럭셔리 룩으로 4개 파일을 일관되게 재정렬합니다. 엔진/다른 슬롯은 건드리지 않습니다.
 
-## Scope
+## 변경 파일
 
-New slot card on Casino lobby, route `/casino/sugar-fever-3000`, warm pastel candy luxury aesthetic (soft pink + warm gold + mint + strawberry red). Shares OlympusSlot engine and `cluster_tumble` bonus pipeline. Reuses existing `olympus` symbol/sound pack as placeholder so it works immediately; assets can be swapped later.
+1. **src/components/slots/SugarFeverCanvas.tsx** — 완전 재작성
+   - 배경: 크림 핑크 → 라벤더 → 민트 베이지 3-stop 라디얼 그라데이션
+   - 2-layer 패럴랙스: 상단 파스텔 슈가 클라우드, 하단 마카롱/케이크 실루엣
+   - 상단에 초콜릿 드립 리본, 떠다니는 wrapped candy / 롤리팝 / 스프링클 dots
+   - Olympus 마블/번개/골드빔 잔재 grep 후 0건 확인
+   - 단일 RAF, DPR cap=2, `prefers-reduced-motion` 정적 폴백
 
-## Files to create
+2. **src/components/celebration/SugarFeverMaxWinOverlay.tsx** — 재구현
+   - 중앙 거대 회전 롤리팝 스월(SVG conic gradient) + 캔디 크라운
+   - 초콜릿 스플래시 아크, 컨페티(파스텔 핑크/민트/골드/라벤더) 250+
+   - 모바일 `navigator.hardwareConcurrency` 기반 파티클 throttle, GPU transform only
+   - "3000x SUGAR RUSH" 카피 + slow-mo + 스크린 셰이크
 
-1. `src/components/slots/SugarFeverCanvas.tsx`
-   - Single RAF loop, DPR cap 2, pause on `document.hidden`, `prefers-reduced-motion` static fallback
-   - 2-layer parallax pastel "sugar clouds", floating candy dots, soft sparkle particles (auto-throttled on mobile)
-   - Warm radial glow vignette (pink → gold)
+3. **src/components/slots/themes.ts** — `SUGAR_FEVER_THEME` 전면 갱신
+   - `reelFrameClass`: 크림 핑크-골드 더블 보더 + soft shadow
+   - `spinStreakClass`: 파스텔 핑크 글로우
+   - `cardFilter`: `hue-rotate(310deg) saturate(1.15)` 유지 + brightness 조정
+   - `reelPattern`: `SUGAR_FEVER_PATTERN` 캔디 도트 격자 재확인
+   - 모든 Olympus 색상 토큰 참조 제거
 
-2. `src/components/celebration/SugarFeverMaxWinOverlay.tsx`
-   - Built on shared celebration primitives (same pattern as `OlympusLegacyMaxWinOverlay`)
-   - 3000x+ candy burst: 250 GPU particles desktop / 120 mobile, chocolate splash radial, giant lollipop + crown candy SVG, slow-mo + screen shake
-   - React.lazy compatible default export, reduced-motion path = single static hero frame
-   - Crown award already handled by base celebration pipeline at 2500x+ via `computeLegendaryCrown`
+4. **src/components/slots/SugarFeverPaytableSheet.tsx** — 시각 일관성
+   - 심볼 칩 배경을 파스텔 캔디 그라데이션으로 통일
+   - Rainbow Swirl / Mint Macaron / Golden Lollipop(scatter) / Multiplier Bomb 설명 톤 정리
+   - 헤더/구분선 색상도 핑크-골드 팔레트로
 
-3. `src/components/slots/SugarFeverPaytableSheet.tsx`
-   - 6-column paytable, candy symbols (Strawberry / Chocolate Bar / Rainbow Candy / Mint Drop / Golden Lollipop scatter / Multiplier Bomb)
-   - Multiplier Bomb ladder 2x → 100x, Free Spins with progressive multipliers, cluster_tumble mechanics explanation
-   - Warm pastel cards with gold accent borders
+## 기술 노트
 
-4. `src/pages/casino/SugarFever3000.tsx`
-   - Exact wrapper mirror of `OlympusLegacy5000.tsx`: `SlotSignatureWrapper` with `slotId="sugar_fever"`, theme, Background, PaytableSheet, MaxWinOverlay, pastel flare colors, signatureLabel, themeKey
-
-## Files to edit (additions only)
-
-5. `src/components/slots/themes.ts`
-   - Add `SUGAR_FEVER_PATTERN` (pastel dot lattice + warm radial glow)
-   - Add `SUGAR_FEVER_THEME`: `gameCode: "sugar_fever_3000"`, `maxMultiplier: 3000`, `volatility: "high"`, `symbolPack: "sugar"` (falls back to olympus assets via theme `bg`/`logo` imports reusing existing slot art temporarily), `soundPack: "sugar"`, `bonusKind: "cluster_tumble"`, pastel pink + gold reel frame
-   - Reuse `bgOlympus` / `logoOlympus` imports with a swap-comment block, identical to Olympus Legacy convention
-
-6. `src/lib/sounds/soundConfig.ts`
-   - Add `sugar_fever` to `SLOT_ID_TO_THEME` (mapped to `olympus` theme as placeholder)
-   - Add `sugar_fever` and `sugar_fever_3000` aliases to `SLOT_ID_TO_SOUND_KEY`
-   - Add `SLOT_SOUND_MAP.sugar_fever` entry (sfx: `candy_pop`, `chocolate_splash`; voice empty for elegance; legendary uses common `legendary_win`)
-
-7. `src/lib/empireConfig.ts`
-   - Add `"sugar_fever"` to `EmpireSlotKey` union
-   - Add `SLOT_CROWN_WEIGHT.sugar_fever = 1.4`
-   - Add `sugar_fever` + `sugar_fever_3000` aliases to ALIAS map
-
-8. `src/App.tsx`
-   - Add `const SugarFever3000 = lazy(() => import("./pages/casino/SugarFever3000"))`
-   - Add `<Route path="/casino/sugar-fever-3000" element={<SugarFever3000 />} />` next to OlympusLegacy5000 route
-
-9. `src/pages/Casino.tsx`
-   - Insert lobby card at top recommended section, mirroring the Olympus Legacy 5000 card with warm pastel gradient + "NEW SIGNATURE" ribbon
-
-## Technical notes
-
-- No new DB tables, RPCs, or backend changes. Pure frontend additive feature.
-- All colors via inline `hsl()` literals inside theme strings (consistent with existing theme file convention — semantic tokens are not used inside `themes.ts` because patterns need raw CSS gradients).
-- `SugarFeverCanvas` uses `useAnimatedCanvas` hook if present, otherwise a self-contained RAF identical to `OlympusLegacyCanvas` to guarantee zero coupling.
-- Mobile particle throttle: `navigator.hardwareConcurrency <= 4 || matchMedia("(max-width: 640px)")` → halve particle counts.
-- Crown weight 1.4 places Sugar Fever between Cosmic Forge (1.5) and Neon Tokyo (1.4) — same tier as Neon, below Olympus Legacy flagship (1.6) by design.
-
-## Out of scope
-
-- New audio asset files (placeholder reuses olympus sound pack; ElevenLabs prompts can be added later in `docs/audio/elevenlabs-prompts.md`)
-- New image assets (placeholder reuses olympus bg/logo; swap comment block included for later)
-- Any change to the OlympusSlot engine, cluster_tumble pipeline, or other 8 existing slots
+- 색상은 컴포넌트 내 inline `hsl()` 리터럴 (캔디 팔레트 전용, 전역 토큰 영향 없음)
+- 기존 8개 슬롯, OlympusSlot 엔진, SlotSignatureWrapper 무수정
+- 새 DB/사운드/에셋 추가 없음 (사운드 팩은 placeholder 유지)
+- 변경 후 `OlympusLegacyCanvas`, 다른 슬롯 페이지 영향 0건 확인
