@@ -83,45 +83,70 @@ Countdown: >5분 Warm Gold / ≤5분 Hot Pink pulse
 - ETA: USDT 1~5분 / 계좌 5~30분 / 상품권 1~6시간
 - CTA: [내 입금 보기] / [닫기]
 
-## 4. File Structure
+## 4. File Structure (분리 강제 — useDeposit 비대화 금지)
+
 ```text
 src/packages/wallet/
   hooks/
-    useDeposit.ts        # state machine + realtime + upload
+    useDeposit.ts            # orchestration ONLY (compose 아래 5개)
+    useDepositRealtime.ts    # crypto_deposit_intents UPDATE + ownership check + replay protection
+    useDepositDraft.ts       # sessionStorage resume (phonara:deposit_draft:v1)
+    useDepositTelemetry.ts   # 6 events + session_funnel_id + abandon reason
+    useDepositCountdown.ts   # expiresAt - Date.now() 재계산 + visibilitychange drift fix
+    useDepositNavGuard.ts    # confirm + beforeunload + useBlocker
+  lib/
+    sanitize.ts              # trim + zero-width 제거
+    depositValidators.ts     # method별 min/format
   components/
-    DepositCard.tsx      # 초대형 CTA + 평균 도착 배지
-    DepositModal.tsx     # 3-step dialog
-    DepositHistory.tsx   # 최근 5건 + status pill + realtime
+    DepositCard.tsx          # 초대형 CTA + 평균 도착 배지
+    DepositModal.tsx         # 3-step dialog (얇은 shell)
+    DepositStep1Methods.tsx
+    DepositStep2Coin.tsx
+    DepositStep2Bank.tsx
+    DepositStep2Voucher.tsx
+    DepositStep3Success.tsx
+    DepositHistory.tsx       # 최근 5건 + 3-step timeline + realtime
+    DepositTimeline.tsx      # 신청됨 · 확인중 · 반영완료
 ```
 
-`WalletTopSection` 갱신:
-```text
-Wallet
-└─ WalletTopSection
-   ├─ WalletDashboard
-   ├─ CTA Grid (grid-cols-2 gap-3)
-   │   ├─ WithdrawCard
-   │   └─ DepositCard
-   ├─ WithdrawHistory
-   └─ DepositHistory
-```
+규칙: `useDeposit.ts`는 500줄 이하 유지. 모든 사이드이펙트는 전용 훅으로 위임. method당 컴포넌트 분리해 1500줄 monster 방지.
+
+## 4.5 Core Principles (LOCKED)
+
+1. **Realtime = UX, Polling = Truth**
+   - realtime은 즉시 UI 반응(낙관적 전환·토스트·burst).
+   - 최종 잔액/intent 상태 확정은 `get_my_pending_deposits` + `phon_balances` refetch로 검증.
+   - websocket drop은 반드시 발생 → polling fallback이 source of truth.
+
+2. **History wording은 고령층 언어**
+   - 금지: pending / processing / checking / matched.
+   - 허용: `신청됨` → `확인중` → `반영완료` (3단계 고정).
+   - `DepositTimeline` 단일 출처.
+
+3. **심리 안정감 4종 유지 (타협 불가)**
+   - grace UI / safe-checking 카피 / heartbeat / copy verification.
+   - "입금 이탈률 감소 장치" — 디자인 단순화 명목으로 제거 금지.
+
+4. **명세 고정 후 그대로 구현**
+   - 본 플랜 승인 이후 추가 권장사항은 v1.1로 분리. v1.0은 본 문서 범위 안에서만 구현·QA·배포.
 
 ## 5. useDeposit FINAL State Machine
 ```ts
 step: 1 | 2 | 3
 method: 'coin' | 'bank' | 'voucher'
-common: { amount }
+common: { amount, beforeBalance, clientRequestId, sessionFunnelId }
 coin:   { intent, qrDataUrl, expiresAt, status }
 bank:   { bankName, bankAccount, senderName }
 voucher:{ voucherBrand, voucherPin, receiptFile, receiptUrl }
+locks:  { inputsLocked: boolean }   // soft-freeze after intent_created
 
 actions:
-  next() prev() reset() close()
-  submit()                  // method별 분기
-  copy(text)                // haptic + toast
-  regenerateIntent()        // expired 복구
-  subscribeRealtime(id)     // crypto_deposit_intents UPDATE
+  next() prev() reset() close(reason)
+  submit()                  // method별 분기, idempotent via clientRequestId
+  copy(text)                // sanitize + haptic + toast + last-6 chip
+  regenerateIntent()        // expired/grace 복구
 ```
+orchestration만. realtime/draft/countdown/telemetry/navGuard는 전용 훅이 담당.
 
 ## 6. Validation
 | 수단 | 최소 |
