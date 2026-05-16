@@ -1584,6 +1584,128 @@ export type Database = {
         }
         Relationships: []
       }
+      crash_bets: {
+        Row: {
+          auto_cashout: number | null
+          bet_phon: number
+          bonus_mult: number
+          cashed_out_at_multiplier: number | null
+          created_at: string
+          id: string
+          payout_phon: number
+          round_id: string
+          user_id: string
+          won: boolean | null
+        }
+        Insert: {
+          auto_cashout?: number | null
+          bet_phon: number
+          bonus_mult?: number
+          cashed_out_at_multiplier?: number | null
+          created_at?: string
+          id?: string
+          payout_phon?: number
+          round_id: string
+          user_id: string
+          won?: boolean | null
+        }
+        Update: {
+          auto_cashout?: number | null
+          bet_phon?: number
+          bonus_mult?: number
+          cashed_out_at_multiplier?: number | null
+          created_at?: string
+          id?: string
+          payout_phon?: number
+          round_id?: string
+          user_id?: string
+          won?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crash_bets_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "crash_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crash_hot_streaks: {
+        Row: {
+          streak: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          streak?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          streak?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      crash_mission_claims: {
+        Row: {
+          claimed_at: string
+          day: string
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          day?: string
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          day?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      crash_rounds: {
+        Row: {
+          crash_multiplier: number
+          crashed_at: string | null
+          created_at: string
+          id: string
+          pending_until: string
+          seed: string
+          seed_hash: string
+          seed_revealed: boolean
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          crash_multiplier: number
+          crashed_at?: string | null
+          created_at?: string
+          id?: string
+          pending_until?: string
+          seed: string
+          seed_hash: string
+          seed_revealed?: boolean
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          crash_multiplier?: number
+          crashed_at?: string | null
+          created_at?: string
+          id?: string
+          pending_until?: string
+          seed?: string
+          seed_hash?: string
+          seed_revealed?: boolean
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       cron_settle_audit_log: {
         Row: {
           caller: string | null
@@ -8839,6 +8961,15 @@ export type Database = {
         Returns: number
       }
       _check_daily_operator_pnl: { Args: never; Returns: Json }
+      _crash_compute_multiplier: { Args: { _seed: string }; Returns: number }
+      _crash_vip_limits: {
+        Args: { _uid: string }
+        Returns: {
+          bonus_mult: number
+          max_bet: number
+          tier: string
+        }[]
+      }
       _credit_referral_commission: {
         Args: { _base: number; _invitee: string; _source: string }
         Returns: undefined
@@ -9870,6 +10001,7 @@ export type Database = {
       claim_ai_bot_run: { Args: { _run_id: string }; Returns: Json }
       claim_ai_mission: { Args: { _mission_id: string }; Returns: Json }
       claim_coin_first_win: { Args: never; Returns: Json }
+      claim_crash_mission_phon: { Args: never; Returns: Json }
       claim_daily_attendance: {
         Args: { user_id: string }
         Returns: {
@@ -9946,6 +10078,37 @@ export type Database = {
         Returns: boolean
       }
       count_admin_backup_codes: { Args: never; Returns: number }
+      crash_cashout: { Args: { _round_id: string }; Returns: Json }
+      crash_get_current_round: { Args: never; Returns: Json }
+      crash_get_live_bets: {
+        Args: { _round_id: string }
+        Returns: {
+          avatar_id: string
+          bet_phon: number
+          cashed_at: number
+          nick: string
+          payout: number
+          status: string
+        }[]
+      }
+      crash_get_my_hot_streak: { Args: never; Returns: Json }
+      crash_get_my_stats: { Args: never; Returns: Json }
+      crash_get_recent_wins: {
+        Args: { _limit?: number }
+        Returns: {
+          avatar_id: string
+          created_at: string
+          multiplier: number
+          nick: string
+          payout: number
+          round_id: string
+        }[]
+      }
+      crash_place_bet: {
+        Args: { _auto_cashout?: number; _bet_phon: number }
+        Returns: Json
+      }
+      crash_tick_round: { Args: never; Returns: Json }
       create_api_key: {
         Args: {
           _name: string

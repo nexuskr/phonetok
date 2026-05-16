@@ -86,6 +86,7 @@ const GROUPS: NavGroup[] = [
     icon: Zap,
     children: [
       { to: "/casino", label: "슬롯 로비", icon: Zap },
+      { to: "/crash", label: "🚀 Crash NEW", icon: Zap },
       { to: "/casino/olympus-1000", label: "Olympus 1000", icon: Crown },
     ],
   },
