@@ -1,0 +1,37 @@
+{
+  "_pr": "PR-H",
+  "_status": "exit_audit",
+  "_summary": "Phase 2 Visibility EXIT — Idle Suspension live (admin paused after 60s idle, resume on input) + governance contract met. All cooperative, money-flow IMMUTABLE.",
+  "implementation": {
+    "idle": "src/packages/runtime/runtime.idle.ts — installIdleSuspension(): 60s no-input → pauseCategory('admin'); any input → resumeCategory('admin'); 5s poll; visibilitychange→visible counts as activity",
+    "wiring": "src/main.tsx — installIdleSuspension() at boot",
+    "governor_check": "src/lib/util/visible-interval.ts tick() honors both hidden-tab (PR-G) and idle (PR-H) pauses via isCategoryPaused(cat)"
+  },
+  "exit_thresholds": {
+    "coverage": ">= 0.7 (DEV ledger via EntropyChip)",
+    "category_unknown": 0,
+    "untracked_size": "< 5 (long-term FREEZE only)",
+    "money_flow_git_diff": 0,
+    "freeze_check": "[freeze] OK — 8 money-flow paths intact",
+    "raw_setInterval_total": 15,
+    "raw_breakdown": "12 money-flow FREEZE + 1 rpc.surface DEV collector + 1 PR-F idle-detector + 1 PR-H idle-tick (none in business logic)"
+  },
+  "pr_history": {
+    "A": "Triage Freeze List (0 code lines)",
+    "B": "Cosmetic Wave 1 (78→62)",
+    "C": "Cosmetic Wave 2 (62→21)",
+    "D": "Admin Wave (21→13)",
+    "E": "Unknown=0 + ignorelist (13→12)",
+    "F": "DEV RPC 3-mode collector + baseline scaffold",
+    "G": "governor.pauseCategory('cosmetic') on hidden tab",
+    "H": "installIdleSuspension() — pauseCategory('admin') after 60s idle + EXIT AUDIT"
+  },
+  "scenario_for_verification": "Run __phonaraSurface.report() after [active 5m → hidden 5m → idle 5m] in DEV. Compare against reports/rpc.surface.2026-05-21.json baseline. Targets: hidden RPC -90%, idle RPC -70%, foreground unchanged.",
+  "guarantees_met": [
+    "No business logic mutation",
+    "No money-flow disturbance",
+    "No hidden execution (cosmetic paused while hidden)",
+    "No uncontrolled interval execution (cooperative governor on all tracked sites)",
+    "Full runtime observability through ledger only"
+  ]
+}

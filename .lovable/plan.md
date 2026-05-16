@@ -5,7 +5,7 @@
 
 Phase 2 Pre-Flight (visibility instrumentation) 완료. 본 문서는 다음 8개 PR 의 **변경 불가 실행 계약**.
 
-**진행 상태:** PR-A ✅ · PR-B ✅ (78→62) · PR-C ✅ (62→21) · PR-D ✅ (21→13) · PR-E ✅ (13→12, triage.unknown=0) · PR-F ✅ (DEV RPC 3-mode collector + baseline scaffold) · PR-G ✅ (governor.pauseCategory("cosmetic") + setVisibleInterval tick-gate + main.tsx installHiddenTabSuspension, money-flow diff=0, `reports/rpc.surface.2026-05-22.json`) · PR-H ⏳ 대기 (Idle Suspension 60s → admin pause + Exit Audit).
+**진행 상태:** PR-A ✅ · PR-B ✅ · PR-C ✅ · PR-D ✅ · PR-E ✅ · PR-F ✅ · PR-G ✅ · PR-H ✅ **PHASE 2 COMPLETE** — `installIdleSuspension()` 추가(60s idle → admin pause, 입력시 즉시 resume), money-flow diff=0, exit audit `reports/rpc.surface.2026-05-23.json`. 시나리오 5+5+5 실행 후 baseline 대비 hidden -90% / idle -70% 검증만 남음.
 
 ## 0. System Definition (절대 고정)
 
