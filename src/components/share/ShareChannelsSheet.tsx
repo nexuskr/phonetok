@@ -57,7 +57,7 @@ export default function ShareChannelsSheet({
         </SheetHeader>
 
         <div className="grid grid-cols-3 gap-3 mt-5">
-          {ORDER.slice(0, 6).map((ch) => {
+          {ORDER.slice(0, 5).map((ch) => {
             const m = CHANNEL_META[ch];
             return (
               <button
