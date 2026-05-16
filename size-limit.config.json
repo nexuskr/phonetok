@@ -1,0 +1,16 @@
+{
+  "$schema": "./size-limit.schema.json",
+  "comment": "PR-L per-route bundle budgets (gzip). Consumed by scripts/bundle-budget.mjs.",
+  "budgets": [
+    { "name": "index (Layer 1 entry)",       "pattern": "^index-[^/]+\\.js$",          "limit_kb": 180, "aggregate": "max" },
+    { "name": "operator (admin lazy chunk)", "pattern": "^operator-[^/]+\\.js$",       "limit_kb": 400, "aggregate": "sum" },
+    { "name": "Casino slot routes",          "pattern": "^(Casino|AztecSun1200|CherrySakura500|CosmicForge5000|DragonEmpire|NeonTokyo88|Olympus1000|OlympusLegacy5000|PharaohsVault2500|PiratesCurse1500|SugarFever3000|VikingThunder4000|Wizard2000)-[^/]+\\.js$", "limit_kb": 120, "aggregate": "max" },
+    { "name": "Crash game",                  "pattern": "^Crash-[^/]+\\.js$",          "limit_kb": 80,  "aggregate": "max" },
+    { "name": "Roulette game",               "pattern": "^Roulette-[^/]+\\.js$",       "limit_kb": 80,  "aggregate": "max" },
+    { "name": "Wallet / Packages / Pay",     "pattern": "^(Packages|Pay|Wallet)[^/]*-[^/]+\\.js$", "limit_kb": 100, "aggregate": "max" },
+    { "name": "Support / Chat",              "pattern": "^(Support|SupportTickets|Chat)[^/]*-[^/]+\\.js$", "limit_kb": 80, "aggregate": "max" },
+    { "name": "Live / Market",               "pattern": "^(Live|LiveOverlay|Whales)-[^/]+\\.js$", "limit_kb": 90, "aggregate": "max" },
+    { "name": "i18n locale shard (per lang)","pattern": "^locale-(ko|en|ja|vi)-[^/]+\\.js$", "limit_kb": 40, "aggregate": "max" },
+    { "name": "vendor chunks",               "pattern": "^(vendor|supabase|icons|motion|i18n)-[^/]+\\.js$", "limit_kb": 250, "aggregate": "max", "warn_only": true }
+  ]
+}

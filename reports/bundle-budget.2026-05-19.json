@@ -1,0 +1,281 @@
+{
+  "generated_at": "2026-05-16T15:28:40.813Z",
+  "baseline": null,
+  "failed": 0,
+  "groups": [
+    {
+      "name": "index (Layer 1 entry)",
+      "pattern": "^index-[^/]+\\.js$",
+      "aggregate": "max",
+      "warn_only": false,
+      "limit_kb": 180,
+      "measured_kb": 36.97,
+      "file_count": 3,
+      "files": [
+        {
+          "file": "index-BI7lSd8b.js",
+          "gz_kb": 2.96
+        },
+        {
+          "file": "index-DulRK1Hn.js",
+          "gz_kb": 36.97
+        },
+        {
+          "file": "index-VXSrAtoS.js",
+          "gz_kb": 1.05
+        }
+      ],
+      "delta_kb": null,
+      "status": "PASS"
+    },
+    {
+      "name": "operator (admin lazy chunk)",
+      "pattern": "^operator-[^/]+\\.js$",
+      "aggregate": "sum",
+      "warn_only": false,
+      "limit_kb": 400,
+      "measured_kb": 264.7,
+      "file_count": 1,
+      "files": [
+        {
+          "file": "operator-BtyCvTR7.js",
+          "gz_kb": 264.7
+        }
+      ],
+      "delta_kb": null,
+      "status": "PASS"
+    },
+    {
+      "name": "Casino slot routes",
+      "pattern": "^(Casino|AztecSun1200|CherrySakura500|CosmicForge5000|DragonEmpire|NeonTokyo88|Olympus1000|OlympusLegacy5000|PharaohsVault2500|PiratesCurse1500|SugarFever3000|VikingThunder4000|Wizard2000)-[^/]+\\.js$",
+      "aggregate": "max",
+      "warn_only": false,
+      "limit_kb": 120,
+      "measured_kb": 4.63,
+      "file_count": 13,
+      "files": [
+        {
+          "file": "AztecSun1200-BSAVSqSH.js",
+          "gz_kb": 0.72
+        },
+        {
+          "file": "Casino-DSL8VhQE.js",
+          "gz_kb": 2.05
+        },
+        {
+          "file": "CherrySakura500-DhBqwqXk.js",
+          "gz_kb": 4.35
+        },
+        {
+          "file": "CosmicForge5000-CqSdlKrF.js",
+          "gz_kb": 3.01
+        },
+        {
+          "file": "DragonEmpire-CL-CWe1S.js",
+          "gz_kb": 3.44
+        },
+        {
+          "file": "NeonTokyo88-NHFonvrs.js",
+          "gz_kb": 3.7
+        },
+        {
+          "file": "Olympus1000-C2GSJiNh.js",
+          "gz_kb": 0.68
+        },
+        {
+          "file": "OlympusLegacy5000-BKQ9A7vU.js",
+          "gz_kb": 3.96
+        },
+        {
+          "file": "PharaohsVault2500-Og4LuT2K.js",
+          "gz_kb": 4.23
+        },
+        {
+          "file": "PiratesCurse1500-B4aoIKMS.js",
+          "gz_kb": 3.76
+        },
+        {
+          "file": "SugarFever3000-CPydwPTW.js",
+          "gz_kb": 4.63
+        },
+        {
+          "file": "VikingThunder4000-4AsCHyg5.js",
+          "gz_kb": 0.72
+        },
+        {
+          "file": "Wizard2000-7PQM64iN.js",
+          "gz_kb": 4.51
+        }
+      ],
+      "delta_kb": null,
+      "status": "PASS"
+    },
+    {
+      "name": "Crash game",
+      "pattern": "^Crash-[^/]+\\.js$",
+      "aggregate": "max",
+      "warn_only": false,
+      "limit_kb": 80,
+      "measured_kb": 6.22,
+      "file_count": 1,
+      "files": [
+        {
+          "file": "Crash-t3u60eSG.js",
+          "gz_kb": 6.22
+        }
+      ],
+      "delta_kb": null,
+      "status": "PASS"
+    },
+    {
+      "name": "Roulette game",
+      "pattern": "^Roulette-[^/]+\\.js$",
+      "aggregate": "max",
+      "warn_only": false,
+      "limit_kb": 80,
+      "measured_kb": 5.95,
+      "file_count": 1,
+      "files": [
+        {
+          "file": "Roulette-_tum1SQA.js",
+          "gz_kb": 5.95
+        }
+      ],
+      "delta_kb": null,
+      "status": "PASS"
+    },
+    {
+      "name": "Wallet / Packages / Pay",
+      "pattern": "^(Packages|Pay|Wallet)[^/]*-[^/]+\\.js$",
+      "aggregate": "max",
+      "warn_only": false,
+      "limit_kb": 100,
+      "measured_kb": 26.39,
+      "file_count": 4,
+      "files": [
+        {
+          "file": "Packages-Cb1CE9rB.js",
+          "gz_kb": 14.22
+        },
+        {
+          "file": "Pay-CsuAJZ3T.js",
+          "gz_kb": 3.52
+        },
+        {
+          "file": "PaymentStickyCTA-BT_lle3h.js",
+          "gz_kb": 0.93
+        },
+        {
+          "file": "Wallet-Bb8WD-Nj.js",
+          "gz_kb": 26.39
+        }
+      ],
+      "delta_kb": null,
+      "status": "PASS"
+    },
+    {
+      "name": "Support / Chat",
+      "pattern": "^(Support|SupportTickets|Chat)[^/]*-[^/]+\\.js$",
+      "aggregate": "max",
+      "warn_only": false,
+      "limit_kb": 80,
+      "measured_kb": 2.91,
+      "file_count": 2,
+      "files": [
+        {
+          "file": "Support-CmIRhGo4.js",
+          "gz_kb": 2.91
+        },
+        {
+          "file": "SupportTickets-DJoHR6_d.js",
+          "gz_kb": 1.74
+        }
+      ],
+      "delta_kb": null,
+      "status": "PASS"
+    },
+    {
+      "name": "Live / Market",
+      "pattern": "^(Live|LiveOverlay|Whales)-[^/]+\\.js$",
+      "aggregate": "max",
+      "warn_only": false,
+      "limit_kb": 90,
+      "measured_kb": 2.08,
+      "file_count": 3,
+      "files": [
+        {
+          "file": "Live-CaImXakQ.js",
+          "gz_kb": 1.23
+        },
+        {
+          "file": "LiveOverlay-BE6DB0lO.js",
+          "gz_kb": 1.42
+        },
+        {
+          "file": "Whales-3FAtckw6.js",
+          "gz_kb": 2.08
+        }
+      ],
+      "delta_kb": null,
+      "status": "PASS"
+    },
+    {
+      "name": "i18n locale shard (per lang)",
+      "pattern": "^locale-(ko|en|ja|vi)-[^/]+\\.js$",
+      "aggregate": "max",
+      "warn_only": false,
+      "limit_kb": 40,
+      "measured_kb": 20.89,
+      "file_count": 4,
+      "files": [
+        {
+          "file": "locale-en-Bl4q8ApS.js",
+          "gz_kb": 18.38
+        },
+        {
+          "file": "locale-ja-BtbfMohH.js",
+          "gz_kb": 1.46
+        },
+        {
+          "file": "locale-ko-DZQ7RXcm.js",
+          "gz_kb": 20.89
+        },
+        {
+          "file": "locale-vi-CZHWbkVP.js",
+          "gz_kb": 1.32
+        }
+      ],
+      "delta_kb": null,
+      "status": "PASS"
+    },
+    {
+      "name": "vendor chunks",
+      "pattern": "^(vendor|supabase|icons|motion|i18n)-[^/]+\\.js$",
+      "aggregate": "max",
+      "warn_only": true,
+      "limit_kb": 250,
+      "measured_kb": 52.06,
+      "file_count": 4,
+      "files": [
+        {
+          "file": "i18n-Sm_cNpbt.js",
+          "gz_kb": 24.47
+        },
+        {
+          "file": "icons-BkS36-Hc.js",
+          "gz_kb": 14.29
+        },
+        {
+          "file": "motion-CplpKjXK.js",
+          "gz_kb": 44.96
+        },
+        {
+          "file": "supabase-1ZKCCWdm.js",
+          "gz_kb": 52.06
+        }
+      ],
+      "delta_kb": null,
+      "status": "PASS"
+    }
+  ]
+}

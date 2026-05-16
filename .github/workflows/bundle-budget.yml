@@ -1,0 +1,56 @@
+name: bundle-budget
+
+# PR-L — Per-route bundle budget CI gate.
+# Fails the PR if any lazy route exceeds its gzip budget defined in
+# size-limit.config.json. Posts a sticky PR comment with the delta table.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  budget:
+    name: Per-route bundle budget
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Build (vite)
+        run: bun run build
+
+      - name: Operator isolation gate (PR-K)
+        run: node scripts/check-operator-isolation.mjs
+
+      - name: Money-flow freeze gate
+        run: node scripts/check-money-flow-freeze.mjs
+
+      - name: Per-route bundle budget gate (PR-L)
+        id: budget
+        run: node scripts/bundle-budget.mjs
+
+      - name: Upload bundle-budget snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-budget-report
+          path: |
+            reports/bundle-budget.*.json
+            reports/bundle-budget.comment.md
+
+      - name: Sticky PR comment (size diff)
+        if: github.event_name == 'pull_request' && always()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: bundle-budget
+          path: reports/bundle-budget.comment.md
