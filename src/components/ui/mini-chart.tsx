@@ -67,7 +67,7 @@ function Tip({ x, y, items, label }: { x: number; y: number; items: { c: string;
   );
 }
 
-function useChart(props: BaseProps & { width: number }) {
+function computeChart(props: BaseProps & { width: number }) {
   const { data, xKey, series, width, height = 180, yFormatter = fmtCompact, yDomain } = props;
   const innerW = Math.max(1, width - PAD.l - PAD.r);
   const innerH = Math.max(1, height - PAD.t - PAD.b);
@@ -107,7 +107,7 @@ export function LineMini(props: BaseProps) {
   return (
     <Container height={height}>
       {(width) => {
-        const c = useChart({ ...props, width });
+        const c = computeChart({ ...props, width });
         return (
           <>
             <svg width={width} height={height} className="block">
@@ -166,7 +166,7 @@ export function AreaMini(props: BaseProps) {
   return (
     <Container height={height}>
       {(width) => {
-        const c = useChart({ ...props, width });
+        const c = computeChart({ ...props, width });
         return (
           <>
             <svg width={width} height={height} className="block">
@@ -233,7 +233,7 @@ export function BarsMini(props: BaseProps) {
   return (
     <Container height={height}>
       {(width) => {
-        const c = useChart({ ...props, width });
+        const c = computeChart({ ...props, width });
         const groupW = c.innerW / Math.max(1, data.length);
         const barW = Math.max(2, (groupW * 0.7) / series.length);
         return (
@@ -295,7 +295,7 @@ export function StackedBarsMini(props: BaseProps) {
   return (
     <Container height={height}>
       {(width) => {
-        const c = useChart({ ...props, width, yDomain: [0, yMax] as [number, number] });
+        const c = computeChart({ ...props, width, yDomain: [0, yMax] as [number, number] });
         const groupW = c.innerW / Math.max(1, data.length);
         const barW = Math.max(2, groupW * 0.6);
         return (
