@@ -58,6 +58,8 @@ async function refresh() {
     emit(next);
   } catch {
     emit({ ...cache, loaded: true });
+  } finally {
+    inflight = false;
   }
 }
 
