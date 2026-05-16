@@ -2353,6 +2353,39 @@ export type Database = {
         }
         Relationships: []
       }
+      earn_roulette_spins: {
+        Row: {
+          amount: number
+          base_amount: number
+          created_at: string
+          id: string
+          multiplier: number
+          spin_date: string
+          user_id: string
+          weight_bucket: string
+        }
+        Insert: {
+          amount: number
+          base_amount: number
+          created_at?: string
+          id?: string
+          multiplier?: number
+          spin_date?: string
+          user_id: string
+          weight_bucket: string
+        }
+        Update: {
+          amount?: number
+          base_amount?: number
+          created_at?: string
+          id?: string
+          multiplier?: number
+          spin_date?: string
+          user_id?: string
+          weight_bucket?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -11632,6 +11665,7 @@ export type Database = {
       spend_phon_for_booster: { Args: never; Returns: Json }
       spend_phon_for_crown_boost: { Args: never; Returns: Json }
       spend_phon_for_fee_discount: { Args: { _amount: number }; Returns: Json }
+      spin_daily_roulette: { Args: never; Returns: Json }
       spin_roulette: { Args: { _kind: string }; Returns: Json }
       spin_slot_demo: {
         Args: {
