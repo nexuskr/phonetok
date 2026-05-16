@@ -1,90 +1,45 @@
-# Background Suspension 실패 원인 해결 (PR-G/H 검증 PASS)
+# PR-H Idle/Hidden Suspension — 회귀 수정
 
-## 측정 결과 요약
+## 현재 시나리오 결과
+- `activeRPC: 5` (정상)
+- `hiddenRPC: 1` — FAIL (`platform_kill_switches` 1회 유출)
+- `idleRPC: 5` — FAIL (cosmetic 4개 + admin 1개 전부 유출)
 
-3×60s 시나리오:
-- `activeRPC=2` (platform_kill_switches + get_whale_strikes_24h, 정상)
-- `hiddenRPC=1` (FAIL, 목표 0~1 미만이지만 -90% 미달)
-- `idleRPC=2` (FAIL, idle suspension 미작동 — active와 동일)
+## 원인
+1. **Idle**: `runtime.idle.installIdleSuspension()`이 `pauseCategory("admin")`만 호출합니다. `use-auth-live-data`의 4개 폴링(KPI, whale, top5, 1s drift)은 `category: "cosmetic"` 이므로 idle 단계에서 계속 발사됩니다.
+2. **Hidden**: `setVisibleInterval`은 `document.hidden`과 governor를 모두 가드하지만, `use-kill-switches`의 두 가지 비-interval 경로가 가드되지 않습니다:
+   - Supabase realtime `postgres_changes` 콜백 → `refresh()` 직접 호출
+   - `window` `focus` 이벤트 → `refresh()` 직접 호출 (시나리오가 visibility를 토글할 때 트리거될 가능성)
 
-## 근본 원인 2가지
+## 변경안
 
-### 1. `use-kill-switches.ts`가 raw `setInterval` 사용
+### A. Idle 정책 확장 (정답으로 추천)
+`runtime.idle.ts`를 수정해 60초 입력 없음이 감지되면 **`admin` + `cosmetic` 둘 다** 일시정지하도록 변경. 입력 복귀 시 둘 다 resume.
+
+근거: 탭이 visible이라도 60초간 입력이 없으면 화면을 능동적으로 보지 않는 상태이므로 cosmetic 폴링/마키 갱신을 멈춰도 UX 손실이 없고, 입력 한 번에 즉시 catch-up이 일어납니다. `useDocumentVisible`/Realtime은 영향 없습니다.
+
+대안 (선택하면 알려주세요):
+- **B**. `use-auth-live-data`만 `category: "admin"`으로 재분류 — 좁은 수정이지만 `/secure-auth` 외 다른 cosmetic 폴링은 idle에 계속 살아남음.
+- **C**. 새 카테고리 `"idle-suppressible"` 도입 — 코드 양 가장 많음, 비추천.
+
+### Hidden 누수 차단 (A/B/C 공통)
+`use-kill-switches.ts`의 `refresh()` 호출 시 가드 추가:
+```ts
+function refresh() {
+  if (typeof document !== "undefined" && document.hidden) return;
+  if (isCategoryPaused("admin")) return;
+  // ...
+}
 ```
-src/hooks/use-kill-switches.ts:71
-const id = setInterval(refresh, 60_000);
-```
-- governor가 못 건드림 → hidden/idle 양쪽 모두 통과
-- 카테고리 "admin" 으로 분류돼야 idle suspension(PR-H)이 잡음
-- hidden 버킷의 `platform_kill_switches: 1`가 바로 이놈
+- realtime 콜백/focus 핸들러 모두 자동으로 보호됨.
+- realtime 이벤트는 무시되지만, visible 복귀 시 `setVisibleInterval` catch-up과 `focus` 리스너가 1회 즉시 refresh 하므로 일관성 유지.
 
-### 2. `runtime.idle`의 idle 상태를 시나리오 러너가 트리거 못함
-- `runtime.idle.ts`는 자체 `lastInput` 변수로 60초 무입력을 감지
-- `rpc.surface.runScenario`는 자기네 `lastInteraction = 0`만 리셋 → runtime.idle의 lastInput은 그대로 → `pauseCategory("admin")` 호출 안 됨
-- 결과: idle 단계에서도 admin/cosmetic 둘 다 활성 → 2 RPC 그대로 흐름
-
-## 수정안
-
-### A. `use-kill-switches.ts` 마이그레이션
-```text
-- import { setInterval } (raw)
-+ import { setVisibleInterval } from "@/lib/util/visible-interval";
-- const id = setInterval(refresh, 60_000);
-- return () => clearInterval(id);
-+ return setVisibleInterval(refresh, 60_000, {
-+   meta: { owner: "use-kill-switches", category: "admin" },
-+ });
-```
-효과:
-- hidden: governor.pauseCategory("cosmetic")는 admin엔 영향 없지만, `document.hidden` 가드(tick 첫 줄)가 직접 막음 → hidden 버킷 0
-- idle: runtime.idle이 pauseCategory("admin") 호출하면 자동 skip
-
-### B. DEV-only `runtime.idle` 강제 API
-`src/packages/runtime/runtime.idle.ts`에 DEV 가드로 노출:
-```text
-if (DEV) (window as any).__phonaraIdle = {
-  force(on: boolean) {
-    if (on) { lastInput = 0; idle = true; pauseCategory("admin"); }
-    else    { lastInput = Date.now(); if (idle){ idle=false; resumeCategory("admin"); } }
-  },
-  isIdle: () => idle,
-};
-```
-
-### C. `rpc.surface.runScenario`에서 idle 단계 진입/이탈 시 위 API 호출
-```text
-// Phase 2 시작
-window.__phonaraIdle?.force(true);
-...await idleMs...
-// 종료
-window.__phonaraIdle?.force(false);
-```
-
-## 기대 결과 (재측정)
-
-```
-activeRPC: 2
-hiddenRPC: 0    ← PASS (-100%)
-idleRPC:   0    ← PASS (-100%)
-verdict: { hidden: "PASS", idle: "PASS" }
-```
-
-## 영향 범위
-
-- 운영 동작 변화: kill switch 폴링이 백그라운드/유휴 시 일시정지 (60s 폴링 → 복귀 즉시 catch-up 호출). 보안성 영향 없음 (활성 사용자에게만 폴링).
-- 머니플로우: 변경 없음 (`scripts/check-money-flow-freeze.mjs` 통과 예상).
-- 번들: ±0 KB (전부 기존 모듈 재사용).
-- DEV API: prod 빌드에서 `import.meta.env.DEV` 가드로 tree-shake.
-
-## 파일 변경 목록
-
-1. `src/hooks/use-kill-switches.ts` — raw setInterval → setVisibleInterval(admin)
-2. `src/packages/runtime/runtime.idle.ts` — DEV `__phonaraIdle.force()` 노출
-3. `src/packages/entropy/rpc.surface.ts` — idle 단계에서 `__phonaraIdle.force(true/false)` 호출
+## 변경 파일
+- `src/packages/runtime/runtime.idle.ts` — `tick()`/`markActive()`/`__phonaraIdle.force()`에서 `admin` + `cosmetic` 둘 다 pause/resume.
+- `src/hooks/use-kill-switches.ts` — `refresh()` 첫 줄에 hidden + admin paused 가드 추가, `isCategoryPaused` import.
 
 ## 검증
-
-1. `bun run build` (번들 회귀 없음 확인)
-2. DEV 서버에서 `await __phonaraSurface.runScenario()` 재실행
-3. `verdict.hidden === "PASS" && verdict.idle === "PASS"` 확인
-4. 결과 JSON을 `reports/rpc.surface.2026-05-16.json`에 저장
+1. `bun run build`
+2. `__phonaraSurface.runScenario()` 실행
+3. 기대 결과: `verdict.hidden === "PASS"`, `verdict.idle === "PASS"`, `hiddenRPC=0`, `idleRPC=0`
+4. 통과 시 `reports/rpc.surface.2026-05-16.json`에 결과 저장
