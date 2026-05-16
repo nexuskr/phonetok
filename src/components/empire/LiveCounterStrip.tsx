@@ -38,7 +38,7 @@ export default function LiveCounterStrip() {
 
   useEffect(() => {
     let alive = true;
-    let timer: ReturnType<typeof setInterval>;
+    let timer: (() => void) | undefined;
     async function fetchOnce() {
       const { data } = await supabase.rpc("get_ghost_pulse");
       if (!alive || !data) return;
