@@ -1,0 +1,23 @@
+{
+  "_pr": "PR-G",
+  "_status": "hidden_tab_suspension_live",
+  "_summary": "Cooperative pause of category='cosmetic' while document.hidden via governor.pauseCategory. Money-flow (raw setInterval) unaffected. Admin stays live (governed in PR-H).",
+  "implementation": {
+    "governor": "src/packages/runtime/runtime.governor.ts — pauseCategory/resumeCategory/isCategoryPaused/installHiddenTabSuspension",
+    "tick_gate": "src/lib/util/visible-interval.ts — tick() returns early when isCategoryPaused(cat)",
+    "auto_bind": "src/main.tsx — installHiddenTabSuspension() at boot (visibilitychange → cosmetic)",
+    "exports": "src/packages/runtime/index.ts — pauseCategory/resumeCategory/isCategoryPaused/pausedCategories/subscribeGovernor/installHiddenTabSuspension"
+  },
+  "behavior_change": {
+    "cosmetic_tracked": "skipped while hidden AND while governor-paused",
+    "admin_tracked": "still skipped while hidden (intrinsic), NOT governor-paused yet",
+    "money_flow_raw": "untouched — raw window.setInterval ignores governor (immutable)"
+  },
+  "validation": {
+    "money_flow_diff_lines": 0,
+    "freeze_check": "[freeze] OK — 8 money-flow paths intact",
+    "raw_setInterval_count": 14,
+    "raw_breakdown": "12 money-flow FREEZE + 1 rpc.surface DEV collector + 1 governor watcher (none in business logic)"
+  },
+  "scenario": "Run __phonaraSurface.report() after [active 5m → hidden 5m → idle 5m] and compare hidden bucket against reports/rpc.surface.2026-05-21.json baseline. PR-G expectation: hidden.count drops sharply for cosmetic-driven RPCs; admin polling unchanged."
+}
