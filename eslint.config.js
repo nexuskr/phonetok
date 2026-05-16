@@ -70,6 +70,11 @@ const restrictSonnerRule = {
           message:
             "Direct sonner import is forbidden. Use `import { notify } from '@/lib/notify'` instead. (PHASE 1 lockdown)",
         },
+        {
+          name: "@/hooks/use-realtime-channel",
+          message:
+            "Direct `useRealtimeChannel` import is forbidden. Use `@pkg/realtime` wrappers (useWalletChannel / useGameChannel / useChatChannel / useMarketChannel). (PR-J)",
+        },
       ],
     },
   ],
@@ -82,7 +87,7 @@ const restrictRawChannelRule = {
       selector:
         "CallExpression[callee.object.name='supabase'][callee.property.name='channel']",
       message:
-        "Direct `supabase.channel(...)` is forbidden. Use `@pkg/realtime/*` wrappers (useWalletChannel / useGameChannel / useChatChannel / useMarketChannel) or `useRealtimeChannel`. (PHASE 1 lockdown)",
+        "Direct `supabase.channel(...)` is forbidden. Use `@pkg/realtime/*` wrappers (useWalletChannel / useGameChannel / useChatChannel / useMarketChannel). (PHASE 1 lockdown)",
     },
   ],
 };
