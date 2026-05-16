@@ -46,6 +46,8 @@ jobs:
         run: bun run build
       - name: Bundle size gate (Layer 1 ≤ 180 KB gzip)
         run: node scripts/bundle-check.mjs
+      - name: Per-route bundle budget gate (PR-L)
+        run: node scripts/bundle-budget.mjs
       - name: Lighthouse CI (mobile)
         run: bunx @lhci/cli@0.13.x autorun || echo "lighthouse warn (non-blocking until PHASE 5)"
         continue-on-error: true

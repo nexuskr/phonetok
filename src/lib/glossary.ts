@@ -222,6 +222,10 @@ export const G = {
   realtimeDegraded: "실시간 연결이 잠시 느려졌어요. 돈과 데이터는 안전합니다",
   realtimeRestored: "다시 실시간으로 연결됐어요",
 
+  // PR-L: bundle budget user-facing fallbacks (CI gate, rarely surfaced)
+  bundleOverBudget: "잠시만요 — 화면이 무거워졌어요. 운영팀이 곧 가볍게 만들게요",
+  bundleHealthy: "지금 화면이 아주 가볍게 잘 돌아가고 있어요",
+
 } as const;
 
 export type GlossaryKey = keyof typeof G;
