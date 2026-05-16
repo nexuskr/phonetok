@@ -67,7 +67,7 @@ export default function JackpotMeter({ gameCode }: { gameCode: string }) {
   // Realtime — every spin (anyone, anywhere) bumps pool_phon, we want to feel it.
   useEffect(() => {
     const off = subscribeRealtime({
-      key: `jackpot:${gameCode}`,
+      key: `game:jackpot:${gameCode}`,
       bindings: [{
         event: "UPDATE",
         schema: "public",
