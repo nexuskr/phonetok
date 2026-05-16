@@ -1,0 +1,13 @@
+{
+  "_note": "PR-B post-migration RPC surface placeholder. Run scripts/rpc.surface.baseline.mjs in browser to capture live numbers. Foreground should be ±5% of 2026-05-16 baseline; hidden RPC delta deferred to PR-F (governor pause).",
+  "pr": "PR-B",
+  "capturedAt": null,
+  "scenario": "login → /dashboard 5min foreground → 5min hidden → 5min idle",
+  "compare_to": "reports/rpc.surface.2026-05-16.json",
+  "expected_post_PR_B": {
+    "foreground": "≈ baseline (±5%) — same RPC calls, just visibility-aware",
+    "hidden": "≈ baseline for now — governor still inactive (PR-F)",
+    "idle": "≈ baseline for now — governor still inactive (PR-G)"
+  },
+  "surface": { "foreground": { "count": null, "byRpc": {} }, "hidden": { "count": null, "byRpc": {} }, "idle": { "count": null, "byRpc": {} } }
+}

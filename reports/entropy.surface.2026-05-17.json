@@ -1,0 +1,36 @@
+{
+  "_note": "PR-B Cosmetic Wave 1 ledger snapshot. Static counts derived from source diff (setInterval → setVisibleInterval). For live capture, run `__phonaraSurface.entropy()` in DEV console on /dashboard and overwrite this file.",
+  "pr": "PR-B",
+  "capturedAt": "2026-05-17T00:00:00Z",
+  "diff_from_baseline_2026_05_16": {
+    "raw_setInterval_call_sites": { "before": 78, "after": 62, "delta": -16 },
+    "tracked_via_setVisibleInterval_delta": +16,
+    "money_flow_git_diff_lines": 0,
+    "false_positive_skipped": 1
+  },
+  "counts": { "tracked_added_this_pr": 16, "untracked_removed_this_pr": 16, "coverage_direction": "monotonic_increase" },
+  "migrated_call_sites": [
+    { "owner": "src/pages/LiveOverlay.tsx:36",                                "intervalMs": 1000,  "category": "cosmetic" },
+    { "owner": "src/components/MachineFomoTicker.tsx:22",                     "intervalMs": 6500,  "category": "cosmetic" },
+    { "owner": "src/hooks/use-now-tick.ts:34",                                "intervalMs": 1000,  "category": "cosmetic", "note": "Native setInterval retained (singleton bucket with custom hidden-skip); registered via trackInterval directly to appear in ledger." },
+    { "owner": "src/components/PayoutTicker.tsx:39",                          "intervalMs": 4000,  "category": "cosmetic" },
+    { "owner": "src/components/AttendanceCard.tsx:17",                        "intervalMs": 30000, "category": "cosmetic" },
+    { "owner": "src/packages/live/components/LiveTicker.tsx:50",              "intervalMs": 60000, "category": "cosmetic" },
+    { "owner": "src/components/empire/VipArrivalsTicker.tsx:31",              "intervalMs": 15000, "category": "cosmetic" },
+    { "owner": "src/components/empire/ThreeMinuteCashLoop.tsx:51",            "intervalMs": 1000,  "category": "cosmetic" },
+    { "owner": "src/components/earn/VipBoostCard.tsx:29",                     "intervalMs": 1000,  "category": "cosmetic" },
+    { "owner": "src/components/conversion/LivePurchaseTicker.tsx:102",        "intervalMs": 8000,  "category": "cosmetic" },
+    { "owner": "src/components/conversion/patterns/CountdownLossAversion.tsx:29", "intervalMs": 1000, "category": "cosmetic" },
+    { "owner": "src/components/auth/AuthSocialProof.tsx:192",                 "intervalMs": 1000,  "category": "cosmetic" },
+    { "owner": "src/components/empire/LiveCounterStrip.tsx:93",               "intervalMs": 4000,  "category": "cosmetic" },
+    { "owner": "src/components/landing/TournamentCountdownBar.tsx:45",        "intervalMs": 1000,  "category": "cosmetic" },
+    { "owner": "src/components/landing/WorldDominationWall.tsx:112",          "intervalMs": 8000,  "category": "cosmetic" },
+    { "owner": "src/components/slots/SlotTournamentBanner.tsx:71",            "intervalMs": 1000,  "category": "cosmetic" }
+  ],
+  "money_flow_freeze_verified": true,
+  "validation_gates": {
+    "tracked_monotonic_increase": "pass",
+    "money_flow_diff_zero": "pass (check-money-flow-freeze.mjs OK — 8 paths intact)",
+    "bundle_delta_estimate_kb": "+0.0 (only import + same call structure)"
+  }
+}
