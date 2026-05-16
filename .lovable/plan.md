@@ -273,7 +273,82 @@ quiet 모드:
 
 ---
 
-## 13. 최종 느낌 (체크리스트)
+## 13. Ω-FINAL 3 Additions (LOCKED — OS 마감)
+
+### 13-1. Runtime Priority System
+모바일에서 모든 걸 동시에 실행하면 죽는다. 4단계 우선순위 강제.
+
+```text
+A — Critical Runtime    ⇒ 즉시 (auth · wallet · deposit · withdraw · kernel · oracle)
+B — Interactive Runtime ⇒ first paint 직후 (play · live-strip · missions · ticker)
+C — Deferred Runtime    ⇒ 첫 user interaction 이후 (chat · feed · leaderboard · avatar)
+D — Cosmetic Runtime    ⇒ 조건부 device.profile 게이팅 (particles · glow · 3D · hologram)
+```
+
+신규 헬퍼 `@pkg/performance/runtime`:
+```ts
+runWhenIdle(fn, { timeout })       // requestIdleCallback + fallback
+runIfVisible(ref, fn)              // IntersectionObserver
+runIfHighEndDevice(fn)             // 13-2 device.profile === "high"
+runAfterFirstInteraction(fn)       // pointerdown/keydown 1회
+```
+
+규칙: A에 lazy import 금지. B/C는 위 헬퍼 경유. D는 항상 device 게이팅. Layer 1 진입 시 동시 task ≤ 4.
+
+### 13-2. Device Intelligence Layer
+저가 안드폰과 iPhone Pro에 같은 UI = 죽음. 전세계 단말 자동 적응.
+
+```text
+device.profile = "low" | "mid" | "high"
+
+판정 입력:
+  - navigator.deviceMemory       (< 4 ⇒ low)
+  - hardwareConcurrency          (< 4 ⇒ low)
+  - GPU tier (detect-gpu)        (tier 1 ⇒ low)
+  - effectiveConnectionType      (2g/3g/saveData ⇒ low)
+  - 첫 5초 fps drops > 10        ⇒ 자동 downgrade
+```
+
+| 항목 | low | mid | high |
+|------|-----|-----|------|
+| blur / backdrop | off | reduced | full |
+| shadows | flat | reduced | full |
+| realtime poll freq | 60s | 20s | 5s |
+| animation | reduced | normal | full |
+| video autoplay | off | on | on |
+| 3D 라우트 | disabled | 2.5D fallback | full |
+| particles | off | reduced | full |
+
+구현: `@pkg/performance/device` — `useDeviceProfile()` + `<body data-device="...">`. Tailwind plugin으로 `low:hidden mid:opacity-50 high:animate-pulse` 변형. 모든 cosmetic 효과는 데이터 셀렉터 기반.
+
+### 13-3. Operator Mode Separation (운영자 앱 분리)
+운영자 코드가 user 번들에 섞이면 → 번들 비대 + 보안 리스크 + 상태 꼬임.
+
+```text
+/apps
+  /web       → user PWA  (instant)
+  /operator  → admin · kpi · moderation · payout · kernel · oracle
+  /studio    → live · clips · promotion · OBS overlay
+```
+
+강제 규칙:
+- `src/pages/admin/*`, `src/pages/Cockpit*`, `src/pages/security/*` → `src/packages/operator/*` 로 이전.
+- 별도 Vite build target `vite.operator.config.ts` → 별도 entry, 별도 chunk.
+- 별도 도메인: user `phonara.world` · operator `ops.phonara.world` · studio `studio.phonara.world`.
+- 별도 auth scope: operator 진입 시 **AAL2 강제** + admin JWT claim 검증.
+- 별도 realtime 채널: operator = `admin:*` only. user = `user:* / wallet:* / game:* / chat:* / market:*` only.
+- 별도 deploy 파이프라인: operator 배포가 user 트래픽 영향 0.
+- ESLint 룰: `src/packages/operator/*` 는 user app에서 import 금지(역방향만 허용).
+
+점진 마이그레이션:
+1. **Now**     — `src/packages/operator` 폴더 신설, admin 컴포넌트 이전(route 유지).
+2. **Week 2**  — `vite.operator.config.ts` + 별도 build script + chunk 검증.
+3. **Week 3**  — `ops.phonara.world` 서브도메인 라우팅 + AAL2 게이트.
+4. **Week 4**  — user 번들에서 operator 코드 제거 검증(`source-map-explorer`).
+
+---
+
+## 14. 최종 느낌 (체크리스트)
 
 플랫폼이 아래 5개 다 충족하면 출시 합격:
 - [ ] 조용한데 살아있다 (Emotion Timing)
@@ -284,13 +359,15 @@ quiet 모드:
 
 ---
 
-## 14. 지금 바로 1번 작업
+## 15. 지금 바로 1번 작업
 
-**Week 1 detox 3종 + Ω-Core 12-1/12-4 토대 병렬 착수:**
+**Week 1 detox + Ω-Core/Ω-FINAL 토대 병렬 착수:**
 - Toast 4-Tier (`notify.critical/important/passive/silent`) + ESLint `no-direct-sonner` 룰
 - `@pkg/realtime` 4채널 진입점 + GodModePanel·AIBotCards 마이그레이션
 - `setVisibleInterval` 헬퍼로 30+ setInterval 일괄 교체
 - `@pkg/ui/SoftBoundary` 도입 + optional 마운트 지점 1차 적용
-- `web-vitals` + budget telemetry 수집 시작 (`/admin/kpi` 패널 후속)
+- `web-vitals` + budget telemetry 수집 (`/admin/kpi` 패널 후속)
+- `@pkg/performance/runtime` (runWhenIdle/runIfVisible/runAfterFirstInteraction) + `@pkg/performance/device` (useDeviceProfile) 토대
+- `src/packages/operator` 폴더 신설 + admin 컴포넌트 점진 이전 시작 (route 유지)
 
-이 5개가 끝나야 Week 1 #2/#4/#5… 로 진행. **Week 1 끝까지 신규 기능 금지. 매주 금요일 Death Cleanup Day 시작.**
+이게 끝나야 Week 1 #2/#4/#5… 진행. **Week 1 끝까지 신규 기능 금지. 매주 금요일 Death Cleanup Day 시작.**
