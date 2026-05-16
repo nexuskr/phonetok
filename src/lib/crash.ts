@@ -45,7 +45,7 @@ export interface MyCrashStats {
 export async function getCurrentRound(): Promise<CurrentRound> {
   const { data, error } = await supabase.rpc("crash_get_current_round");
   if (error) throw error;
-  return (data as CurrentRound) ?? { status: "none" };
+  return (data as unknown as CurrentRound) ?? { status: "none" };
 }
 
 export async function getRecentWins(limit = 20): Promise<RecentWin[]> {
