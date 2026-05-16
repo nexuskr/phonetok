@@ -167,6 +167,14 @@ export default tseslint.config(
       "no-restricted-syntax": "warn",
     },
   },
+  // PR-J FREEZE: money-flow paths retain direct `useRealtimeChannel` by design
+  // (git diff = 0 requirement). Other realtime imports stay forbidden.
+  {
+    files: PRJ_FREEZE_RAW_CHANNEL,
+    rules: {
+      "no-restricted-imports": "off",
+    },
+  },
   // Critical money path — strictest rules.
   {
     files: CRITICAL_PATHS,
