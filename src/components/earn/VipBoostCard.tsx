@@ -51,8 +51,8 @@ export default function VipBoostCard({ active, multiplier, endsAt }: Props) {
           <div className="text-base font-bold text-foreground">
             {active ? G.earnVipBoostOn : G.earnVipBoostOff}
           </div>
-          <div className="text-xs text-muted-foreground">
-            {active ? `모든 미션/룰렛/공유 보상 ×${multiplier}` : "30일 30,000 PHON · 모든 보상 +50%"}
+          <div className="text-sm text-muted-foreground">
+            {active ? `모든 미션/룰렛/공유 보상 ×${multiplier}` : G.earnVipBoostHint}
           </div>
         </div>
       </header>

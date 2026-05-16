@@ -15,6 +15,20 @@ import VipBoostCard from "@/components/earn/VipBoostCard";
 import ShareChannelsSheet from "@/components/share/ShareChannelsSheet";
 import { G } from "@/lib/glossary";
 
+function useLiveEarners(min = 1100, max = 1450) {
+  const [n, setN] = useState(() => min + Math.floor(Math.random() * (max - min)));
+  useEffect(() => {
+    const i = window.setInterval(() => {
+      setN((p) => {
+        const next = p + (Math.random() < 0.5 ? -1 : 1) * Math.floor(Math.random() * 7);
+        return Math.max(min, Math.min(max, next));
+      });
+    }, 60_000);
+    return () => clearInterval(i);
+  }, [min, max]);
+  return n;
+}
+
 function useCountUp(target: number, ms = 600) {
   const [n, setN] = useState(target);
   useEffect(() => {
@@ -39,6 +53,7 @@ export default function Earn() {
   const user = useRequireAuth();
   const { state, loading, claim, claimAttendance, refresh } = useEarnHub();
   const earned = useCountUp(state.today_earned);
+  const livePlayers = useLiveEarners();
   const [shareOpen, setShareOpen] = useState(false);
 
   if (!user) return null;
@@ -76,8 +91,8 @@ export default function Earn() {
             </div>
             <div className="text-lg font-bold text-foreground/70 pb-1">PHON</div>
           </div>
-          <div className="text-[11px] text-muted-foreground mt-1">
-            {G.earnTodayLabel} · {G.earnFomoLine}
+          <div className="text-sm text-muted-foreground mt-1 font-medium">
+            {G.earnTodayLabel} · {G.earnFomoLive.replace("{n}", livePlayers.toLocaleString())}
           </div>
         </motion.header>
 

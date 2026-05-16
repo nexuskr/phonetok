@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, useAnimation } from "framer-motion";
+import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { Gift, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { notify } from "@/lib/notify";
@@ -101,6 +101,8 @@ export default function RouletteCard({ spunToday, lastAmount, multiplier, onSpun
           animate={controls}
           className="w-40 h-40 rounded-full border-4 border-amber-300/60 shadow-[0_0_40px_rgba(255,215,0,0.25)] relative"
           style={{
+            willChange: "transform",
+            transform: "translateZ(0)",
             background:
               "conic-gradient(from 0deg, #FFD700 0 45deg, #FF00AA 45deg 90deg, #FFD700 90deg 135deg, #FF00AA 135deg 180deg, #FFD700 180deg 225deg, #FF00AA 225deg 270deg, #FFD700 270deg 315deg, #FF00AA 315deg 360deg)",
           }}
@@ -124,17 +126,26 @@ export default function RouletteCard({ spunToday, lastAmount, multiplier, onSpun
       </div>
 
       {/* Result / CTA */}
-      {result !== null ? (
-        <div className="rounded-xl bg-background/60 border border-amber-400/30 p-3 text-center">
-          <div className="text-[10px] text-muted-foreground tracking-widest">{G.earnRouletteResult}</div>
-          <div className="text-3xl font-black tabular-nums text-amber-300">
-            +{result.toLocaleString()} <span className="text-sm text-foreground/70">PHON</span>
-          </div>
-          {multiplier > 1 && (
-            <div className="text-[11px] text-pink-400 font-bold mt-0.5">VIP ×{multiplier}</div>
-          )}
-        </div>
-      ) : null}
+      <AnimatePresence mode="wait">
+        {result !== null ? (
+          <motion.div
+            key={result}
+            initial={{ opacity: 0, scale: 0.85, y: 4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.28, ease: "easeOut" }}
+            className="rounded-xl bg-background/60 border border-amber-400/30 p-3 text-center"
+          >
+            <div className="text-[10px] text-muted-foreground tracking-widest">{G.earnRouletteResult}</div>
+            <div className="text-3xl font-black tabular-nums text-amber-300">
+              +{result.toLocaleString()} <span className="text-sm text-foreground/70">PHON</span>
+            </div>
+            {multiplier > 1 && (
+              <div className="text-[11px] text-pink-400 font-bold mt-0.5">VIP ×{multiplier}</div>
+            )}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       <button
         onClick={spin}
