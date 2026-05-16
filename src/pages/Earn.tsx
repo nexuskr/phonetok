@@ -10,6 +10,10 @@ import MissionsCard from "@/components/earn/MissionsCard";
 import ReferralCard from "@/components/earn/ReferralCard";
 import PlayToEarnCard from "@/components/earn/PlayToEarnCard";
 import ShareRewardCard from "@/components/earn/ShareRewardCard";
+import RouletteCard from "@/components/earn/RouletteCard";
+import VipBoostCard from "@/components/earn/VipBoostCard";
+import ShareChannelsSheet from "@/components/share/ShareChannelsSheet";
+import { G } from "@/lib/glossary";
 
 function useCountUp(target: number, ms = 600) {
   const [n, setN] = useState(target);
@@ -33,10 +37,14 @@ function useCountUp(target: number, ms = 600) {
 
 export default function Earn() {
   const user = useRequireAuth();
-  const { state, loading, claim, claimShare, claimAttendance } = useEarnHub();
+  const { state, loading, claim, claimAttendance, refresh } = useEarnHub();
   const earned = useCountUp(state.today_earned);
+  const [shareOpen, setShareOpen] = useState(false);
 
   if (!user) return null;
+
+  const roul = state.roulette ?? { spun_today: false, last_amount: 0, multiplier: 1 };
+  const vip = state.vip_boost ?? { active: false, multiplier: 1, ends_at: null };
 
   return (
     <SlimShell>
@@ -51,10 +59,8 @@ export default function Earn() {
           <div className="flex items-end justify-between gap-3 relative">
             <div>
               <div className="text-[10px] tracking-[0.3em] font-black text-primary uppercase">매일 무료 수익</div>
-              <h1 className="text-2xl md:text-3xl font-black text-foreground mt-1">오늘 얼마 벌었나요?</h1>
-              <p className="text-xs text-muted-foreground mt-1">
-                아래 5가지만 다 하면 매일 4,000~6,000 PHON 확보
-              </p>
+              <h1 className="text-2xl md:text-3xl font-black text-foreground mt-1">{G.earnHeader}</h1>
+              <p className="text-xs text-muted-foreground mt-1">{G.earnSubheader}</p>
             </div>
             <Link
               to="/events"
@@ -70,12 +76,14 @@ export default function Earn() {
             </div>
             <div className="text-lg font-bold text-foreground/70 pb-1">PHON</div>
           </div>
-          <div className="text-[11px] text-muted-foreground mt-1">오늘 누적 적립</div>
+          <div className="text-[11px] text-muted-foreground mt-1">
+            {G.earnTodayLabel} · {G.earnFomoLine}
+          </div>
         </motion.header>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {Array.from({ length: 5 }).map((_, i) => (
+            {Array.from({ length: 7 }).map((_, i) => (
               <div key={i} className="h-56 rounded-2xl border border-border/40 bg-card animate-pulse" />
             ))}
           </div>
@@ -88,6 +96,12 @@ export default function Earn() {
               onClaim={claimAttendance}
             />
             <MissionsCard missions={state.missions} onClaim={claim} />
+            <RouletteCard
+              spunToday={roul.spun_today}
+              lastAmount={roul.last_amount}
+              multiplier={roul.multiplier}
+              onSpun={() => refresh()}
+            />
             <ReferralCard
               code={state.referral.code}
               invited={state.referral.invited}
@@ -98,13 +112,25 @@ export default function Earn() {
               amount={state.play_today.amount}
               onClaim={() => claim("play_today")}
             />
-            <ShareRewardCard
-              claimedChannels={state.share_today.channels}
-              amountEach={state.share_today.amount_each}
-            />
+            <VipBoostCard active={vip.active} multiplier={vip.multiplier} endsAt={vip.ends_at} />
+            <div onClick={() => setShareOpen(true)} className="cursor-pointer">
+              <ShareRewardCard
+                claimedChannels={state.share_today.channels}
+                amountEach={state.share_today.amount_each}
+              />
+            </div>
           </div>
         )}
       </div>
+
+      <ShareChannelsSheet
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        kind="bigwin"
+        amount={state.today_earned}
+        referralCode={state.referral.code}
+        onClaimed={() => refresh()}
+      />
     </SlimShell>
   );
 }
