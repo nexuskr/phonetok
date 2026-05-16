@@ -247,7 +247,7 @@ export function useRealtimeChannel(opts: UseRealtimeChannelOpts) {
     let cancelled = false;
     let attached = false;
     const id = idRef.current;
-    let pollTimer: ReturnType<typeof setInterval> | null = null;
+    let pollTimer: (() => void) | null = null;
     let lastState: ConnState = "connecting";
 
     const fireStatus = (s: ConnState) => {
