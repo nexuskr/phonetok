@@ -8,7 +8,7 @@ import { detectPreferredLocale } from "./hooks/use-preferred-locale";
 import { installViewportLock } from "./lib/viewport-lock";
 import { installLayoutShiftMonitor } from "./lib/layout-shift-monitor";
 import { watchMotionClass } from "./lib/app-settings";
-import { installHiddenTabSuspension } from "@pkg/runtime";
+import { installHiddenTabSuspension, installIdleSuspension } from "@pkg/runtime";
 
 // First-visit auto locale: respect explicit ?lang=/persisted choice; otherwise detect.
 try {
@@ -30,6 +30,8 @@ watchMotionClass();
 installLayoutShiftMonitor();
 // PR-G: pause cosmetic intervals while tab is hidden (cooperative, prod-safe).
 installHiddenTabSuspension();
+// PR-H: pause admin intervals after 60s idle (cooperative, prod-safe).
+installIdleSuspension();
 
 // PR-F: DEV-only RPC 3-mode (foreground/hidden/idle) baseline collector.
 // Tree-shaken in production via import.meta.env.DEV guard.

@@ -24,3 +24,4 @@ export {
   subscribeGovernor,
   installHiddenTabSuspension,
 } from "./runtime.governor";
+export { installIdleSuspension, isIdle } from "./runtime.idle";
