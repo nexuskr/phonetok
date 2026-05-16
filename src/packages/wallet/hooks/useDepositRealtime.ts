@@ -40,7 +40,7 @@ export function useDepositRealtime({ intentId, active, onFilled, onStatusUpdate 
     onEvent: (payload) => {
       lastEventAtRef.current = Date.now();
       setDegraded(false);
-      const row = (payload as { new: CryptoDepositIntent }).new;
+      const row = (payload as unknown as { new: CryptoDepositIntent }).new;
       if (!row) return;
       // A3 ownership verification
       if (userIdRef.current && row.user_id && row.user_id !== userIdRef.current) {
