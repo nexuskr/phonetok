@@ -1,0 +1,61 @@
+{
+  "_note": "PR-E Resolution Wave — closes the triage ledger: 0 unknown, 0 unmigrated cosmetic/admin. Remaining 12 raw setInterval call sites are the money-flow FREEZE inventory (intentional, never modified).",
+  "pr": "PR-E",
+  "capturedAt": "2026-05-20T00:00:00Z",
+  "diff_from_previous_2026_05_19": {
+    "raw_setInterval_call_sites": { "before": 13, "after": 12, "delta": -1 },
+    "tracked_via_setVisibleInterval_delta": 1,
+    "money_flow_git_diff_lines": 0
+  },
+  "counts": {
+    "tracked_added_this_pr": 1,
+    "untracked_removed_this_pr": 1,
+    "false_positives_documented": 1,
+    "coverage_direction": "monotonic_increase",
+    "triage_unknown_remaining": 0
+  },
+  "resolutions": [
+    {
+      "owner": "src/components/empire/JackpotEmpireBanner.tsx:76",
+      "action": "migrate",
+      "category": "cosmetic",
+      "intervalMs": 1000,
+      "note": "Incidental PR-C miss (paren matcher skipped this nested arrow). Now setVisibleInterval + clearInterval(t) → t()."
+    },
+    {
+      "owner": "src/components/trading/ChartWithHeader.tsx:97",
+      "action": "ignore",
+      "category": "false_positive",
+      "note": "Local React state setter destructured as [interval, setInterval] — not a native browser loop. Added to SETINTERVAL_FALSE_POSITIVES ignorelist in @pkg/entropy/entropy.map.ts."
+    }
+  ],
+  "money_flow_freeze_residual": {
+    "_rule": "These 12 call sites are protected by check-money-flow-freeze.mjs and MUST remain raw setInterval. Every PR-E→H validates 0-line git diff across these files.",
+    "sites": [
+      "src/packages/wallet/hooks/useDeposit.ts:173",
+      "src/packages/wallet/hooks/useDepositRealtime.ts:69",
+      "src/packages/wallet/hooks/useDepositCountdown.ts:22",
+      "src/hooks/use-auto-bet.ts:26",
+      "src/hooks/use-kill-switches.ts:71",
+      "src/components/trading/MegaOrderPanel.tsx:81",
+      "src/lib/paper-trading/bybit-feed.ts:234",
+      "src/lib/paper-trading/bybit-feed.ts:238",
+      "src/lib/paper-trading/bybit-feed.ts:376",
+      "src/components/empire/PhonaraPayPanel.tsx:57",
+      "src/components/crash/hooks/useCrashRound.ts:21"
+    ]
+  },
+  "money_flow_freeze_verified": true,
+  "validation_gates": {
+    "tracked_monotonic_increase": "pass",
+    "money_flow_diff_zero": "pass (check-money-flow-freeze.mjs OK — 8 paths intact)",
+    "triage_unknown_zero": "pass (0 unknown, 1 false_positive documented in entropy.map.ts)",
+    "build": "pass",
+    "bundle_delta_estimate_kb": "+0.0"
+  },
+  "next_pr": {
+    "id": "PR-F",
+    "scope": "RPC surface baseline — instrument all supabase.rpc / supabase.from(...).select() call sites with foreground/hidden/idle attribution into rpc.surface ledger. No payload mutation, no timing change.",
+    "validation": "rpc.surface.snapshot() must enumerate 100% of observed RPCs; hidden-call RPCs must be measurable (per pipeline rule §4)."
+  }
+}
