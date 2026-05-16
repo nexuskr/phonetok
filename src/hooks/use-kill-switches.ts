@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
+import { isCategoryPaused } from "@pkg/runtime";
 
 export type KillSwitches = {
   trading_halt: boolean;
@@ -35,6 +36,9 @@ function emit(next: KillSwitches) {
 }
 
 async function refresh() {
+  // PR-H: skip while tab hidden or admin category paused (idle).
+  if (typeof document !== "undefined" && document.hidden) return;
+  if (isCategoryPaused("admin")) return;
   try {
     const { data, error } = await (supabase as any)
       .from("platform_kill_switches")

@@ -17,19 +17,29 @@ let installed = false;
 let lastInput = Date.now();
 let idle = false;
 
+function enterIdle() {
+  if (idle) return;
+  idle = true;
+  pauseCategory("admin");
+  pauseCategory("cosmetic");
+}
+
+function exitIdle() {
+  if (!idle) return;
+  idle = false;
+  resumeCategory("admin");
+  resumeCategory("cosmetic");
+}
+
 function markActive() {
   lastInput = Date.now();
-  if (idle) {
-    idle = false;
-    resumeCategory("admin");
-  }
+  exitIdle();
 }
 
 function tick() {
   if (typeof document === "undefined" || document.hidden) return;
   if (!idle && Date.now() - lastInput > IDLE_MS) {
-    idle = true;
-    pauseCategory("admin");
+    enterIdle();
   }
 }
 
@@ -52,10 +62,10 @@ export function installIdleSuspension(): void {
       force(on: boolean) {
         if (on) {
           lastInput = 0;
-          if (!idle) { idle = true; pauseCategory("admin"); }
+          enterIdle();
         } else {
           lastInput = Date.now();
-          if (idle) { idle = false; resumeCategory("admin"); }
+          exitIdle();
         }
       },
       isIdle: () => idle,
