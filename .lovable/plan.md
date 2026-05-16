@@ -352,7 +352,93 @@ device.profile = "low" | "mid" | "high"
 
 ---
 
-## 14. 최종 느낌 (체크리스트)
+## 14. Ω-LOCK 5 Safety Pins (마지막 추가 · 실패 방지 안전핀)
+
+새 기능이 아니라 **"기술적으로 무너질 수 없게 만드는" 5개 안전핀.** 이걸로 사실상 LOCK.
+
+### 14-1. Hard Performance CI Gate
+"목표"가 아니라 **merge 불가능**하게 강제.
+
+```text
+PR 자동 reject:
+  - Layer 1 entry gzip > 180KB         (bundle-check)
+  - Lighthouse mobile perf < 90        (lighthouse-ci)
+  - INP > 200ms (lab) / LCP > 2.5s     (lighthouse-ci)
+  - unused deps 증가                    (depcheck)
+  - Layer 1 → Layer 2/3 import 발견    (eslint custom)
+  - animation budget 초과 (>3 동시)     (eslint custom 13-1)
+```
+
+신규: `.github/workflows/perf-gate.yml` + `scripts/bundle-check.ts` + `lighthouserc.json` (mobile preset). PR comment bot이 budget diff 표를 자동 게시.
+
+### 14-2. Money Path Isolation (물리적 격리)
+Fail-Soft는 런타임 보호 — 여기에 **빌드타임 import 차단**을 더한다.
+
+```text
+src/packages/critical/  ⇒ auth · wallet · deposit · withdraw · oracle · kernel
+  forbidden import 대상:
+    @pkg/social/*  @pkg/avatar-nft/*  @pkg/live/*  @pkg/3d/*
+    @pkg/clip/*    framer-motion(critical 전용 사용 외)
+    optional realtime 채널 (chat/clip/feed)
+```
+
+ESLint `no-restricted-imports` + dependency-cruiser 룰. 위반 시 빌드 실패. 결과: "채팅 버그 때문에 출금 UI 죽음" 사태 원천 차단.
+
+### 14-3. Telemetry Sampling Rule
+텔레메트리가 성능을 죽이지 않게 채널별 샘플링 차등.
+
+```text
+HIGH-FREQUENCY (sample 5~10%, client-side bucket)
+  - scroll · hover · pointermove · animation frame · fps tick
+  - route change · component mount
+
+CRITICAL FINANCIAL (sample 100%, 영구 보존)
+  - deposit · withdraw · receipt verify · oracle drift
+  - kill-switch toggle · permission change · anomaly events
+  - crown award · package purchase · refund
+```
+
+`@pkg/telemetry/sampling.ts` — `track(name, payload, { tier: "high" | "critical" })`. high tier는 클라이언트에서 hash bucket으로 컷, critical은 무조건 flush + retry.
+
+### 14-4. Anti-FOMO Fatigue Rule (정량 규칙화)
+Emotion Timing(12-3)을 **숫자로** 강제.
+
+```text
+화면당 동시 attention source ≤ 2
+  attention source = { ticker, marquee, pulse, glow, autoplay video,
+                       toast, confetti, shake, count-up, shimmer }
+
+위반 예시:
+  ❌ Whale ticker + Live card glow + Mission shimmer + Toast popup (4)
+  ✅ Whale ticker + Live card glow (2)
+```
+
+`@pkg/ui/AttentionRegistry` — 컴포넌트가 mount 시 `claimAttention(kind)` 호출, 2개 초과 시 dev에서 warn + 가장 낮은 우선순위 자동 mute. `/admin/kpi`에 attention overflow 빈도 패널.
+
+### 14-5. Emergency Degrade Mode (`SYSTEM_DEGRADE`)
+트래픽 폭주 / WS 장애 / 저사양 단말에서 **죽지 않는 모드**.
+
+```text
+trigger:
+  - 수동: platform_kill_switches.degrade_mode = true (admin)
+  - 자동: client fps < 30 5초 연속 OR WS reconnect > 3회/min
+          OR navigator.connection.saveData OR memory <2GB
+
+degrade 동작:
+  - 모든 animation off (prefers-reduced-motion 강제)
+  - clip/video autoplay off
+  - realtime poll 5s → 30s
+  - shadow/blur/backdrop off
+  - feed limit 50 → 10
+  - 3D 라우트 disable → 2.5D fallback
+  - market freeze 시 last-known price + "FROZEN" 칩
+```
+
+신규: `platform_kill_switches.degrade_mode` 컬럼 + `useDegradeMode()` 훅 + `<body data-degrade="1">`. Tailwind `degrade:hidden`/`degrade:opacity-100` 변형. 자동 트리거는 13-2 device 신호 + WS health 합산.
+
+---
+
+## 15. 최종 느낌 (체크리스트)
 
 플랫폼이 아래 5개 다 충족하면 출시 합격:
 - [ ] 조용한데 살아있다 (Emotion Timing)
