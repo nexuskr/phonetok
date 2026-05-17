@@ -111,6 +111,36 @@ public: [dynamicOffset, fomo, nearMiss, trigger]`}</pre>
               </ul>
             </div>
           </TabsContent>
+
+          <TabsContent value="betting" className="space-y-2">
+            <div className="rounded-xl p-3 bg-gradient-to-br from-[#160a05] to-[#1a0a14] border border-amber-400/30">
+              <div className="text-[10px] tracking-[0.28em] font-black uppercase text-amber-300/85">Betting Audit</div>
+              <p className="text-[11px] text-amber-200/85 mt-1 break-keep leading-snug">
+                시뮬레이션 베팅이지만 동일한 HMAC seed 로 누구나 재계산할 수 있습니다. 잔액은 변동되지 않습니다.
+              </p>
+            </div>
+            {bettingAudit.length === 0 ? (
+              <div className="text-[11px] text-amber-200/70 text-center py-4">아직 정산된 라운드가 없습니다</div>
+            ) : (
+              <div className="space-y-1.5">
+                <div className="grid grid-cols-[40px_1fr_1fr_56px_72px] gap-1.5 text-[9px] tracking-[0.18em] font-black uppercase text-amber-300/75 px-2">
+                  <span>#R</span><span>L Pool</span><span>R Pool</span><span>승자</span><span>Payout</span>
+                </div>
+                {bettingAudit.slice().reverse().map((e) => (
+                  <div key={e.round} className="grid grid-cols-[40px_1fr_1fr_56px_72px] gap-1.5 items-center rounded-lg px-2 py-1.5 bg-black/40 border border-amber-400/15 text-[11px] text-amber-100/95 tabular-nums">
+                    <span className="text-amber-300">{e.round}</span>
+                    <span>{e.leftPool.toLocaleString()}</span>
+                    <span>{e.rightPool.toLocaleString()}</span>
+                    <span className={e.winnerSide === "left" ? "text-amber-300" : "text-pink-300"}>{e.winnerSide.toUpperCase()}</span>
+                    <span className={e.payout > 0 ? "text-amber-200 font-black" : "text-amber-200/55"}>
+                      {e.payout > 0 ? "+" + e.payout.toLocaleString() : "—"}
+                    </span>
+                    <span className="col-span-5 font-mono text-[9px] text-amber-300/65 truncate">{e.hmacShort}…</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
         </Tabs>
       </div>
     </BottomSheet>
