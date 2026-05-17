@@ -1,5 +1,5 @@
 /**
- * useFomoOracle — Adaptive Global + Personalized FOMO 시그널 12s 틱.
+ * useFomoOracle — Adaptive Global + Personalized + Spectator Pressure FOMO 시그널 12s 틱.
  * 모두 클라 시뮬, RPC 0.
  */
 import { useEffect, useState } from "react";
@@ -35,7 +35,7 @@ function save(p: Personal) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch { /* */ }
 }
 
-export function useFomoOracle(opts: { spectators: number; jackpotPct: number }): FomoSignals & {
+export function useFomoOracle(opts: { spectators: number; jackpotPct: number; poolImbalance?: number }): FomoSignals & {
   recordResult: (winner: "left" | "right", nearMiss: boolean) => void;
 } {
   const [personal, setPersonal] = useState<Personal>(load);
@@ -56,6 +56,7 @@ export function useFomoOracle(opts: { spectators: number; jackpotPct: number }):
       dynamicOffset: offset,
       nearMissFlag: false,
       threshold,
+      poolImbalance: opts.poolImbalance,
     }),
   );
 
@@ -72,12 +73,13 @@ export function useFomoOracle(opts: { spectators: number; jackpotPct: number }):
           dynamicOffset: offset,
           nearMissFlag: false,
           threshold,
+          poolImbalance: opts.poolImbalance,
         }),
       );
     compute();
     const id = window.setInterval(compute, 12_000);
     return () => window.clearInterval(id);
-  }, [opts.spectators, opts.jackpotPct, personal, offset, threshold]);
+  }, [opts.spectators, opts.jackpotPct, opts.poolImbalance, personal, offset, threshold]);
 
   const recordResult = (winner: "left" | "right", nearMiss: boolean) => {
     setPersonal((p) => {
