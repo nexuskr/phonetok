@@ -16,6 +16,9 @@ import { Coins, Crown, Zap, Sparkles, ArrowRight, TrendingUp, Gift } from "lucid
 
 const PhonAdvantageRibbon = lazy(() => import("@/components/trading/v3/PhonAdvantageRibbon"));
 const EmpireCollection = lazy(() => import("@/pages/EmpireCollection"));
+const PhonEconomyExplainer = lazy(() => import("@/components/phon/PhonEconomyExplainer"));
+const PhonSwapBridge = lazy(() => import("@/components/phon/PhonSwapBridge"));
+const PhonStakingComingSoon = lazy(() => import("@/components/phon/PhonStakingComingSoon"));
 
 function fmt(n: number) {
   return new Intl.NumberFormat("ko-KR").format(Math.floor(n));
