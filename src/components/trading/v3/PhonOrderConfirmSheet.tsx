@@ -60,8 +60,11 @@ export default function PhonOrderConfirmSheet({
             <div className="px-5 pt-3 pb-5 space-y-4">
               <div className="flex items-center gap-2 text-amber-300">
                 <Sparkles className="w-4 h-4" />
-                <span className="text-[11px] font-black tracking-[0.2em]">PHON 베팅 확인</span>
+                <span className="text-[11px] font-black tracking-[0.2em]">폐하의 베팅 카드</span>
               </div>
+              <p className="text-[13px] font-bold leading-snug">
+                폐하, 이 베팅으로 제국을 확장하시겠습니까?
+              </p>
 
               <div className={`rounded-2xl p-4 bg-gradient-to-br ${sideColor} text-white`}>
                 <div className="flex items-center gap-2 text-xs font-black tracking-wide opacity-90">

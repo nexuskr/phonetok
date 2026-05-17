@@ -131,6 +131,7 @@ const Referral = lazy(() => import("./pages/Referral.tsx"));
 const CampaignRedirect = lazy(() => import("./pages/CampaignRedirect.tsx"));
 const ReplayLanding = lazy(() => import("./pages/ReplayLanding.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
+const Fairness = lazy(() => import("./pages/Fairness.tsx"));
 const LegalDoc = lazy(() => import("./pages/LegalDoc.tsx"));
 const LiveOverlay = lazy(() => import("./pages/LiveOverlay.tsx"));
 const InfluencerLanding = lazy(() => import("./pages/InfluencerLanding.tsx"));
@@ -363,6 +364,7 @@ const App = () => (
               <Route path="/quests" element={<Navigate to="/missions?tab=daily" replace />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/trust" element={<Trust />} />
+              <Route path="/fairness" element={<Fairness />} />
               <Route path="/legal/:docKey" element={<LegalDoc />} />
               <Route path="/status" element={<Status />} />
               <Route path="/hall-of-fame" element={<Navigate to="/legacy" replace />} />
