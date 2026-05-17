@@ -521,7 +521,7 @@ export default function Wallet() {
 
                 {depositChannel === "bank" && (
                   <div className="glass rounded-xl p-4 text-xs space-y-2 border border-border/40">
-                    <div className="flex justify-between"><span className="text-muted-foreground">{t("depositBankInfo")}</span><span className="font-bold tabular-nums">{BANK_LABEL["KB"][lng]} 123-456-78901234</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">{t("depositBankInfo")}</span><span className="font-bold tabular-nums">{DEFAULT_KOREAN_BANK_DISPLAY} 123-456-78901234</span></div>
                     <div className="flex justify-between"><span className="text-muted-foreground">{t("depositOwner")}</span><span className="font-bold">{lng === "en" ? "Phonara Inc." : "(주)Phonara"}</span></div>
                     <p className="text-[10px] text-muted-foreground pt-2 border-t border-border/40">{t("depositMemo")}</p>
                   </div>
