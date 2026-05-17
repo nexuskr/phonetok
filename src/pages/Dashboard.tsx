@@ -163,14 +163,11 @@ export default function Dashboard() {
         {/* 📦 더 보기 — 기존 카드 전부 보존 */}
         <MoreSection ref={moreRef}>
           <HubTabs hub="command" />
-          <FomoNotificationStrip />
           <CrownWarHUD />
-          <WhaleStrikeRail compact />
-          <Suspense fallback={null}><FoundingContendersBadge /></Suspense>
           <Suspense fallback={null}><FriendLeaderboard /></Suspense>
 
           <div className="flex items-center justify-between gap-2 pt-2">
-            <div className="text-[10px] tracking-[0.3em] font-bold text-primary/80">우주 황제 베팅 패널</div>
+            <div className="text-[10px] tracking-[0.3em] font-bold text-primary/80">폐하의 전략 패널</div>
             <StreakBadge />
           </div>
           <RecoveryPrompt onResubmit={() => betRef.current?.resubmit()} />
