@@ -1,9 +1,18 @@
 /**
- * VerificationOracleModal — 4-Tab 검증 오라클.
+ * VerificationOracleModal — 5-Tab 검증 오라클 (Classic / Groth16 / zk-STARK / Personal / Betting Audit).
  */
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import type { DuelRoundResult, FomoSignals } from "@pkg/duel";
+
+export interface BettingAuditEntry {
+  round: number;
+  leftPool: number;
+  rightPool: number;
+  winnerSide: "left" | "right";
+  payout: number;
+  hmacShort: string;
+}
 
 const TRIGGER_LABEL: Record<string, string> = {
   near_miss_streak: "황제의 운이 가까이",
@@ -11,6 +20,7 @@ const TRIGGER_LABEL: Record<string, string> = {
   royal_pass_milestone: "황실 패스 임박",
   session_resurrection: "다시 강림하신 폐하",
   heat_surge: "황실이 끓어오릅니다",
+  pool_imbalance: "한쪽 진영이 폭주합니다",
 };
 
 export function VerificationOracleModal({
@@ -18,21 +28,24 @@ export function VerificationOracleModal({
   onOpenChange,
   result,
   signals,
+  bettingAudit = [],
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   result: DuelRoundResult | null;
   signals: FomoSignals;
+  bettingAudit?: BettingAuditEntry[];
 }) {
   return (
     <BottomSheet open={open} onOpenChange={onOpenChange} title={<span className="font-imperial tracking-[0.18em] text-amber-100">황실 검증 오라클</span>} description="폐하의 결투, 황실이 직접 증명합니다">
       <div className="px-4 pb-4">
         <Tabs defaultValue="classic">
-          <TabsList className="grid grid-cols-4 w-full bg-black/45 border border-amber-400/25">
-            <TabsTrigger value="classic" className="text-[11px]">Classic</TabsTrigger>
-            <TabsTrigger value="groth16" className="text-[11px]">Groth16</TabsTrigger>
-            <TabsTrigger value="stark" className="text-[11px]">zk-STARK</TabsTrigger>
-            <TabsTrigger value="personal" className="text-[11px]">Personal</TabsTrigger>
+          <TabsList className="grid grid-cols-5 w-full bg-black/45 border border-amber-400/25">
+            <TabsTrigger value="classic" className="text-[10px]">Classic</TabsTrigger>
+            <TabsTrigger value="groth16" className="text-[10px]">Groth16</TabsTrigger>
+            <TabsTrigger value="stark" className="text-[10px]">zk-STARK</TabsTrigger>
+            <TabsTrigger value="personal" className="text-[10px]">Personal</TabsTrigger>
+            <TabsTrigger value="betting" className="text-[10px]">Betting</TabsTrigger>
           </TabsList>
 
           <TabsContent value="classic" className="space-y-2">
