@@ -12,7 +12,7 @@ import { useMyPower } from "@/hooks/use-my-power";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingList } from "@/components/ui/loading-state";
-import { Coins, Crown, Zap, Sparkles, ArrowRight, TrendingUp, Gift } from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
 
 const PhonAdvantageRibbon = lazy(() => import("@/components/trading/v3/PhonAdvantageRibbon"));
 const EmpireCollection = lazy(() => import("@/pages/EmpireCollection"));
