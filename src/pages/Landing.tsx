@@ -30,22 +30,6 @@ export default function Landing() {
   );
 }
 
-function AnimatedEarning() {
-  const target = 4800;
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    let raf = 0; const start = performance.now();
-    const tick = (t: number) => {
-      const p = Math.min(1, (t - start) / 1200);
-      setN(Math.floor(target * (1 - Math.pow(1 - p, 3))));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-  return <span className="tabular-nums">{n.toLocaleString()}</span>;
-}
-
 /** 정적 골드 입자 오버레이 — JS 0, CSS radial-gradient만 */
 function GoldParticles() {
   return (
@@ -90,17 +74,17 @@ function Hero() {
 
         <motion.h1
           initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.05 }}
-          className="mt-6 font-imperial text-[36px] leading-[1.05] sm:text-5xl md:text-6xl lg:text-7xl tracking-[0.04em] text-foreground"
+          className="mt-6 font-imperial text-[40px] leading-[1.04] sm:text-6xl md:text-7xl lg:text-8xl tracking-[0.04em] text-foreground"
         >
           <span className="block">
-            <span className="bg-gradient-to-r from-[hsl(var(--gold))] via-[hsl(var(--gold))] to-[hsl(var(--pink))] bg-clip-text text-transparent drop-shadow-[0_4px_24px_hsl(var(--gold)/0.35)]">
+            <span className="bg-gradient-to-r from-[hsl(var(--gold))] via-[hsl(var(--gold))] to-[hsl(var(--pink))] bg-clip-text text-transparent drop-shadow-[0_6px_32px_hsl(var(--gold)/0.55)]">
               0원
             </span>
             <span className="text-foreground">으로 시작해서</span>
           </span>
           <span className="block mt-2 sm:mt-3">
             <span className="text-foreground">매일 돈을 버는 </span>
-            <span className="bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(var(--pink))] bg-clip-text text-transparent drop-shadow-[0_4px_24px_hsl(var(--pink)/0.35)]">
+            <span className="bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(var(--pink))] bg-clip-text text-transparent drop-shadow-[0_6px_32px_hsl(var(--pink)/0.55)]">
               제국
             </span>
           </span>
@@ -108,48 +92,54 @@ function Hero() {
 
         <motion.p
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.55, delay: 0.18 }}
-          className="mt-6 text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-semibold text-[hsl(var(--gold)/0.92)]"
+          className="mt-7 text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed font-bold text-foreground/95"
         >
-          지금 가입하면 첫 입금 <span className="text-[hsl(var(--gold))] font-black">10,000 PHON</span> 즉시 지급<br className="hidden sm:inline" />
-          <span className="text-foreground/80 font-medium"> + 실시간으로 전 세계 황제들의 승전보를 확인하세요</span>
+          지금 이 순간에도 <span className="text-[hsl(var(--gold))] drop-shadow-[0_0_18px_hsl(var(--gold)/0.55)]">수만 명의 황제들</span>이<br className="hidden sm:inline" />
+          <span> 실시간으로 수익을 창출하고 있습니다</span>
+        </motion.p>
+
+        <motion.p
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.55, delay: 0.24 }}
+          className="mt-3 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed font-semibold text-[hsl(var(--gold)/0.92)]"
+        >
+          전 세계 황제들이 오늘도 평균{" "}
+          <span className="font-mono font-black text-[hsl(var(--gold))] drop-shadow-[0_0_14px_hsl(var(--gold)/0.55)]">₩347,000+</span>{" "}
+          수익 ·{" "}
+          <span className="font-black text-[hsl(var(--gold))] drop-shadow-[0_0_14px_hsl(var(--gold)/0.55)]">가입 즉시 10,000 PHON</span> 지급
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.28 }}
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.32 }}
           className="mt-9 flex flex-col items-center gap-3"
         >
           <Link
             to="/auth?mode=signup"
-            className="pulse-halo group inline-flex items-center gap-2.5 h-16 px-8 rounded-2xl bg-gradient-to-r from-[hsl(var(--gold))] via-[hsl(var(--gold))] to-[hsl(var(--pink))] text-background font-black text-base md:text-lg press shadow-[0_24px_72px_-18px_hsl(var(--gold)/0.85)] glow-imperial"
+            className="pulse-halo group inline-flex items-center gap-2.5 h-[68px] px-9 rounded-2xl bg-gradient-to-r from-[hsl(var(--gold))] via-[hsl(var(--gold))] to-[hsl(var(--pink))] text-background font-black text-lg md:text-xl press shadow-[0_28px_84px_-18px_hsl(var(--gold)/0.9),0_0_0_1px_hsl(var(--gold)/0.7)] glow-imperial"
           >
             <Crown className="w-5 h-5" />
             지금 무료로 황제가 되기
-            <span className="ml-1 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-background/25 text-[11px] font-black tracking-wide">
+            <span className="ml-1 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-background/25 text-[11px] md:text-[12px] font-black tracking-wide">
+              <span className="relative inline-flex">
+                <span className="absolute inset-0 rounded-full bg-[hsl(var(--gold))] animate-ping opacity-80" />
+                <span className="relative inline-block w-1.5 h-1.5 rounded-full bg-[hsl(var(--gold))]" />
+              </span>
               +10,000 PHON
             </span>
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
-          <div className="text-[12px] text-[hsl(var(--gold)/0.75)] flex items-center gap-1.5 font-semibold">
+          <div className="text-[12px] sm:text-[13px] text-[hsl(var(--gold)/0.85)] flex items-center gap-1.5 font-bold">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            가입 즉시 무료 PHON · 신용카드 필요 없음 · 30초 안에 시작
+            가입 즉시 10,000 PHON 지급 · 폐하의 자리는 언제나 열려 있습니다
           </div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-10 flex items-center gap-4 text-[12px] text-foreground/70"
+          className="mt-10 flex items-center gap-4 text-[12px] sm:text-[13px] text-foreground/75 font-bold"
         >
           <span className="inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> 실시간 출금 중</span>
           <span className="text-[hsl(var(--gold)/0.5)]">·</span>
-          <span className="font-semibold">한국 1위 가상세계 플랫폼</span>
-        </motion.div>
-
-        {/* 오늘 누적 — 작게 */}
-        <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.7 }}
-          className="mt-6 text-[12px] text-foreground/55"
-        >
-          오늘 사용자 평균 수익 <span className="font-mono font-black text-[hsl(var(--gold))]"><AnimatedEarning />원</span>
+          <span>한국 1위 가상세계 플랫폼</span>
         </motion.div>
       </div>
     </section>
