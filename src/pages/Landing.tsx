@@ -74,17 +74,17 @@ function Hero() {
 
         <motion.h1
           initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.05 }}
-          className="mt-6 font-imperial text-[40px] leading-[1.04] sm:text-6xl md:text-7xl lg:text-8xl tracking-[0.04em] text-foreground"
+          className="mt-6 font-imperial text-[40px] leading-[1.04] sm:text-6xl md:text-7xl lg:text-8xl tracking-[0.04em] text-foreground text-shadow-imperial-xl"
         >
           <span className="block">
-            <span className="bg-gradient-to-r from-[hsl(var(--gold))] via-[hsl(var(--gold))] to-[hsl(var(--pink))] bg-clip-text text-transparent drop-shadow-[0_6px_32px_hsl(var(--gold)/0.55)]">
+            <span className="bg-gradient-to-r from-[hsl(var(--gold))] via-[hsl(var(--gold))] to-[hsl(var(--pink))] bg-clip-text text-transparent drop-shadow-[0_6px_32px_hsl(var(--gold)/0.7)]">
               0원
             </span>
             <span className="text-foreground">으로 시작해서</span>
           </span>
           <span className="block mt-2 sm:mt-3">
             <span className="text-foreground">매일 돈을 버는 </span>
-            <span className="bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(var(--pink))] bg-clip-text text-transparent drop-shadow-[0_6px_32px_hsl(var(--pink)/0.55)]">
+            <span className="bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(var(--pink))] bg-clip-text text-transparent drop-shadow-[0_6px_32px_hsl(var(--pink)/0.7)]">
               제국
             </span>
           </span>
