@@ -257,6 +257,11 @@ export default function Index() {
         </div>
       </section>
 
+      {/* v19 Slice 2: Global Live Wins — Stake Crusher (Hero 직후) */}
+      <section className="relative z-10 container -mt-8 mb-6">
+        <ImperialLiveWinsRail />
+      </section>
+
       {/* Mega trust badge */}
       <section className="relative z-10 container -mt-4">
         <div className="rounded-3xl p-6 sm:p-8 border border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent text-center relative overflow-hidden glow-imperial">
