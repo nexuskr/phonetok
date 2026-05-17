@@ -104,6 +104,7 @@ const Support = lazy(() => import("./pages/Support.tsx"));
 const SupportTickets = lazy(() => import("./pages/SupportTickets.tsx"));
 const Guide = lazy(() => import("./pages/Guide.tsx"));
 const GuidePhon = lazy(() => import("./pages/GuidePhon.tsx"));
+const PhonHub = lazy(() => import("./pages/PhonHub.tsx"));
 const AdminRoutes = lazy(() => import("./pages/admin/_AdminRoutes.tsx"));
 const FounderCockpit = lazy(() => import("./pages/Cockpit.tsx"));
 const SecureAuth = lazy(() => import("./pages/SecureAuth.tsx"));
@@ -256,6 +257,9 @@ const App = () => (
 
               {/* v14.0 — 4탭 슬림 IA */}
               <Route path="/home" element={<Home />} />
+              <Route path="/phon" element={<PhonHub />} />
+              <Route path="/swap" element={<Navigate to="/phon" replace />} />
+              <Route path="/stake" element={<Navigate to="/phon" replace />} />
               <Route path="/earn" element={<Earn />} />
               <Route path="/live" element={<Live />} />
               <Route path="/games" element={<CasinoLobby />} />

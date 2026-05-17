@@ -9,6 +9,9 @@ import { G } from "@/lib/glossary";
 const WhaleStrikeRail = lazy(() => import("@/components/empire/WhaleStrikeRail"));
 const LiveTicker = lazy(() => import("@pkg/live/components/LiveTicker"));
 const Onboarding60s = lazy(() => import("@pkg/earn/components/Onboarding60s"));
+const LivePayoutCounter = lazy(() => import("@/components/fomo/LivePayoutCounter"));
+const LiveTradingCounter = lazy(() => import("@/components/fomo/LiveTradingCounter"));
+const FoundingContendersBadge = lazy(() => import("@/components/fomo/FoundingContendersBadge"));
 
 /**
  * /home — Sprint 0 슬림 홈.
@@ -59,6 +62,15 @@ export default function Home() {
       <WorldHero />
 
       <div className="container py-6 space-y-5">
+        {/* 위에서 아래로 = 한 결정: 지금 누가 벌고 있나 → 어디로 들어갈지 */}
+        <Suspense fallback={null}>
+          <div className="grid grid-cols-3 gap-2">
+            <LivePayoutCounter />
+            <LiveTradingCounter compact />
+            <FoundingContendersBadge />
+          </div>
+        </Suspense>
+
         {/* 4 큰 카드 — 한 화면에 끝남 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {CARDS.map((c) => {

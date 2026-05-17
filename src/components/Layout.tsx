@@ -16,6 +16,8 @@ import {
   Sparkles,
   Coins,
   Lock,
+  Home as HomeIcon,
+  Gamepad2,
 } from "lucide-react";
 import { useDB } from "@/lib/store";
 import React from "react";
@@ -122,14 +124,14 @@ const GROUPS: NavGroup[] = [
   },
 ];
 
-// Bottom nav for mobile (5 tabs, center FAB = slot)
+// Mobile bottom nav — 5 tabs, center FAB = PHON 허브
 type BottomItem = { to: string; matches: string[]; icon: typeof LayoutDashboard; label: string; fab?: boolean };
 const BOTTOM_NAV: BottomItem[] = [
-  { to: "/command",  matches: ["/command", "/dashboard"], icon: LayoutDashboard, label: "대시보드" },
-  { to: "/arena",    matches: ["/arena"],                 icon: TrendingUp,      label: "트레이딩" },
-  { to: "/casino",   matches: ["/casino"],                icon: Zap,             label: "슬롯", fab: true },
-  { to: "/empire",   matches: ["/empire", "/packages"],   icon: Crown,           label: "광장" },
-  { to: "/profile",  matches: ["/profile", "/wallet"],    icon: UserIcon,        label: "내 제국" },
+  { to: "/home",    matches: ["/home", "/", "/command", "/dashboard"], icon: HomeIcon,   label: "홈" },
+  { to: "/trade",   matches: ["/trade", "/arena"],                     icon: TrendingUp, label: "트레이딩" },
+  { to: "/phon",    matches: ["/phon"],                                icon: Coins,      label: "PHON", fab: true },
+  { to: "/games",   matches: ["/games", "/casino", "/crash", "/jackpot"], icon: Gamepad2, label: "게임" },
+  { to: "/profile", matches: ["/profile", "/wallet", "/empire"],       icon: Crown,      label: "내 제국" },
 ];
 
 function isLeafActive(leaf: NavLeaf, pathname: string) {
@@ -427,13 +429,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 return (
                   <NavLink key={item.to} to={item.to} className="relative -mt-7 flex-1 flex justify-center">
                     <div
-                      className={`relative w-16 h-16 rounded-full bg-gradient-imperial flex items-center justify-center shadow-2xl press ${
-                        active ? "glow-imperial" : ""
+                      className={`relative w-16 h-16 rounded-full flex items-center justify-center shadow-2xl press bg-gradient-to-br from-primary via-primary-glow to-pink ${
+                        active ? "ring-2 ring-pink/60 glow-imperial" : ""
                       }`}
                     >
-                      <div className="absolute inset-0 rounded-full bg-primary/30 blur-xl animate-ring-pulse -z-10" />
-                      <Icon className="w-7 h-7 text-primary-foreground" />
-                      <span className="absolute -bottom-5 text-[10px] font-imperial tracking-[0.2em] text-primary">
+                      <div className="absolute inset-0 rounded-full bg-pink/30 blur-xl animate-ring-pulse -z-10" />
+                      <Icon className="w-7 h-7 text-primary-foreground drop-shadow" />
+                      <span className="absolute -bottom-5 text-[10px] font-imperial tracking-[0.2em] text-pink">
                         {item.label.toUpperCase()}
                       </span>
                     </div>
