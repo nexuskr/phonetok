@@ -4,7 +4,7 @@ import { g } from "@pkg/core/i18n/glossary";
 import { formatFromPhon } from "@/lib/displayCurrency";
 import { Banknote, Coins, Gift, ArrowLeft, Loader2, Clock3 } from "lucide-react";
 import { useWithdraw, type WithdrawMethod } from "../hooks/useWithdraw";
-import { koreanBanks } from "@/lib/koreanBanks";
+import BankSearchSelect from "./BankSearchSelect";
 
 interface Props {
   available: number;
