@@ -5,12 +5,16 @@ money-flow 8경로 / Operator Isolation / Bundle Budget / Phase D / Phase F Push
 
 ---
 
-## Slice 2 보강 — Imperial Live Wins Rail
+## Slice 2 보강 — Imperial Live Wins Rail (Stake.com Crusher)
 
 ### 새 컴포넌트
-`src/components/empire/ImperialLiveWinsRail.tsx` (~220줄, framer-motion 기반)
+`src/components/empire/ImperialLiveWinsRail.tsx` (~260줄, framer-motion 기반)
 
-Dashboard 상단 `ImperialLivePulseRail` 바로 아래 마운트.
+**마운트 2곳** (들어오자마자 강력 FOMO):
+- `src/pages/Dashboard.tsx` — `ImperialLivePulseRail` 직후
+- `src/pages/Index.tsx` — 히어로 직후 상단 (랜딩 진입 즉시 노출)
+
+Props: `variant?: "full" | "compact"` — Dashboard 는 full(8행), Index 는 full(8행, 동일).
 
 ### 구조
 
