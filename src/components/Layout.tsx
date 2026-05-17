@@ -16,6 +16,8 @@ import {
   Sparkles,
   Coins,
   Lock,
+  Home as HomeIcon,
+  Gamepad2,
 } from "lucide-react";
 import { useDB } from "@/lib/store";
 import React from "react";
