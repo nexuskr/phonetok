@@ -429,13 +429,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 return (
                   <NavLink key={item.to} to={item.to} className="relative -mt-7 flex-1 flex justify-center">
                     <div
-                      className={`relative w-16 h-16 rounded-full bg-gradient-imperial flex items-center justify-center shadow-2xl press ${
-                        active ? "glow-imperial" : ""
+                      className={`relative w-16 h-16 rounded-full flex items-center justify-center shadow-2xl press bg-gradient-to-br from-primary via-primary-glow to-pink ${
+                        active ? "ring-2 ring-pink/60 glow-imperial" : ""
                       }`}
                     >
-                      <div className="absolute inset-0 rounded-full bg-primary/30 blur-xl animate-ring-pulse -z-10" />
-                      <Icon className="w-7 h-7 text-primary-foreground" />
-                      <span className="absolute -bottom-5 text-[10px] font-imperial tracking-[0.2em] text-primary">
+                      <div className="absolute inset-0 rounded-full bg-pink/30 blur-xl animate-ring-pulse -z-10" />
+                      <Icon className="w-7 h-7 text-primary-foreground drop-shadow" />
+                      <span className="absolute -bottom-5 text-[10px] font-imperial tracking-[0.2em] text-pink">
                         {item.label.toUpperCase()}
                       </span>
                     </div>
