@@ -10,11 +10,10 @@ import RecoveryPrompt from "@/components/dashboard/RecoveryPrompt";
 import StreakBadge from "@/components/dashboard/StreakBadge";
 import WithdrawNudge from "@/components/dashboard/WithdrawNudge";
 import CommandHero from "@/components/CommandHero";
-import { FomoNotificationStrip } from "@/components/empire/FomoNotificationStrip";
-import WhaleStrikeRail from "@/components/empire/WhaleStrikeRail";
-import LiveRankingMarquee from "@/components/LiveRankingMarquee";
 import CrownWarHUD from "@/components/empire/CrownWarHUD";
-import EmpireSignature from "@/components/status/EmpireSignature";
+import LiveRankingMarquee from "@/components/LiveRankingMarquee";
+import ImperialLivePulseRail from "@/components/empire/ImperialLivePulseRail";
+// v19 Slice 2: FomoNotificationStrip / WhaleStrikeRail / EmpireSignature 마운트 해제 (파일 보존).
 import { useWinback } from "@/hooks/use-winback";
 import HubTabs from "@/components/HubTabs";
 import Disclaimer from "@/components/Disclaimer";
@@ -34,13 +33,10 @@ import { useMyPower } from "@/hooks/use-my-power";
 import { useOnline } from "@/components/LiveStats";
 import RoutingMigrationBanner from "@/components/RoutingMigrationBanner";
 import ChurnReactivationBanner from "@/components/reactivation/ChurnReactivationBanner";
-const DailyChest = lazy(() => import("@/components/gamification/DailyChest"));
-const LevelProgressBar = lazy(() => import("@/components/gamification/LevelProgressBar"));
-const LivePayoutCounter = lazy(() => import("@/components/fomo/LivePayoutCounter"));
-const YesterdayPayoutsBanner = lazy(() => import("@/components/fomo/YesterdayPayoutsBanner"));
+// v19 Slice 2: DailyChest / LevelProgressBar 마운트 해제 (게이미피케이션 페이지에 잔존).
+// v19 Slice 2: LivePayoutCounter / YesterdayPayoutsBanner / FriendGapToast / FoundingContendersBadge
+// 마운트 해제 — Imperial Live Pulse Rail 하나로 통합. 파일은 보존 (다른 페이지에서 재사용 가능).
 const FriendLeaderboard = lazy(() => import("@/components/fomo/FriendLeaderboard"));
-const FriendGapToast = lazy(() => import("@/components/fomo/FriendGapToast"));
-const FoundingContendersBadge = lazy(() => import("@/components/fomo/FoundingContendersBadge"));
 
 // 접힘 영역에 들어가는 기존 컴포넌트들 — 모두 lazy
 const LiveRanking = lazy(() => import("@/components/LiveRanking"));
@@ -106,23 +102,18 @@ export default function Dashboard() {
   return (
     <Layout>
       <RoutingMigrationBanner />
-      <div className="container pt-3 flex flex-col gap-2">
+      <div className="container pt-3 flex flex-col gap-3">
         <ChurnReactivationBanner />
-        <Suspense fallback={null}><LivePayoutCounter /></Suspense>
-        <Suspense fallback={null}><YesterdayPayoutsBanner /></Suspense>
-        <Suspense fallback={null}><FriendGapToast /></Suspense>
-      </div>
-      <div className="container pt-3 grid gap-3 md:grid-cols-2">
-        <Suspense fallback={null}><DailyChest /></Suspense>
-        <Suspense fallback={null}><LevelProgressBar /></Suspense>
+        {/* v19 Slice 2: Imperial Empire Hub 단일 라이브 카드 */}
+        <ImperialLivePulseRail />
       </div>
       <Suspense fallback={null}>
         <LivePurchaseTicker />
       </Suspense>
-      <EmpireSignature />
 
       {/* 🌌 100vh Cosmic Hero — 단일 CTA */}
       <DashboardHeroV3 phon={phon} nfts={nfts} online={online} />
+
 
       <div className="container relative pt-6 pb-12 space-y-6">
         {/* 🌅 Daily AI Briefing — 5장 카드 */}
@@ -171,14 +162,11 @@ export default function Dashboard() {
         {/* 📦 더 보기 — 기존 카드 전부 보존 */}
         <MoreSection ref={moreRef}>
           <HubTabs hub="command" />
-          <FomoNotificationStrip />
           <CrownWarHUD />
-          <WhaleStrikeRail compact />
-          <Suspense fallback={null}><FoundingContendersBadge /></Suspense>
           <Suspense fallback={null}><FriendLeaderboard /></Suspense>
 
           <div className="flex items-center justify-between gap-2 pt-2">
-            <div className="text-[10px] tracking-[0.3em] font-bold text-primary/80">우주 황제 베팅 패널</div>
+            <div className="text-[10px] tracking-[0.3em] font-bold text-primary/80">폐하의 전략 패널</div>
             <StreakBadge />
           </div>
           <RecoveryPrompt onResubmit={() => betRef.current?.resubmit()} />
