@@ -96,7 +96,10 @@ export default function AttendanceCard() {
             <CalendarCheck className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <div className="text-[10px] tracking-widest text-secondary font-black">DAILY ATTENDANCE</div>
+            <div className="flex items-center gap-2">
+              <div className="text-[10px] tracking-widest text-secondary font-black">DAILY ATTENDANCE</div>
+              <StreakFlame streak={streak} size="sm" />
+            </div>
             <div className="text-sm font-display font-black">
               {claimed ? `오늘 출석 완료 · ${streak}일 연속` : `오늘의 출석 보상 +${formatKRW(todayReward)}`}
             </div>
