@@ -274,15 +274,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
               if (item.fab) {
                 return (
-                  <NavLink key={item.to} to={item.to} className="relative -mt-7 flex-1 flex justify-center">
+                  <NavLink key={item.to} to={item.to} className="relative -mt-8 flex-1 flex justify-center">
                     <div
-                      className={`relative w-16 h-16 rounded-full flex items-center justify-center shadow-2xl press bg-gradient-to-br from-primary via-primary-glow to-pink ${
-                        active ? "ring-2 ring-pink/60 glow-imperial" : ""
+                      className={`relative w-[68px] h-[68px] rounded-full flex items-center justify-center press bg-gradient-to-br from-[hsl(var(--gold))] via-[hsl(var(--gold))] to-[hsl(var(--pink))] glow-pink-xl imperial-jackpot-breathe transition-transform duration-300 hover:scale-110 ${
+                        active ? "ring-2 ring-[hsl(var(--pink)/0.7)]" : "ring-1 ring-[hsl(var(--gold)/0.5)]"
                       }`}
                     >
-                      <div className="absolute inset-0 rounded-full bg-pink/30 blur-xl animate-ring-pulse -z-10" />
-                      <Icon className="w-7 h-7 text-primary-foreground drop-shadow" />
-                      <span className="absolute -bottom-5 text-[10px] font-imperial tracking-[0.2em] text-pink">
+                      <div className="absolute inset-0 rounded-full bg-[hsl(var(--pink)/0.35)] blur-2xl -z-10 animate-pulse" />
+                      <div className="absolute inset-[3px] rounded-full bg-gradient-to-br from-[hsl(var(--gold)/0.95)] to-[hsl(var(--pink)/0.85)] flex items-center justify-center">
+                        <Icon className="w-7 h-7 text-background drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]" />
+                      </div>
+                      <span className="absolute -bottom-5 text-[10px] font-imperial tracking-[0.22em] text-[hsl(var(--gold))] drop-shadow-[0_0_8px_hsl(var(--gold)/0.7)]">
                         {item.label.toUpperCase()}
                       </span>
                     </div>
@@ -294,15 +296,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <NavLink key={item.to} to={item.to} className="flex-1 press">
                   <div
                     className={`relative flex flex-col items-center gap-1 py-1.5 rounded-xl transition-all duration-300 ${
-                      active ? "bg-primary/10" : ""
+                      active ? "bg-[hsl(var(--gold)/0.08)]" : "hover:bg-muted/30"
                     }`}
                   >
                     {active && (
-                      <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-7 h-1 rounded-full bg-gradient-imperial glow-imperial" />
+                      <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(var(--pink))] shadow-[0_0_14px_hsl(var(--gold)/0.85)]" />
                     )}
-                    <Icon className={`w-5 h-5 ${active ? "text-primary" : "text-muted-foreground"}`} />
+                    <Icon
+                      className={`w-5 h-5 transition-all duration-200 ${
+                        active
+                          ? "text-[hsl(var(--gold))] scale-110 drop-shadow-[0_0_8px_hsl(var(--gold)/0.7)]"
+                          : "text-muted-foreground group-hover:text-foreground"
+                      }`}
+                    />
                     <span
-                      className={`text-[10px] font-semibold ${active ? "text-foreground" : "text-muted-foreground"}`}
+                      className={`text-[10px] font-bold tracking-wide transition-colors ${
+                        active ? "text-foreground" : "text-muted-foreground"
+                      }`}
                     >
                       {item.label}
                     </span>
