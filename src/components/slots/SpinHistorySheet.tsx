@@ -7,6 +7,7 @@ import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
 import { notify } from "@/lib/notify";
 import { verifySpin } from "@/lib/slots/fairness";
+import ProvablyFairBadge from "@/components/empire/betting/ProvablyFairBadge";
 
 type SpinRow = {
   id: string;
@@ -91,9 +92,12 @@ export default function SpinHistorySheet({ gameCode }: { gameCode: string }) {
       </SheetTrigger>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            스핀 히스토리 · Provably Fair
+          <SheetTitle className="flex items-center justify-between gap-2">
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              황제의 전투 기록
+            </span>
+            <ProvablyFairBadge size="sm" />
           </SheetTitle>
         </SheetHeader>
 

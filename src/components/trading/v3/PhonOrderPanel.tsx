@@ -16,6 +16,7 @@ import { useOpenPhonPosition, type Side } from "@/hooks/use-open-phon-position";
 import { useMyPhonLeverageBonus } from "@/hooks/use-my-phon-leverage-bonus";
 import { HOUSE_EDGE_DISCOUNT_RATE } from "@/lib/phonEconomy";
 import { notify } from "@/lib/notify";
+import ProvablyFairBadge from "@/components/empire/betting/ProvablyFairBadge";
 
 const PhonOrderConfirmSheet = lazy(() => import("./PhonOrderConfirmSheet"));
 
@@ -79,7 +80,10 @@ export default function PhonOrderPanel({ symbol, price }: Props) {
             <Sparkles className="w-3.5 h-3.5" />
           </div>
           <div>
-            <div className="text-[11px] font-black tracking-[0.2em] text-amber-300">PHON 베팅</div>
+            <div className="flex items-center gap-1.5">
+              <div className="text-[11px] font-black tracking-[0.2em] text-amber-300">PHON 베팅</div>
+              <ProvablyFairBadge size="sm" />
+            </div>
             <div className="text-[10px] text-muted-foreground">수수료 자동 -20% · 즉시 적용</div>
           </div>
         </div>
