@@ -25,6 +25,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import FreezeBanner from "./FreezeBanner";
 import { useAchievementWatcher } from "@/hooks/use-achievement-watcher";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import ImperialLogo from "@/components/brand/ImperialLogo";
 
 // v19 Phase 0-R: 글로벌 idle 오버레이 13종 전면 마운트 해제.
 // (FloatingChat, NeonNotificationFeed, BaronPromotionDialog, EmpireBoosterTimer,
@@ -147,14 +148,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {user && (
         <aside className="hidden md:flex fixed inset-y-0 left-0 z-30 w-60 flex-col glass-strong border-r border-primary/10">
           <div className="px-5 py-5 border-b border-border/40">
-            <Link to="/command" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-imperial glow-imperial flex items-center justify-center font-imperial font-black text-primary-foreground text-base">
-                P
-              </div>
-              <span className="font-imperial text-base text-gradient-imperial tracking-[0.22em]">
-                PHONARA
-              </span>
-            </Link>
+            <ImperialLogo to="/command" size="md" withWordmark withWorld={false} ariaLabel="PHONARA 홈" />
+
           </div>
           <nav className="flex-1 p-3 overflow-y-auto">
             <SlimMenu pathname={loc.pathname} isAdmin={!!user.isAdmin} />
@@ -189,14 +184,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </SheetTrigger>
                 <SheetContent side="left" className="w-72 p-0 bg-background/95 backdrop-blur-xl">
                   <div className="px-5 py-5 border-b border-border/40">
-                    <Link to="/command" onClick={() => setSheetOpen(false)} className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-imperial glow-imperial flex items-center justify-center font-imperial font-black text-primary-foreground text-base">
-                        P
-                      </div>
-                      <span className="font-imperial text-base text-gradient-imperial tracking-[0.22em]">
-                        PHONARA
-                      </span>
-                    </Link>
+                    <div onClick={() => setSheetOpen(false)} className="inline-block">
+                      <ImperialLogo to="/command" size="md" withWordmark withWorld={false} />
+                    </div>
                   </div>
                   <div className="p-3 overflow-y-auto h-[calc(100%-180px)]">
                     <SlimMenu pathname={loc.pathname} isAdmin={!!user.isAdmin} onNavigate={() => setSheetOpen(false)} />
@@ -215,14 +205,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </SheetContent>
               </Sheet>
             )}
-            <Link to={user ? "/command" : "/"} className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-imperial flex items-center justify-center font-imperial font-black text-primary-foreground text-sm">
-                P
-              </div>
-              <span className="font-imperial text-sm text-gradient-imperial tracking-[0.18em]">
-                PHONARA
-              </span>
-            </Link>
+            <ImperialLogo to={user ? "/command" : "/"} size="sm" withWordmark withWorld={false} />
+
           </div>
           {/* Desktop spacer */}
           <div className="hidden md:block" />

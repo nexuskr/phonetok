@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Bell, ChevronDown, LogOut, Settings, Sparkles, User as UserIcon, Wallet } from "lucide-react";
+import ImperialLogo from "@/components/brand/ImperialLogo";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyPower } from "@/hooks/use-my-power";
 import {
@@ -45,14 +46,9 @@ export default function PhonaraTopBar() {
       role="banner"
     >
       <div className="container h-full flex items-center justify-between gap-3">
-        <Link to="/" className="flex items-center gap-2 group" aria-label="PHONARA.WORLD 홈">
-          <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-[hsl(var(--gold))] to-[hsl(var(--pink))] text-background shadow-[0_0_24px_-6px_hsl(var(--gold)/.6)]">
-            <Sparkles className="w-4 h-4" />
-          </span>
-          <span className="hidden sm:inline font-imperial text-base tracking-[0.22em] text-foreground">
-            PHONARA<span className="text-[hsl(var(--pink))]">.</span>WORLD
-          </span>
-        </Link>
+        <ImperialLogo to="/" size="md" withWordmark withWorld className="hidden sm:inline-flex" ariaLabel="PHONARA.WORLD 홈" />
+        <ImperialLogo to="/" size="sm" withWordmark={false} className="sm:hidden" ariaLabel="PHONARA.WORLD 홈" />
+
 
         {authed === false && (
           <div className="flex items-center gap-2">

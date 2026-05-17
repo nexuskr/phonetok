@@ -38,7 +38,6 @@ const VipTradingRoom = lazy(() => import("@/components/trading/v3/VipTradingRoom
 const PhonOrderPanel = lazy(() => import("@/components/trading/v3/PhonOrderPanel"));
 const PhonLiveSocialProof = lazy(() => import("@/components/trading/v3/PhonLiveSocialProof"));
 const PhonPositionsList = lazy(() => import("@/components/trading/v3/PhonPositionsList"));
-const LiveTradingCounter = lazy(() => import("@/components/fomo/LiveTradingCounter"));
 const ImperialTradeFomoBar = lazy(() => import("@/components/trade/ImperialTradeFomoBar"));
 const CurrencyExchangeButton = lazy(() => import("@/components/trade/CurrencyExchangeButton"));
 
@@ -362,9 +361,6 @@ export default function TradingArenaBybit() {
               바이비트급 차트 · 25 페어 · 최대 100× · Paper ↔ Real
               <span className="hidden md:inline text-muted-foreground/60"> · Esc로 전체 청산</span>
             </p>
-            <div className="mt-1.5">
-              <Suspense fallback={null}><LiveTradingCounter /></Suspense>
-            </div>
           </div>
           <div className="inline-flex items-center gap-2">
             <Suspense fallback={null}><CurrencyExchangeButton /></Suspense>

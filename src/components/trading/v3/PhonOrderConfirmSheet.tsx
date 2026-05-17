@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TrendingUp, TrendingDown, Sparkles, ShieldCheck } from "lucide-react";
 import { HOUSE_EDGE_DISCOUNT_RATE } from "@/lib/phonEconomy";
+import { USDT_PER_PHON } from "@/lib/displayCurrency";
 
 interface Props {
   open: boolean;
@@ -17,10 +18,11 @@ interface Props {
   leverage: number;
   amountPhon: number;
   estLiq: number;
+  displayUnit?: "PHON" | "USDT";
 }
 
 export default function PhonOrderConfirmSheet({
-  open, onClose, onConfirm, busy, side, symbol, leverage, amountPhon, estLiq,
+  open, onClose, onConfirm, busy, side, symbol, leverage, amountPhon, estLiq, displayUnit = "PHON",
 }: Props) {
   useEffect(() => {
     if (!open) return;
@@ -77,6 +79,10 @@ export default function PhonOrderConfirmSheet({
                 <div className="mt-2 font-display font-black text-3xl tabular-nums">
                   {Math.floor(amountPhon).toLocaleString("ko-KR")}
                   <span className="text-sm font-bold ml-2 opacity-80">PHON</span>
+                </div>
+                <div className="mt-0.5 text-[11px] font-bold opacity-85 tabular-nums">
+                  ≈ {(amountPhon * USDT_PER_PHON).toLocaleString(undefined, { maximumFractionDigits: 2 })} USDT
+                  {displayUnit === "USDT" && <span className="ml-1.5 opacity-75">· USDT 입력</span>}
                 </div>
               </div>
 
