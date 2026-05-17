@@ -35,6 +35,9 @@ const LiveSideCounter = lazy(() => import("@/components/trading/v3/LiveSideCount
 const MobileOrderSheet = lazy(() => import("@/components/trading/v3/MobileOrderSheet"));
 const PhonBettingNudge = lazy(() => import("@/components/trading/v3/PhonBettingNudge"));
 const VipTradingRoom = lazy(() => import("@/components/trading/v3/VipTradingRoom"));
+const PhonOrderPanel = lazy(() => import("@/components/trading/v3/PhonOrderPanel"));
+const PhonLiveSocialProof = lazy(() => import("@/components/trading/v3/PhonLiveSocialProof"));
+const PhonPositionsList = lazy(() => import("@/components/trading/v3/PhonPositionsList"));
 
 function usePriceStore() {
   return useSyncExternalStore(priceStore.subscribe, priceStore.getSnapshot, priceStore.getSnapshot);
