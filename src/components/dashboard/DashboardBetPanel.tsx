@@ -141,6 +141,7 @@ const DashboardBetPanel = forwardRef<BetPanelHandle>(function DashboardBetPanel(
             {credit.toLocaleString(undefined, { maximumFractionDigits: 2 })} <span className="text-xs font-bold text-muted-foreground">USDT</span>
           </div>
           <div className="text-[11px] text-muted-foreground tabular-nums">PHON {phon.toLocaleString()}</div>
+          <div className="mt-1"><LiveTradingCounter compact /></div>
         </div>
         <div className="text-right">
           <div className="text-[10px] tracking-[0.2em] font-bold text-muted-foreground">{SYMBOL}</div>
