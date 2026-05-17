@@ -33,6 +33,8 @@ const HotCoinRail = lazy(() => import("@/components/trading/v3/HotCoinRail"));
 const LeveragePresetRail = lazy(() => import("@/components/trading/v3/LeveragePresetRail"));
 const LiveSideCounter = lazy(() => import("@/components/trading/v3/LiveSideCounter"));
 const MobileOrderSheet = lazy(() => import("@/components/trading/v3/MobileOrderSheet"));
+const PhonBettingNudge = lazy(() => import("@/components/trading/v3/PhonBettingNudge"));
+const VipTradingRoom = lazy(() => import("@/components/trading/v3/VipTradingRoom"));
 
 function usePriceStore() {
   return useSyncExternalStore(priceStore.subscribe, priceStore.getSnapshot, priceStore.getSnapshot);
