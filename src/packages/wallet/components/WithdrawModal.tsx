@@ -76,14 +76,21 @@ export default function WithdrawModal({ available, minWithdraw, ctl }: Props) {
               {g("withdrawNext")}
             </button>
           ) : (
-            <button
-              onClick={() => void submit()}
-              disabled={!canSubmit || submitting}
-              className="w-full min-h-[56px] rounded-xl bg-amber-400 text-neutral-900 font-black text-lg disabled:opacity-50 disabled:pointer-events-none active:scale-[0.99] transition inline-flex items-center justify-center gap-2"
-            >
-              {submitting && <Loader2 className="w-5 h-5 animate-spin" />}
-              {g("withdrawSubmit")}
-            </button>
+            <>
+              <button
+                onClick={() => void submit()}
+                disabled={!canSubmit || submitting}
+                className="w-full min-h-[56px] rounded-xl bg-amber-400 text-neutral-900 font-black text-lg disabled:opacity-50 disabled:pointer-events-none active:scale-[0.99] transition inline-flex items-center justify-center gap-2"
+              >
+                {submitting && <Loader2 className="w-5 h-5 animate-spin" />}
+                {g("withdrawSubmit")}
+              </button>
+              {submitting && (
+                <p className="mt-2 text-[11px] text-amber-200/80 text-center">
+                  안전하게 처리하고 있어요. 창을 닫지 마세요.
+                </p>
+              )}
+            </>
           )}
         </div>
       </DialogContent>
