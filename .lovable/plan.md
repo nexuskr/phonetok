@@ -87,41 +87,41 @@ Props: `variant?: "full" | "compact"` — Dashboard 는 full(8행), Index 는 fu
 
 ```text
 ┌──────────────────────────────────────────────────────┐
-│   🏠       ⚔️        ⬢ PHON ⬢      👑       👤      │
-│  Home    Arena    [FAB Half-Off]  Empire  My Throne │
-│   /     /trade        /phon       /empire  /profile │
+│   🏠       📈        ⬢ PHON ⬢      🎰         👤      │
+│   홈      거래      [FAB 첫입금+50%]  게임       내정보  │
+│   /     /trade        /phon         /games    /profile│
 └──────────────────────────────────────────────────────┘
 ```
 
-- **Home** `/` — 대시보드
-- **Arena** `/trade` (alias /arena/army) — 트레이딩 + 슬롯 진입
-- **PHON FAB (중앙, 떠 있음)** — Half-Off Imperial 그라디언트, Crown 아이콘, 강한 글로우 ring + 펄스 halo, `imperial-halfoff` + `pulse-halo` 토큰. 클릭 → `/phon`. 길게 누르거나 보조 액션 없음 (단순 1탭). 모바일 핵심 CTA.
-- **Empire** `/empire` — 티어 / Founding / Galaxy 허브
-- **My Throne** `/profile` — 프로필 / 보안 / 알림
+50~70대 사용자도 한눈에 이해할 수 있도록 **5개 탭 라벨 전부 한글 단어 단독** (영문 보조 텍스트 / tagline 제거).
 
-`/live`, `/games`, `/earn` 등 기존 탭은 라우트는 유지하되 nav 에서는 제거 (Home 카드와 More 섹션에서 진입).
+- **홈** `/` — 대시보드
+- **거래** `/trade` (alias /arena/army) — 트레이딩 진입
+- **PHON FAB (중앙, 떠 있음)** — Half-Off Imperial 그라디언트, Crown 아이콘, 강한 글로우 ring + 펄스 halo, `imperial-halfoff` + `pulse-halo` 토큰. 클릭 → `/phon`. 단순 1탭. FAB 우상단 미세 칩 (text-[9px]) **"첫입금 +50%"** — 안전 카피.
+- **게임** `/games` (alias /casino) — 슬롯/카지노 허브
+- **내정보** `/profile` — 프로필 / 보안 / 알림
+
+`/live`, `/earn`, `/empire`, `/arena` 등 기존 탭은 라우트는 유지하되 nav 에서는 제거 (Home 카드와 More 섹션, /empire 직접 진입 유지).
 
 ### 컴포넌트 수정
 
 **`src/components/nav/PhonaraNav.tsx`** — 5탭 grid + 중앙 슬롯에 FAB.
 
-- 모바일: 화면 하단 `fixed bottom-0` (현재는 `sticky top-14`). 데스크탑(md+): TopBar 아래 sticky 유지.
-- 5칸 grid 중 3번째(중앙) 칸은 빈 자리, 그 위에 `absolute -top-4` 로 FAB 떠 있음 (Stake/coinbase 모바일 패턴).
-- 비활성 탭: `bg-card/40 border-border/30 text-muted-foreground`.
-- 활성 탭: `text-[hsl(var(--gold))]` + 아이콘 글로우.
-- haptic tick 유지.
+- 모바일: 화면 하단 `fixed bottom-0 inset-x-0` + safe-area inset. 데스크탑(md+): TopBar 아래 sticky 유지.
+- 5칸 grid 중 3번째(중앙) 칸은 빈 자리, 그 위에 `absolute -top-5` 로 FAB 떠 있음.
+- 비활성 탭: `bg-card/40 border-border/30 text-muted-foreground`. 라벨 `text-[13px] font-black`.
+- 활성 탭: `text-[hsl(var(--gold))]` + 아이콘 글로우, 미세 -translate-y.
+- haptic tick 유지. 본문 하단 패딩 `pb-20 md:pb-0` 처리 (별도 Layout 보강 — Layout 의 main wrapper 에 클래스 추가).
 
-**FAB**: 기존 `src/components/ui/floating-fab.tsx` `imperial` variant 재사용 (이미 `imperial-halfoff` + `pulse-halo` 토큰). PhonaraNav 내부에 `<FloatingFabLink to="/phon" icon={<Crown/>} label="PHON" pulse variant="imperial"/>` 형태로 nav 자체 자식으로 배치 (전역 FloatingDock 과 충돌 없음 — 중앙 nav 슬롯 한정).
-
-라벨링 텍스트 "Half-Off" 미세 칩 (text-[9px]) 을 FAB 우상단에 배지처럼 — "50% OFF" or "1+1" 식이 아니라 **"첫 입금 +50%"** (안전 카피).
+**FAB**: 기존 `src/components/ui/floating-fab.tsx` `imperial` variant 재사용. PhonaraNav 중앙 슬롯 한정 — 전역 FloatingDock 과 충돌 없도록 z-index/위치만 nav 내부로 한정.
 
 ### isActive 매핑
 
-- `/` → Home
-- `/trade`, `/arena`, `/games`, `/casino`, `/live` → Arena
-- `/phon` → FAB (별도)
-- `/empire`, `/empire/*` → Empire
-- `/profile`, `/security/*`, `/profile?tab=*` → My Throne
+- `/` → 홈
+- `/trade`, `/arena`, `/arena/*` → 거래
+- `/phon` → FAB
+- `/games`, `/games/*`, `/casino`, `/casino/*` → 게임
+- `/profile`, `/security/*` → 내정보
 
 ### 변경 파일
 
