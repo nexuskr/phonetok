@@ -1,107 +1,98 @@
-# 이탈 방지 강화 — 7일 스트릭 + 휴면 재활성화 + 미션 회복
+# 게임화(Gamification) 대폭 도입 — Pass 1
 
-## 목표
-사용자가 매일 돌아오고, 끊겨도 빠르게 복귀하도록 3개 시스템을 강화한다. 기존 자산(`AttendanceCard`, `reactivation_campaigns`, `MissionsCard`, `ReactivationOfferDialog`)을 깨지 않고 확장한다.
+기존 자산을 최대한 재사용하고, money-flow / Operator Isolation / Bundle Budget / Realtime Partition / Active Governor는 단 1바이트도 건드리지 않습니다.
 
-## 절대 불변 (변경 0줄)
-- money-flow 8경로 (`useDeposit/useWithdraw/request_withdrawal/verify_withdraw_otp/credit_crypto_deposit/admin approve/complete/cancel`)
-- Operator Isolation / Bundle Budget / Realtime Partition / Active Governor
-- `claim_daily_attendance` RPC 본문은 **수정하지 않음** — 스트릭 정정 로직은 별도 함수로 추가
+## 기존 자산 (재사용)
 
----
+- `achievements_catalog` (60개), `user_achievements` — 업적 시스템 골격 존재
+- `badges_catalog` (33개), `user_badges` — 배지 시스템 골격 존재 (Bronze/Silver/Gold/Legendary tier)
+- `empire_levels` + `recompute_empire_level` — Empire 레벨 (유지, 미변경)
+- `claim_daily_attendance_v2` — 7일 스트릭 (유지)
+- `award_crown`, `enqueue_fomo_notification` — Warm King 알림 인프라
 
-## 1. 7일 연속 스트릭 강화
+## 신규 작업
 
-### DB (마이그레이션 1)
-- `claim_daily_attendance` 를 **건드리지 않고** 새 RPC `claim_daily_attendance_v2(user_id)` 추가
-  - 어제(`today - 1`) 출석이 아니면 `attendance_streak = 1` 로 리셋 후 +1 처리
-  - 7의 배수 도달 시 weekly_bonus 가산하여 phon 입금 (기존 `attendance_streak` 컬럼만 사용)
-  - 반환: `{ reward, new_streak, weekly_bonus, milestone_hit boolean }`
-- 신규 테이블 `streak_milestones (user_id, streak_len, awarded_at)` — 7/14/30/100일 1회 보너스 디듀프
-- 클라이언트는 `AttendanceCard.tsx` 의 RPC 이름만 v2 로 교체 (money-flow 무관)
+### 1. PHON 레벨 시스템 (1~100)
 
-### UI
-- 신규 `src/components/streak/StreakFlame.tsx` — 🔥 + 일수 칩 (Tier별 색)
-  - 상단바/프로필/`AttendanceCard` 헤더에 마운트
-  - `attendance_streak >= 7` 시 펄스 애니메이션
-- 스트릭 끊김 감지 훅 `src/hooks/use-streak-loss.ts`
-  - `last_attendance < today - 1` 이고 `attendance_streak == 0` 으로 막 리셋된 경우 1회 한정 Warm King 토스트
-  - "아쉽네요. 다시 쌓아볼까요? 첫날부터 함께 가겠습니다."
-- 7일 달성 시 `notify.success("👑 7일 연속! +X PHON · Empire 경험치 +50 · 황제 배지 획득")`
+신규 테이블:
+- `phon_levels(user_id PK, level int, xp bigint, total_xp bigint, updated_at)`
+- `phon_level_events(id, user_id, kind, xp_delta, source_ref, created_at)` — 감사 로그
+- `phon_level_rewards_claimed(user_id, level, claimed_at)` — 레벨업 보너스 1회 지급 보장
 
----
+XP 공식 (클라이언트 + 서버 미러):
+- level N → next: `floor(100 * 1.15^(N-1))` XP 필요 (1→2: 100, 50→51: ~108k, 100 cap)
 
-## 2. 휴면 재활성화 캠페인 확장
+신규 RPC (SECURITY DEFINER + `auth.uid()` 가드):
+- `grant_phon_xp(_kind text, _xp bigint, _source_ref text)` — XP 가산, 레벨업 시 `phon_level_events` + `enqueue_fomo_notification('level_up')` + 레벨×1000 PHON 보너스 + 10레벨마다 24h Empire Booster (`empire_boosters` 재사용)
+- `get_my_phon_level()` → `{level, xp, xp_to_next, total_xp}`
+- `claim_phon_level_reward(_level int)` — 멱등 (UNIQUE user_id+level)
 
-### DB (마이그레이션 1)
-- `reactivation_campaigns` 에 행 보강/업서트:
-  - `comeback_7d`: phon_bonus 10000, body "7일 만에 돌아오시면 +10,000 PHON" (기존 500 → 10000 상향)
-  - `comeback_14d`: phon_bonus 5000 + meta hint "Founding Seat 우선권" (UI에서 강조)
-  - 신규 `comeback_30d`: dormant_days=30, phon_bonus 25000, title "당신의 Empire 레벨이 올라갔어요"
-- `run_reactivation_campaigns` 가 이미 모든 active 캠페인을 순회 — 별도 cron 변경 불필요(기존 cron 유지)
+XP 적립 소스 (트리거 추가 — money-flow 미터치):
+- `user_achievements` AFTER INSERT → `grant_phon_xp('achievement', catalog.ap*10, key)`
+- `streak_milestones` AFTER INSERT → `grant_phon_xp('streak', day*50, ...)`
+- 출금/입금/베팅 등 money-flow 경로는 **건드리지 않음** (필요 시 별도 Pass 2)
 
-### UI
-- `ReactivationOfferDialog.tsx` 는 이미 `get_my_reactivation_offer` 를 사용 — **로직 변경 없음**, 30d 캠페인 자동 노출
-- 신규 `src/components/reactivation/ChurnReactivationBanner.tsx` — Dashboard 상단 슬림 배너 (다이얼로그 닫혀도 보이는 상시 CTA)
+### 2. 업적 30개 큐레이션
 
----
+`achievements_catalog`는 이미 60개. 사용자 요청 30개 핵심 업적을 카탈로그에 **존재하는지 확인 후 upsert** (insert tool):
+- `first_withdrawal`, `streak_7`, `streak_30`, `earn_1m_phon`, `founding_seat`, `staking_100k`, `trade_50pct_gain`, `first_deposit`, `daily_chest_30`, `phon_level_10/25/50/100`, `badge_collector_10`, `achievement_15`, `vip_subscribed`, `crown_war_winner` 등 30종.
+- 각 업적 `badge_tier` 채워 자동 배지 지급 (기존 `trg_user_achievement_is` 활용).
 
-## 3. 미션 실패 회복 시스템
+### 3. 일일 보상 상자 (Daily Chest)
 
-### DB (마이그레이션 1)
-- 신규 테이블 `mission_daily_status (user_id, day date, completed_count int, failed boolean, recovery_bonus_pct int default 0)` PK (user_id, day)
-- 신규 RPC `record_mission_outcome(_completed_today int)` — 자정에 fail 판정 누적, 3일 연속 fail 시 다음날 row 에 `recovery_bonus_pct = 30` 세팅
-- 신규 RPC `get_mission_recovery_state()` → `{ consecutive_fails int, recovery_pct int, easy_mode boolean }`
-- 신규 RPC `claim_daily_quick_reward` 는 **수정하지 않음** — 클라이언트가 `recovery_pct` 만큼 가산 표시 (실지급은 별도 RPC `apply_recovery_bonus(_kind)` 가 추가 PHON 지급)
+신규 테이블:
+- `daily_chest_opens(user_id, opened_date PK, streak_day int, tier text, payload jsonb, opened_at)`
 
-### UI
-- `src/hooks/use-mission-recovery.ts` — state 폴링
-- `MissionsCard.tsx` 상단에 회복 모드 배너: "포기하지 마세요. 오늘은 보상 +30%!"
-- 미션 amount 표시에 `+30% 회복` 칩 (recovery 활성 시)
+보상 풀 (상수 `DAILY_CHEST_REWARDS`, 서버 권위):
+- Bronze (1~2일): 500~2000 PHON + 50 XP
+- Silver (3~6일): 2000~6000 PHON + 150 XP + 가끔 무료 베팅권 1매
+- Gold (7~13일): 6000~15000 PHON + 400 XP + Empire Booster 6h 5%
+- Legendary (14일+): 15000~50000 PHON + 1000 XP + Empire Booster 24h 25% + Crown 가능성
 
----
+신규 RPC:
+- `open_daily_chest()` — 오늘 미오픈 시 attendance_streak 기반 tier 결정 → 랜덤 페이로드 → PHON/XP/booster 지급 + `enqueue_fomo_notification('chest_legendary')` (Legendary 시)
+- `get_daily_chest_state()` → `{can_open, streak_day, tier_preview, last_opened_at}`
 
-## 4. FOMO 강화
+### 4. 프론트엔드
 
-### DB (마이그레이션 1)
-- 신규 RPC `get_today_mission_completion_stats()` → `{ overall_pct numeric, my_remaining int }` (전체 활성 유저 대비)
-- public read OK (집계만)
+신규 컴포넌트 (`@/components/gamification/`):
+- `LevelProgressBar.tsx` — PHON 레벨 + XP 게이지 (Warm King 그라디언트)
+- `DailyChest.tsx` — Dashboard 마운트, 클릭 시 오픈 애니메이션 (framer-motion `scale + glow`)
+- `AchievementCard.tsx` — 잠금/해제 상태, AP/배지 tier 표시
+- `BadgeCollection.tsx` — 프로필 그리드 (tier 색상 칩)
+- `LevelUpToast.tsx` — 레벨업 시 전역 알림 (zustand store)
 
-### UI
-- `MissionsCard.tsx` 헤더에 FOMO 라인: "오늘 미션 완료율 {pct}%. 당신은 아직 {n}개 남았어요"
-- 미션 실패 시 토스트: "친구 {pct}% 가 오늘 미션을 끝냈어요. 내일은 함께 가요." (Warm King 톤)
+신규 훅 (`src/hooks/`):
+- `use-phon-level.ts` (`useLevel`) — `get_my_phon_level` + Realtime on `phon_levels` (wallet 파티션 재사용 X — 별도 `gamification:phon_levels` 채널은 wallet wrapper 통해)
+- `use-daily-chest.ts` (`useDailyChest`)
+- `use-achievement.ts` (`useAchievement`) — 기존 `use-achievement-watcher`와 충돌 없이 read-only 조회 훅으로
 
----
+신규 상수 (`src/lib/gamification.ts`):
+- `ACHIEVEMENT_LIST`, `STREAK_MILESTONE_DAYS`, `DAILY_CHEST_REWARDS`, `PHON_LEVEL_XP_FORMULA`
 
-## 5. Warm King 톤 / 네이밍
-- 모든 메시지 `docs/conventions/naming.md` 톤 가이드 준수
-- 신규 컴포넌트: `StreakFlame`, `ChurnReactivationBanner`, 신규 훅: `useStreakLoss`, `useMissionRecovery`
-- 상수: `STREAK_MILESTONE_DAYS=[7,14,30,100]`, `RECOVERY_BONUS_PCT=30`, `RECOVERY_TRIGGER_FAIL_DAYS=3`
+페이지 통합:
+- `Dashboard.tsx`: `<DailyChest />` + `<LevelProgressBar />` 상단 추가
+- `/profile` 또는 `/empire/my-seat` 근처: `<BadgeCollection />` + PHON 레벨 + Empire 레벨 동시 표시
+- `/achievements`: 기존 페이지에 카테고리 필터 + `AchievementCard` 적용
 
----
+### 5. Warm King 톤
 
-## 파일 변경 요약
+`docs/conventions/naming.md` 준수:
+- 레벨업: "👑 폐하의 위엄이 한 단계 더 깊어졌습니다 (Lv {N})"
+- 상자 Legendary: "🎁 전설의 보물상자가 폐하 앞에 놓였습니다"
+- 업적 해제: "🏆 새로운 업적 — {name}"
 
-신규 (8):
-- `src/components/streak/StreakFlame.tsx`
-- `src/components/reactivation/ChurnReactivationBanner.tsx`
-- `src/hooks/use-streak-loss.ts`
-- `src/hooks/use-mission-recovery.ts`
-- 마이그레이션 1개 (streak v2 RPC + milestones 테이블 + 3개 캠페인 upsert + mission_daily_status + recovery RPC 3종 + completion stats RPC)
+## 절대 불변 검증
 
-수정 (3):
-- `src/components/AttendanceCard.tsx` — RPC `claim_daily_attendance` → `claim_daily_attendance_v2`, weekly_bonus/milestone 표시, `<StreakFlame />` 마운트
-- `src/components/earn/MissionsCard.tsx` — FOMO 헤더 + 회복 배너 + recovery 칩
-- `src/pages/Dashboard.tsx` — `<ChurnReactivationBanner />` 마운트 (기존 `ReactivationOfferDialog` 와 공존)
+- `node scripts/check-money-flow-freeze.mjs` — git diff = 0
+- `node scripts/check-operator-isolation.mjs` — PASS
+- `npm run size:check` — 신규 컴포넌트 lazy import로 index/dashboard 청크 예산 유지
+- Realtime: 신규 채널은 `useWalletChannel` (wallet 파티션) 재사용, raw `supabase.channel` 금지
 
-money-flow / Operator / Bundle / Realtime / Governor 파일 0건 변경.
+## 작업 순서
 
----
-
-## 검증
-- `node scripts/check-money-flow-freeze.mjs` → diff 0
-- `node scripts/check-operator-isolation.mjs` → PASS
-- `npm run size:check` → 예산 내
-- 신규 RPC 모두 `SECURITY DEFINER` + `auth.uid()` 가드
-- `attendance_streak` 컬럼은 기존 `guard_profile_sensitive_columns` 트리거 보호 — v2 RPC 도 SECURITY DEFINER 이므로 통과
-- `linter` 후 RLS 경고 0
+1. 마이그레이션 1개: 테이블 4개 + RPC 6개 + 트리거 2개 + RLS
+2. insert 호출 1개: `achievements_catalog` 30개 upsert + `DAILY_CHEST_REWARDS` 시드 (필요 시)
+3. 상수/훅/컴포넌트 작성 (병렬)
+4. Dashboard / Profile / Achievements 페이지 통합
+5. 검증 3종 + 타입 재생성
