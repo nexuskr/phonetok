@@ -55,22 +55,23 @@ function GameCardTile({ g }: { g: GameCard }) {
   return (
     <Link
       to={g.to}
-      className={`group relative aspect-[3/4] rounded-xl overflow-hidden border border-border/40 bg-gradient-to-br ${toneClasses(g.tone)} hover:border-primary/50 transition press`}
+      className={`imperial-card-hover imperial-corner-shine group relative aspect-[3/4] rounded-xl overflow-hidden border border-border/40 bg-gradient-to-br ${toneClasses(g.tone)} hover:border-[hsl(var(--gold)/0.7)] transition press`}
     >
-      <div className="absolute inset-x-0 top-0 p-2 flex items-start justify-between">
+      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-black/40 pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 p-2 flex items-start justify-between z-10">
         {g.badge && (
-          <span className="px-1.5 py-0.5 rounded text-[9px] font-black tracking-wider bg-primary text-primary-foreground">
+          <span className="px-1.5 py-0.5 rounded text-[9px] font-black tracking-wider bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(var(--pink))] text-background shadow-[0_2px_10px_hsl(var(--gold)/0.5)]">
             {g.badge}
           </span>
         )}
         {g.multiplier && (
-          <span className="ml-auto px-1.5 py-0.5 rounded text-[10px] font-mono font-black bg-background/60 text-foreground border border-border/40">
+          <span className="ml-auto px-1.5 py-0.5 rounded text-[10px] font-mono font-black bg-background/70 backdrop-blur text-[hsl(var(--gold))] border border-[hsl(var(--gold)/0.4)] shadow-[0_0_10px_hsl(var(--gold)/0.25)]">
             {g.multiplier}
           </span>
         )}
       </div>
-      <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-        <div className="text-xs sm:text-sm font-bold text-foreground truncate">{g.title}</div>
+      <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-10">
+        <div className="text-xs sm:text-sm font-bold text-foreground truncate group-hover:text-[hsl(var(--gold))] transition-colors">{g.title}</div>
       </div>
     </Link>
   );
