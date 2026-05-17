@@ -4294,6 +4294,7 @@ export type Database = {
       live_positions: {
         Row: {
           allocated_margin: number | null
+          bet_currency: string
           entry: number
           fee_open: number
           id: string
@@ -4319,6 +4320,7 @@ export type Database = {
         }
         Insert: {
           allocated_margin?: number | null
+          bet_currency?: string
           entry: number
           fee_open?: number
           id?: string
@@ -4344,6 +4346,7 @@ export type Database = {
         }
         Update: {
           allocated_margin?: number | null
+          bet_currency?: string
           entry?: number
           fee_open?: number
           id?: string
@@ -5268,6 +5271,48 @@ export type Database = {
         }
         Relationships: []
       }
+      phon_bet_audit: {
+        Row: {
+          action: string
+          amount_phon: number
+          created_at: string
+          fee_phon: number | null
+          id: string
+          idem_key: string
+          leverage: number | null
+          meta: Json
+          pnl_phon: number | null
+          position_id: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          amount_phon: number
+          created_at?: string
+          fee_phon?: number | null
+          id?: string
+          idem_key: string
+          leverage?: number | null
+          meta?: Json
+          pnl_phon?: number | null
+          position_id?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          amount_phon?: number
+          created_at?: string
+          fee_phon?: number | null
+          id?: string
+          idem_key?: string
+          leverage?: number | null
+          meta?: Json
+          pnl_phon?: number | null
+          position_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       phon_level_events: {
         Row: {
           created_at: string
@@ -5342,6 +5387,85 @@ export type Database = {
           xp?: number
         }
         Relationships: []
+      }
+      phon_stake_yields: {
+        Row: {
+          created_at: string
+          id: string
+          idem_key: string
+          settled_for_date: string
+          stake_id: string
+          user_id: string
+          yield_phon: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          idem_key: string
+          settled_for_date: string
+          stake_id: string
+          user_id: string
+          yield_phon: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          idem_key?: string
+          settled_for_date?: string
+          stake_id?: string
+          user_id?: string
+          yield_phon?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "phon_stake_yields_stake_id_fkey"
+            columns: ["stake_id"]
+            isOneToOne: false
+            referencedRelation: "phon_stakes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      phon_stakes: {
+        Row: {
+          amount: number
+          id: string
+          last_yield_at: string | null
+          policy_id: number
+          started_at: string
+          status: string
+          unstaked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          id?: string
+          last_yield_at?: string | null
+          policy_id: number
+          started_at?: string
+          status?: string
+          unstaked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          id?: string
+          last_yield_at?: string | null
+          policy_id?: number
+          started_at?: string
+          status?: string
+          unstaked_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "phon_stakes_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "staking_policies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       phon_transactions: {
         Row: {
@@ -7054,6 +7178,33 @@ export type Database = {
         }
         Relationships: []
       }
+      staking_policies: {
+        Row: {
+          active: boolean
+          apy_bps: number
+          id: number
+          lock_days: number
+          min_stake_phon: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          apy_bps: number
+          id: number
+          lock_days?: number
+          min_stake_phon?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          apy_bps?: number
+          id?: number
+          lock_days?: number
+          min_stake_phon?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       streak_milestones: {
         Row: {
           awarded_at: string
@@ -7260,6 +7411,60 @@ export type Database = {
           id?: string
           metadata?: Json | null
           reason?: string
+        }
+        Relationships: []
+      }
+      swap_audit: {
+        Row: {
+          anomaly: string | null
+          created_at: string
+          direction: string
+          id: string
+          idem_key: string
+          in_amount: number
+          out_amount: number
+          rate: number
+          user_id: string
+        }
+        Insert: {
+          anomaly?: string | null
+          created_at?: string
+          direction: string
+          id?: string
+          idem_key: string
+          in_amount: number
+          out_amount: number
+          rate: number
+          user_id: string
+        }
+        Update: {
+          anomaly?: string | null
+          created_at?: string
+          direction?: string
+          id?: string
+          idem_key?: string
+          in_amount?: number
+          out_amount?: number
+          rate?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      swap_limits_daily: {
+        Row: {
+          day: string
+          total_in_krw: number
+          user_id: string
+        }
+        Insert: {
+          day: string
+          total_in_krw?: number
+          user_id: string
+        }
+        Update: {
+          day?: string
+          total_in_krw?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -10330,6 +10535,10 @@ export type Database = {
       claim_share_reward: { Args: { _channel: string }; Returns: Json }
       claim_weekly_pass_reward: { Args: { _level: number }; Returns: Json }
       cleanup_bot_activity: { Args: never; Returns: undefined }
+      close_position_phon: {
+        Args: { p_idem_key: string; p_pnl_pct: number; p_position_id: string }
+        Returns: Json
+      }
       complete_guide_bonus: { Args: never; Returns: Json }
       compute_oracle_consensus: { Args: { _symbol: string }; Returns: Json }
       compute_oracle_consensus_weighted: {
@@ -11070,6 +11279,7 @@ export type Database = {
           xp_to_next: number
         }[]
       }
+      get_my_phon_leverage_bonus: { Args: never; Returns: Json }
       get_my_quests: { Args: never; Returns: Json }
       get_my_reactivation_offer: {
         Args: never
@@ -11085,6 +11295,14 @@ export type Database = {
           title: string
         }[]
       }
+      get_my_recent_stake_yields: {
+        Args: { p_limit?: number }
+        Returns: {
+          created_at: string
+          settled_for_date: string
+          yield_phon: number
+        }[]
+      }
       get_my_security_events: {
         Args: { _limit?: number }
         Returns: {
@@ -11094,6 +11312,19 @@ export type Database = {
           id: string
           rule: string
           severity: string
+        }[]
+      }
+      get_my_stake_summary: { Args: never; Returns: Json }
+      get_my_stakes: {
+        Args: never
+        Returns: {
+          amount: number
+          apy_bps: number
+          id: string
+          last_yield_at: string
+          lock_days: number
+          started_at: string
+          status: string
         }[]
       }
       get_my_total_boost_pct: { Args: never; Returns: number }
@@ -11370,6 +11601,7 @@ export type Database = {
         Returns: Json
       }
       harvest_machine: { Args: { _purchase_id: string }; Returns: Json }
+      has_active_phon_bonus: { Args: { _user: string }; Returns: boolean }
       has_beta_access: { Args: never; Returns: boolean }
       has_role: {
         Args: {
@@ -11479,6 +11711,7 @@ export type Database = {
         Args: never
         Returns: {
           allocated_margin: number | null
+          bet_currency: string
           entry: number
           fee_open: number
           id: string
@@ -11661,6 +11894,16 @@ export type Database = {
           tier: string
           xp_reward: number
         }[]
+      }
+      open_position_phon: {
+        Args: {
+          p_amount_phon: number
+          p_idem_key: string
+          p_leverage: number
+          p_side: string
+          p_symbol: string
+        }
+        Returns: Json
       }
       pay_emperor_daily_dividend: { Args: never; Returns: Json }
       pay_weekly_leaderboard: { Args: never; Returns: Json }
@@ -11981,6 +12224,7 @@ export type Database = {
         Returns: Json
       }
       settle_package_daily: { Args: never; Returns: Json }
+      settle_phon_staking_daily: { Args: never; Returns: Json }
       settle_viral_milestone: {
         Args: {
           _catalog_key: string
@@ -12025,6 +12269,7 @@ export type Database = {
         }
         Returns: Json
       }
+      stake_phon: { Args: { p_amount: number }; Returns: Json }
       start_ai_bot_run: {
         Args: {
           _kind: Database["public"]["Enums"]["ai_bot_kind"]
@@ -12108,6 +12353,10 @@ export type Database = {
       subscribe_vip_pass_phon:
         | { Args: never; Returns: Json }
         | { Args: { _tier?: string }; Returns: Json }
+      swap_phon_krw: {
+        Args: { p_amount: number; p_direction: string; p_idem_key: string }
+        Returns: Json
+      }
       take_phon_snapshot: { Args: never; Returns: Json }
       tap_reinforce: { Args: { _nonce: string }; Returns: Json }
       tick_weekly_leaderboard_ranks: { Args: never; Returns: Json }
@@ -12167,6 +12416,7 @@ export type Database = {
       }
       unfreeze_expired: { Args: never; Returns: Json }
       unlock_achievement: { Args: { _key: string }; Returns: Json }
+      unstake_phon: { Args: { p_stake_id: string }; Returns: Json }
       update_bot_ratio_phase: { Args: never; Returns: undefined }
       upsert_daily_briefing: {
         Args: { _cards: Json; _context: Json; _model: string; _user_id: string }
