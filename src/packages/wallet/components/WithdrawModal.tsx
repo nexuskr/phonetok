@@ -4,8 +4,7 @@ import { g } from "@pkg/core/i18n/glossary";
 import { formatFromPhon } from "@/lib/displayCurrency";
 import { Banknote, Coins, Gift, ArrowLeft, Loader2, Clock3 } from "lucide-react";
 import { useWithdraw, type WithdrawMethod } from "../hooks/useWithdraw";
-
-const BANKS = ["KB국민", "신한", "우리", "하나", "농협", "카카오뱅크", "토스뱅크"];
+import { koreanBanks } from "@/lib/koreanBanks";
 
 interface Props {
   available: number;
@@ -219,7 +218,9 @@ function Step2({ form, update }: { form: any; update: any }) {
               onChange={(e) => update("bankName", e.target.value)}
               className="mt-1.5 w-full min-h-[52px] rounded-xl bg-input border border-border px-4 text-base focus:outline-none focus:border-amber-400"
             >
-              {BANKS.map(b => <option key={b} value={b}>{b}</option>)}
+              {koreanBanks.map(b => (
+                <option key={b.code} value={b.display}>{b.display}</option>
+              ))}
             </select>
           </label>
           <label className="block">

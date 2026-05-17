@@ -1,11 +1,16 @@
 /**
  * useWithdraw — Sprint 2 3-step withdraw state machine.
  * Reuses `request_withdrawal` RPC. AAL2/PIN/frozen/OTP handled server-side.
+ *
+ * v15.2:
+ *  - 모든 서버 에러를 사용자 친화 한국어 알림으로 매핑 (개발자 코드 노출 0).
+ *  - step_up_required → 인라인 StepUpGate 다이얼로그를 띄우고 인증 성공 시 1회 자동 재시도.
+ *  - 기본 은행: KB국민은행 (한국 은행 20종 전체 목록은 src/lib/koreanBanks.ts).
  */
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { requestWithdrawal } from "@/lib/wallet";
 import { notify } from "@/lib/notify";
-import { g } from "@pkg/core/i18n/glossary";
+import { DEFAULT_KOREAN_BANK_DISPLAY } from "@/lib/koreanBanks";
 
 export type WithdrawMethod = "bank" | "coin";
 
@@ -22,7 +27,7 @@ export interface WithdrawForm {
 const INIT: WithdrawForm = {
   amount: "",
   method: "bank",
-  bankName: "KB",
+  bankName: DEFAULT_KOREAN_BANK_DISPLAY,
   bankAccount: "",
   coinNetwork: "TRC20",
   coinAddress: "",
@@ -33,13 +38,81 @@ export interface UseWithdrawOpts {
   available: number;
   minWithdraw: number;
   onSuccess?: () => void;
+  /** 서버가 step_up_required 를 반환했을 때 호출 — true 반환 시 출금 자동 재시도. */
+  requireStepUp?: (label?: string) => Promise<boolean>;
 }
 
-export function useWithdraw({ available, minWithdraw, onSuccess }: UseWithdrawOpts) {
+/** 서버 에러 → 사용자 친화 한국어 알림 매핑. raw 코드는 절대 노출하지 않음. */
+function mapWithdrawError(rawMsg: string, minWithdraw: number): { title: string; description: string } {
+  const m = rawMsg.toLowerCase();
+
+  if (m.includes("account_frozen")) {
+    return {
+      title: "계정이 일시 보호 중입니다",
+      description: "이상 활동이 감지되어 자동 보호가 적용됐어요. 자세한 사항은 고객센터로 문의해 주세요.",
+    };
+  }
+  if (m.includes("step_up_required")) {
+    return {
+      title: "추가 인증이 필요해요",
+      description: "잠시 후 인증 창이 열립니다. 등록한 인증 앱의 6자리 코드를 입력해 주세요.",
+    };
+  }
+  if (m.includes("pin mismatch") || m.includes("invalid pin") || m.includes("wrong_pin")) {
+    return {
+      title: "출금 비밀번호가 일치하지 않습니다",
+      description: "6자리 출금 비밀번호를 다시 입력해 주세요.",
+    };
+  }
+  if (m.includes("below_min")) {
+    return {
+      title: "최소 출금 금액 미만입니다",
+      description: `최소 ${minWithdraw.toLocaleString()} PHON부터 출금이 가능합니다.`,
+    };
+  }
+  if (m.includes("insufficient_funds")) {
+    return {
+      title: "출금 가능 잔액이 부족합니다",
+      description: "현재 사용 가능 잔액을 확인해 주세요.",
+    };
+  }
+  if (m.includes("daily_withdraw_limit") || m.includes("daily_limit")) {
+    return {
+      title: "오늘 출금 한도를 모두 사용하셨어요",
+      description: "자정에 한도가 초기화됩니다.",
+    };
+  }
+  if (m.includes("rate_limited") || m.includes("too_many")) {
+    return {
+      title: "잠시 후 다시 시도해 주세요",
+      description: "짧은 시간에 요청이 너무 많아요.",
+    };
+  }
+  if (m.includes("kill_switch") || m.includes("withdrawals_halt")) {
+    return {
+      title: "출금이 일시 중단되었습니다",
+      description: "점검 또는 보안 사유로 일시 중단된 상태입니다. 잠시 후 다시 시도해 주세요.",
+    };
+  }
+  if (m.includes("unauthenticated") || m.includes("not_authenticated")) {
+    return {
+      title: "로그인이 필요해요",
+      description: "다시 로그인 후 출금을 진행해 주세요.",
+    };
+  }
+  return {
+    title: "출금을 처리하지 못했어요",
+    description: "잠시 후 다시 시도해 주세요. 문제가 지속되면 고객센터로 문의해 주세요.",
+  };
+}
+
+export function useWithdraw({ available, minWithdraw, onSuccess, requireStepUp }: UseWithdrawOpts) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [form, setForm] = useState<WithdrawForm>(INIT);
   const [submitting, setSubmitting] = useState(false);
+  const formRef = useRef(form);
+  formRef.current = form;
 
   const reset = useCallback(() => { setForm(INIT); setStep(1); }, []);
   const openModal = useCallback(() => { reset(); setOpen(true); }, [reset]);
@@ -61,61 +134,103 @@ export function useWithdraw({ available, minWithdraw, onSuccess }: UseWithdrawOp
 
   const next = useCallback(() => {
     if (step === 1 && !canNext1) {
-      if (amountNum < minWithdraw) notify.error(g("withdrawErrMin"));
-      else if (amountNum > available) notify.error(g("withdrawErrFunds"));
+      if (amountNum < minWithdraw) {
+        notify.error("최소 출금 금액 미만입니다", {
+          description: `최소 ${minWithdraw.toLocaleString()} PHON부터 출금이 가능합니다.`,
+        });
+      } else if (amountNum > available) {
+        notify.error("출금 가능 잔액이 부족합니다", {
+          description: "현재 사용 가능 잔액을 확인해 주세요.",
+        });
+      }
       return;
     }
     if (step === 2 && !canNext2) {
-      notify.error(g("withdrawErrGeneric"));
+      notify.error(
+        form.method === "bank" ? "계좌번호를 확인해 주세요" : "지갑 주소를 확인해 주세요",
+        { description: form.method === "bank" ? "숫자 10자리 이상으로 입력해 주세요." : "전체 주소(20자 이상)를 정확히 입력해 주세요." },
+      );
       return;
     }
     setStep(s => (s === 3 ? 3 : ((s + 1) as 1 | 2 | 3)));
-  }, [step, canNext1, canNext2, amountNum, minWithdraw, available]);
+  }, [step, canNext1, canNext2, amountNum, minWithdraw, available, form.method]);
 
   const prev = useCallback(() => {
     setStep(s => (s === 1 ? 1 : ((s - 1) as 1 | 2 | 3)));
   }, []);
 
+  const callRpc = useCallback(async (f: WithdrawForm) => {
+    await requestWithdrawal({
+      amount: Number(f.amount) || 0,
+      method: f.method,
+      bankName: f.method === "bank" ? f.bankName : undefined,
+      bankAccount: f.method === "bank" ? f.bankAccount : undefined,
+      coinAddress: f.method === "coin" ? f.coinAddress : undefined,
+      coinNetwork: f.method === "coin" ? f.coinNetwork : undefined,
+      pin: f.pin,
+    });
+  }, []);
+
+  const finishOk = useCallback(() => {
+    notify.success("출금 요청이 접수됐어요", {
+      description: "처리 현황은 출금 내역에서 확인할 수 있어요.",
+    });
+    setOpen(false);
+    reset();
+    window.dispatchEvent(new Event("wallet:refresh"));
+    onSuccess?.();
+  }, [onSuccess, reset]);
+
   const submit = useCallback(async () => {
     if (!canSubmit || submitting) return;
     setSubmitting(true);
     try {
-      await requestWithdrawal({
-        amount: amountNum,
-        method: form.method,
-        bankName: form.method === "bank" ? form.bankName : undefined,
-        bankAccount: form.method === "bank" ? form.bankAccount : undefined,
-        coinAddress: form.method === "coin" ? form.coinAddress : undefined,
-        coinNetwork: form.method === "coin" ? form.coinNetwork : undefined,
-        pin: form.pin,
-      });
-      notify.success(g("withdrawSuccess"), { description: g("withdrawProcessing") });
-      setOpen(false);
-      reset();
-      window.dispatchEvent(new Event("wallet:refresh"));
-      onSuccess?.();
+      await callRpc(formRef.current);
+      finishOk();
     } catch (e: any) {
-      const msg = String(e?.message ?? "");
-      if (msg.includes("account_frozen")) {
-        notify.error(g("withdrawErrFrozen"), { description: "/trust 에서 자세히 확인" });
-      } else if (msg.includes("step_up_required")) {
-        notify.error(g("withdrawErrStepUp"), { description: "/security/totp 에서 등록해주세요" });
-      } else if (msg.includes("pin") || msg.includes("PIN")) {
-        notify.error(g("withdrawErrPin"));
+      const rawMsg = String(e?.message ?? "");
+
+      // 1) step_up_required: 인라인 인증창 → 성공 시 1회 자동 재시도
+      if (/step_up_required/i.test(rawMsg) && requireStepUp) {
+        notify.info("추가 인증이 필요해요", {
+          description: "잠시 후 인증 창이 열립니다. 등록한 인증 앱의 6자리 코드를 입력해 주세요.",
+        });
+        try {
+          const ok = await requireStepUp("출금");
+          if (ok) {
+            try {
+              await callRpc(formRef.current);
+              finishOk();
+              return;
+            } catch (retryErr: any) {
+              const r = String(retryErr?.message ?? "");
+              const mapped = mapWithdrawError(r, minWithdraw);
+              notify.error(mapped.title, { description: mapped.description });
+              if (/pin/i.test(r)) setForm(f => ({ ...f, pin: "" }));
+              return;
+            }
+          }
+          // 사용자가 인증 취소 → 별도 알림 없이 종료
+          return;
+        } catch {
+          return;
+        }
+      }
+
+      // 2) 매핑된 친절한 알림
+      const mapped = mapWithdrawError(rawMsg, minWithdraw);
+      notify.error(mapped.title, { description: mapped.description });
+
+      // 입력 보정
+      if (/pin/i.test(rawMsg)) {
         setForm(f => ({ ...f, pin: "" }));
-      } else if (msg.includes("below_min")) {
-        notify.error(g("withdrawErrMin"));
+      } else if (/below_min/i.test(rawMsg) || /insufficient_funds/i.test(rawMsg)) {
         setStep(1);
-      } else if (msg.includes("insufficient_funds")) {
-        notify.error(g("withdrawErrFunds"));
-        setStep(1);
-      } else {
-        notify.error(g("withdrawErrGeneric"), { description: msg.slice(0, 120) });
       }
     } finally {
       setSubmitting(false);
     }
-  }, [canSubmit, submitting, amountNum, form, onSuccess, reset]);
+  }, [canSubmit, submitting, callRpc, finishOk, requireStepUp, minWithdraw]);
 
   return {
     open, openModal, closeModal,

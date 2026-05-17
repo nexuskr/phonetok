@@ -84,7 +84,11 @@ export default function StepUpGate({ open, scope = "민감 작업", onClose, onV
       setCode("");
       await finalizeStepUpSuccess("강력 인증 완료");
     } catch (e: any) {
-      notify.error("인증 실패", { description: e?.message });
+      const raw = String(e?.message ?? "").toLowerCase();
+      const desc = raw.includes("invalid") || raw.includes("expired") || raw.includes("incorrect")
+        ? "코드가 일치하지 않거나 만료됐어요. 인증 앱에서 새 코드를 확인해 주세요."
+        : "인증을 완료하지 못했어요. 잠시 후 다시 시도해 주세요.";
+      notify.error("인증 실패", { description: desc });
     } finally {
       setBusy(false);
     }
