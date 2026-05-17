@@ -1,83 +1,92 @@
-# Sound Assets Integration Plan (17 files)
+# 슬롯 사운드 타이밍 검증 + 새 mp3 실제 재생 연결
 
-업로드된 17개 mp3 를 코드가 기대하는 경로/이름으로 배치하고, `soundConfig.ts` 매핑을 업데이트합니다. money-flow 8 경로·Operator Isolation·Bundle Budget·Active Governor 는 손대지 않습니다 (정적 자산 + 설정 상수만 변경).
+## 진단 (왜 "안 들리고 겹치는 느낌"인가)
 
-## 1. 파일 → 경로 매핑
+현재 슬롯 페이지에는 **두 개의 사운드 시스템**이 병렬로 돌고 있습니다.
 
-### 공통 SFX (2개)
-| 업로드 | 배치 경로 | 용도 |
-|---|---|---|
-| `coin_drop.mp3` | `public/sounds/common/sfx/coin_drop.mp3` | 코인 드롭 (기존 키 그대로) |
-| `big_celebration.mp3` | `public/sounds/common/sfx/big_win_trigger.mp3` | BIG WIN 트리거 |
+```text
+[OlympusSlot.tsx — 실제 슬롯 UI]
+        │
+        ├─ SoundManager.playReelSpin()    ← 스핀 시작
+        ├─ SoundManager.playReelStop()    ← 릴 정지
+        ├─ SoundManager.playWinTier()     ← 승리
+        └─ SoundManager.playBonusTrigger / playScatter
+                  │
+                  └─ src/lib/sound/SoundManager.ts  (LEGACY)
+                        │
+                        ├─ cache에 mp3 있으면 재생
+                        └─ 없으면 procedural(합성음) 폴백 ← 지금 들리는 소리
 
-공통 SFX 키 중 `spin_start / reel_stop / button_click / mega_win / epic_win / legendary_win` 6 개는 업로드 파일에 대응 자산이 없음 → 기존처럼 **세션 캐시 + procedural fallback 으로 무음 진행** (404 0건 보장). `big_celebration` 1 개를 `big_win_trigger` 로만 매핑, mega/epic/legendary 는 그대로 fallback 유지 (BIG → MEGA → EPIC → LEGENDARY 톤 차이가 1 파일로는 표현 안 되므로 오히려 다 같은 소리로 깔지 않는 것이 Warm King UX 에 자연스러움).
+[useSlotSound(slotId) — 슬롯 진입 시 마운트만]
+        │
+        └─ src/lib/sounds/SlotSoundManager.ts  (신규 FACADE)
+                │
+                ├─ /sounds/{slotId}/sfx/spin_start.mp3 등 Howl로 로드
+                ├─ public/sounds/common/sfx/coin_drop.mp3 로드
+                └─ public/sounds/common/sfx/big_win_trigger.mp3 로드
+                        ↓
+                  로드만 됨. **OlympusSlot은 이 facade를 호출하지 않음.**
+```
 
-### 슬롯별 spin (테마별 spin_start.mp3)
-slotId 폴더의 `sfx/spin_start.mp3` 로 떨어지면 SlotSoundManager 가 자동 사용합니다 (등록 키 `spin_start` 는 공통이지만, 슬롯 폴더에 동명 파일이 있으면 register 안 됨 → 새 키 `theme_spin` 으로 추가하고 슬롯 진입 시 우선 재생).
+결론:
+- 17개 mp3는 정상적으로 다운로드되고 Howl 버퍼에 올라감
+- 그러나 스핀/정지/승리 시점에 실제로 트리거되는 것은 **legacy procedural 합성음**
+- 그래서 사용자에게는 "새 사운드는 거의 안 들리고, 기존 합성음과 겹치는 듯한" 인상
 
-| 업로드 | slotId | 배치 경로 |
-|---|---|---|
-| `olympus_spin.mp3` | olympus_legacy (= olympus_1000 alias) | `public/sounds/olympus_legacy/sfx/spin_start.mp3` + `public/sounds/olympus_1000/sfx/spin_start.mp3` |
-| `sugarfever_spin.mp3` | sugar_fever | `public/sounds/sugar_fever/sfx/spin_start.mp3` |
-| `pharaoh_spin.mp3` | pharaoh_vault (= pharaohs_vault_2500) | `public/sounds/pharaoh_vault/sfx/spin_start.mp3` + alias |
-| `dragon_spin.mp3` | dragon_empire | `public/sounds/dragon_empire/sfx/spin_start.mp3` |
-| `viking_spin.mp3` | viking_thunder_4000 | `public/sounds/viking_thunder_4000/sfx/spin_start.mp3` |
-| `aztec_spin.mp3` | aztec_sun_1200 | `public/sounds/aztec_sun_1200/sfx/spin_start.mp3` |
-| `cosmic_spin.mp3` | cosmic_forge (= cosmic_forge_5000) | `public/sounds/cosmic_forge/sfx/spin_start.mp3` + alias |
-| `sakura_spin.mp3` | cherry_sakura (= cherry_sakura_500) | `public/sounds/cherry_sakura/sfx/spin_start.mp3` + alias |
-| `neon_spin.mp3` | neon_tokyo_88 | `public/sounds/neon_tokyo_88/sfx/spin_start.mp3` |
-| `crown_spin.mp3` | (공통 강조용) | `public/sounds/common/sfx/spin_start.mp3` — 모든 슬롯 fallback spin |
+## 무엇을 할 것인가
 
-### 슬롯 미매칭 2개 (rename/보류 제안)
-| 업로드 | 현황 | 권장 처리 |
-|---|---|---|
-| `wildwest_spin.mp3` | Wild West 슬롯이 아직 없음 (DB/페이지 무) | **`public/sounds/_unmapped/wildwest_spin.mp3`** 에 보관. 추후 Wild West 슬롯 추가 시 그대로 사용 |
-| `deepsea_spin.mp3` | Deep Sea 슬롯 없음. 가장 가까운 분위기는 `pirate_curse` | **`public/sounds/pirate_curse/sfx/spin_start.mp3`** 로 배치 (해적/심해 음향 호환) + alias `pirates_curse_1500`. 원본도 `_unmapped/deepsea_spin.mp3` 백업 |
+### 1) 브리지 — 업로드한 mp3가 자동으로 올바른 타이밍에 재생되게
 
-### Crash 게임 (3개)
-현재 `/crash` 페이지엔 전용 사운드 매니저가 연결돼 있지 않음. **파일만 정자리에 배치**하고, 이번 PR 에선 소비 코드를 건드리지 않음 (Crash 페이지는 게임 로직 = money-flow 인접 → 동결).
+`SoundManager.play(cue, channel)` 내부에서 procedural 폴백 직전에
+"공용/슬롯별 override 테이블"을 우선 조회하도록 한 줄짜리 라우팅을 추가합니다.
 
-| 업로드 | 배치 경로 |
-|---|---|
-| `crash_tension.mp3` | `public/sounds/crash/sfx/tension.mp3` |
-| `crash_explosion.mp3` | `public/sounds/crash/sfx/explosion.mp3` |
-| `crash_cashout.mp3` | `public/sounds/crash/sfx/cashout.mp3` |
+매핑 (사용자가 올린 17개 파일 기준):
 
-향후 별도 PR (`PR-CRASH-AUDIO`) 에서 Crash 페이지 hook 만 추가.
+| 슬롯 내부 cue (legacy)        | 새로 재생할 파일                                    | 타이밍                |
+|-------------------------------|-----------------------------------------------------|-----------------------|
+| `reel_spin` / `reel_spin_fast`| `/sounds/{slotId}/sfx/spin_start.mp3` (있을 때만)   | Spin 버튼 클릭        |
+| `reel_stop`                   | `/sounds/common/sfx/coin_drop.mp3`                  | 마지막 릴 정지        |
+| `win_big` / `win_huge`        | `/sounds/common/sfx/big_win_trigger.mp3`            | 베팅 ×10 이상 승리    |
+| `win_mega` / `win_epic`       | (없음) → 기존 procedural 그대로                     | 베팅 ×200, ×500 이상  |
 
-## 2. 코드 변경 (최소 surface)
+원칙:
+- **있으면 mp3, 없으면 기존 procedural** (자동 폴백 유지)
+- legacy `SoundManager`는 단일 진입점이므로, 한 곳만 손대면 모든 슬롯에 적용
+- 새 facade(`SlotSoundManager`)는 그대로 두되 BGM/사전 로딩 책임만 유지 → **겹침 제거**
+- money-flow / Operator Isolation / Bundle Budget / Realtime 무관 (사운드 레이어 한정)
 
-### A. `src/lib/sounds/soundConfig.ts`
-- `SOUND_PATHS.common.spin_start` 유지 (이제 실파일 존재 = crown_spin)
-- `SOUND_PATHS.common.coin_drop` 유지 (실파일 존재)
-- `SOUND_PATHS.common.big_win_trigger` 유지 (실파일 존재)
-- `SLOT_SOUND_MAP` 각 슬롯의 `sfx` 배열에 `"spin_start"` 추가 → 슬롯별 폴더 spin 자동 등록
-  - 이미 `commonHowls` 에 `spin_start` 가 있어 `resolveEntry` 가 슬롯 우선 → 테마 spin 재생, 미존재 슬롯은 공통 fallback (crown_spin)
-- `SLOT_ID_TO_SOUND_KEY` 에 `viking_thunder_4000`, `aztec_sun_1200` canonical 추가 (현재 SLOT_SOUND_MAP 에 entry 없음) → 둘은 spin 1개만 가지므로 entry 신설:
-  ```
-  viking_thunder_4000: { sfx:["spin_start"], voice:[], legendary:{primary:"legendary_win"} }
-  aztec_sun_1200:      { sfx:["spin_start"], voice:[], legendary:{primary:"legendary_win"} }
-  ```
+### 2) 검증 — 실제 타이밍 테스트
 
-### B. `public/sounds/**` 정적 자산 배치
-17 개 파일 복사. `_headers` (immutable assets) 가 이미 매칭하므로 cache 정책 OK. Bundle budget 미영향 (정적 자산).
+두 단계로 확인합니다.
 
-### C. 변경 없음 (확인용)
-- `src/lib/sounds/SlotSoundManager.ts` — 세션 404 캐시 & procedural fallback 그대로 동작
-- `src/hooks/useSlotSound.ts` — 변경 없음
-- money-flow 8경로 / Crash 페이지 / Operator 청크 / Realtime 래퍼 — 무손상
-- `supabase/**` — 무변경
+**A. Dev 사운드 테스트 패널** (DEV 빌드에서만 노출)
+- `src/components/dev/SoundTimingPanel.tsx` 신규
+- 슬롯 페이지 우하단에 작은 플로팅 패널 (production 자동 제거)
+- 버튼 4개: `spin_start`, `coin_drop`, `big_win_trigger`, `legendary`
+- 각 버튼 누르면 현재 재생 경로(mp3 파일 URL 또는 "procedural") + 길이(ms)를 패널에 표시
+- 사용자가 직접 "이 슬롯에서 이 소리가 이렇게 들린다"를 한눈에 확인
 
-## 3. 검증
+**B. 자동 회귀 (헤드리스 검증)**
+- `scripts/check-slot-sound-routing.mjs` 추가
+- 17개 mp3 파일이 `public/sounds/**` 에 실제 존재하는지 + `SLOT_SOUND_MAP` 매핑이 일치하는지 정적 검사
+- CI 노이즈 방지를 위해 npm script로만 노출 (PR 게이트 X)
 
-1. 빌드 (자동) — 자산 추가만이므로 budget 영향 없음
-2. 슬롯 진입 시 네트워크 탭: `/sounds/{slotId}/sfx/spin_start.mp3` 200 응답 확인
-3. 미배치 슬롯(예: wizard_2000) 진입 → 공통 `spin_start.mp3` (crown_spin) fallback 정상
-4. SPIN 첫 클릭 시 SFX 재생, BIG WIN ≥50x 시 `big_celebration` 재생
-5. `phonara:audio:missing:v1` sessionStorage 가 비어 있어야 함 (404 0건)
+타이밍 자체(실제 오디오 출력)는 브라우저 자동화로 mp3 디코딩까지 검증하기 어렵습니다.
+대신 (A) 패널로 사용자가 직접 슬롯 한 번 돌려보고 다음 3가지를 확인하시면 됩니다:
+1. Spin 누른 순간 → 슬롯별 `spin_start.mp3` 1회
+2. 릴 마지막 정지 → `coin_drop.mp3` 1회 (procedural 합성음과 겹치지 않음)
+3. 큰 승리 → `big_win_trigger.mp3` (작은 승리는 기존 procedural 유지)
 
-## 4. 산출물 요약
+## 변경 파일 요약
 
-- 17 mp3 파일 → `public/sounds/...` 12 경로 + 4 alias 사본 + 1 백업
-- `src/lib/sounds/soundConfig.ts` 1 파일 수정
-- 코드/머니플로우 변경 0줄
+- 수정: `src/lib/sound/SoundManager.ts` — `play()` 메서드에 override 라우팅 1블록 추가 (~15줄)
+- 신규: `src/lib/sound/cueOverrides.ts` — 위 매핑 테이블 (정적 상수)
+- 신규: `src/components/dev/SoundTimingPanel.tsx` — DEV 전용 플로팅 패널
+- 수정: `src/components/slots/SlotSignatureWrapper.tsx` — `<SoundTimingPanel />` 마운트 (import.meta.env.DEV 가드)
+- 신규: `scripts/check-slot-sound-routing.mjs` — 정적 파일 존재 검사
+
+## 절대 불변
+- money-flow 8경로 git diff = 0
+- Operator Isolation / Bundle Budget / Active Governor / Realtime wrapper 무손상
+- 기존 procedural 폴백 동작 그대로 (mp3 없으면 지금과 동일)
+- `OlympusSlot.tsx` 무수정 (기존 호출 시그니처 유지)
