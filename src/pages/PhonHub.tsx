@@ -95,19 +95,6 @@ function NextTierProgress() {
   );
 }
 
-function ComingSoonCard() {
-  return (
-    <Card className="rounded-2xl border-dashed border-border/60 bg-card/30 p-5">
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <Coins className="w-4 h-4 text-primary" />
-        <span className="font-imperial text-sm">스왑 · 스테이킹 · 일일 배당</span>
-      </div>
-      <div className="mt-2 text-xs text-muted-foreground">
-        PHON 경제의 다음 장(章)이 곧 열립니다. 폐하의 자리는 그대로 유지됩니다.
-      </div>
-    </Card>
-  );
-}
 
 export default function PhonHub() {
   const user = useRequireAuth();
