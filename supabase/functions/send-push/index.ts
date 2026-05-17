@@ -51,6 +51,8 @@ Deno.serve(async (req) => {
     const message = String(body.body || "").slice(0, 300);
     const kind = String(body.kind || "general");
     const notifId = body.notification_id || null;
+    const icon = typeof body.icon === "string" ? body.icon.slice(0, 200) : "/icon-192.png";
+    const badge = typeof body.badge === "string" ? body.badge.slice(0, 200) : "/icon-192.png";
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
     const { data: subs, error } = await admin
@@ -60,10 +62,19 @@ Deno.serve(async (req) => {
     if (error) return json({ ok: false, error: error.message }, 500);
     if (!subs || subs.length === 0) return json({ ok: true, sent: 0 });
 
-    const payload = JSON.stringify({
-      title, body: message, kind, notification_id: notifId,
-      url: payloadUrl(kind),
-    });
+    // SECURITY: Whitelist-only payload. Never include amount/balance/phon/krw/user_id/PII.
+    const payload = JSON.stringify(createSecurePayload({
+      title,
+      body: message,
+      icon,
+      badge,
+      data: {
+        url: payloadUrl(kind),
+        type: kind,
+        timestamp: Date.now(),
+        notification_id: notifId,
+      },
+    }));
 
     let sent = 0;
     const expired: string[] = [];
@@ -97,4 +108,34 @@ function payloadUrl(kind: string): string {
   if (kind.startsWith("withdraw")) return "/wallet";
   if (kind.startsWith("deposit") || kind.startsWith("package")) return "/wallet";
   return "/dashboard";
+}
+
+// SECURITY: Strict whitelist payload builder. Strips any non-allowed field.
+// Prevents leakage of balances, amounts, PII through Web Push payload.
+interface SecurePushPayload {
+  title?: string;
+  body?: string;
+  icon?: string;
+  badge?: string;
+  data?: {
+    url?: string;
+    type?: string;
+    timestamp?: number;
+    notification_id?: string | null;
+  };
+}
+function createSecurePayload(input: SecurePushPayload): SecurePushPayload {
+  const d = input.data ?? {};
+  return {
+    title: typeof input.title === "string" ? input.title.slice(0, 120) : "Phonara",
+    body: typeof input.body === "string" ? input.body.slice(0, 300) : "",
+    icon: typeof input.icon === "string" ? input.icon.slice(0, 200) : "/icon-192.png",
+    badge: typeof input.badge === "string" ? input.badge.slice(0, 200) : "/icon-192.png",
+    data: {
+      url: typeof d.url === "string" ? d.url.slice(0, 300) : "/dashboard",
+      type: typeof d.type === "string" ? d.type.slice(0, 64) : "general",
+      timestamp: typeof d.timestamp === "number" ? d.timestamp : Date.now(),
+      notification_id: typeof d.notification_id === "string" ? d.notification_id : null,
+    },
+  };
 }
