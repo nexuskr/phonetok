@@ -1,45 +1,46 @@
-# Phase D — Slice 2: Virtual Lobby v3 + Routing + Mobile Hardening
+# Phase E — Final UI/UX Polish (Stake급 세련 × Warm King × 모바일 OS-like)
 
-Slice 1 (Avatar Studio + DB + Avatar3D fallback) is shipped. Slice 2 wires everything into the app and adds the FOMO-driving Virtual Lobby — without touching money-flow, operator chunks, or bundle budgets.
+목표: 모든 주요 화면을 한 번에 갈아엎는 대신, **공통 프리미티브 → 핵심 화면 → 디테일** 순으로 슬라이스해 회귀를 0에 가깝게 유지하면서 체감 품질을 단계적으로 끌어올린다. money-flow 8경로 / Operator Isolation / Bundle Budget은 모든 슬라이스에서 무손상.
 
-## Scope
+## Slice E1 — Mobile OS Primitives (이번 턴 작업)
 
-### 1. Routing & navigation
-- Register `/avatar/studio` and `/lobby` in `src/App.tsx` via `React.lazy` (lands in the `three3d` chunk, not Layer 1).
-- Add a floating "황제의 로비" FAB to the mobile Bottom Nav linking to `/lobby`. Warm King tone, gold pulse.
+가장 자주 보이는 5개 프리미티브를 통일. 페이지 코드는 단 한 줄도 갈아엎지 않고, 기존 컴포넌트가 자연스럽게 새 모습을 갖도록 한다.
 
-### 2. `src/components/lobby/v3/` (new)
-- `useDeviceTier.ts` — detect Low-end via `hardwareConcurrency ≤ 4`, `deviceMemory ≤ 4`, `devicePixelRatio ≤ 2`, or UA match (iPhone ≤ 11, Galaxy A). Returns `'low' | 'mid' | 'high'`.
-- `InstancedAvatarManager.tsx` — single `InstancedMesh` for up to 160 avatars (mid/high). Frustum culling, LOD by distance, shader-based breathing/idle. `MAX_COUNT = 60` on low.
-- `VirtualLobby3D.tsx` — R3F `<Canvas>` with `dpr={[1, tier==='high'?2:1.5]}`, `frameloop="demand"` when idle, `gl={{ powerPreference:'high-performance', antialias: tier!=='low' }}`. Mounts manager + lights + ground.
-- `VirtualLobby2DFallback.tsx` — SVG grid of avatars for low-end / WebGL unavailable.
-- `ProximityFomoToast.tsx` — when a nearby avatar's PHON/tier > viewer, fire Warm King toast ("저 황제의 왕관이 당신을 노려보고 있습니다…"). Throttled 1/8s, max 3/min.
-- `useContextRecovery.ts` reuse — listen `webglcontextlost/restored`, re-mount scene, restore loadout within 5s.
-- `safeDispose` everywhere on unmount; zero geometry/texture growth verified over 5min.
+1. **BottomSheet (`src/components/ui/bottom-sheet.tsx`)**
+   - vaul 기반(이미 설치됨). iOS 시트 핸들, safe-area, 백드롭 블러, 스냅 포인트(40%/90%).
+   - 기존 Dialog 중 모바일에서 시트가 더 자연스러운 케이스에서 옵트인.
+2. **Sonner 토스트 글로벌 톤 통일 (`src/components/ui/sonner.tsx`)**
+   - Warm Gold/Amber 그라디언트 보더, 24px radius, 백드롭 블러 14px, 진입 spring.
+   - notify 4-tier 매핑 그대로 유지.
+3. **FloatingFab 공통 컴포넌트 (`src/components/ui/floating-fab.tsx`)**
+   - LobbyFab/FloatingChat을 동일 톤·동일 진입 애니메이션으로 정렬. shadow/ring/active:scale-95 일치.
+4. **Page transition (`src/components/ui/page-transition.tsx`)**
+   - 18ms fade + 8px translateY, prefers-reduced-motion 자동 OFF. Suspense 폴백을 감싸는 wrapper.
+5. **Bottom Nav haptic + active glow (`src/components/Layout.tsx` 의 BottomNav 부분만)**
+   - 아이콘 active 시 warm gold halo + 살짝 lift, navigator.vibrate(8) (지원 시).
 
-### 3. `/lobby` page
-- `src/pages/Lobby.tsx` — Suspense + ErrorBoundary → tier check → `VirtualLobby3D` or `VirtualLobby2DFallback`. Header with live emperor count and "내 황제 꾸미기" CTA → `/avatar/studio`.
+## Slice E2 — 핵심 화면 4종 폴리시 (다음 턴)
 
-### 4. Guardrails
-- `vite.config.ts`: `lobby` and `avatar` files resolve into `three3d` chunk (already excluded from preload).
-- No imports from `src/pages/admin/**` or `@pkg/operator/**`.
-- No edits to money-flow 8 paths (PRJ_FREEZE_RAW_CHANNEL, wallet ledger, withdraw, deposit, swap, betting, staking, packages).
+- Auth (로그인), Dashboard, /trade, /phon — 헤더 hierarchy, spacing rhythm(4·8·12·16·24), 첫 화면 LCP 요소 typography 정리. 라우팅·로직 변경 0.
 
-## Validation
+## Slice E3 — 게임 로비 + 카드 시스템 (그 다음 턴)
 
-- `git diff` on money-flow 8 paths = 0 lines.
-- `node scripts/check-operator-isolation.mjs` PASS.
-- `npm run size:check` PASS — avatar + lobby chunks ≤ 120KB gzip each; `index` delta = 0.
-- Manual FPS notes for iPhone 12 / 15 / S21 / A54 at 100–160 avatars (target avg 45–60 FPS; A54 falls back to 2D).
-- Context-lost recovery verified <5s.
-- 5min residency: 0 geometry/texture growth (devtools memory snapshot).
+- /games · /casino 카드 깊이감, 진입 prefetch hover, "지금 잭팟 대기 중" 펄스. 슬롯 페이지 내부는 손대지 않음.
 
-## Memory updates
+## Slice E4 — FOMO / 중독성 디테일
 
-- Append `mem://features/phase-d-avatar-lobby-v3` with: routes, files, tier thresholds, MAX_COUNT, FOMO copy rules.
-- Update `mem://index.md` Memories list with one-liner.
+- 매일 입장 streak 시각화 강화, 출금 라이브 카운터 위치 조정, "어제 폐하 N명 출금" 1줄 배너.
 
-## Out of scope (later slice)
+## 보호 가드 (모든 슬라이스 공통)
 
-- Realtime multi-user presence sync (currently seeded from `get_world_domination_stats` + sampled top emperors).
-- NFT cosmetic crossover (Phase C collection visuals).
+- money-flow 8경로(`PRJ_FREEZE_RAW_CHANNEL`) git diff = 0줄
+- `node scripts/check-operator-isolation.mjs` PASS
+- `npm run size:check` PASS — index ≤ 180KB gz, slots/wallet/lobby 청크 변동 없음
+- raw `supabase.channel(...)` 0 추가
+- 디자인 토큰만 사용(HSL var), 인라인 hex 금지(기존 v3 로비 파일은 예외 — three.js color 입력)
+
+## 비범위 (이번 슬라이스에서 안 함)
+
+- 신규 비즈니스 기능, RPC, 마이그레이션
+- 페이지 구조/IA 변경
+- three3d 청크 손대기 (Phase D 완료 상태 동결)
