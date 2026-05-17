@@ -1,105 +1,80 @@
-# v19.0 Hybrid Rebuild — Imperial Empire OS
+# Slice 2 — Imperial Dashboard + Imperial Live Pulse Rail
 
-전체 플랫폼을 "하나의 메타 가상 황제 제국"으로 통합한다. 백엔드·인프라는 **0줄 변경**, UI/네비/알림/베팅 흐름만 v19 톤으로 재조립한다.
+Dashboard를 산만한 위젯 다발에서 **단일 Imperial Empire Hub**로 축약한다. money-flow 8경로, Operator Isolation, Bundle Budget, Phase D/F, Realtime 파티션은 0줄 변경.
 
-## 절대 불변 (Untouched)
-
-- money-flow 8경로 (FREEZE 가드)
-- Operator Isolation (admin 청크)
-- Bundle Budget (size-limit + bundle-budget.mjs)
-- Phase D (Avatar + Virtual Lobby)
-- Phase F Push 인프라 (`push_send_log`, cap, kill switch, `send-push`, `reengagement-tick` cron)
-- Trust v2 / Legal Consent / Practice Mode / Loss Protection / VIP Pass
-- DB migration·RPC·edge function 0건 (Slice 4 베팅 흐름도 신규 백엔드 없이 기존 RPC 재조립)
-
-## 작업 범위
-
-UI 레이어 (`src/pages/**`, `src/components/**`, `src/packages/ui|earn|wallet/components/**`) + Phase F Push **카피·딥링크만** 재배선.
-
-## 카피 톤 규칙 (확정)
-
-- ✅ **OK**: "지금 진입", "라운드 시작", "오늘의 도전", "폐하, 다음 라운드 바로 입장", "10,000 PHON 충전 → 즉시 베팅"
-- ❌ **금지** (규제·Trust v2 정합성): "역전 가능", "회복 가능", "조금만 더 하면", "충분히 이깁니다" 등 **결과 약속/손실 회복 암시**
-- 호칭 "폐하" + Warm King 존중어는 전면 허용
-- 직접적 입금 CTA는 **행동 단위**로 (금액·1탭 경로 명시) — 결과 단위 ❌
-- "군대/전쟁/army/war" 어휘 전면 삭제 → "제국/Empire/궁/Court" 톤으로 치환
-
-## 슬라이스 구조
+## 결과 화면 구조 (top → bottom)
 
 ```text
-Slice 1  Auth + Onboarding 리빌드  ← 이번 PR에서 진행
-Slice 2  Imperial Dashboard + Imperial Live Pulse Rail (FOMO 위젯 1개로 압축)
-Slice 3  Navigation 5탭 + Imperial FAB
-Slice 4  Betting Experience (Bet Slip / Cash Out / Auto Bet / History + Replay)
-Slice 5  알림 시스템 정리 (Push 카피 v19 + Sonner dedupe + 게임결과 토스트 축소)
-Slice 6  Imperial Polish + 군대→제국 어휘 치환 + 메타 세계관 통합 sweep
+[ChurnReactivationBanner]   (휴면 복귀자만, 안전 카피)
+[ImperialLivePulseRail]     ← 신규 단일 위젯 (Slice 2 핵심)
+[DashboardHeroV3]           (유지: 단일 CTA)
+[DailyBriefingCard]         (유지, lazy)
+[VipWhalePreview]           (VIP 전용, 유지)
+[ImperialStoryRail]         (유지)
+[ImperialJourneyMap]
+[JourneyClaimPanel]
+[TradingEntryCard]
+[Olympus 1000 카드]
+[KpiGridV3]
+[MoreSection]               (접힘 영역 — 기존 카드 보존)
+[Disclaimer]
 ```
 
-각 슬라이스는 독립 PR. 슬라이스 끝마다 `check-money-flow-freeze.mjs` / `check-operator-isolation.mjs` / `npm run size:check` PASS 확인.
+## Imperial Live Pulse Rail (신규 컴포넌트)
 
----
+`src/components/empire/ImperialLivePulseRail.tsx` — 1개 카드, 3행 압축:
 
-## Slice 1 상세 — Auth + Onboarding
+1. **헤드라인**: "폐하, 지금 제국이 이렇게 돌아가고 있습니다" + 라이브 점멸 도트.
+2. **3 메트릭 (가로 그리드)**:
+   - 지금 로비에 있는 황제 수 (`useOnline()` 재사용)
+   - 지금 출금 중인 황제 수 (`get_payout_ops_stats_24h` 의 in-flight count 또는 기존 LivePayoutCounter 소스 재활용)
+   - 최근 24h 대형 승리/Whale 활동 (`get_whale_strikes_24h(_limit:=2)` — 최대 2개만 노출)
+3. **CTA**: "지금 참여 · 첫 입금 보너스" → `/wallet?focus=deposit` (안전선: 결과 약속 ❌, 행동 권유 ✅).
 
-### 목표
+스타일: Warm Gold 베이스 + Hot Pink Accent dot, 기존 `glow-imperial` / `text-gradient-imperial` / `font-imperial` 토큰 재사용. 새 색 토큰 추가 없음.
 
-"0원 → 황제 시작" 첫 화면을 5초 안에 이해. 산만한 온보딩 (`OnboardingV2`·`OnboardingV3`·`SixtySecondFlow` 3종 중첩) 을 **단일 Imperial Onboarding** 으로 통합.
+데이터 소스는 모두 기존 공개 RPC — DB/엣지 0 변경.
 
-### 화면
+## 정리할 마운트 (Dashboard.tsx 상단부)
 
-**1) `/auth` (Auth.tsx) — Imperial Throne Gate**
-- 단일 컬럼, full-bleed warm-gold gradient
-- 상단: 작은 제국 인장 + "Phonara · Empire OS"
-- 중앙: 큰 헤드라인 "폐하, 제국이 기다리고 있습니다"
-- 서브: "무료로 시작 · 첫 10,000 PHON 즉시 지급"
-- 1개의 Primary CTA: **Google 1탭 로그인** (이메일은 토글로 접기)
-- 하단 미세 카피: Trust 3 chip (출금 평균 N분 / N명 활동 / Practice Mode)
-- 기존 백엔드/세션 로직 그대로 — Tailwind/카피만 교체
+**삭제 (Dashboard에서만 unmount, 파일은 보존)**:
+- `LivePayoutCounter`
+- `YesterdayPayoutsBanner`
+- `FriendGapToast`
+- `LivePurchaseTicker`
+- `DailyChest` / `LevelProgressBar` 두-칸 그리드 (Dashboard 상단에서 제거 — 게이미피케이션 페이지에 이미 존재)
+- `EmpireSignature` (헤더 중복)
 
-**2) `/welcome` (신규, App 루트 라우트 추가)**
-- 첫 로그인 직후 **1회만** 표시. localStorage `phonara:welcome:v19` 로 dedupe
-- 3-슬라이드 풀스크린 (가로 스와이프)
-  1. "폐하, 즉시 10,000 PHON" — 자동 지급 애니메이션 (count-up)
-  2. "오늘의 무료 도전 3개" — 출석 / 미션 / 무료 슬롯 1회 카드
-  3. "준비되시면 입장" — 단일 CTA `/dashboard?focus=quick-start`
-- Skip 버튼은 항상 우상단
+**MoreSection 내부에서 정리**:
+- `FomoNotificationStrip`, `WhaleStrikeRail compact`, `FriendLeaderboard`, `FoundingContendersBadge`, `MachineFomoTicker` → Pulse Rail로 대체되므로 MoreSection에서도 제거 (파일은 보존, 다른 페이지 마운트는 무변경).
+- `CrownWarHUD` 는 유지 (Crown 시스템 핵심).
 
-**3) 기존 온보딩 정리**
-- `OnboardingV2.tsx`, `OnboardingV3.tsx`, `SixtySecondFlow.tsx`, `FirstDepositTopBanner.tsx`, `EarnedToast.tsx` 의 **Dashboard 마운트 제거** (파일 삭제하지 않음 — 코드 보존, 단지 마운트 해제)
-- Dashboard 는 Slice 2 에서 본격 정리. Slice 1 에서는 마운트만 빠짐
-- `Onboarding60s` (`@pkg/earn/components`) 는 Home 에서 유지 (이미 1회 디듀프)
+**유지**: 그 외 MoreSection 내용 (HubTabs, 베팅 패널, RecoveryPrompt, WithdrawNudge, LiveRankingMarquee, CommandHero, EmpireP2EDashboard, BoostHeroCard, PersonalizedFeedRail+RevenueWidget, SevenDayChallenge, EmpireDayCountdown, AttendanceCard, TierComparisonCard, JackpotBanner, ActiveBotsMini, FirstMissionCard, LiveRanking).
 
-### 기술 메모
+## 어휘 정리 (Dashboard 가시 카피만)
 
-- `src/pages/Welcome.tsx` 신규 (≈120줄)
-- `App.tsx` 라우트 등록 + Auth 성공 후 redirect 분기 (`/welcome` if first-time, else `/dashboard`)
-- `src/pages/Auth.tsx`: JSX 재작성, `supabase.auth.*` 호출은 그대로
-- `src/pages/Dashboard.tsx`: `<OnboardingV2/>`, `<SixtySecondFlow/>`, `<EarnedToast/>`, `<FirstDepositTopBanner/>` Suspense 블록 제거 (lazy import 도 제거)
-- 디자인 토큰 only: `bg-gradient-imperial`, `glow-imperial`, `pulse-halo`, `imperial-card`, `text-gradient-imperial`
-- 신규 색/폰트 추가 0건
+- "베팅 패널" / "전투력" 등 군사적 표현 잔재 검색 → "황제 전략 / 폐하의 진입" 톤으로 치환. (Dashboard.tsx line 181 `우주 황제 베팅 패널` → `폐하의 전략 패널`.)
 
-### 검증
+## 변경 파일
 
-1. `check-money-flow-freeze.mjs` → PASS
-2. `check-operator-isolation.mjs` → PASS
-3. `npm run size:check` → index 청크 delta ≤ +2KB (gzip)
-4. 새 계정 가입 → `/welcome` 1회 표시 → 두 번째 로그인 시 `/dashboard` 직행
-5. 기존 계정 로그인 → `/dashboard` 직행 (`/welcome` 미노출)
+- **신규**: `src/components/empire/ImperialLivePulseRail.tsx` (~140줄)
+- **수정**: `src/pages/Dashboard.tsx` — import 정리 + 상단 마운트 교체 + MoreSection 슬림화
 
-### Out of Scope (Slice 1)
+기존 컴포넌트 파일은 **삭제하지 않음** (다른 페이지에서 사용 중일 수 있음 / 롤백 안전성).
 
-- Dashboard 본문 리빌드 → Slice 2
-- Push 카피 → Slice 5
-- 베팅 흐름 → Slice 4
+## 카피 규칙 (재확인)
 
----
+- ✅ "지금 참여하시면 첫 입금 보너스를 받으실 수 있습니다, 폐하."
+- ❌ "지금 입금하면 역전 가능합니다." / "조금만 더 하면 됩니다."
 
-## 위험 & 완화
+## 검증
 
-| 위험 | 완화 |
-|---|---|
-| Dashboard 마운트 해제로 기존 funnel 지표 누락 | Slice 2 에서 Imperial Live Pulse Rail 로 대체 분석 이벤트 재배선 |
-| `/welcome` 라우트 prerender 누락 | `scripts/prerender.mjs` 화이트리스트 확인, 인증 전용이므로 prerender 불필요 |
-| 카피 톤 충돌 (사용자 답변 내부 불일치) | 본 플랜의 "안전선" 톤 규칙을 기본값으로 채택. 더 강한 톤 원하시면 본 카드 거절 + 수정 요청 |
+- `node scripts/check-money-flow-freeze.mjs` → PASS
+- `node scripts/check-operator-isolation.mjs` → PASS
+- `npm run size:check` → index delta ≤ +2KB (lazy import 한 컴포넌트 다수 제거되므로 오히려 감소 예상)
+- 브라우저: `/dashboard` 진입 시 상단이 단일 Pulse Rail 1장으로 압축됐는지, 60s 갱신 동작, CTA → `/wallet` 이동
+- realtime 채널: 신규 추가 없음 (`useOnline` 기존 채널 재사용)
 
-승인 시 Slice 1 즉시 시작.
+## Slice 3 예고
+
+Navigation + Half-Off Imperial FAB — `PhonaraNav` + `FloatingFab` Imperial 톤 강화, 50% 첫 입금 보너스 글로벌 FAB.
