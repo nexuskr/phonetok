@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, TrendingUp, Gamepad2, User, Crown } from "lucide-react";
+import { Home, TrendingUp, Gamepad2, User, Crown, type LucideIcon } from "lucide-react";
 import { haptics } from "@/lib/haptics";
 
 /**
@@ -14,7 +14,7 @@ import { haptics } from "@/lib/haptics";
 
 type Tab = {
   to: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   label: string;
 };
 
