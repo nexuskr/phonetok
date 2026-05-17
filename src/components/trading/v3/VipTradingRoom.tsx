@@ -20,6 +20,7 @@ function dispatchSymbol(sym: string) {
 export default function VipTradingRoom() {
   const gate = useVipRoom();
   const rows = useHotSymbols(5);
+  const bonus = useMyPhonLeverageBonus();
   const loading = rows.length === 0;
 
   // 미인증/잠금 상태에서는 작은 티저만 노출 (정직한 마케팅)
@@ -58,6 +59,23 @@ export default function VipTradingRoom() {
       <div className="text-[11px] text-muted-foreground mb-2 leading-relaxed">
         지난 24시간 동안 폐하들이 가장 많이 다룬 종목입니다. 누르면 차트가 즉시 전환됩니다.
       </div>
+
+      {bonus.active ? (
+        <div className="mb-3 rounded-xl border border-emerald-400/30 bg-emerald-500/8 px-3 py-2 text-[11px] flex items-center justify-between">
+          <span className="text-muted-foreground">폐하의 레버리지 보너스</span>
+          <span className="font-black tabular-nums text-emerald-300">
+            +{bonus.bonus_pct}% · 최종 한도 {bonus.effective}x
+          </span>
+        </div>
+      ) : (
+        <Link
+          to="/phon"
+          className="mb-3 rounded-xl border border-pink/30 bg-pink/5 px-3 py-2 text-[11px] flex items-center justify-between hover:border-pink/50 transition"
+        >
+          <span className="text-muted-foreground">PHON 스테이킹 시 레버리지 +50% 보너스 해금</span>
+          <span className="font-black text-pink">지금 →</span>
+        </Link>
+      )}
 
       {loading ? (
         <LoadingList rows={3} />
