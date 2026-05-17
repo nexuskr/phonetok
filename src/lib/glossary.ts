@@ -31,6 +31,12 @@ export const FOMO = {
   rarePartsCard: "이 슬롯은 극소수의 황제만이 정복했습니다",
   legendaryCrownCard: "Legendary Crown 보유자만의 무대",
   gamesEyebrow: "제국의 놀이터",
+  // Phase E Slice 4 — FOMO / 중독성 디테일
+  streakGlow: "폐하의 연속 제국이 빛나고 있습니다",
+  withdrawingNow: (n: number) =>
+    `지금 ${n.toLocaleString()}명의 황제들이 출금하고 있습니다 — 폐하도 자격이 충분합니다`,
+  yesterdayPayouts: (n: number) =>
+    `어제 폐하 ${n.toLocaleString()}명이 출금을 마쳤습니다 — 다음 차례는 폐하입니다`,
 } as const;
 
 export const G = {
