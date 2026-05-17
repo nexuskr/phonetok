@@ -213,7 +213,11 @@ export default function ImperialLiveWinsRail({ variant = "compact" }: { variant?
   return (
     <section
       aria-label="Imperial Live Wins"
-      className="relative overflow-hidden rounded-2xl border border-secondary/30 bg-gradient-to-br from-amber-950/40 via-background to-stone-950/50 backdrop-blur-md shadow-[0_0_40px_-12px_hsl(var(--secondary)/0.35)]"
+      className={
+        isFull
+          ? "relative overflow-hidden rounded-2xl border border-[hsl(var(--gold)/0.45)] bg-gradient-to-br from-[#1a1320] via-[#110d1a] to-[#1a0f18] backdrop-blur-md shadow-[0_24px_80px_-20px_hsl(var(--gold)/0.45)] glow-imperial"
+          : "relative overflow-hidden rounded-2xl border border-secondary/30 bg-gradient-to-br from-amber-950/40 via-background to-stone-950/50 backdrop-blur-md shadow-[0_0_40px_-12px_hsl(var(--secondary)/0.35)]"
+      }
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-secondary/80 to-transparent" />
 
