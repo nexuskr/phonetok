@@ -161,10 +161,12 @@ const CCY_CHIP: Record<Currency, string> = {
 // Component
 // ─────────────────────────────────────────────────────────────
 
-const INITIAL_ROWS = 8;
-const MAX_ROWS = 8;
+type Variant = "compact" | "full";
 
-export default function ImperialLiveWinsRail() {
+export default function ImperialLiveWinsRail({ variant = "compact" }: { variant?: Variant } = {}) {
+  const isFull = variant === "full";
+  const INITIAL_ROWS = isFull ? 10 : 8;
+  const MAX_ROWS = isFull ? 10 : 8;
   const [rows, setRows] = useState<WinRow[]>([]);
   const [, force] = useState(0);
   const navigate = useNavigate();
