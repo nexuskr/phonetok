@@ -369,12 +369,6 @@ export default function TradingArenaBybit() {
             >
               <Flame className="w-3.5 h-3.5" /> 실전 트레이딩
             </button>
-            <NavLink
-              to="/arena/army"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-muted-foreground hover:text-foreground"
-            >
-              <Swords className="w-3.5 h-3.5" /> 군대 배틀
-            </NavLink>
           </div>
         </header>
 

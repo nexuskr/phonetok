@@ -45,7 +45,7 @@ function TrustComparisonWallInner() {
               <th className="py-2 px-3">주식</th>
               <th className="py-2 px-3">전세사기</th>
               <th className="py-2 px-3">MLM · 다단계</th>
-              <th className="py-2 pl-3 text-gold">Phonara 군대 배틀</th>
+              <th className="py-2 pl-3 text-gold">Phonara 트레이딩</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/40">

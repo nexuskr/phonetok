@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Coins, Crown, Radio, ShieldCheck, Sparkles } from "lucide-react";
 import PhonaraTopBar from "@/components/nav/PhonaraTopBar";
 import ImperialLiveActivity from "@/components/live/ImperialLiveActivity";
+import ImperialPresenceBar from "@/components/live/ImperialPresenceBar";
 
 /**
  * /  — v19 Ultimate Stake Crusher.
@@ -22,8 +23,9 @@ export default function Landing() {
 
 function LiveActivityBand() {
   return (
-    <section className="container py-6">
-      <ImperialLiveActivity variant="compact" rows={4} />
+    <section className="container py-6 space-y-4">
+      <ImperialPresenceBar />
+      <ImperialLiveActivity variant="compact" rows={5} />
     </section>
   );
 }
