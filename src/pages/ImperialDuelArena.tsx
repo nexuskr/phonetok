@@ -45,6 +45,7 @@ export default function ImperialDuelArena() {
     poolImbalance: imbalance,
   });
 
+  const shadow = useShadowBetting();
   const [round, setRound] = useState(1);
   const [state, setState] = useState<"idle" | "rolling" | "settled">("idle");
   const [result, setResult] = useState<DuelRoundResult | null>(null);
@@ -54,6 +55,9 @@ export default function ImperialDuelArena() {
   const [nearMissSide, setNearMissSide] = useState<"left" | "right" | null>(null);
   const [lastPayout, setLastPayout] = useState<{ won: boolean; amount: number; stake: number } | null>(null);
   const [auditLog, setAuditLog] = useState<BettingAuditEntry[]>([]);
+  const [divineOpen, setDivineOpen] = useState(false);
+  const [divineWinnerName, setDivineWinnerName] = useState("");
+  const [lastSeedHash, setLastSeedHash] = useState<string>("");
   const historyRef = useRef<Array<"left" | "right">>([]);
 
   const easeStrong = (result?.nearMiss ?? false) || nearMissIntensity > 0.4;
