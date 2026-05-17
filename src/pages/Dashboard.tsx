@@ -120,6 +120,7 @@ export default function Dashboard() {
       <div className="container pt-3 flex flex-col gap-2">
         <ChurnReactivationBanner />
         <Suspense fallback={null}><LivePayoutCounter /></Suspense>
+        <Suspense fallback={null}><YesterdayPayoutsBanner /></Suspense>
         <Suspense fallback={null}><FriendGapToast /></Suspense>
       </div>
       <div className="container pt-3 grid gap-3 md:grid-cols-2">
