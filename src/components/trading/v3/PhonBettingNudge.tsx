@@ -23,17 +23,17 @@ export default function PhonBettingNudge() {
           <>
             <div className="text-sm font-bold text-foreground leading-tight">
               폐하의 레버리지 한도 <span className="text-pink">{maxLeverage}x</span>
-              <span className="text-muted-foreground font-normal"> · PHON 베팅 수수료 {Math.round(HOUSE_EDGE_DISCOUNT_RATE * 100)}% 자동 할인 적용 중</span>
+              <span className="text-muted-foreground font-normal"> · PHON · USDT 모두 지원 · 수수료 {Math.round(HOUSE_EDGE_DISCOUNT_RATE * 100)}% 자동 할인</span>
             </div>
             <div className="text-[11px] text-muted-foreground mt-0.5">
-              아래 PHON 베팅 패널에서 바로 LONG · SHORT 진입하실 수 있어요.
+              USDT 입력 시 1 USDT = 1,300 PHON 으로 환산되어 즉시 체결됩니다.
             </div>
           </>
         ) : (
           <>
             <div className="text-sm font-bold text-foreground leading-tight">
-              PHON 으로 베팅하면 <span className="text-primary">레버리지 최대 100x</span>
-              <span className="text-muted-foreground font-normal"> + 수수료 {Math.round(HOUSE_EDGE_DISCOUNT_RATE * 100)}% 즉시 할인</span>
+              <span className="text-primary">PHON · USDT</span> 베팅 모두 지원
+              <span className="text-muted-foreground font-normal"> · 레버리지 최대 100x · 수수료 {Math.round(HOUSE_EDGE_DISCOUNT_RATE * 100)}% 즉시 할인</span>
             </div>
             <div className="text-[11px] text-muted-foreground mt-0.5">
               지금 PHON 을 확보하시면 폐하의 자리가 한 단계 위로 올라갑니다.
