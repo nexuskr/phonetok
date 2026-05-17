@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { Crown, Sparkles, Zap, TrendingUp, ChevronRight } from "lucide-react";
+import ImperialLiveActivity from "@/components/live/ImperialLiveActivity";
+import ImperialTradeSection from "@/components/dashboard/ImperialTradeSection";
 
 /**
  * Dashboard — v19 Phase 0-R TRUE Clean Rebuild.
