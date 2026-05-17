@@ -24,6 +24,7 @@ import logoDragon from "@/assets/slots/dragon/logo.png";
 import bgSugarFever from "@/assets/slots/sugar-fever/bg.jpg";
 import logoSugarFever from "@/assets/slots/sugar-fever/logo.png";
 import { useRequireAuth } from "@/hooks/use-require-auth";
+import { FOMO } from "@/lib/glossary";
 
 type GameCard = {
   to: string;
@@ -35,34 +36,68 @@ type GameCard = {
   bg: string;
   logo?: string;
   comingSoon?: boolean;
+  fomo?: string;
+  jackpot?: boolean;
+  prefetch?: () => Promise<unknown>;
 };
 
 const GAMES: GameCard[] = [
   { to: "/casino/sugar-fever-3000", code: "sugar_fever_3000", title: "Sugar Fever 3000",
-    subtitle: "고변동 · Cluster Tumble · Multiplier Bomb", rtp: "RTP 96.0%", max: "MAX 3000×", bg: bgSugarFever, logo: logoSugarFever },
+    subtitle: "고변동 · Cluster Tumble · Multiplier Bomb", rtp: "RTP 96.0%", max: "MAX 3000×", bg: bgSugarFever, logo: logoSugarFever,
+    fomo: FOMO.jackpotWaiting, jackpot: true,
+    prefetch: () => import("@/pages/casino/SugarFever3000") },
   { to: "/casino/olympus-legacy-5000", code: "olympus_legacy_5000", title: "Olympus Legacy 5000",
-    subtitle: "고변동 · Cluster Tumble · Zeus Ladder", rtp: "RTP 96.0%", max: "MAX 5000×", bg: bgImage, logo: logoImage },
+    subtitle: "고변동 · Cluster Tumble · Zeus Ladder", rtp: "RTP 96.0%", max: "MAX 5000×", bg: bgImage, logo: logoImage,
+    fomo: FOMO.legendaryCrownCard, jackpot: true,
+    prefetch: () => import("@/pages/casino/OlympusLegacy5000") },
   { to: "/casino/cosmic-forge-5000", code: "cosmic_forge_5000", title: "Cosmic Forge 5000",
-    subtitle: "고변동 · Sticky Multiplier", rtp: "RTP 96.0%", max: "MAX 5000×", bg: bgCosmic, logo: logoCosmic },
+    subtitle: "고변동 · Sticky Multiplier", rtp: "RTP 96.0%", max: "MAX 5000×", bg: bgCosmic, logo: logoCosmic,
+    fomo: FOMO.rarePartsCard, jackpot: true,
+    prefetch: () => import("@/pages/casino/CosmicForge5000") },
   { to: "/casino/neon-tokyo-88", code: "neon_tokyo_88", title: "Neon Tokyo 88",
-    subtitle: "초고변동 · Hold & Spin", rtp: "RTP 96.0%", max: "MAX 8888×", bg: bgNeon, logo: logoNeon },
+    subtitle: "초고변동 · Hold & Spin", rtp: "RTP 96.0%", max: "MAX 8888×", bg: bgNeon, logo: logoNeon,
+    fomo: FOMO.jackpotWaiting, jackpot: true,
+    prefetch: () => import("@/pages/casino/NeonTokyo88") },
   { to: "/casino/viking-thunder-4000", code: "viking_thunder_4000", title: "Viking Thunder 4000",
-    subtitle: "고변동 · 3-Path Spins", rtp: "RTP 96.0%", max: "MAX 4000×", bg: bgViking, logo: logoViking },
+    subtitle: "고변동 · 3-Path Spins", rtp: "RTP 96.0%", max: "MAX 4000×", bg: bgViking, logo: logoViking,
+    fomo: FOMO.rarePartsCard, jackpot: true,
+    prefetch: () => import("@/pages/casino/VikingThunder4000") },
   { to: "/casino/pharaohs-vault-2500", code: "pharaohs_vault_2500", title: "Pharaoh's Vault 2500",
-    subtitle: "중변동 · Pick & Reveal", rtp: "RTP 96.0%", max: "MAX 2500×", bg: bgPharaoh, logo: logoPharaoh },
+    subtitle: "중변동 · Pick & Reveal", rtp: "RTP 96.0%", max: "MAX 2500×", bg: bgPharaoh, logo: logoPharaoh,
+    fomo: FOMO.jackpotWaiting,
+    prefetch: () => import("@/pages/casino/PharaohsVault2500") },
   { to: "/casino/wizard-2000", code: "wizard_2000", title: "Wizard 2000",
-    subtitle: "고변동 · 보너스 폭발형", rtp: "RTP 95.3%", max: "MAX 2000×", bg: bgWizard, logo: logoWizard },
+    subtitle: "고변동 · 보너스 폭발형", rtp: "RTP 95.3%", max: "MAX 2000×", bg: bgWizard, logo: logoWizard,
+    fomo: FOMO.rarePartsCard,
+    prefetch: () => import("@/pages/casino/Wizard2000") },
   { to: "/casino/pirates-curse-1500", code: "pirates_curse_1500", title: "Pirate's Curse 1500",
-    subtitle: "중변동 · Crash Cannon", rtp: "RTP 96.0%", max: "MAX 1500×", bg: bgPirate, logo: logoPirate },
+    subtitle: "중변동 · Crash Cannon", rtp: "RTP 96.0%", max: "MAX 1500×", bg: bgPirate, logo: logoPirate,
+    fomo: FOMO.jackpotWaiting,
+    prefetch: () => import("@/pages/casino/PiratesCurse1500") },
   { to: "/casino/aztec-sun-1200", code: "aztec_sun_1200", title: "Aztec Sun 1200",
-    subtitle: "중변동 · Cluster Tumble", rtp: "RTP 96.0%", max: "MAX 1200×", bg: bgAztec, logo: logoAztec },
+    subtitle: "중변동 · Cluster Tumble", rtp: "RTP 96.0%", max: "MAX 1200×", bg: bgAztec, logo: logoAztec,
+    fomo: FOMO.legendaryCrownCard,
+    prefetch: () => import("@/pages/casino/AztecSun1200") },
   { to: "/casino/olympus-1000", code: "olympus_1000", title: "Olympus 1000",
-    subtitle: "중변동 · 클래식", rtp: "RTP 96.0%", max: "MAX 1000×", bg: bgImage, logo: logoImage },
+    subtitle: "중변동 · 클래식", rtp: "RTP 96.0%", max: "MAX 1000×", bg: bgImage, logo: logoImage,
+    fomo: FOMO.jackpotWaiting,
+    prefetch: () => import("@/pages/casino/Olympus1000") },
   { to: "/casino/cherry-sakura-500", code: "cherry_sakura_500", title: "Cherry Sakura 500",
-    subtitle: "저변동 · Mission Trail", rtp: "RTP 96.0%", max: "MAX 500×", bg: bgSakura, logo: logoSakura },
+    subtitle: "저변동 · Mission Trail", rtp: "RTP 96.0%", max: "MAX 500×", bg: bgSakura, logo: logoSakura,
+    fomo: FOMO.rarePartsCard,
+    prefetch: () => import("@/pages/casino/CherrySakura500") },
   { to: "/casino/dragon-empire", code: "dragon_500", title: "Dragon Empire",
-    subtitle: "저변동 · 연속 당첨형", rtp: "RTP 95.6%", max: "MAX 500×", bg: bgDragon, logo: logoDragon },
+    subtitle: "저변동 · 연속 당첨형", rtp: "RTP 95.6%", max: "MAX 500×", bg: bgDragon, logo: logoDragon,
+    fomo: FOMO.legendaryCrownCard,
+    prefetch: () => import("@/pages/casino/DragonEmpire") },
 ];
+
+const prefetched = new WeakSet<GameCard>();
+const warm = (g: GameCard) => () => {
+  if (prefetched.has(g) || !g.prefetch) return;
+  prefetched.add(g);
+  g.prefetch().catch(() => prefetched.delete(g));
+};
 
 export default function CasinoLobby() {
   const user = useRequireAuth();
@@ -79,7 +114,7 @@ export default function CasinoLobby() {
           </span>
         </div>
 
-        <div className="glass rounded-2xl p-4 border border-primary/30 flex items-start gap-3">
+        <div className="imperial-card p-4 flex items-start gap-3">
           <Sparkles className="w-5 h-5 text-primary mt-0.5" />
           <div className="text-xs text-muted-foreground leading-relaxed">
             <strong className="text-foreground">Practice / Real 모드</strong> — DEMO는 무료 칩으로 즉시 체험,
@@ -91,9 +126,9 @@ export default function CasinoLobby() {
           {GAMES.map((g) => {
             const inner = (
               <div
-                className={`relative aspect-[4/5] rounded-2xl overflow-hidden border-2 ${
-                  g.comingSoon ? "border-border/30 opacity-60" : "border-primary/40 hover:border-primary glow-imperial"
-                } transition group`}
+                className={`imperial-card imperial-card-hover imperial-corner-shine relative aspect-[4/5] group ${
+                  g.comingSoon ? "opacity-60" : ""
+                }`}
                 style={{
                   backgroundImage: `linear-gradient(180deg, transparent 30%, hsl(var(--background) / 0.95)), url(${g.bg})`,
                   backgroundSize: "cover",
@@ -104,21 +139,37 @@ export default function CasinoLobby() {
                   <img
                     src={g.logo}
                     alt={g.title}
-                    className="absolute top-4 left-1/2 -translate-x-1/2 h-16 drop-shadow-[0_0_20px_rgba(255,200,80,0.6)]"
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute top-4 left-1/2 -translate-x-1/2 h-16 drop-shadow-[0_0_20px_hsl(38_92%_55%/0.6)] z-10"
                   />
                 )}
+                {!g.comingSoon && g.jackpot && (
+                  <div
+                    className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-2 py-1 rounded-full bg-background/70 border border-amber-400/40 backdrop-blur-sm"
+                    aria-label="잭팟 대기 중"
+                  >
+                    <span className="imperial-pulse-dot" />
+                    <span className="text-[10px] font-bold tracking-wider text-amber-200">JACKPOT</span>
+                  </div>
+                )}
                 {g.comingSoon && (
-                  <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-background/80 border border-border/40 text-[10px] font-bold inline-flex items-center gap-1">
+                  <div className="absolute top-3 right-3 z-20 px-2 py-1 rounded-full bg-background/80 border border-border/40 text-[10px] font-bold inline-flex items-center gap-1">
                     <Lock className="w-3 h-3" /> SOON
                   </div>
                 )}
-                <div className="absolute bottom-0 left-0 right-0 p-4">
+                <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
                   <div className="font-imperial text-xl text-gradient-imperial tracking-[0.18em]">
                     {g.title}
                   </div>
                   <div className="text-[11px] text-muted-foreground tracking-wider mt-1 flex items-center gap-2">
                     <Crown className="w-3 h-3 text-primary" /> {g.subtitle}
                   </div>
+                  {g.fomo && (
+                    <div className="text-[10px] text-amber-200/80 mt-1.5 leading-snug">
+                      {g.fomo}
+                    </div>
+                  )}
                   <div className="flex gap-2 mt-2">
                     <span className="text-[10px] px-2 py-0.5 rounded-full glass border border-border/40">{g.rtp}</span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full glass border border-border/40">{g.max}</span>
@@ -129,7 +180,15 @@ export default function CasinoLobby() {
             return g.comingSoon ? (
               <div key={g.code}>{inner}</div>
             ) : (
-              <Link key={g.code} to={g.to}>{inner}</Link>
+              <Link
+                key={g.code}
+                to={g.to}
+                onMouseEnter={warm(g)}
+                onFocus={warm(g)}
+                onTouchStart={warm(g)}
+              >
+                {inner}
+              </Link>
             );
           })}
         </div>
