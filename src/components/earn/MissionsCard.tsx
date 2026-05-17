@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Target, Check, Users } from "lucide-react";
+import { Target, Check, Users, Sparkles, HeartHandshake } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { notify } from "@/lib/notify";
 import type { QuickKind } from "@/hooks/use-earn-hub";
+import { useMissionRecovery, applyRecoveryBonus } from "@/hooks/use-mission-recovery";
 
 interface Mission { kind: QuickKind; label: string; sub: string; amount: number; claimed: boolean; }
 
@@ -26,6 +27,36 @@ export default function MissionsCard({ missions, onClaim }: Props) {
     { kind: "mission_deposit", label: "첫 입금 인증", sub: "오늘 처음 충전 시", ...missions.deposit },
   ];
 
+  const recovery = useMissionRecovery();
+  const [fomo, setFomo] = useState<{ pct: number; remaining: number } | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const { data } = await supabase.rpc("get_today_mission_completion_stats" as any);
+        if (!alive) return;
+        const row: any = Array.isArray(data) ? data[0] : data;
+        setFomo({
+          pct: Number(row?.overall_pct ?? 87),
+          remaining: Number(row?.my_remaining ?? 0),
+        });
+      } catch {}
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  async function handleClaim(kind: QuickKind, amount: number) {
+    onClaim(kind);
+    if (recovery.recoveryPct > 0) {
+      const res = await applyRecoveryBonus(amount, kind);
+      if (res?.ok && (res as any).bonus > 0) {
+        notify.success(`회복 보너스 +${Number((res as any).bonus).toLocaleString()} PHON`);
+        recovery.refresh();
+      }
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -37,11 +68,31 @@ export default function MissionsCard({ missions, onClaim }: Props) {
         <span className="w-9 h-9 rounded-xl bg-secondary/20 text-secondary-foreground flex items-center justify-center">
           <Target className="w-5 h-5" />
         </span>
-        <div>
+        <div className="flex-1 min-w-0">
           <div className="text-base font-bold text-foreground">오늘의 미션 3종 + 길드</div>
           <div className="text-xs text-muted-foreground">5분 안에 다 받을 수 있어요</div>
         </div>
+        {fomo && fomo.remaining > 0 && (
+          <div className="text-right shrink-0">
+            <div className="text-[10px] text-muted-foreground">오늘 완료율</div>
+            <div className="text-sm font-black text-amber-300 tabular-nums">{fomo.pct}%</div>
+          </div>
+        )}
       </header>
+
+      {fomo && fomo.remaining > 0 && (
+        <div className="rounded-xl border border-amber-400/30 bg-amber-500/5 px-3 py-2 text-[11px] text-amber-200/90 flex items-center gap-2">
+          <Sparkles className="w-3.5 h-3.5 shrink-0" />
+          오늘 미션 완료율 {fomo.pct}%. 당신은 아직 {fomo.remaining}개 남았어요.
+        </div>
+      )}
+
+      {recovery.recoveryPct > 0 && (
+        <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/5 px-3 py-2 text-[11px] text-emerald-200 flex items-center gap-2">
+          <HeartHandshake className="w-3.5 h-3.5 shrink-0" />
+          포기하지 마세요. 오늘은 보상 +{recovery.recoveryPct}% 회복 모드입니다.
+        </div>
+      )}
 
       <ul className="space-y-2.5">
         {items.map((m) => (
@@ -53,9 +104,14 @@ export default function MissionsCard({ missions, onClaim }: Props) {
               <div className="text-sm font-bold text-foreground truncate">{m.label}</div>
               <div className="text-[11px] text-muted-foreground">{m.sub}</div>
             </div>
-            <div className="text-sm font-black text-primary tabular-nums">+{m.amount}</div>
+            <div className="text-sm font-black text-primary tabular-nums">
+              +{m.amount}
+              {recovery.recoveryPct > 0 && !m.claimed && (
+                <span className="ml-1 text-[9px] text-emerald-300">+{recovery.recoveryPct}%</span>
+              )}
+            </div>
             <button
-              onClick={() => onClaim(m.kind)}
+              onClick={() => handleClaim(m.kind, m.amount)}
               disabled={m.claimed}
               className="h-11 min-w-[88px] px-3 rounded-lg font-bold text-sm bg-primary text-primary-foreground disabled:bg-muted/40 disabled:text-muted-foreground active:scale-[0.98] transition"
             >

@@ -8,10 +8,13 @@ import { emitEarned } from "@/components/onboarding/EarnedToast";
 import { isFlagOn } from "@/lib/conversion-flags";
 import { refreshWallet } from "@/lib/walletRefresh";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
+import StreakFlame from "@/components/streak/StreakFlame";
+import { useStreakLoss } from "@/hooks/use-streak-loss";
 
 export default function AttendanceCard() {
   const [db, setDb] = useDB();
   const [busy, setBusy] = useState(false);
+  useStreakLoss();
   // streak loss aversion countdown — hooks MUST run before any early return
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
@@ -33,12 +36,15 @@ export default function AttendanceCard() {
     setBusy(true);
     try {
       await assertRateLimit(RL_MISSION.scope, RL_MISSION.max);
-      // Server-authoritative attendance claim
-      const { data, error } = await supabase.rpc("claim_daily_attendance", { user_id: u.id });
+      // Server-authoritative attendance claim (v2: streak 정정 + weekly + milestone)
+      const { data, error } = await supabase.rpc("claim_daily_attendance_v2" as any);
       if (error) throw error;
-      const row = Array.isArray(data) ? data[0] : data;
-      const serverReward = Number(row?.reward ?? todayReward);
+      const row: any = Array.isArray(data) ? data[0] : data;
+      const base = Number(row?.reward ?? todayReward);
+      const weekly = Number(row?.weekly_bonus ?? 0);
+      const milestoneBonusStreak = Number(row?.milestone_hit ?? 0);
       const newStreakSrv = Number(row?.new_streak ?? (streak + 1));
+      const totalGain = base + weekly + (milestoneBonusStreak > 0 ? ({ 7: 3000, 14: 8000, 30: 25000, 100: 100000 } as Record<number, number>)[milestoneBonusStreak] ?? 0 : 0);
 
       setDb((d) => {
         if (!d.user) return d;
@@ -46,21 +52,29 @@ export default function AttendanceCard() {
           ...d,
           user: {
             ...d.user,
-            balance: d.user.balance + serverReward,
-            todayEarnings: d.user.todayEarnings + serverReward,
+            balance: d.user.balance + totalGain,
+            todayEarnings: d.user.todayEarnings + totalGain,
             lastAttendance: today,
             attendanceStreak: newStreakSrv,
           },
         };
       });
-      emitEarned(serverReward);
+      emitEarned(totalGain);
       refreshWallet();
-      toast({
-        title: `🗓️ 출석 완료 +${formatKRW(serverReward)}`,
-        description: isWeekly ? `7일 연속! 보너스 포함` : `${newStreakSrv}일 연속 출석`,
-      });
+
+      if (milestoneBonusStreak > 0) {
+        toast({
+          title: `👑 ${milestoneBonusStreak}일 연속 달성! +${formatKRW(totalGain)}`,
+          description: `황제 배지 획득 · Empire 경험치 +50`,
+        });
+      } else {
+        toast({
+          title: `🗓️ 출석 완료 +${formatKRW(totalGain)}`,
+          description: weekly > 0 ? `7일 연속! 보너스 +${formatKRW(weekly)} 포함` : `${newStreakSrv}일 연속 출석`,
+        });
+      }
     } catch (e: any) {
-      toast({ title: "출석 실패", description: e.message ?? "다시 시도해주세요", variant: "destructive" });
+      toast({ title: "출석 실패", description: e.message ?? "잠시 후 다시 시도해 주세요", variant: "destructive" });
     } finally {
       setBusy(false);
     }
@@ -82,7 +96,10 @@ export default function AttendanceCard() {
             <CalendarCheck className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <div className="text-[10px] tracking-widest text-secondary font-black">DAILY ATTENDANCE</div>
+            <div className="flex items-center gap-2">
+              <div className="text-[10px] tracking-widest text-secondary font-black">DAILY ATTENDANCE</div>
+              <StreakFlame streak={streak} size="sm" />
+            </div>
             <div className="text-sm font-display font-black">
               {claimed ? `오늘 출석 완료 · ${streak}일 연속` : `오늘의 출석 보상 +${formatKRW(todayReward)}`}
             </div>
