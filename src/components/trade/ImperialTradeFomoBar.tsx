@@ -123,14 +123,14 @@ export default function ImperialTradeFomoBar() {
           className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-300"
           initial={false}
           animate={{ width: `${longPct}%` }}
-          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 90, damping: 18, mass: 0.8 }}
+          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 110, damping: 16, mass: 0.7 }}
           style={{ boxShadow: "0 0 18px hsl(160 80% 45% / 0.45)" }}
         />
         <motion.div
           className="absolute inset-y-0 right-0 bg-gradient-to-l from-rose-500 via-pink-500 to-fuchsia-400"
           initial={false}
           animate={{ width: `${shortPct}%` }}
-          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 90, damping: 18, mass: 0.8 }}
+          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 110, damping: 16, mass: 0.7 }}
           style={{ boxShadow: "0 0 18px hsl(340 80% 55% / 0.45)" }}
         />
         {/* center divider */}
