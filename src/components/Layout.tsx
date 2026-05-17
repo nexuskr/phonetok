@@ -1,23 +1,18 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import {
-  LayoutDashboard,
   Zap,
   Crown,
   Wallet,
-  Trophy,
   LogOut,
   ShieldCheck,
-  MessageSquare,
   User as UserIcon,
-  ChevronRight,
   TrendingUp,
   Menu,
-  Sparkles,
   Coins,
-  Lock,
   Home as HomeIcon,
   Gamepad2,
+  Radio,
 } from "lucide-react";
 import { useDB } from "@/lib/store";
 import React from "react";
