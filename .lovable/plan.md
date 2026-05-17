@@ -50,11 +50,18 @@ Props: `variant?: "full" | "compact"` — Dashboard 는 full(8행), Index 는 fu
 - 잭팟 행은 행 배경 자체에 미세한 펄스 + 당첨금에 `text-gradient-imperial` + `glow-imperial-xl`.
 - 모바일: 통화/시간 컬럼 축약, 모든 행 min-h 44px (탭 영역 확보).
 
-### 스타일
+### 시각 임팩트 (Stake 압도 포인트)
 
-- Warm Gold + Hot Pink Accent, 기존 `imperial-card` / `text-gradient-imperial` / `glow-imperial` 토큰만 사용. 색 토큰 신규 없음.
-- 당첨금: `font-mono font-black` + 그라디언트 텍스트 + 글로우.
-- 통화 칩: KRW=cyan tint, USDT=green tint, PHON=gold tint — 기존 토큰만 사용.
+- 헤더: 🔥 이모지 + 빨간 펄스 도트 + `font-imperial text-base sm:text-lg` 헤드라인 + 우상단 "LIVE · 24/7" 칩
+- 테이블 행 높이 모바일 48px / 데스크탑 52px — Stake 보다 한 단계 크고 시원하게
+- 당첨금 셀: 그라디언트 텍스트(`from-amber-300 via-yellow-200 to-pink-300`) + `drop-shadow-[0_0_8px_hsl(var(--gold)/.6)]` + `font-mono font-black tabular-nums`
+- 잭팟(×80+): 행 배경 `bg-gradient-to-r from-amber-500/10 via-pink-500/10 to-amber-500/10` + `animate-pulse` 미세 + 좌측 4px 골드 바
+- 통화 칩 색: KRW=cyan, USDT=emerald, PHON=gold (모두 기존 토큰)
+- 모바일에서는 시간 컬럼만 숨김, 나머지 7컬럼 압축 노출
+
+### Dashboard 산만함 추가 정리
+
+기 정리분 외 추가 — `LivePurchaseTicker` Dashboard 마운트 검토(이미 More 영역에 있다면 유지). Wins Rail 이 사실상 같은 사회증명 역할이므로 중복 시 More 에서도 제거 고려 (이번 슬라이스에서는 보수적으로 보존).
 
 ### CTA
 
