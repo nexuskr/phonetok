@@ -62,6 +62,7 @@ function useIdleMount(delayMs = 1500) {
   return ready;
 }
 const QuickAccessStrip = lazy(() => import("./QuickAccessStrip"));
+const ImperialInbox = lazy(() => import("./empire/ImperialInbox"));
 const EmpirePopulationPulse = lazy(() => import("./EmpirePopulationPulse"));
 const ImperialHud = lazy(() => import("./imperial/ImperialHud"));
 
@@ -356,6 +357,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             <TopHUD />
             <TopHUDCompact />
+            {user && (
+              <Suspense fallback={null}>
+                <ImperialInbox />
+              </Suspense>
+            )}
             {user && (
               <Link
                 to="/profile"

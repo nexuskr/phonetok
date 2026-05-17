@@ -44,17 +44,18 @@ export function useClosePhonPosition() {
         return { ok: false as const, error };
       }
       const pnlPhon = Number((data as any)?.pnl_phon ?? 0);
-      if (pnlPhon > 0) {
-        notify.success("축하드려요 폐하", {
-          id: tId,
-          description: `+${Math.floor(pnlPhon).toLocaleString("ko-KR")} PHON 이 다시 손에 들어왔습니다`,
-        });
-      } else {
-        notify.info("청산이 완료되었어요", {
-          id: tId,
-          description: `${Math.floor(pnlPhon).toLocaleString("ko-KR")} PHON · 다음 흐름을 함께 봐요`,
-        });
-      }
+      notify.dismiss(tId);
+      notify.result({
+        kind: pnlPhon >= 0 ? "win" : "loss",
+        amountPhon: pnlPhon,
+        title:
+          pnlPhon > 0
+            ? "축하드려요 폐하 · 청산 완료"
+            : pnlPhon < 0
+              ? "청산이 완료되었어요"
+              : "포지션이 정리됐어요",
+        href: "/wallet",
+      });
       try { navigator.vibrate?.(pnlPhon > 0 ? 25 : 10); } catch {}
       return { ok: true as const, data };
     } finally {

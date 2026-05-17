@@ -63,9 +63,9 @@ export function useOpenPhonPosition() {
         return { ok: false as const, error };
       }
       const sideLabel = args.side === "long" ? "LONG 📈" : "SHORT 📉";
-      notify.success(`폐하의 PHON ${sideLabel} 포지션이 열렸어요`, {
-        id: tId,
-        description: "수수료가 자동으로 20% 깎였습니다 · 좋은 흐름 응원해요",
+      notify.dismiss(tId);
+      notify.passive(`폐하의 PHON ${sideLabel} 포지션이 열렸어요`, {
+        description: "수수료 -20% 자동 적용 · 좋은 흐름 응원합니다",
       });
       try { navigator.vibrate?.(15); } catch {}
       return { ok: true as const, data };

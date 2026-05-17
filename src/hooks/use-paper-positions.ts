@@ -18,8 +18,14 @@ export function usePaperLiquidationWatcher() {
     lastRef.current = now;
     const liq = tick(prices);
     for (const p of liq) {
-      notify.error(`청산: ${p.symbol} ${p.side.toUpperCase()} ${p.leverage}x`, {
-        description: `손실 ${(p.closed?.pnl ?? 0).toFixed(2)} USDT`,
+      const pnlUsdt = Number(p.closed?.pnl ?? 0);
+      // approximate PHON for threshold routing (1 USDT ≈ 1300 PHON)
+      const pnlPhonApprox = pnlUsdt * 1300;
+      notify.result({
+        kind: "liq",
+        amountPhon: pnlPhonApprox,
+        title: `청산 · ${p.symbol} ${p.side.toUpperCase()} ${p.leverage}x`,
+        description: `손실 ${pnlUsdt.toFixed(2)} USDT`,
       });
       track("convert", {
         surface: "paper_trade",
