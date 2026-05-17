@@ -37,6 +37,10 @@ export const FOMO = {
     `지금 ${n.toLocaleString()}명의 황제들이 출금하고 있습니다 — 폐하도 자격이 충분합니다`,
   yesterdayPayouts: (n: number) =>
     `어제 폐하 ${n.toLocaleString()}명이 출금을 마쳤습니다 — 다음 차례는 폐하입니다`,
+  // Phase E Final — Lobby polish
+  lobbyTitle: "황제들의 로비",
+  lobbyFooter: "이 모습은 오직 폐하만의 것 — PHON 으로 왕관을 강화하세요",
+  lobbyCtaCustomize: "내 황제 꾸미기",
 } as const;
 
 export const G = {
