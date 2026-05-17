@@ -37,7 +37,9 @@
       "@pkg/entropy": ["./src/packages/entropy"],
       "@pkg/entropy/*": ["./src/packages/entropy/*"],
       "@pkg/risk": ["./src/packages/risk"],
-      "@pkg/risk/*": ["./src/packages/risk/*"]
+      "@pkg/risk/*": ["./src/packages/risk/*"],
+      "@pkg/duel": ["./src/packages/duel"],
+      "@pkg/duel/*": ["./src/packages/duel/*"]
     },
     "noImplicitAny": false,
     "noUnusedParameters": false,
