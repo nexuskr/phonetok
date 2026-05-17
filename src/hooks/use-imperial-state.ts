@@ -43,45 +43,82 @@ const EMPTY: ImperialState = {
 
 const DASHBOARD_STATE_DISABLED_KEY = "phonara_disable_dashboard_state_rpc";
 
-export function useImperialState() {
-  const [state, setState] = useState<ImperialState>(EMPTY);
-  const [loading, setLoading] = useState(true);
+// Module-scope SWR cache to dedupe across multiple component mounts.
+// Fresh window: within FRESH_MS no new RPC fires, cached state served instantly.
+const FRESH_MS = 15_000;
+let cachedState: ImperialState | null = null;
+let lastFetchedAt = 0;
+let inflight: Promise<ImperialState | null> | null = null;
+const subscribers = new Set<(s: ImperialState) => void>();
 
-  const refresh = useCallback(async () => {
-    if (isCircuitTripped(DASHBOARD_STATE_DISABLED_KEY)) {
-      setLoading(false);
-      return;
-    }
-    if (typeof window !== "undefined" && window.location.pathname.startsWith("/guide")) {
-      setLoading(false);
-      return;
-    }
+function broadcast(next: ImperialState) {
+  cachedState = next;
+  for (const cb of subscribers) {
+    try { cb(next); } catch { /* ignore */ }
+  }
+}
+
+async function fetchDashboardState(force = false): Promise<ImperialState | null> {
+  if (isCircuitTripped(DASHBOARD_STATE_DISABLED_KEY)) return cachedState;
+  if (typeof window !== "undefined" && window.location.pathname.startsWith("/guide")) return cachedState;
+
+  const now = Date.now();
+  if (!force && cachedState && now - lastFetchedAt < FRESH_MS) return cachedState;
+  if (inflight) return inflight;
+
+  inflight = (async () => {
     try {
       const { data: auth } = await supabase.auth.getSession();
-      if (!auth.session?.user) {
-        setLoading(false);
-        return;
-      }
+      if (!auth.session?.user) return cachedState;
       const { data, error } = await supabase.rpc("get_my_dashboard_state" as any);
       if (error) {
         if (shouldTripCircuit(error)) tripCircuit(DASHBOARD_STATE_DISABLED_KEY);
-        setLoading(false);
-        return;
+        return cachedState;
       }
       if (data && typeof data === "object") {
-        setState({ ...EMPTY, ...(data as any) });
+        const next = { ...EMPTY, ...(data as any) } as ImperialState;
+        lastFetchedAt = Date.now();
+        broadcast(next);
+        return next;
       }
-    } catch { /* silent — keep last state */ }
+      return cachedState;
+    } catch {
+      return cachedState;
+    } finally {
+      inflight = null;
+    }
+  })();
+  return inflight;
+}
+
+export function useImperialState() {
+  const [state, setState] = useState<ImperialState>(cachedState ?? EMPTY);
+  const [loading, setLoading] = useState(cachedState === null);
+
+  const refresh = useCallback(async () => {
+    const next = await fetchDashboardState();
+    if (next) setState(next);
     setLoading(false);
   }, []);
 
   useEffect(() => {
     let alive = true;
+    const cb = (s: ImperialState) => { if (alive) setState(s); };
+    subscribers.add(cb);
     refresh();
-    const stop = setVisibleInterval(() => { if (alive) refresh(); }, 30_000);
-    const onFocus = () => refresh();
+    // Polling cadence relaxed 30s → 60s; dedupe guarantees ≤1 RPC per FRESH_MS window.
+    const stop = setVisibleInterval(() => { if (alive) void fetchDashboardState(); }, 60_000);
+    const onFocus = () => { void fetchDashboardState(); };
+    const onWalletRefresh = () => { void fetchDashboardState(true); };
     window.addEventListener("focus", onFocus);
-    return () => { alive = false; stop(); window.removeEventListener("focus", onFocus); };
+    window.addEventListener("wallet:refresh", onWalletRefresh);
+    return () => {
+      alive = false;
+      subscribers.delete(cb);
+      stop();
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("wallet:refresh", onWalletRefresh);
+    };
   }, [refresh]);
 
   return { state, loading, refresh };
