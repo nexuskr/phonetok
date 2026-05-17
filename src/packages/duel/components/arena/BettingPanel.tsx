@@ -132,9 +132,16 @@ export function BettingPanel({
         </div>
       </div>
 
+      {typeof shadowBalance === "number" && (
+        <div className="flex items-center justify-between text-[11px] text-amber-200/85 tabular-nums px-0.5">
+          <span>가상 잔고 (Shadow)</span>
+          <span className="font-black text-amber-100">{shadowBalance.toLocaleString()} PHON</span>
+        </div>
+      )}
+
       <button
         type="button"
-        onClick={handlePlace}
+        onClick={openConfirm}
         disabled={disabled}
         className="w-full inline-flex items-center justify-center gap-2 rounded-2xl py-4 font-imperial tracking-[0.22em] text-sm bg-gradient-to-r from-amber-400 via-amber-300 to-pink-500 text-[#1a0a05] font-black active:scale-[0.97] will-change-transform disabled:opacity-50"
         style={{ minHeight: 56, boxShadow: "0 0 18px hsl(38 92% 60% / 0.5)" }}
@@ -144,8 +151,20 @@ export function BettingPanel({
       </button>
 
       <p className="text-[10px] text-amber-300/70 text-center break-keep leading-snug">
-        시뮬레이션 PHON — 실제 잔액 변동 없음. 황실 검증 오라클에서 모든 라운드를 재계산할 수 있습니다.
+        PROOF MODE · Shadow PHON — 실잔액 변동 없음. 황실 검증 오라클에서 모든 라운드를 재계산할 수 있습니다.
       </p>
+
+      <ConfirmBetSheet
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        side={side}
+        sideName={side === "left" ? leftName : rightName}
+        amount={amount}
+        odds={side === "left" ? oddsLeft : oddsRight}
+        shadowBalance={shadowBalance ?? 0}
+        serverSeedHashPreview={serverSeedHashPreview}
+        onConfirm={confirmPlace}
+      />
     </div>
   );
 }
