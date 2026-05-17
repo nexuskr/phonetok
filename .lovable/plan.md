@@ -1,92 +1,113 @@
-# Slice 8 Phase 2 — Imperial Duel: Spectator + Live Betting + Full Arena
+# Slice 8 Phase 2 — Imperial Duel: Spectator + Live Betting + Cinematic Arena
 
-## 범위 정리 (먼저 합의 필요)
+인프라 트랙(Consul/Envoy/Prometheus/cert-manager/자체 WS)은 `phonara-unicorn/` 으로 분리 합의 완료. 본 플랜은 **프론트엔드 단독 끝판왕** 구현에 집중합니다.
 
-이 프로젝트는 **Vite + React 프론트엔드 + Lovable Cloud(Supabase)** 스택입니다. 요청에 포함된 다음 항목들은 **이 프로젝트에서 구현 불가능**하므로 Phase 2 범위에서 제외하거나, 별도 인프라 트랙(`phonara-unicorn/` ECS 스캐폴드)으로 분리해야 합니다:
-
-- Consul Service Mesh / Envoy Sidecar / mTLS / Intentions / L7 Policy
-- Prometheus / Node Exporter / Alertmanager / Grafana
-- cert-manager TLS 자동 갱신
-- 자체 WebSocket 서버 (현재는 Supabase Realtime 사용 — 이미 PR-J 4-파티션 + PR-N 5축 region sharding 으로 캡슐화됨)
-- Reanimated 3 Worklet (React Native 전용 — 웹에서는 framer-motion + CSS transform 로 대체)
-
-이 인프라 항목들이 정말 필요하다면 별도 트랙(`phonara-unicorn/infra/terraform/`)에서 다뤄야 하며, 현재 user-facing 앱과는 독립적입니다. Phase 2 안에 끼워 넣으면 money-flow FREEZE / Operator Isolation / Bundle Budget 게이트가 전부 깨집니다.
-
-**아래 본 플랜은 "프론트엔드에서 실제로 만들 수 있는 끝판왕 Imperial Duel Phase 2"** 에 집중합니다. 인프라/관측성/메시 트랙을 함께 진행할지 별도 명령으로 알려주세요.
+## 절대 게이트 (diff 0)
+- money-flow 8경로 (`MegaOrderPanel`, `useDeposit*`, `useWithdraw`, `bybit-feed`, `useCrashRound`, `use-auto-bet`, `use-kill-switches`)
+- Operator Isolation chunk / Bundle Budget 180KB index
+- Phase D/F push, FREEZE 인벤토리
+- 신규 RPC / edge function = 0
+- 잔액 변동 0 (베팅은 전부 시뮬레이션)
 
 ---
 
-## Phase 2 구현 범위 (프론트엔드 완결)
+## 1. Odds Engine + Variable Reward
 
-### 1. Spectator Mode (`/duel/arena/:roomId` 확장)
-- 신규 URL 쿼리 `?as=spectator` — 결투에 참여하지 않고 관전만.
-- `SpectatorDeck` 컴포넌트: 양측 군중 사이드바, 좌/우 응원 비율 게이지, 실시간 입장 토스트(가짜 닉네임 마스킹).
-- 좌석 상태는 `useDuelRoom` 훅에 `spectatorMode: boolean` 추가, 베팅 패널/결투 시작 버튼 비활성.
+`src/packages/duel/engine/odds.ts` (NEW)
+- 양측 풀: `{ leftPool, rightPool, totalBets }` 시뮬레이션 ledger.
+- 배당: `odds(side) = (total / sidePool) * (1 - HOUSE_EDGE)`, `HOUSE_EDGE = 0.062`.
+- Variable Reward Tier (확률 + 멀티):
+  ```text
+  Base       (≥0.30 from threshold)   85.0%   ×1.00
+  Surge      (0.18..0.30)               9.5%   ×1.30
+  Crown      (0.08..0.18)               3.5%   ×1.75
+  Empyrean   (0.02..0.08)               0.7%   ×2.40
+  Divine     (<0.02)                    1.3%   ×3.20  -- 황실 잭팟
+  ```
+  (기존 `rewardTierFromRoll` 시그니처 유지하면서 분포 재튜닝)
+- Near-miss zone: `|roll - threshold| ∈ [0.005, 0.025]` → `nearMiss=true` + margin 0..1 정규화.
 
-### 2. Real-time Betting Panel (시뮬레이션, money-flow 무관)
-- 신규 `BettingPanel` (오른쪽 하단 또는 모바일 bottom sheet) — Left/Right 선택 + 베팅 금액 슬라이더(데모 PHON, 실제 잔액 미차감).
-- `useOddsEngine` 훅: 양측 베팅 풀 비율을 0.5s 간격으로 시뮬레이션 업데이트, 배당률은 `(totalPool / sideStake) * 0.95 (수수료)` 공식.
-- 라운드 종료 시 가상 정산 토스트만 표시(잔액 변경 0, FREEZE 보호).
-- 신규 `@pkg/duel/engine/odds.ts` + `@pkg/duel/hooks/useOddsEngine.ts`.
+`src/packages/duel/hooks/useOddsEngine.ts` (NEW)
+- `useGameChannel({ key: "duel:room:" + roomId })` broadcast 로 풀 ledger 동기화 (presence + broadcast 이벤트만, DB 무영향).
+- 0.5s 시뮬레이션 tick 으로 가짜 베터 입장 → 풀 변동.
+- API: `{ left, right, odds: {left, right}, place(side, amount), myStake, settleRound(winner) → payout }`.
 
-### 3. Live Sync (Supabase Realtime wrapper 재사용)
-- `useGameChannel({ key: "duel:room:" + roomId })` 로 다른 탭/사용자 간 베팅 풀 broadcast (presence + broadcast 이벤트만, DB 쓰기 없음).
-- Heartbeat: 기존 `@pkg/realtime/heartbeat.ts` 자동 적용.
-- 재연결: `useRealtimeChannel` 내장 로직 사용. 신규 WS 서버 미구축.
+## 2. Spectator Mode
 
-### 4. Full Arena Cinematic Polish
-- `ThroneStage` v2: 다층 글로우 (radial + sweep + inner highlight), Crown 입자 lazy import (`canvas-confetti` 기존 의존성 재사용).
-- `RewardTierBanner`: Base→Surge→Crown→Empyrean→Divine 5단계 시네마틱 헤드라인 + tier별 색상 토큰.
-- Near-miss 시 0.4s 슬로우모션 + 화면 진동(`transform: scale + translateY`).
-- Mobile gesture: `react-use-gesture` 미사용 — 순수 CSS `touch-action` + `pointer-events` 로 thumb-zone 베팅 슬라이더.
+`src/pages/ImperialDuelArena.tsx` (EDIT)
+- URL: `?as=spectator` → 결투 시작 버튼 숨김, BettingPanel 만 활성.
+- 모드와 무관하게 양측 응원 사이드바, 라이브 입장 토스트 노출.
 
-### 5. FOMO Layering
-- 기존 `useFomoOracle` 에 `spectatorPressure` 추가 (관중 수 + 베팅 풀 격차 → personalScore 가산).
-- `FomoFloatingOracle` 에 "지금 N명이 폐하의 결투를 지켜보고 있습니다" 라이브 카피.
+`SpectatorDeck.tsx` (NEW)
+- 좌/우 군중 비율 게이지 (gold→pink gradient bar).
+- 가짜 마스킹 닉네임 ("황제#3094 ▸ 적군 합류") 6초 폴링 토스트.
+- "지금 N명이 폐하의 결투를 지켜보고 있습니다" 라이브 헤더.
 
-### 6. 검증 오라클 4-Tab 확장
-- 베팅 라운드용 5th tab "Betting Audit" — 라운드별 베팅 풀/정산 비율을 HMAC 시드와 묶어 표시 (시뮬레이션 데이터, 검증 가능).
+`useSpectatorSync.ts` (NEW) — `useGameChannel` wrapper, presence count.
 
----
+## 3. Betting Panel
 
-## 신규/수정 파일 (예상)
+`BettingPanel.tsx` (NEW)
+- Desktop: arena 우측 dock. Mobile: `BottomSheet` (이미 존재).
+- Left/Right 진영 카드 (실시간 odds 펄스), 슬라이더(시뮬레이션 PHON 100~50,000), `placeBet` CTA.
+- 라운드 종료 시 가상 정산 토스트 (`notify.success`) — 실잔액 변동 없음, 명시 표기 "데모 베팅".
+- Thumb-zone: 슬라이더 하단 56px, CTA 56px 높이.
+
+## 4. Cinematic Arena v2
+
+`ThroneStage.tsx` (EDIT)
+- 다층 글로우: outer radial + inner highlight + sweep (`background-position` keyframe).
+- Crown particle: `canvas-confetti` lazy (이미 의존성), Empyrean/Divine 만 트리거.
+
+`RewardTierBanner.tsx` (NEW)
+- 라운드 결과 헤더에 5단계 tier별 카피 + 색상 토큰:
+  - Base "황실의 영광" / Surge "황금이 끓습니다" / Crown "왕관이 빛납니다" / Empyrean "천계가 열립니다" / Divine "신성한 대관식입니다 — JACKPOT".
+
+`NearMissBurst.tsx` (EDIT — 강화)
+- Near-miss 시 `useDuelTick` 의 `easeStrong=true` → 마지막 0.4s 슬로우 + 화면 scale 1.012 펄스 + 진동 시뮬레이션 (`translateY ±2px` 8Hz).
+- "아슬아슬하게 빗나갔습니다 — 폐하의 운이 스치고 지나갔습니다." 토스트.
+
+## 5. Verification Oracle 5th Tab
+
+`VerificationOracleModal.tsx` (EDIT)
+- 신규 "Betting Audit" tab — 라운드별 leftPool/rightPool/winnerSide/payout 을 `proof.hmacHex.slice(0,16)` 와 묶어 표 형태로 노출.
+- 시뮬레이션이지만 동일 HMAC seed 로 누구나 재계산 가능함을 명시.
+
+## 6. FOMO Layering
+
+`useFomoOracle.ts` (EDIT)
+- `spectatorPressure`: `(spectators / 100) + (|leftPool-rightPool| / total) * 25` → `personalScore` 가산 (cap 100).
+- 새 트리거 `pool_imbalance` (한쪽 풀 65%+ 시).
+- `FomoFloatingOracle` 카피 확장.
+
+## 7. 신규/수정 파일
 
 ```text
-src/packages/duel/engine/odds.ts                 NEW
-src/packages/duel/hooks/useOddsEngine.ts         NEW
-src/packages/duel/hooks/useSpectatorSync.ts      NEW   (useGameChannel wrapper)
-src/packages/duel/components/arena/BettingPanel.tsx       NEW
-src/packages/duel/components/arena/SpectatorDeck.tsx      NEW
-src/packages/duel/components/arena/RewardTierBanner.tsx   NEW
-src/packages/duel/components/arena/ThroneStage.tsx        EDIT (v2 폴리시)
-src/packages/duel/components/oracle/VerificationOracleModal.tsx  EDIT (5th tab)
-src/packages/duel/hooks/useDuelRoom.ts            EDIT (spectatorMode)
-src/packages/duel/hooks/useFomoOracle.ts          EDIT (spectatorPressure)
-src/pages/ImperialDuelArena.tsx                   EDIT (panel 마운트 + spectator 분기)
-src/packages/duel/index.ts                        EDIT (re-export)
+src/packages/duel/engine/odds.ts                           NEW
+src/packages/duel/hooks/useOddsEngine.ts                   NEW
+src/packages/duel/hooks/useSpectatorSync.ts                NEW
+src/packages/duel/components/arena/BettingPanel.tsx        NEW
+src/packages/duel/components/arena/SpectatorDeck.tsx       NEW
+src/packages/duel/components/arena/RewardTierBanner.tsx    NEW
+src/packages/duel/components/arena/ThroneStage.tsx         EDIT
+src/packages/duel/components/arena/NearMissBurst.tsx       EDIT
+src/packages/duel/components/oracle/VerificationOracleModal.tsx  EDIT
+src/packages/duel/hooks/useFomoOracle.ts                   EDIT
+src/packages/duel/engine/fomo.ts                           EDIT  (tier 분포 재튜닝)
+src/pages/ImperialDuelArena.tsx                            EDIT
+src/packages/duel/index.ts                                 EDIT  (re-export)
 ```
 
-money-flow FREEZE 8경로 / Operator chunk / Bundle budget(180KB index) / Phase D/F push / 신규 RPC / 신규 edge function = **diff 0**.
+## 8. QA 체크리스트
+- Desktop 1440 + Mobile 390 스크린샷 (Spectator / Better / Near-miss / Divine 잭팟).
+- 60fps: framer-motion transform/opacity only, will-change 적용.
+- `npm run build` PASS + bundle-budget index ≤180KB.
+- `scripts/check-money-flow-freeze.mjs` PASS.
+- Console error/warning 0 (기존 entropy/sandbox 잔존만 허용).
 
----
-
-## 톤
-- "옥좌에 베팅을 올리소서", "폐하의 진영에 N명이 합류했습니다", "황실이 끓어오릅니다 — 배당이 폭발합니다" 등 Warm King.
-
----
-
-## 작업 순서
-1. `odds.ts` + `useOddsEngine` (시뮬레이션 엔진)
-2. `useSpectatorSync` (useGameChannel broadcast/presence)
-3. `BettingPanel` + `SpectatorDeck`
-4. `RewardTierBanner` + ThroneStage v2 폴리시
-5. Arena 페이지 통합 (spectator 분기)
-6. VerificationOracle 5th tab
-7. Mobile 390 / Desktop 1440 QA + bundle budget 확인
-
----
-
-## 확인 필요 사항
-
-1. 위 인프라 항목(Consul/Envoy/Prometheus/cert-manager/자체 WS 서버) **별도 인프라 트랙으로 분리**에 동의하십니까? (이 앱 안에선 구현 불가)
-2. 베팅은 **시뮬레이션(잔액 변동 0)** 으로 유지합니까, 아니면 실제 PHON 차감을 원하시면 별도 RPC + RLS + money-flow 정책 작업이 필요합니다 (이 경우 FREEZE diff 0 약속과 충돌).
+## 9. 톤 (Warm King)
+- "옥좌에 베팅을 올리소서"
+- "폐하의 진영에 N명이 합류했습니다"
+- "황실이 뜨겁게 끓고 있습니다 — 배당이 폭발합니다"
+- "신성한 대관식입니다 — JACKPOT"
+- "아슬아슬하게 빗나갔습니다 — 폐하의 운이 스치고 지나갔습니다"
