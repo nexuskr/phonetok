@@ -54,7 +54,7 @@ function GoldParticles() {
 
 function Hero() {
   return (
-    <section className="relative overflow-hidden">
+    <section className="imperial-vignette relative overflow-hidden">
       {/* Warm Deep Black + Imperial halos */}
       <div className="absolute inset-0 -z-20 bg-[#110d1a]" />
       <div className="absolute inset-0 -z-10 pointer-events-none">
