@@ -1,74 +1,105 @@
-# Phase 0 — EMERGENCY Clean Rebuild
+# Phase 0-R — TRUE Clean Rebuild (Stake.com 급)
 
-**오직 Phase 0만 실행.** Slice 7.5 / Slice 8은 본 작업 승인·완료 후 별도 플랜으로 재상정.
+## 왜 다시 하는가
 
-원칙: **새로 쌓지 않고, 먼저 지운다.** money-flow 8경로 / Operator Isolation / Bundle Budget / Phase D(Avatar+Lobby) / Phase F Push **git diff 0줄**. 정리는 "마운트 해제 + 사용자 노출 라우트 차단 + 카피 교체" 수준이며 파일은 보존(다른 페이지에서 import 가능).
+이전 Phase 0는 "마운트만 해제"였습니다. 실제로는 **Layout, App.tsx, Dashboard** 어디에도 옛 요소가 그대로 살아 있습니다:
 
----
+- **글로벌 토스트/오버레이 17종 상시 마운트**: `EmpireMomentToast`(상단 골드 토스트 — 스크린샷의 "대공 S\*\*\*h 황제 잭팟 적중"), `NeonNotificationFeed`, `BaronPromotionDialog`, `EmpireBoosterTimer`(우상단 14:24 카운터), `EmpireConcierge`, `ReplayShareGlobal`, `CrownWarFinaleModal`, `PowerHeader`(우상단 5,200,000원/활성화/Lv.60), `FirstEmperorBurst`, `CrownThroneOverlay`, `ImperialInbox`, `QuickAccessStrip`, `EmpirePopulationPulse`, `ImperialHud`, `FloatingDockHost`, `SimGlobalBadge`, `PracticeModeBanner`, `EmpireMomentToast`, `FloatingCashLoopWidget`, `ForcedShareDialog`, `VipArrivalAnnouncer`, `ReactivationOfferDialog`, `BigWinShareHost`, `AchievementUnlockListener`, `LobbyFab`, `ImperialDeepLinkListener`.
+- **좌측 사이드바**: 트레이딩/슬롯/제국 광장/황제 미션/내 제국 + Admin — 옛 5그룹 그대로.
+- **Dashboard 본문**: ImperialLivePulseRail, ImperialLiveWinsRail, DashboardHeroV3, DailyBriefingCard, VipWhalePreview, ImperialJourneyMap, JourneyClaimPanel, TradingEntryCard, Olympus 카드, KpiGridV3, MoreSection, DashboardBetPanel — "잘라낸다"고 했지만 모두 살아있음.
 
-## 0.1 Dashboard — `src/pages/Dashboard.tsx`
+스크린샷의 **모든 위젯/탭/토스트는 이 목록에서 나온 것** 입니다.
 
-남기는 hero 흐름(이 순서 그대로):
-1. `<ImperialLivePulseRail/>`
-2. `<ImperialLiveWinsRail/>` (full)
-3. `<DashboardHeroV3/>`
-4. `<DailyBriefingCard/>` (Suspense)
-5. `<VipWhalePreview/>` (Suspense)
-6. `<ImperialJourneyMap/>`
-7. `<JourneyClaimPanel/>`
-8. `<TradingEntryCard/>`
-9. Olympus Slots 진입 카드 (카피 정리)
-10. `<KpiGridV3/>`
-11. `<MoreSection/>` — `DashboardBetPanel` + `WithdrawNudge` + `RecoveryPrompt` + `StreakBadge` + `Disclaimer`만 유지.
+## 이번에는 진짜로 제거
 
-마운트 해제(파일은 보존):
-- `CrownWarHUD`, `LiveRankingMarquee`, `HubTabs hub="command"`, `CommandHero`, `BoostHeroCard`, `EmpireP2EDashboard`, `MachineFomoTicker`, `LiveRanking`, `JackpotBanner`, `EmpireDayCountdown`, `SevenDayChallengeCard`, `FirstMissionCard`, `AttendanceCard`, `TierComparisonCard`, `ActiveBotsMini`, `PersonalizedFeedRail`, `RevenueWidget`, `RoutingMigrationBanner`, `ChurnReactivationBanner`, `FriendLeaderboard`, `LivePurchaseTicker`.
+### 1. Layout.tsx 완전 재작성 (Stake.com 스타일 셸)
 
-## 0.2 Navigation / Layout
+옛 `Layout.tsx`는 **그대로 두고** (다른 페이지 안 깨지게), 새 `ImperialShell.tsx`를 만들어 Dashboard/Home/주요 페이지만 이걸 씁니다.
 
-- `src/components/nav/PhonaraNav.tsx`: 5탭(홈/PHON/슬롯/지갑/더보기) + 중앙 Half-Off Imperial FAB만 유지. War/Arena/Battle 관련 항목 전부 제거. 링크 destination은 `/dashboard?focus=bet` 또는 `/trading`으로 흡수.
-- `src/components/Layout.tsx`: BattleResultOverlay / Arena HUD 잔존 마운트 제거. Imperial Booster Timer / Power Header / Deep Link Listener는 유지.
-- `src/components/nav/PhonaraTopBar.tsx`: war/army 카피 정리.
+```text
+┌───────────────────────────────────────────────────────────┐
+│ TopBar:  [P PHONARA]    [search]    [잔액 ₩] [지갑] [👤] │
+├──────────┬────────────────────────────────────────────────┤
+│ Sidebar  │                                                 │
+│  슬림     │   메인 컨텐츠                                    │
+│  (아이콘) │                                                 │
+│  Home    │                                                 │
+│  Trade   │                                                 │
+│  Slots   │                                                 │
+│  Live    │                                                 │
+│  Wallet  │                                                 │
+└──────────┴────────────────────────────────────────────────┘
+```
 
-## 0.3 Landing — `src/pages/Landing.tsx` (+ `src/pages/Index.tsx`)
+- 사이드바: 5개 아이콘 + 라벨, 그룹 없음, Admin 분리
+- 옛 그룹 아코디언/Accordion 컴포넌트 완전 제거
+- Stake처럼 매우 어두운 #0F1419 배경, 미세 보더, 골드 강조 최소화
 
-남기는 흐름: 
-1. Hero (`imperial-vignette` 배경, H1 + sub-copy + CTA + `+10,000 PHON` chip).
-2. `<ImperialLiveWinsRail/>` (full variant).
-3. Trust 3-line (가입 즉시 PHON / 환불 / 라이브 출금).
-4. Footer 최소.
+### 2. App.tsx 글로벌 오버레이 17종 모두 언마운트
 
-제거: 군사/배틀 마키, 중복 ticker, 옛 feature grid, 잔존 BattleResultOverlay 트리거, EmpireArmy 관련 데모 카드 등.
+다음 정적/Lazy 임포트와 마운트를 모두 삭제 (파일 자체는 남겨둠 — 다른 곳에서 import 깨지지 않게 하려고 `index.ts` 재export 도 유지):
 
-## 0.4 라우트 차단 — `src/App.tsx`
+- `EmpireMomentToast` ← 스크린샷 골드 토스트 주범
+- `FloatingCashLoopWidget`, `ForcedShareDialog`, `VipArrivalAnnouncer`, `ReactivationOfferDialog`, `BigWinShareHost`, `AchievementUnlockListener`, `LobbyFab`, `ImperialDeepLinkListener`, `FloatingDockHost`, `PracticeModeBanner`, `SimGlobalBadge`
+- 우상단 RUNTIME chip(`EntropyChip`)도 DEV-only 유지하되 시각적 노출 OFF
 
-War/Arena 라우트를 사용자 진입에서 차단(컴포넌트 import 제거 후 redirect만 등록):
-- `/arena`, `/empire/arena`, `/trading/army`, `/trading/war`, `/war` → `<Navigate to="/trading" replace/>`.
-- `route-prefetch.ts`에서 위 키 prefetch 항목 제거.
-- App 라우터에 `EmpireArena`/`WarTradingArena`/`TradingArenaWithArmy` import 제거. 파일은 보존(나중에 Imperial Duel 베이스로 재활용).
+Layout 내부의 idle-mount 9종도 모두 삭제: `NeonNotificationFeed`, `BaronPromotionDialog`, `EmpireBoosterTimer`, `EmpireConcierge`, `ReplayShareGlobal`, `CrownWarFinaleModal`, `CrownThroneOverlay`, `PowerHeader`, `FirstEmperorBurst`, `EmpirePopulationPulse`, `ImperialHud`, `QuickAccessStrip`, `ImperialInbox`.
 
-## 0.5 카피 일괄 sweep (사용자 노출 string만)
+남는 것: `Toaster`(shadcn) + `Sonner` 만. 토스트는 명시적으로 부른 곳에서만 표시.
 
-대상 화이트리스트(머니플로 호출 hook/엣지 제외):
-`src/pages/{Landing,Index,Dashboard,Empire,EmpireHall,EmpireCollection}.tsx`, `src/components/{Layout,nav/*,empire/ImperialLive*,empire/JackpotEmpireBanner,empire/CrownThroneOverlay,dashboard/v3/*}.tsx`, `src/components/auth/AuthFeatureGrid.tsx`, `src/packages/earn/components/Onboarding60s.tsx`.
+### 3. Dashboard.tsx — 한 화면 = Stake 카탈로그 1개
 
-치환 사전:
-- "전투"/"battle" → "대결" / "Imperial Duel"
-- "전쟁"/"war" → "왕좌전"
-- "군대"/"army" → "Imperial Guard"
-- "Crown War"/"크라운 워" → "Crown Throne"
-- "Empire Arena"/"엠파이어 아레나" → "Imperial Hall"
-- 톤 정렬: 황제 / 제국 / 폐하 / 승전보 / Imperial.
+옛 11개 위젯 전부 삭제. 새 구성:
 
-내부 식별자(변수·함수·파일명·이벤트키)는 **변경 금지**.
+```text
+┌─────────────────────────────────────┐
+│ Hero search-row: "게임 검색…"        │
+├─────────────────────────────────────┤
+│ Quick chips: Slots · Live · Crash · Trade │
+├─────────────────────────────────────┤
+│ "Phonara Originals"  →    [캐러셀 6장]│
+├─────────────────────────────────────┤
+│ "Slots"              →    [캐러셀 6장]│
+├─────────────────────────────────────┤
+│ "Live Casino"        →    [캐러셀 6장]│
+├─────────────────────────────────────┤
+│ "Trading"            →    [BTC LONG/SHORT 카드]│
+└─────────────────────────────────────┘
+```
 
-## 0.6 검증
+- 모든 카드 데이터는 **이미 있는** `src/pages/casino/*` 라우트 12개를 그대로 사용
+- 깜빡임/펄스/glow 없음, 카드 hover 시 미세 lift만
+- 토스트/배너/카운트다운/마키 0개
 
-- `bunx tsc --noEmit` 통과.
-- `rg -i "battle|전투|전쟁|army|군대|crown war|empire arena" src/pages/{Landing,Index,Dashboard}.tsx src/components/{Layout.tsx,nav/PhonaraNav.tsx,nav/PhonaraTopBar.tsx,empire/ImperialLivePulseRail.tsx,empire/ImperialLiveWinsRail.tsx}` → 0건.
-- money-flow 파일 git diff = 0줄(`request_withdrawal`/`credit_crypto_deposit`/`bet_*` 호출 hook/엣지/`warTrading.ts`/`battleStore.ts` 등).
-- /, /dashboard 수동 확인 + 스크린샷 3장(Dashboard / Navigation / Landing).
+### 4. Landing.tsx 톤다운
 
-## 0.7 완료 보고
+현재 `Landing.tsx`(411줄 짜리 옛 `Index.tsx`가 아니라 새 Landing.tsx)는 Hero + Live Wins + Trust 로 이미 비교적 깔끔하지만:
 
-"✅ Clean Rebuild Phase 완료" + Dashboard / Navigation / Landing 스크린샷 첨부. 이후 Slice 7.5 Final Visual Touch 플랜 별도 상정.
+- 마키(`ImperialLiveWinsRail`) 제거 — Stake은 랜딩에 마키 안 씀
+- `pulse-halo`, `glow-imperial`, `animate-ping` 등 과한 효과 제거
+- Hero 카피 유지하되 폰트 사이즈 줄이고 단일 CTA만
+
+### 5. 옛 Index.tsx (`/legacy-index`) 라우트 제거
+
+App.tsx 의 `<Route path="/legacy-index" element={<Index />} />` 삭제 + `Index.tsx` lazy import 삭제.
+
+## 기술 세부
+
+- 파일 신규: `src/components/shell/ImperialShell.tsx`, `src/components/shell/ImperialTopBar.tsx`, `src/components/shell/ImperialSidebar.tsx`, `src/components/dashboard/v19/GameRail.tsx`
+- 파일 수정: `src/App.tsx`(글로벌 오버레이 17종 삭제), `src/pages/Dashboard.tsx`(전면 재작성), `src/pages/Landing.tsx`(톤다운), `src/components/Layout.tsx`(idle-mount 13종 삭제 + 사이드바 슬림화)
+- 파일 삭제 없음 (다른 페이지가 import 중일 수 있음 — 마운트만 끊음)
+- 라우트: `/legacy-index` 제거
+- 디자인 토큰: 새 변수 `--stake-bg: 220 13% 9%`, `--stake-surface: 220 13% 12%`, `--stake-border: 220 13% 18%` 추가
+- money-flow 코드, 토스트 라이브러리, 인증, 결제, DB는 **0줄도 안 건드림**
+
+## 검증
+
+빌드 후 `/`, `/command`(Dashboard), `/trade` 3개 페이지가 스크린샷 기준으로:
+
+1. 우상단 골드 토스트 없음
+2. 우상단 14:24 부스터 카운터 없음
+3. 좌측 그룹 아코디언 없음(슬림 사이드바만)
+4. RUNTIME chip 없음
+5. Dashboard에 황실 브리핑/저니맵/올림푸스 카드/베팅 패널 없음 — 게임 카탈로그만
+
+확인은 새 스크린샷 3장으로 첨부해서 보고합니다.
