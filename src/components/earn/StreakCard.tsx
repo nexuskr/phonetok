@@ -9,17 +9,16 @@ interface Props {
 }
 
 export default function StreakCard({ days, claimedToday, nextReward, onClaim }: Props) {
-  const dots = Array.from({ length: 7 }, (_, i) => i < (claimedToday ? days : days));
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className="rounded-2xl border border-primary/30 bg-card p-5 flex flex-col gap-4"
+      className="imperial-card imperial-card-hover imperial-corner-shine relative overflow-hidden p-5 flex flex-col gap-4 will-change-transform"
     >
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="w-9 h-9 rounded-xl bg-primary/15 text-primary flex items-center justify-center">
+          <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/25 to-pink/15 text-primary flex items-center justify-center ring-1 ring-primary/30">
             <CalendarCheck className="w-5 h-5" />
           </span>
           <div>
@@ -29,16 +28,20 @@ export default function StreakCard({ days, claimedToday, nextReward, onClaim }: 
         </div>
         <div className="text-right">
           <div className="text-[10px] text-muted-foreground">오늘 받을 보상</div>
-          <div className="text-lg font-black text-primary">+{nextReward.toLocaleString()}</div>
+          <div className="text-lg font-black imperial-halfoff-text">
+            +{nextReward.toLocaleString()}
+          </div>
         </div>
       </header>
 
       <div className="flex items-center gap-1.5">
-        {dots.map((on, i) => (
+        {Array.from({ length: 7 }).map((_, i) => (
           <div
             key={i}
             className={`flex-1 h-2.5 rounded-full transition-colors ${
-              i < days ? "bg-primary" : "bg-muted/40"
+              i < days
+                ? "bg-gradient-to-r from-primary to-pink"
+                : "bg-muted/40"
             }`}
             aria-label={`D${i + 1}`}
           />
@@ -48,7 +51,7 @@ export default function StreakCard({ days, claimedToday, nextReward, onClaim }: 
       <button
         onClick={onClaim}
         disabled={claimedToday}
-        className="h-12 rounded-xl font-bold text-base bg-primary text-primary-foreground disabled:bg-muted/40 disabled:text-muted-foreground transition active:scale-[0.98]"
+        className="min-h-12 rounded-xl font-bold text-base bg-gradient-to-r from-primary to-pink text-primary-foreground disabled:from-muted/40 disabled:to-muted/40 disabled:text-muted-foreground transition active:scale-[0.98] will-change-transform"
       >
         {claimedToday ? (
           <span className="inline-flex items-center gap-1.5">
