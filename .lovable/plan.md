@@ -1,219 +1,134 @@
-# Phase 5 — 48h Monitoring + Migration C (Strict Drift)
+# Phase 4 — Mobile OS Exclusive Hyper-Optimization
 
-승인하신 Option 1 경로입니다. Migration B 안정성을 48시간 실 트래픽으로 검증한 뒤, Migration C(strict drift mode)로 마무리합니다.
-
-## 1. 48h Monitoring Window
-
-기간: Migration B 머지 시각 기준 +48h
-
-핵심 모니터링 대상 (Money-flow 8경로 우선):
-
-- `imperial_settle_duel` — settle 성공률 / 에러 로그
-- `imperial_place_phon_bet` — bet 진입 실패율
-- `credit_crypto_deposit` — 입금 크레딧 + NFT 부여
-- `request_withdrawal` — 출금 RPC + AAL2 게이트
-- `_apply_house_edge_split` / `_do_inject_liquidity` — treasury 분개 정상 여부 (`imperial_treasury_ledger` rowcount delta)
-- `trg_enforce_leverage_gate` / `trg_block_trades_when_halted` / `trg_block_withdrawals_when_halted` — 트리거 차단 정상 발화
-- `anomaly_events` — 신규 룰 (특히 `withdrawal_velocity`, `oracle_spike_quarantine`)
-- `error_logs` / `spans` — 권한 거부(permission denied for function) 0건 확인
-
-판정 기준 (모두 충족 시 GO):
-- Money-flow 8경로 에러율 평소 baseline 대비 +0.5%p 이내
-- `permission denied for function` 로그 0건
-- treasury ledger insert 정상 흐름 유지 (수동 SQL 표본 점검)
-- `check_permission_drift()` 결과 변화 없음 (B 직후와 동일)
-
-## 2. Migration C — Strict Drift Mode
-
-목적: `check_permission_drift()` 가 baseline 외 user-callable 함수를 발견하면 **fail** (현재 warn). 신규 함수 등록 누락을 CI 단계에서 차단.
-
-SQL 골자:
-
-```sql
--- C-1. 함수 본문 교체 (warn → fail)
-CREATE OR REPLACE FUNCTION public.check_permission_drift(_strict boolean DEFAULT true)
-RETURNS TABLE(function_name text, status text, detail text)
-LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
-AS $$
-BEGIN
-  -- baseline 미등록 user-callable 함수 → fail
-  -- baseline 등록되었으나 실제 grant 불일치 → fail
-  -- (기존 warn 분기 제거)
-  ...
-END $$;
-
--- C-2. CI workflow (db-permissions.yml)에서 strict=true 로 호출
--- C-3. function_permissions_baseline 에 `phase5-C-2026-05-XX` note 컬럼 갱신
-```
-
-Rollback: `git revert` 1커밋 (함수 본문만 교체, 권한 변경 0건).
-
-## 3. Security Impact (C)
-
-- 권한 변경: **0건** (정책 강화만)
-- Money-flow 영향: **0바이트** (imperial_* 본문 무변경)
-- CI 차단 강화: 신규 SECURITY DEFINER 함수 추가 시 PR에서 baseline INSERT 강제
-- Linter 경고: 변화 없음 (이미 B에서 −62 달성)
-
-## 4. Rollback Plan
-
-| 단계 | 명령 | 소요 |
-|---|---|---|
-| C-1 함수 본문 | `git revert <commit>` | 30s |
-| CI workflow | strict 플래그 토글 (false 로 복귀) | 10s |
-
-Migration B 자체 롤백이 필요해질 경우: `scripts/phase5-rollback.sql` (이미 준비됨, 31 GRANT) 즉시 실행 — 5초.
-
-## 5. 보고 산출물 (48h 후)
-
-`reports/phase5-monitoring-2026-05-20.md`:
-- 8경로 에러율 표 (before / after)
-- treasury ledger delta 검증 결과
-- permission denied 로그 0건 캡처
-- Migration C GO/NO-GO 판정 + 실행 시각
-
-## 6. 일정
-
-```text
-T+0h    Migration B 머지 (완료)
-T+24h   중간 헬스 체크 (anomaly_events / 에러 로그 스캔)
-T+48h   최종 판정 → Migration C 실행
-T+48h+1h 최종 보안 스캔 (security--run_security_scan)
-```
-
-## 7. 다음 단계 (C 이후, 별도 PR)
-
-- Phase 2: Realtime owner-scoped broadcast (notifications/support_*)
-- Phase 1 잔여 15개 Edge Function 점진 적용
+목표: Phonara.world를 모바일 네이티브앱 체감(LCP ≤ 1.5s / INP ≤ 100ms / CLS ≤ 0.02, 60fps 무한 유지)으로 끌어올린다. Money-flow 8경로, Operator Isolation, imperial_* 함수, 8개 freeze 경로는 **0바이트** 변경.
 
 ---
 
-## Migration A — Baseline 확장 (read-only effect)
-
-**목적:** `function_permissions_baseline`을 현실에 맞게 동기화하여, Migration C(strict drift) 가 거짓 양성으로 PR을 막지 않도록 한다.
-
-**범위:** drift 리포트에서 분류된 242개 함수를 baseline에 등록.
-- 181 user-callable (money-flow 8경로 포함: `credit_crypto_deposit`, `imperial_place_phon_bet`, `imperial_settle_duel`, `apply_token_burn`, `claim_first_deposit_godmode` 등)
-- 61 admin (`has_role()` 내부 가드 보유)
-
-**SQL 형태:**
-```sql
-INSERT INTO function_permissions_baseline (function_name, expected_grantees, notes, inserted_at)
-VALUES
-  ('credit_crypto_deposit', ARRAY['authenticated'], 'money-flow path 1', now()),
-  -- ... 241 more rows
-ON CONFLICT (function_name) DO NOTHING;
-```
-
-**Security Impact:**
-- 권한 변경: **0**
-- 함수 본문 변경: **0**
-- 효과: drift 탐지 정확도만 상승. 런타임 동작 무변경.
-
-**Rollback Plan:**
-```sql
-DELETE FROM function_permissions_baseline
- WHERE inserted_at >= '<deploy-timestamp>';
-```
-소요 시간: <5s. 데이터 손실 없음.
-
-**Verification Gate:**
-- 🟢 `SELECT count(*) FROM function_permissions_baseline` = 기존 + 242
-- 🟢 `check_permission_drift()` 결과에서 위 242개가 사라짐
-- 🟢 머니플로 8경로 함수 oid SHA-512 동일
+## 불변 가드 (모든 단계 공통)
+- Money-flow 8경로 `git diff = 0` — `scripts/check-money-flow-freeze.mjs` PR마다 실행
+- Operator chunk Layer 1 0바이트 — `scripts/check-operator-isolation.mjs`
+- imperial_* RPC 본문 unchanged — DB migration 금지
+- 모든 신규 컴포넌트 `imperial_` prefix, Atomic/Idempotent/Observable/Rollbackable
+- Realtime은 `@pkg/realtime` 파티션 래퍼만 사용
+- 토스트 `@/lib/notify`만, sonner 직접 호출 금지
 
 ---
 
-## Migration B — 28개 internal helper REVOKE
+## Sprint 0 — Diagnosis & Baseline (1 PR, 읽기 전용)
 
-**목적:** 클라이언트가 PostgREST `rpc()` 로 직접 호출하면 안 되는 내부 헬퍼 28개에서 `EXECUTE` 권한을 제거.
+산출물: `reports/mobile-baseline-2026-05-20.md`
 
-**대상 (28):**
-```
-_achv_increment, _achv_on_attendance, _achv_on_crown,
-_achv_on_empire_level, _achv_on_position_close, _achv_on_stake_insert,
-_achv_on_stake_yield, _achv_record, _apply_house_edge_split,
-_crash_compute_multiplier, _crash_vip_limits, _do_inject_liquidity,
-_maybe_upgrade_nft, _recompute_emission_scale, _recompute_volatility_tier,
-+ 12 trigger helpers (trg_* / *_trigger)
-+ 1 monitor_* cron helper
-```
+1. `lighthouserc.json` 모바일 프리셋(Moto G4 + 4G throttle)으로 6개 핵심 라우트 측정 — `/`, `/home`, `/duel`, `/dashboard`, `/wallet`, `/casino/aztec-sun-1200`
+2. `browser--performance_profile` + `start_profiling` 으로 INP 병목 함수 Top 10
+3. 번들 분석: `bundle-budget.latest.json` 대비 라우트별 transferred KB 표
+4. Stake.com / Rollbit 모바일 5개 화면 (홈 / 게임 로비 / 슬롯 / 베팅 / 지갑) 캡처 비교
 
-**SQL 형태:**
-```sql
-REVOKE EXECUTE ON FUNCTION public._apply_house_edge_split(numeric, uuid)
-  FROM authenticated, anon;
--- × 28
-```
-
-**핵심 안전성 분석:**
-- 이 함수들은 모두 `SECURITY DEFINER` → owner 권한으로 실행됨
-- 상위 RPC(`imperial_settle_duel` 등)가 내부에서 호출할 때는 **caller grant 와 무관** (owner-rights)
-- 즉, money-flow 8경로 본문은 그대로, 내부 호출도 그대로, 외부 PostgREST 호출만 차단됨
-
-**Pre-deploy 강제 체크:**
-1. `rg "rpc\('_(achv|apply|crash|do_inject|maybe_upgrade|recompute)" src/` → 결과 0이어야 함
-2. `rg "rpc\('(trg_|monitor_)" src/` → 결과 0이어야 함
-3. 스테이징에서 1건 settle 실행 → 성공 확인
-
-**Security Impact:**
-- Before: 28개 financially-sensitive helper가 모든 인증 클라이언트에 노출
-- After: `service_role` + SECURITY DEFINER 호출 경로만 사용 가능
-- 클라이언트 도달 가능 표면 **10.5% 감축**
-- 가장 중요한 차단: `_apply_house_edge_split`, `_do_inject_liquidity` (treasury split 우회 시도 봉쇄)
-
-**Rollback Plan:**
-`scripts/phase5-rollback.sql` 자동 생성 (28 GRANT lines):
-```sql
-GRANT EXECUTE ON FUNCTION public._apply_house_edge_split(numeric, uuid)
-  TO authenticated, anon;
--- × 28
-```
-소요 시간: <30s. 무중단.
-
-**Verification Gate:**
-- 🟢 28개 함수 모두 `has_function_privilege('authenticated', oid, 'EXECUTE')` = false
-- 🟢 머니플로 8경로 함수 oid SHA-512 동일
-- 🟢 30분 모니터링: `imperial_settle_duel` 에러율 ≤ baseline
-- 🟢 Production smoke: 1건 duel settle 정상 완료
+Gate: 베이스라인 표 + Top 10 병목 + Stake 비교 표 머지 후 다음 진입.
 
 ---
 
-## Migration C — `check_permission_drift()` strict mode
+## Sprint 1 — Mobile Shell & Web Vitals 코어 (PR 단위 4개)
 
-**목적:** A+B 안정 머지 후, drift 탐지를 **warn → fail** 로 승격하여 향후 PR 에서 미등록 SECURITY DEFINER 함수 추가를 CI 단계에서 차단.
+1. **PR-Mob1 PWA 매니페스트 강화** (제한적)
+   - `public/manifest.webmanifest` `display_override: ["window-controls-overlay","standalone"]`, `categories`, `screenshots[]` (mobile narrow 1, wide 1)
+   - iOS splash `<link rel="apple-touch-startup-image">` 4 size
+   - Service Worker 변경 **없음** (현행 `registerSW.ts` 가드 유지)
 
-**범위:**
-- `check_permission_drift()` 함수 본문 수정: drift 발견 시 `RAISE EXCEPTION` 대신 status='fail' 반환 (CI가 fail 처리)
-- `.github/workflows/db-permissions.yml` 이미 호출 중 → 변경 불필요
+2. **PR-Mob2 LCP 자산 프리로드 + 폰트 swap**
+   - `index.html` 모바일 hero 이미지 `<link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)">`
+   - 모든 `@font-face` `font-display: swap` 강제 감사
 
-**Security Impact:**
-- 새 SECURITY DEFINER 함수 추가 시 baseline 등록 강제
-- 권한 누수 회귀 방지
+3. **PR-Mob3 CLS 제거**
+   - `<img>` width/height 누락 자동 스캔 스크립트 `scripts/check-img-dimensions.mjs` 추가 + CI
+   - Topbar / BottomNav 고정 높이 토큰화 (`--topbar-h`, `--bottom-nav-h`) — 이미 일부 존재, 누락 페이지 보강
 
-**Rollback Plan:**
-```sql
--- 이전 버전 본문으로 복구 (마이그레이션에 ROLLBACK 블록 동봉)
-```
+4. **PR-Mob4 INP — useTransition 도입**
+   - 무거운 클릭 핸들러(베팅 슬립 다이얼 변경, 카지노 spin 트리거 UI 업데이트만) `startTransition` 감싸기 — **RPC 호출/머니플로 코드 본문 무변경**, UI state 갱신만
 
-**Verification Gate:**
-- 🟢 의도적으로 unregistered 함수 1개 만든 PR 이 CI 에서 red 처리됨
-- 🟢 현재 main 의 모든 PR 은 green 유지
+Gate: Lighthouse Mobile 4지표 ≥ 90, INP 측정값 ≤ 150ms.
 
 ---
 
-## 불변 원칙 준수 체크리스트 (전체 Phase 5)
+## Sprint 2 — Cosmetic Compute Offload (Web Worker, 머니플로 무변경)
 
-- [x] Money-flow 8경로 함수 **본문** git diff = 0
-- [x] `imperial_*` 함수 **본문** git diff = 0
-- [x] Operator Isolation 5-layer 영향 없음 (DB-layer 작업)
-- [x] Edge function 코드 변경 없음
-- [x] 프론트엔드 변경 없음 (모든 user-callable RPC 는 baseline 등록만 됨)
+대상: **시각/사운드 전용** 계산만 (Near-Miss 시각 effect, particle, multiplier 카운트업 보간, AI Fortune 텍스트). **베팅 결과/배당/seed/RNG 결과는 서버 RPC 단일 소스 — Worker로 옮기지 않는다.**
 
-## 진행 순서
+1. `src/packages/workers/imperial_cosmetic_worker.ts` (Dedicated Worker)
+2. Comlink는 UI 트리거용만, particle 좌표는 `Float32Array` Transferable
+3. SAB는 **도입하지 않음** — COOP/COEP credentialless 가 Supabase OAuth 팝업과 충돌 가능, 도입 시 별도 ADR 필요 (Sprint 후속 검토)
+4. Fallback: Worker 미지원/저사양은 메인 스레드 동기 계산 — Graceful degrade
 
-1. **이 PR (Migration A)**: baseline 242 INSERT — 승인 즉시 안전
-2. **다음 PR (Migration B)**: 28 REVOKE — A 머지 + 24h 모니터링 후
-3. **마지막 PR (Migration C)**: strict drift — B 머지 + 48h 모니터링 후
+Gate: spin 1회당 main thread long task ≤ 50ms (현재 측정 후 목표 재조정).
 
-Phase 2 (Realtime owner-scoped) 와 Phase 1 잔여 15개 Edge Function 하드닝은 Phase 5 C 까지 안정 완료된 뒤 별도 plan 으로 재진입.
+---
+
+## Sprint 3 — Mobile Native Feel (UI only)
+
+대상 화면: `/home`, `/duel`, `/wallet`, `/dashboard`, 카지노 슬롯 12종 헤더
+
+1. **Pull-to-Refresh** — `@pkg/ui/mobile/imperial_PullToRefresh.tsx` (touch + framer-motion, 60fps transform-only)
+2. **Swipe Gesture** — Duel Lobby Gate 카드 좌우 스와이프로 룸 전환
+3. **Haptic** — `navigator.vibrate` 안전 가드 + 사용자 토글 (`localStorage phonara:haptic:v1`)
+4. **Skeleton 통일** — 기존 `@/components/ui/loading-state` 강제 사용 감사 (이미 메모 등록됨)
+5. **Glass + Dynamic Island top capsule** — `imperial_DynamicCapsule.tsx` PowerHeader 모바일 변형
+6. 기존 `MobileOrderSheet`, `BottomSheet`, `FloatingFab` 재사용 — 신규 중복 컴포넌트 만들지 않음
+
+Gate: 실측 60fps 유지(Performance panel scrolling FPS meter), 터치 응답 ≤ 100ms.
+
+---
+
+## Sprint 4 — Image / Bundle 다이어트
+
+1. `vite-imagetools` 도입, hero/카지노 썸네일 AVIF + WebP + srcset 자동 생성
+2. 모든 `<img>` → `loading="lazy" decoding="async"` 일괄 (top-fold LCP 1장 제외)
+3. Lucide 아이콘 사용처 감사 — barrel import 금지, 개별 import 강제 (eslint rule)
+4. `size-limit` 예산 재조정: index 165KB, slots 110KB (현재 180/120)
+5. Edge cache `_headers` 재확인 — 이미 PR-M에서 immutable 적용
+
+Gate: `bundle-budget` 신규 예산 PASS, 라우트별 Transferred -30% 이상.
+
+---
+
+## Sprint 5 — Verification & Rollback
+
+1. Lighthouse Mobile CI (lighthouserc) 점수 ≥ 95 for `/home`, ≥ 92 for `/duel`·`/dashboard`
+2. BrowserStack 5종 (저사양: Galaxy A14, iPhone SE 2nd / 중급: A54, iPhone 12 / 고급: S24) 60fps + INP 100ms 수동 확인 — 결과 `reports/mobile-device-matrix-YYYY-MM-DD.md`
+3. Stake.com vs Phonara 6항목 비교표 (LCP/INP/CLS/터치반응/스크롤FPS/체감점수) — 산출물 머지
+4. Rollback: 각 PR은 단일 revert 안전, Worker 도입 PR은 feature flag `imperial_cosmetic_worker_enabled` (kill switch row) 로 OFF 가능
+5. 최종 보고서: `reports/phase4-mobile-hyperion-final.md`
+
+---
+
+## 의도적으로 **하지 않는** 것 (리스크 차단)
+
+- SharedArrayBuffer + COOP/COEP credentialless — Supabase OAuth 팝업·iframe preview 깨질 위험. 별도 ADR 후 결정.
+- imperial_* / treasury / settle / withdrawal 함수 본문 수정
+- 새 Service Worker 캐시 전략 — 현 가드(`registerSW.ts`)가 preview/iframe 완벽 차단 중, 건드리지 않음
+- Realtime broadcast 정책 변경 — Phase 5 후속
+- Edge Function 신규 추가 — 본 작업 범위 외
+- Framer Motion 제거/교체 — `motion` 청크 이미 분리, 전면 교체 ROI 낮음
+
+---
+
+## 기술 부록
+
+- 신규 디렉터리: `src/packages/ui/mobile/`, `src/packages/workers/`
+- 신규 CI: `.github/workflows/mobile-vitals.yml` (Lighthouse Mobile gate)
+- 신규 스크립트: `scripts/check-img-dimensions.mjs`
+- 신규 kill switch: `imperial_cosmetic_worker_enabled` (`platform_kill_switches` row insert만, 정책 RLS 기존 그대로)
+- 메모 갱신: `mem://features/phase-4-mobile-hyperion` (Sprint 완료 시)
+
+---
+
+## 추정 일정
+
+| Sprint | 작업량 | 위험도 |
+| --- | --- | --- |
+| 0 Diagnosis | 0.5d | none (read-only) |
+| 1 Vitals | 1.5d | low |
+| 2 Worker | 2d | medium (fallback 필수) |
+| 3 Native Feel | 2d | low |
+| 4 Bundle | 1.5d | low-medium |
+| 5 Verify | 1d | none |
+
+총 ~8.5일. 각 Sprint 머지 후 24h 모니터링.
