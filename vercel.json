@@ -6,7 +6,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/((?!api|assets|sounds|.*\\..*).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|assets/|sounds/|.*\\.).*)", "destination": "/index.html" }
   ],
   "headers": [
     {
