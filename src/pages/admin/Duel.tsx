@@ -76,7 +76,7 @@ export default function AdminDuel() {
     if (killOn === null) return;
     setBusy(true);
     try {
-      const { error } = await supabase.rpc("admin_set_kill_switch", { p_key: "phon_betting_enabled", p_enabled: !killOn });
+      const { error } = await supabase.rpc("admin_set_kill_switch", { _key: "phon_betting_enabled", _enabled: !killOn });
       if (error) throw error;
       notify.success(killOn ? "PHON 결투 봉인됨" : "PHON 결투 개방됨");
       await refresh();

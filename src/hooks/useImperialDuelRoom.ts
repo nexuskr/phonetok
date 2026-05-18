@@ -1,6 +1,7 @@
 /**
- * useImperialDuelRoom — subscribes to a duel room's state + broadcast events.
- * MONEY_FLOW_NEW_PATH: phon_betting (Mode B). Uses `useGameChannel` per PR-J.
+ * useImperialDuelRoom — subscribes to a duel room's state via postgres_changes
+ * on `imperial_duel_bets` (PR-J game partition) + periodic refresh.
+ * MONEY_FLOW_NEW_PATH: phon_betting (Mode B).
  */
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,25 +47,17 @@ export function useImperialDuelRoom(roomId: string | null) {
   useEffect(() => { void refresh(); }, [refresh]);
 
   useGameChannel({
-    channelKey: roomId ? `imperial_duel:${roomId}` : "",
+    key: roomId ? `imperial_duel:${roomId}` : "",
     bindings: roomId
       ? [
-          {
-            kind: "broadcast",
-            event: "bet_placed",
-            handler: () => { void refresh(); },
-          },
-          {
-            kind: "broadcast",
-            event: "settled",
-            handler: (payload: any) => {
-              setState((s) => s ? ({ ...s, ...(payload?.payload?.result ?? {}) }) : s);
-              void refresh();
-            },
-          },
+          { event: "*", table: "imperial_duel_bets", filter: `room_id=eq.${roomId}` },
+          { event: "UPDATE", table: "imperial_duel_rooms", filter: `id=eq.${roomId}` },
         ]
       : [],
+    onEvent: () => { void refresh(); },
     enabled: !!roomId,
+    pollMs: 8000,
+    onPoll: () => { void refresh(); },
   });
 
   return { state, loading, error, refresh };
