@@ -1567,6 +1567,57 @@ export type Database = {
         }
         Relationships: []
       }
+      client_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          meta: Json
+          metric: string
+          route: string
+          user_id: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meta?: Json
+          metric: string
+          route: string
+          user_id?: string | null
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meta?: Json
+          metric?: string
+          route?: string
+          user_id?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
+      client_metrics_error_log: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          payload: Json | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload?: Json | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload?: Json | null
+        }
+        Relationships: []
+      }
       coin_deposit_addresses: {
         Row: {
           address: string
@@ -10849,6 +10900,10 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_get_lobby_analytics: {
+        Args: { window_hours?: number }
+        Returns: Json
+      }
       admin_get_monthly_revenue_progress: { Args: never; Returns: Json }
       admin_get_oracle_health: { Args: never; Returns: Json }
       admin_get_oracle_swap_readiness: { Args: never; Returns: Json }
@@ -11691,6 +11746,7 @@ export type Database = {
       claim_share_reward: { Args: { _channel: string }; Returns: Json }
       claim_weekly_pass_reward: { Args: { _level: number }; Returns: Json }
       cleanup_bot_activity: { Args: never; Returns: undefined }
+      cleanup_client_metrics: { Args: never; Returns: undefined }
       close_position_phon: {
         Args: { p_idem_key: string; p_pnl_pct: number; p_position_id: string }
         Returns: Json
