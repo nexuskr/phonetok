@@ -81,6 +81,7 @@ const SimRealConversion   = lazy(() => import("@/components/admin/growth/SimReal
 const SelfHeal            = lazy(() => import("./ops/SelfHeal"));
 const RegionHealth        = lazy(() => import("./ops/RegionHealth"));
 const AdminDuel           = lazy(() => import("./Duel"));
+const ImperialCommandCenter = lazy(() => import("./imperial/CommandCenter"));
 
 function Section({
   title,
@@ -198,6 +199,7 @@ export default function AdminRoutes() {
         <Route path="ops/report"        element={<Suspense fallback={<LoadingList rows={4} />}><OpsReport /></Suspense>} />
         <Route path="ops/thresholds"    element={<Section title="Mission Control 임계값"><ThresholdsAdmin /></Section>} />
         <Route path="duel"              element={<Suspense fallback={<LoadingList rows={4} />}><AdminDuel /></Suspense>} />
+        <Route path="ops/imperial-command" element={<Suspense fallback={<LoadingList rows={4} />}><ImperialCommandCenter /></Suspense>} />
 
         {/* GROWTH */}
         <Route path="growth/marketing"  element={<Section><MarketingTools /></Section>} />
