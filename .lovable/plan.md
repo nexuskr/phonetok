@@ -1,118 +1,138 @@
-# Phase 3.5 Hardening — Limited Rollout Production Readiness
+# Imperial Empire Phase 4 — Limited Rollout Production Launch (v20.4)
 
-Phase 3.5 Deflationary Flywheel이 Complete된 상태에서, 실제 돈이 오가는 Limited Rollout으로 안전하게 진입하기 위한 최종 Hardening 슬라이스. Money-flow 8경로는 git diff = 0 절대 유지, Operator Isolation 유지, 모든 신규 객체는 `imperial_` prefix.
+Phase 3.5 Hardening이 완료된 상태에서 실제 PHON이 흐르는 Limited Rollout을 안전하게 점화한다. Money-flow 8경로 git diff = 0, Operator Isolation, 모든 신규 객체 `imperial_` prefix를 절대 원칙으로 유지한다.
 
-## 작업 순서 (Safety → Burn+NFT → Cinematic → Rollback → Admin → Rollout)
+---
 
-### 1) Global Safety & Emergency Freeze
-- 신규 테이블 `imperial_kill_switches(key text pk, enabled bool, reason text, updated_at, updated_by)` — admin-only RLS
-- 기본 row: `imperial_betting`, `imperial_flywheel`, `imperial_withdrawal`, `imperial_burn`, `imperial_nft_mint` (모두 OFF)
-- RPC: `emergency_freeze_all(reason)` / `emergency_unfreeze_all(reason)` (AAL2 + admin) → 모든 imperial_* 스위치 일괄 ON/OFF, `imperial_kill_switch_audit` immutable log
-- 기존 `imperial_place_phon_bet` / `imperial_settle_phon_bet` SQL **건드리지 않음** — 대신 `imperial_duel_rooms.emergency_freeze_flag` 와 새 스위치를 OR로 묶는 헬퍼 `imperial_is_betting_allowed()` 추가, 기존 트리거 가드 1줄만 확장
-- Hook: `useImperialKillSwitches()` (15s + realtime, wallet/admin partition)
+## 1. Full Stack Integration Test (Deadlock + PID + Hybrid SCC + Rollout Gate)
 
-### 2) Optimized Token Burn + NFT Synergy
-신규 테이블 (모두 append-only immutable, admin SELECT, self SELECT own):
-- `imperial_token_burns(id, user_id, source enum[house_edge|volatility|near_miss|manual], base_amount, burn_rate, burn_amount, ref_id, ref_type, meta jsonb, created_at)`
-- `imperial_user_nfts(id, user_id, tier 1..5, lifetime_burn, mint_event_id, last_upgraded_at)` — unique(user_id)
-- `imperial_nft_audit(id, user_id, from_tier, to_tier, lifetime_burn, reason, created_at)`
+신규 통합 시나리오를 단일 진입점에서 실행한다. Money-flow 함수는 호출만 하고 본문은 건드리지 않는다.
 
-RPC (모두 SECURITY DEFINER, internal 호출):
-- `apply_token_burn(_user, _source, _base, _ref_id, _ref_type)` → rate 결정 + insert + `_maybe_upgrade_nft(_user)` 호출, idempotent on (source, ref_id, ref_type) unique
-- Burn rate constants in `imperial_flywheel_params` (hot-reload):
-  - `house_edge` 26%
-  - `volatility_extra` per tier: calm 0.8 / warm 1.2 / hot 1.8 / surge 2.4 / extreme 3.2 (%)
-  - `near_miss_strong` 12~22% (RNG 결정)
-- `_apply_house_edge_split` **변경 없이** burn leg 직후 `apply_token_burn(user, 'house_edge', burn_amount, ref_id, 'settle')` 추가 호출 — split 자체 4-leg는 그대로 (rollback 영향 0)
-- `get_burn_leaderboard(_limit)` 공개 RPC + 자기 순위
-- NFT 5 tier thresholds (lifetime PHON burned):
-  1. Ember Witness — 1,000
-  2. Flame Sovereign — 25,000
-  3. Pyric Marshal — 250,000
-  4. Eternal Sacrifice — 2,500,000
-  5. Imperial Ascendant — 25,000,000
-- Tier별 perks meta (revenue_share_bps, yield_boost_bps, gov_weight) — DB 상수 + 클라 미러 `src/lib/imperialNft.ts`
+- `src/__tests__/integration/imperial-fullstack.integration.test.ts`
+  - 300 동시 가상 사용자 시나리오 (place → settle → burn → rollback drill)
+  - Hybrid SCC + Tarjan 사이클 검출, PID setpoint 추종 검증
+  - Rollout Gate Tier 0/1/2/3 daily cap 경계 테스트
+- `scripts/chaos/imperial-fullstack-drill.ts`
+  - kill switch 강제 ON → 모든 placement reject 확인 → unfreeze 후 회복 시간 측정
+- 결과 리포트: `reports/imperial.fullstack.integration.<date>.json`
 
-### 3) Cinematic Visual + Thunder Reverb Audio
-신규 컴포넌트:
-- `src/components/imperial/BurnRevealOverlay.tsx` — 5 tier별 Framer Motion 시퀀스 (Ember pulse → Flame pillar → Pyric vortex → Eternal rift → Mythic thunder)
-- `src/components/imperial/MythicThunder.tsx` — lightning bolts (SVG path stroke-dashoffset), screen shake, particle storm (canvas, low-end fallback → static glow)
-- `src/components/imperial/NftUpgradeReveal.tsx` — Golden Rift + Dragon Flame + Crown Particle + Imperial Serif font (Cinzel/Cormorant)
-- `src/hooks/useImperialThunderWithReverb.ts` — Web Audio API: white-noise burst → ConvolutionNode (procedural impulse response, 2.5s decay, hall-size), LP filter sweep, sub-bass rumble. Respect prefers-reduced-motion + `degrade_mode`.
-- 모두 lazy-load, `low:hidden` / `degrade:hidden` Tailwind variant 사용, 60fps budget (transform/opacity only)
+QA: Money-flow git diff = 0 / Operator Isolation PASS / Tarjan O(V+E) 검증 / PID 정착시간 < 5s.
 
-진입점:
-- `RealBetSlip.tsx` 결과 처리 직후 `<BurnRevealOverlay tier={result.burnTier}/>` 마운트 (UI only)
-- NFT 업그레이드는 realtime `imperial_user_nfts` UPDATE 수신 시 `<NftUpgradeReveal/>`
+---
 
-### 4) Rollback System
-- `rollback_injection_event(_event_id uuid)` (admin AAL2)
-  - FOR UPDATE lock event row
-  - Snapshot pre-state → `imperial_rollback_snapshots(event_id, pre jsonb, post jsonb, created_by, created_at)`
-  - Treasury/liquidity ledger reversal entries (append-only, kind='rollback', meta.original_event_id)
-  - Mark `imperial_injection_events.rolled_back_at` + `rolled_back_by`
-  - Emit telemetry `tlog('rollback', 'warn', ...)`
-- Test: `src/__tests__/flywheel/rollback.test.ts` — inject → rollback → balances restore 검증
+## 2. Production Hardening Final Layer
 
-### 5) Admin `/admin/flywheel` (확장)
-기존 `<FlywheelAdmin/>` 에 패널 추가 (단일 tab):
-- Big Red **Freeze All** / **Unfreeze All** 버튼 (AAL2 confirm dialog, 사유 입력 필수)
-- 개별 5개 Kill Switch row
-- **Rollback** 패널 — 최근 50 injection event 테이블 + rollback 버튼 (사유 + 더블 confirm)
-- 5-Tier Volatility Heatmap (이미 존재) + Burn Leaderboard Top 20
-- NFT Tier Distribution donut
-- 15s 자동 갱신 (`setVisibleInterval` admin category)
+### 2.1 Circuit Breaker v2
+- `src/lib/imperialCircuitV2.ts` — 3-state (Closed / Open / Half-Open), exponential backoff, jitter, per-RPC budget.
+- 기존 `src/lib/rpc-circuit.ts` 는 deprecated re-export로 호환 유지.
 
-### 6) Limited Rollout Guardrails
-- `imperial_rollout_tiers` 테이블: user_id → tier 0..3 (0=block, 3=full)
-- `imperial_can_participate(_user)` SECURITY DEFINER → kill switch + rollout tier + adult gate 종합 판정
-- `RealBetSlip` 진입 시 게이트: tier 0 → Risk Warning 모달, tier 1 → 일일 입금/베팅 캡 5만 PHON
-- Onboarding: `<ImperialRolloutGate/>` (1회 동의 + `imperial_rollout_consents` 기록)
-- CI: `scripts/check-money-flow-freeze.mjs` 통과 강제
+### 2.2 Global Observability
+- 신규 테이블 `imperial_observability_events` (append-only, admin-only RLS)
+- RPC `imperial_log_observability(_kind text, _payload jsonb)` — idempotency key (kind, dedupe_key, hour bucket)
+- 신규 컴포넌트 `src/components/admin/ImperialObservabilityStream.tsx` (15s 자동 갱신, severity 필터)
+
+### 2.3 Auto-Healing
+- 신규 cron `imperial_auto_heal_tick()` — 매 5분
+  - stuck reserved intents → reclaim (기존 `reclaim_stale_intents` 위임)
+  - 이상 emission scale (|s-1| > 0.5 지속 30분) → 자동 emission kill switch ON + alert
+  - 비정상 burn 0 (last 1h) + injection > 0 → alert only
+- 신규 RPC `imperial_get_auto_heal_log(_hours int)`
+
+---
+
+## 3. Limited Rollout Activation Sequence
+
+### 3.1 Surgical Enablement
+- 신규 RPC `imperial_rollout_activate(_phase int, _actor uuid)` (AAL2, audit log)
+  - phase 1: kill switches 유지 OFF, Tier 0 only, observer mode 24h
+  - phase 2: Tier 1 활성, daily cap 50k PHON
+  - phase 3: Tier 2 활성, cap 250k
+  - phase 4: Tier 3 무제한 + 모든 게이트 GREEN
+- 신규 테이블 `imperial_rollout_phases` (phase, started_at, started_by, metrics_snapshot jsonb, status)
+
+### 3.2 Money-Flow Freeze 확인
+- `scripts/check-money-flow-freeze.mjs` 자동 실행 in CI step
+- 본 Phase에서 8개 핵심 파일 git diff = 0 명시 보고
+
+---
+
+## 4. Ultimate Admin Command Center
+
+- 신규 페이지 `src/pages/admin/imperial/CommandCenter.tsx` (Operator 청크, AAL2)
+  - 5 패널: Rollout Phase, Auto-Heal Log, Observability Stream, Circuit Breaker States, Kill Switch Matrix
+  - 15s 자동 갱신 + WebSocket realtime (useGameChannel `imperial:command`)
+- `/admin/imperial` 라우트 추가, `_AdminSidebar` 항목 추가
+- Operator manualChunks 패턴 일치 확인 (`check-operator-isolation.mjs`)
+
+---
+
+## 5. Comprehensive Load Test
+
+- `scripts/load/imperial-300k-locks.ts` — 300k 분산 잠금 시뮬레이션 (in-memory wait-for graph, Tarjan)
+- `scripts/load/imperial-pid-autotune-cycle.ts` — Relay Feedback + Ziegler-Nichols open loop 자동 튜닝 1회 full cycle 측정
+- 결과: `reports/imperial.loadtest.<date>.json`
+  - p50/p95/p99 lock acquire, deadlock 검출률, PID 정착 시간
+
+---
+
+## 6. Final Go/No-Go Package + Eternal Archive
+
+- `docs/duel/phase4-production-launch-bible.md`
+  - 전체 스택 다이어그램, Rollout 시나리오, Rollback playbook, On-call runbook
+- `docs/duel/phase4-go-nogo-checklist.md`
+  - 18-item GO/NO-GO 체크리스트 (Money-flow diff / SCC / PID / Burn / NFT / Rollout / Observability 등)
+- `mem://features/phase-4-limited-rollout` 신규 메모 + `mem://index.md` Core 한 줄 추가
+
+---
 
 ## Technical Details
 
-### Files (new)
+### 신규 SQL Migration (단일 파일)
+`supabase/migrations/<ts>_imperial_phase4_rollout.sql`
+- `imperial_observability_events` 테이블 + RLS (admin SELECT, SECURITY DEFINER INSERT)
+- `imperial_rollout_phases` 테이블 + RLS
+- `imperial_auto_heal_log` 테이블 + RLS
+- 함수: `imperial_log_observability`, `imperial_rollout_activate`, `imperial_auto_heal_tick`, `imperial_get_auto_heal_log`
+- pg_cron: `imperial_auto_heal_tick` every 5 min
+
+### 신규 파일
+- `src/lib/imperialCircuitV2.ts`
+- `src/components/admin/ImperialObservabilityStream.tsx`
+- `src/components/admin/ImperialRolloutPhasePanel.tsx`
+- `src/components/admin/ImperialAutoHealPanel.tsx`
+- `src/pages/admin/imperial/CommandCenter.tsx`
+- `src/__tests__/integration/imperial-fullstack.integration.test.ts`
+- `scripts/chaos/imperial-fullstack-drill.ts`
+- `scripts/load/imperial-300k-locks.ts`
+- `scripts/load/imperial-pid-autotune-cycle.ts`
+- `docs/duel/phase4-production-launch-bible.md`
+- `docs/duel/phase4-go-nogo-checklist.md`
+
+### 편집 파일 (money-flow 무관)
+- `src/pages/admin/_AdminSidebar.tsx` — Imperial Command Center 링크
+- `src/pages/admin/_nav.ts` — 신규 라우트 등록
+- `vite.config.ts` — Operator manualChunks 패턴이 이미 `src/pages/admin/**` 를 잡으므로 변경 없음 확인
+- `mem://index.md`, `mem://features/phase-4-limited-rollout`
+
+### 절대 건드리지 않는 8경로 (FREEZE)
+`useDeposit.ts`, `useDepositRealtime.ts`, `useDepositCountdown.ts`, `bybit-feed.ts`, `useCrashRound.ts`, `MegaOrderPanel.tsx`, `use-kill-switches.ts`, `use-auto-bet.ts`, 그리고 `imperial_place_phon_bet` / `settle_phon_bet` / `_apply_house_edge_split` SQL 본문.
+
+### Rollout 점화 시퀀스 (실 운영)
 ```text
-supabase/migrations/2026xxxx_imperial_phase35_hardening.sql
-src/lib/imperialNft.ts
-src/lib/imperialBurn.ts
-src/hooks/useImperialKillSwitches.ts
-src/hooks/useImperialThunderWithReverb.ts
-src/hooks/useImperialUserNft.ts
-src/components/imperial/BurnRevealOverlay.tsx
-src/components/imperial/MythicThunder.tsx
-src/components/imperial/NftUpgradeReveal.tsx
-src/components/imperial/ImperialRolloutGate.tsx
-src/components/admin/FlywheelRollbackPanel.tsx
-src/components/admin/FlywheelEmergencyPanel.tsx
-src/components/admin/BurnLeaderboardPanel.tsx
-src/__tests__/flywheel/rollback.test.ts
-src/__tests__/flywheel/burn-rates.test.ts
-docs/duel/phase3.5-hardening-bible.md
+Phase 1 (T+0h)   observer, Tier 0, all kill OFF default
+Phase 2 (T+24h)  Tier 1 ON, cap 50k, burn ON
+Phase 3 (T+72h)  Tier 2 ON, cap 250k, NFT mint ON
+Phase 4 (T+168h) Tier 3 ON, unlimited, full GREEN
 ```
+각 phase 진입 전 18-item GO/NO-GO 체크리스트 PASS 필수.
 
-### Files (edited — UI/admin only, money-flow 0줄)
-```text
-src/components/duel/RealBetSlip.tsx          // overlay mount only
-src/components/admin/FlywheelAdmin.tsx       // mount new panels
-src/pages/admin/Duel.tsx                     // tab labels
-```
+---
 
-### Money-Flow FREEZE (untouched)
-모든 8경로 (`useDeposit`, `useDepositRealtime`, `useDepositCountdown`, `bybit-feed`, `useCrashRound`, `MegaOrderPanel`, `use-kill-switches`, `use-auto-bet`) git diff = 0. `imperial_place_phon_bet`/`imperial_settle_phon_bet` SQL 본문 변경 없음 — split RPC 내부에서 burn 호출만 추가.
-
-### Rollout Plan
-- 모든 신규 Kill Switch **default OFF** (= 기능 비활성). Tier 0 사용자만 enable.
-- 72h alpha → metrics OK 시 burn/nft ON
-- Rollback drill: 첫 24h 내 1회 강제 실행 검증
-
-### QA / Verification
-- `bun run test src/__tests__/flywheel/*` (burn rate 분포 + 5000-spin edge + rollback)
-- `node scripts/check-money-flow-freeze.mjs` PASS
-- `node scripts/check-operator-isolation.mjs` PASS
-- Lighthouse 60fps (BurnReveal tier 5 포함)
-- Manual: AAL2 Freeze All → 모든 placement reject 확인
-
-### Memory Update
-신규 `mem://features/phase-3.5-hardening` + index Core 1줄.
+## Verification Gates (모든 단계 종료 시)
+1. `check-money-flow-freeze.mjs` PASS
+2. `check-operator-isolation.mjs` PASS
+3. `imperial_get_kernel_summary()` 정상
+4. `admin_get_flywheel_health(24)` Net Deflation ≥ 0
+5. Integration test green
+6. Load test p99 lock acquire < 50ms
+7. Rollback drill 1회 성공 기록
