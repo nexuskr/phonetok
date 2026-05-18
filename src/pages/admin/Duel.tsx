@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { notify, describeError } from "@/lib/notify";
 import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
+import DuelHealthDashboard from "@/components/admin/DuelHealthDashboard";
 
 type Metrics = {
   window: string;
@@ -215,6 +216,7 @@ export default function AdminDuel() {
               </button>
             </div>
           </div>
+          <DuelHealthDashboard />
         </>
       )}
     </div>

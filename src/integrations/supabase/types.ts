@@ -3870,6 +3870,27 @@ export type Database = {
         }
         Relationships: []
       }
+      imperial_duel_alert_thresholds: {
+        Row: {
+          error_rate_bps: number
+          house_edge_drift_bps: number
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          error_rate_bps?: number
+          house_edge_drift_bps?: number
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          error_rate_bps?: number
+          house_edge_drift_bps?: number
+          id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       imperial_duel_audit: {
         Row: {
           actual_roll: number | null
@@ -3985,6 +4006,7 @@ export type Database = {
       imperial_duel_rooms: {
         Row: {
           created_at: string
+          emergency_freeze_flag: boolean
           house_edge_bps: number
           id: string
           lock_at: string
@@ -3999,6 +4021,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          emergency_freeze_flag?: boolean
           house_edge_bps?: number
           id?: string
           lock_at?: string
@@ -4013,6 +4036,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          emergency_freeze_flag?: boolean
           house_edge_bps?: number
           id?: string
           lock_at?: string
@@ -4024,6 +4048,36 @@ export type Database = {
           settle_meta?: Json
           status?: string
           winner_side?: string | null
+        }
+        Relationships: []
+      }
+      imperial_duel_telemetry: {
+        Row: {
+          created_at: string
+          event: string
+          function_name: string
+          id: string
+          payload: Json
+          severity: string
+          trace_id: string
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          function_name: string
+          id?: string
+          payload?: Json
+          severity: string
+          trace_id: string
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          function_name?: string
+          id?: string
+          payload?: Json
+          severity?: string
+          trace_id?: string
         }
         Relationships: []
       }
@@ -10113,6 +10167,7 @@ export type Database = {
         }
       }
       admin_get_demo_bias_perf: { Args: never; Returns: Json }
+      admin_get_duel_health_24h: { Args: never; Returns: Json }
       admin_get_duel_metrics_24h: { Args: never; Returns: Json }
       admin_get_economy_stats: { Args: never; Returns: Json }
       admin_get_empire_realtime: { Args: never; Returns: Json }
@@ -10657,6 +10712,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      admin_set_duel_emergency_freeze: {
+        Args: { _on: boolean; _room_id: string }
+        Returns: Json
       }
       admin_set_kill_switch: {
         Args: { _enabled: boolean; _key: string; _reason?: string }
@@ -12365,6 +12424,16 @@ export type Database = {
           _metadata?: Json
           _ok: boolean
           _settled_count: number
+        }
+        Returns: undefined
+      }
+      log_duel_telemetry: {
+        Args: {
+          _evt: string
+          _fn: string
+          _payload?: Json
+          _sev: string
+          _trace: string
         }
         Returns: undefined
       }
