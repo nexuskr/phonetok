@@ -108,6 +108,9 @@ const SecureAuth = lazy(() => import("./pages/SecureAuth.tsx"));
 const SecureWallet = lazy(() => import("./pages/SecureWallet.tsx"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
+// Phase 4 P1 — Observer Mode onboarding (lazy: not on critical path)
+const ImperialWelcomeDialog = lazy(() => import("./components/onboarding/ImperialWelcomeDialog"));
+const DailyLoginRewardToast = lazy(() => import("./components/onboarding/DailyLoginRewardToast"));
 const CompleteProfile = lazy(() => import("./pages/CompleteProfile.tsx"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback.tsx"));
 const SecurityTotp = lazy(() => import("./pages/security/Totp.tsx"));
@@ -228,6 +231,11 @@ const App = () => (
             <Suspense fallback={null}><EntropyChip /></Suspense>
           )}
           {/* v19 Phase 0-R: BigWinShareHost / AchievementUnlockListener / LobbyFab / ImperialDeepLinkListener 마운트 해제 */}
+          {/* Phase 4 P1 Observer Mode — welcome + daily login (lazy, suspended) */}
+          <Suspense fallback={null}>
+            <ImperialWelcomeDialog />
+            <DailyLoginRewardToast />
+          </Suspense>
           <Suspense fallback={<RouteFallback />}>
             <MaintenanceGate>
             <Routes>
