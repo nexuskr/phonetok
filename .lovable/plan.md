@@ -31,9 +31,9 @@ Single migration `..._phase1_hyperion_ignition.sql`:
   - Idempotent on `(user_id, source='signup')` partial unique index (already exists).
   - Fraud: reject if any of `(device_fp | ip_hash | ua_hash)` already bound to another claimed user_id; insert into `imperial_onboarding_fraud_signals` either way.
   - Logs to `imperial_observability_events` (`kind='onboarding.signup'`) + `imperial_audit_trail` (new minimal append-only table).
-- `imperial_claim_daily_login_bonus()` adds tiny variable-reward jitter (480..520 PHON, server-side `gen_random_bytes`) for near-miss feel; cap-aware.
-- `imperial_get_phase1_kpis()` SECURITY DEFINER, admin-only: returns 12 KPIs (signups 24h, daily 24h, total PHON granted 24h, active 5m/1h/24h, invite clicks, first-duel conversion, fraud_rejects_24h, cap_utilization_pct, retention_d1, anomaly_score).
-- `imperial_phase1_emergency_pause(_reason)` AAL2: flips `auto_pause=true` on caps row + sets kill switch `imperial_onboarding=ON` (new key, separate from money-flow kill switches).
+- `imperial_claim_daily_login_bonus()` variable reward 450..550 PHON (server-side `gen_random_bytes`, near-miss curve); cap-aware.
+- `imperial_get_phase1_kpis()` SECURITY DEFINER, admin-only: returns **14 KPIs** — signups 24h, daily 24h, total PHON granted 24h, active 5m/1h/24h, invite clicks, first-duel conversion, fraud_rejects_24h, cap_utilization_pct, retention_d1, anomaly_score, **invite_to_first_duel_rate**, **warm_king_engagement_score** (welcome-dialog-completion × first-duel-click × daily-return blended 0..1).
+- `imperial_phase1_emergency_pause(_reason)` AAL2: flips `auto_pause=true` + sets kill switch `imperial_onboarding=ON`. Preemptive Warm King Mercy: anomaly_score ≥ 0.08% surfaces yellow warning on monitor (no auto-action); ≥ 0.1% × 3 ticks arms auto-rollback.
 
 Rate limit (3 tiers) via existing `enforce_rate_limit`:
 - `onboarding_claim_signup` 2/min, `onboarding_claim_daily` 5/min, `onboarding_state_read` 30/min — applied in RPC bodies, not client.
@@ -52,11 +52,11 @@ Existing components already mounted (`ImperialWelcomeDialog`, `DailyLoginRewardT
 
 `Phase1LiveMonitor.tsx` upgraded in place (operator-only chunk):
 
-- Polls `imperial_get_phase1_kpis()` every 3s (was 10s). Realtime subscribe on `imperial_onboarding_grants` for live count flashes.
-- 12 KPI cards + sparkline (inline SVG, no new deps).
-- Cap utilization bar; if >80% warn, >100% red.
-- New `<ApocalypseProtocolPanel/>`: shows fraud_rejects_24h, anomaly_score; one-click `imperial_phase1_emergency_pause` (AAL2 confirm).
-- Auto-rollback hook: when `anomaly_score > 0.1%` for 3 consecutive ticks, surfaces a one-click "Auto-Rollback" that calls `imperial_phase1_emergency_pause` + `imperial_rollout_activate(0)`.
+- Polls `imperial_get_phase1_kpis()` every 3s. Realtime subscribe on `imperial_onboarding_grants` for live count flashes.
+- **14 KPI** cards + inline-SVG sparkline (no new deps).
+- Cap utilization bar; >80% warn, >100% red.
+- New `<ApocalypseProtocolPanel/>`: fraud_rejects_24h, anomaly_score, preemptive yellow at ≥0.08%; one-click `imperial_phase1_emergency_pause` (AAL2 confirm).
+- Auto-rollback: anomaly_score > 0.1% for 3 consecutive ticks → arms one-click "Auto-Rollback" that calls `imperial_phase1_emergency_pause` + `imperial_rollout_activate(0)`. Full revert path completes in **≤10 minutes** (see Rollback plan).
 
 ## 5. Activation order (runbook)
 
@@ -65,7 +65,7 @@ Existing components already mounted (`ImperialWelcomeDialog`, `DailyLoginRewardT
 3. Admin opens `/admin/imperial/command-center` (AAL2) → "Activate Phase 1".
 4. Watch monitor for 10m / 30m / 1h / 6h / 24h checkpoints.
 
-## Rollback plan (≤15 min)
+## Rollback plan (≤10 min)
 
 - One-click `imperial_phase1_emergency_pause` → blocks new claims, leaves existing grants intact.
 - `imperial_rollout_activate(0)` returns rollout to Observer-off.
