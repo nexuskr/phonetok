@@ -1,93 +1,103 @@
-# phonara-world-main /complete-profile 백엔드 복구 계획
+# Phase 5 백엔드 복구 — 경로 C (+ 경로 A 안전망)
 
-## 현재 확인된 사실
+대상: 독립 백엔드 `wyhhdyrvqtoejvusnhva` (phonara-world-main)
+금지: 관리형 `ketlqzfaplppmupaiwft` 에는 어떤 SQL/함수도 적용 금지
 
-### 프론트엔드 기준
-- `/complete-profile` 라우트는 이미 등록되어 있습니다.
-- `src/pages/CompleteProfile.tsx` 는 `complete_profile` RPC를 호출하지 않고, `profiles` 테이블을 직접 `UPDATE` 합니다.
-- 이 흐름과 함께 실제로 연동되는 백엔드 호출은 다음입니다.
-  - `register_device` — 로그인 직후 `useAuthBridge` / `src/lib/deviceFingerprint.ts`
-  - `assign_persona` — 로그인 직후 `useAuthBridge`
-  - `record_span` — `src/lib/spans.ts`
-  - `get_empire_seats_remaining` — `src/pages/Empire.tsx`
-  - `get_active_boost_count` — 현재 코드 탐색 범위에서는 직접 사용 흔적 미약하나, 백엔드 surface에는 포함됨
+## 현실 체크 (중요)
 
-### 현재 연결된 백엔드 기준
-- 지금 이 프로젝트가 바라보는 백엔드에는 아래 함수가 이미 존재합니다.
-  - `get_active_boost_count`
-  - `get_empire_seats_remaining`
-  - `register_device`
-  - `assign_persona`
-  - `record_span`
-- `profiles` 테이블에는 이미 아래 RLS 정책이 있습니다.
-  - 본인 `SELECT`
-  - 본인 `INSERT`
-  - 본인 `UPDATE`
-- `auth.users` → `public.handle_new_user()` 트리거도 이미 연결되어 있습니다.
-- 즉, **현재 repo가 연결된 관리형 백엔드에는 요청하신 핵심 요소가 대부분 이미 존재**합니다.
+`scripts/independence/0[1-3]-*.sh` 는 **로컬 머신에서만** 실행 가능합니다.
+이유:
+- `supabase login` — 브라우저 OAuth 필요
+- `supabase link --project-ref wyhhdyrvqtoejvusnhva` — 사용자 자격증명 필요
+- `supabase db dump` — Docker 데몬 필요
+- `supabase db push` — 독립 ref 에 직접 쓰기 (Lovable 마이그레이션 툴은 관리형 ref 에만 적용됨)
 
-### 진짜 위험 지점
-- 이 repo는 아직 `supabase/config.toml` 기준 `ketlqzfaplppmupaiwft` 에 연결되어 있습니다.
-- 문서상 독립 백엔드 `phonara-world-main` 은 별도 ref(`wyhhdyrvqtoejvusnhva`) 입니다.
-- 따라서 지금 바로 마이그레이션을 실행하면 **독립 백엔드가 아니라 현재 관리형 백엔드에 적용될 위험**이 큽니다.
+따라서 **에이전트가 푸시를 대행할 수 없습니다.** 대신 두 트랙을 동시에 준비합니다:
 
-## 목표
+- **트랙 1 (경로 C, 권장):** 사용자가 로컬에서 3-스크립트 시퀀스 실행 → 에이전트가 검증 SQL 과 후속 단계를 가이드
+- **트랙 2 (경로 A, 안전망):** 02 diff 결과가 sync 라면 핵심만 담은 `phase5-recovery.sql` 단일 파일 제공 → SQL Editor 또는 psql 로 1회 실행
 
-독립 백엔드 `phonara-world-main` 에서 `/complete-profile` 흐름이 막히지 않도록, 필요한 함수 / 권한 / RLS / signup trigger 상태를 **독립 백엔드 기준으로 정렬**하고 검증합니다.
+## 트랙 1 — 사용자 실행 순서
 
-## 실행 계획
+```text
+[사용자 로컬]                                   [독립 백엔드 wyhhdyrvqtoejvusnhva]
+  01-prepare.sh    ──login + link──────────►        (인증)
+  02-pull-and-diff ──db dump──────────────►   _remote_baseline.sql 생성
+                   └─diff 산출──────────►   supabase/migrations/_DIFF_REPORT.txt
+  [diff 검토]
+  03-deploy.sh     ──db push──────────────►   누락 migration 적용
+                   └─functions deploy 44개►   엣지 배포
+```
 
-### 1. 대상 백엔드 정렬
-- 독립 백엔드 ref를 기준으로 작업 대상을 명확히 전환합니다.
-- 잘못된 프로젝트에 마이그레이션이 들어가지 않도록 현재 링크 상태를 먼저 정리합니다.
+사용자 명령:
+```bash
+cd <repo>
+export TARGET_REF=wyhhdyrvqtoejvusnhva
+bash scripts/independence/01-prepare.sh
+bash scripts/independence/02-pull-and-diff.sh
+# → supabase/migrations/_DIFF_REPORT.txt 검토 후
+bash scripts/independence/03-deploy.sh
+```
 
-### 2. 복구용 마이그레이션 1회 작성
-독립 백엔드에 대해 아래를 모두 idempotent 하게 보장하는 수복 마이그레이션을 작성합니다.
+푸시 후 사용자가 채팅에 “03 완료” 라고만 알려주면 에이전트가 검증 SQL 4묶음을 SQL Editor 용으로 즉시 전달합니다. (RPC 존재/EXECUTE, profiles RLS, trigger 연결, 신규 가입 시뮬레이션)
 
-- `register_device` 존재 및 `authenticated` 실행 권한
-- `assign_persona` 존재 및 `authenticated` 실행 권한
-- `record_span` 존재 및 `authenticated` 실행 권한
-- `get_active_boost_count` 존재 및 필요한 실행 권한
-- `get_empire_seats_remaining` 존재 및 필요한 실행 권한
-- `profiles` RLS 활성화
-- `profile_self_select / insert / update` 정책 재보장
-- `handle_new_user` 함수 재정의
-- `on_auth_user_created` 트리거 재생성
+## 트랙 2 — 경로 A 안전망 (`phase5-recovery.sql`)
 
-`complete_profile` RPC는 현재 프론트 코드에서 사용하지 않으므로, 이 계획에서는 **불필요한 신규 RPC를 만들지 않고 실제 호출 surface만 복구**합니다.
+02 의 `_DIFF_REPORT.txt` 가 비어 있다면(이미 sync), 푸시할 게 없다는 뜻이므로 누락된 항목만 정정하는 **idempotent 단일 파일** 을 제공합니다. 핵심 구성:
 
-### 3. 권한 표면 점검
-- 함수 EXECUTE 권한이 `PUBLIC` 또는 잘못된 role로 새지 않았는지 함께 점검합니다.
-- 가능하면 기존 permission baseline 흐름과 충돌하지 않도록 유지합니다.
+1. 5개 RPC `CREATE OR REPLACE FUNCTION` (기존 정의 그대로 재선언, SECURITY DEFINER + `set search_path = public`)
+2. `REVOKE ALL FROM public` + `GRANT EXECUTE TO authenticated` (5개)
+3. `profiles` 자가 RLS 3개 (`drop policy if exists` 후 재생성)
+4. `handle_new_user()` + `on_auth_user_created` 트리거 재생성
+5. `wallet_balances`, `user_roles` 자동 시드 INSERT … ON CONFLICT DO NOTHING
 
-### 4. 독립 백엔드 검증
-복구 후 아래를 독립 백엔드에서 확인합니다.
+실행 위치: 독립 백엔드 SQL Editor (대시보드) 또는 `psql "$DATABASE_URL_WYH" -f phase5-recovery.sql`. 절대 Lovable 마이그레이션 툴 사용 금지(관리형 ref 로 들어감).
 
-- 함수 존재 여부
-- 함수 실행 권한
-- `profiles` 정책 존재 여부
-- `handle_new_user` 트리거 존재 여부
-- 신규 가입 시 `profiles / wallet_balances / user_roles` 자동 생성 여부
+## 검증 SQL (트랙 1·2 공통, 푸시 후 실행)
 
-### 5. 프론트 연결 확인
-- 독립 백엔드 URL / publishable key가 Production 빌드에 실제로 들어가는지 재확인합니다.
-- `/complete-profile` 가 SPA 라우팅과 백엔드 인증 흐름 둘 다 통과하는지 점검합니다.
+```sql
+-- (1) 5개 RPC 존재 + EXECUTE 권한
+select p.proname,
+       has_function_privilege('authenticated', p.oid, 'EXECUTE') as authed_exec
+from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+where n.nspname='public'
+  and p.proname in ('register_device','assign_persona','record_span',
+                    'get_active_boost_count','get_empire_seats_remaining');
 
-## 사용자 영향
+-- (2) profiles RLS 정책
+select policyname, cmd from pg_policies
+where schemaname='public' and tablename='profiles';
 
-- 신규 가입자 프로필 자동 생성 실패
-- `/complete-profile` 저장 실패
-- 로그인 직후 디바이스 등록 / persona 부여 / span 기록 오류
+-- (3) 가입 트리거 연결
+select tgname, tgrelid::regclass, tgenabled
+from pg_trigger where tgname='on_auth_user_created';
 
-이 세 갈래를 한 번에 막는 계획입니다.
+-- (4) 가입 시뮬레이션 (Auth → Add user 로 1명 생성 후)
+select (select count(*) from public.profiles        where id=:uid) as profile_ok,
+       (select count(*) from public.wallet_balances where user_id=:uid) as wallet_ok,
+       (select count(*) from public.user_roles      where user_id=:uid) as role_ok;
+```
 
-## 완료 기준
+## Vercel 단계 (3·4번)
 
-- 독립 백엔드에서 필요한 함수 5종이 모두 존재하고 권한이 맞음
-- `profiles` RLS가 본인 insert/update를 허용함
-- `handle_new_user` 트리거가 정상 연결됨
-- Production 환경에서 `/complete-profile` 진입 후 저장이 막히지 않음
+스크립트 완료 후 에이전트가 가이드:
+1. Vercel → Project → Settings → Environment Variables
+   - `VITE_SUPABASE_URL` = `https://wyhhdyrvqtoejvusnhva.supabase.co`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY` = (독립 ref anon key)
+   - `VITE_SUPABASE_PROJECT_ID` = `wyhhdyrvqtoejvusnhva`
+   - 3개 모두 Production / Preview / Development 체크
+2. Deployments → 최신 → ⋯ → Redeploy → **“Use existing Build Cache” 해제**
+3. 검증: `curl -I https://phonara.net/complete-profile` → 200, 빌드 JS 에 `wyhhdyrvqtoejvusnhva` 문자열 grep 으로 존재 확인
 
-## 참고
+## Rollback
 
-- 별도 ref로 독립된 backend가 맞다면, 이번 작업의 핵심은 **새 기능 추가가 아니라 독립 백엔드와 현재 repo 스키마의 drift 복구**입니다.
+- 트랙 1: 03 푸시는 마이그레이션 단위라 실패 파일만 재시도. functions deploy 실패는 개별 재배포.
+- 트랙 2: `phase5-recovery.sql` 은 idempotent 라 재실행 안전. 잘못 적용 시 `DROP FUNCTION public.<name> CASCADE` 후 원래 마이그레이션에서 재선언.
+- Vercel: 직전 deployment 의 “Promote to Production” 으로 즉시 롤백.
+
+## 승인 시 에이전트가 할 일
+
+1. 사용자가 로컬 명령을 돌리는 동안 대기 (또는 02 diff sync 보고 시 트랙 2 로 전환)
+2. 트랙 2 전환 시 `scripts/independence/phase5-recovery.sql` 작성 (실제 컬럼·시그니처는 기존 마이그레이션에서 복사)
+3. 사용자가 “03 완료” 또는 “SQL 적용 완료” 라고 알리면 검증 SQL 4묶음 전달
+4. 검증 PASS 후 Vercel 환경변수·Redeploy 가이드 및 `curl` 점검 보조
