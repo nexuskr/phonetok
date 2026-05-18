@@ -24,6 +24,7 @@ import MaintenanceGate from "./components/MaintenanceGate";
 import { DegradeModeBinder } from "./components/system/DegradeModeBinder";
 import { DegradeModeBanner } from "./components/system/DegradeModeBanner";
 import { DynamicIslandPill } from "@/packages/native/components/DynamicIslandPill";
+import { ClientMetricsBinder } from "@/components/system/ClientMetricsBinder";
 import { registerSW } from "./lib/pwa/registerSW";
 
 installGlobalErrorLogging();
@@ -225,6 +226,7 @@ const App = () => (
           <DegradeModeBanner />
           <DegradeModeBinder />
           <DynamicIslandPill />
+          <ClientMetricsBinder />
           <SessionWatcher />
           <ReviewerMaskRoot />
           <ReviewerBadge />
