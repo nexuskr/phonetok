@@ -17,7 +17,7 @@ export function DivineJackpotOverlay({ open, winnerName, onDone }: Props) {
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
-    let stopTime = Date.now() + 2400;
+    let stopTime = Date.now() + 3000;
     (async () => {
       try {
         const mod = await import("canvas-confetti");
@@ -38,7 +38,7 @@ export function DivineJackpotOverlay({ open, winnerName, onDone }: Props) {
         fire();
       } catch { /* ignore */ }
     })();
-    const t = window.setTimeout(onDone, 3200);
+    const t = window.setTimeout(onDone, 3800);
     return () => { cancelled = true; window.clearTimeout(t); };
   }, [open, onDone]);
 
@@ -47,7 +47,8 @@ export function DivineJackpotOverlay({ open, winnerName, onDone }: Props) {
       {open && (
         <motion.div
           key="divine-overlay"
-          className="fixed inset-0 z-[95] flex items-center justify-center pointer-events-none"
+          className="fixed inset-0 z-[95] flex items-center justify-center cursor-pointer"
+          onClick={onDone}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

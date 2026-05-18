@@ -1,5 +1,7 @@
 /**
- * /duel/arena/:roomId — Imperial Duel Arena (Spectator + Live Betting + Cinematic v2).
+ * /duel/arena/:roomId — Imperial Duel Arena
+ * Slice 8 Phase 3 — Cosmic Shadow Real Betting + Cosmic Verification Oracle God Mode.
+ * 머니플로 FREEZE — Shadow Ledger(sessionStorage)만 사용, 실잔액 변동 0.
  */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
@@ -63,7 +65,7 @@ export default function ImperialDuelArena() {
   const easeStrong = (result?.nearMiss ?? false) || nearMissIntensity > 0.4;
   const tick = useDuelTick(state === "rolling", DURATION_MS, easeStrong);
 
-  // pool_imbalance 트리거 토스트 (한 라운드당 1회)
+  // pool_imbalance 토스트 (라운드당 1회 쓰로틀)
   const lastImbToast = useRef(0);
   useEffect(() => {
     if (imbalance >= 0.45 && Date.now() - lastImbToast.current > 25_000) {
@@ -72,11 +74,22 @@ export default function ImperialDuelArena() {
     }
   }, [imbalance]);
 
+  /** Shadow Ledger 가상 차감 후 odds.place 호출 */
+  const handlePlace = useCallback((side: "left" | "right", amount: number) => {
+    if (amount > shadow.balance) {
+      notify.warning(`가상 잔고 부족 — 보유 ${shadow.balance.toLocaleString()} PHON`);
+      return;
+    }
+    shadow.reserve(amount);
+    odds.place(side, amount);
+  }, [shadow, odds]);
+
   const startRoll = useCallback(async () => {
     setState("rolling");
     setShowBurst(false);
     setNearMissIntensity(0);
     setNearMissSide(null);
+
     const serverSeed = randomSeed(32);
     const clientSeed = randomSeed(16);
     const nonce = round;
@@ -106,31 +119,43 @@ export default function ImperialDuelArena() {
     };
     historyRef.current = [...historyRef.current, winner].slice(-10);
 
-    // 즉시 intensity 반영 — 회전 중 dynamic glow/sweep 가속
     setNearMissIntensity(strongIntensity);
 
     window.setTimeout(() => {
       setResult(next);
       setState("settled");
+      setLastSeedHash(serverSeedHash);
       if (nm.nearMiss || strongIntensity > 0.2) {
         setShowBurst(true);
-        // 진 측 표기
         setNearMissSide(winner === "left" ? "right" : "left");
       }
       signals.recordResult(winner, nm.nearMiss);
 
-      // 베팅 정산
+      // 가상 정산
       const poolSnapshot = odds.pool;
       const settled = odds.settleRound(winner);
       const won = settled.payout > 0;
       const stake = settled.bet?.amount ?? 0;
+      let nextBalance = shadow.balance;
       if (settled.bet) {
+        const settledShadow = shadow.settle({
+          round,
+          side: settled.bet.side,
+          stake,
+          winnerSide: winner,
+          payout: settled.payout,
+          hmacShort: rng.hmacHex.slice(0, 16),
+        });
+        nextBalance = settledShadow.balance;
         setLastPayout({ won, amount: settled.payout, stake });
       }
 
-      // 황실 잭팟 토스트
+      // 황실 잭팟
       if (tier === "divine") {
-        notify.imperial(`신성한 대관식입니다 — JACKPOT (${winner === "left" ? room.left.nickname : room.right.nickname})`);
+        const wn = winner === "left" ? room.left.nickname : room.right.nickname;
+        setDivineWinnerName(wn);
+        setDivineOpen(true);
+        notify.imperial(`신성한 대관식입니다 — JACKPOT (${wn})`);
       } else if (tier === "empyrean") {
         notify.imperial("천계가 열립니다 — Empyrean Tier");
       }
@@ -144,10 +169,11 @@ export default function ImperialDuelArena() {
           winnerSide: winner,
           payout: settled.payout,
           hmacShort: rng.hmacHex.slice(0, 16),
+          balanceAfter: nextBalance,
         },
       ].slice(-30));
     }, DURATION_MS);
-  }, [round, signals, odds, room]);
+  }, [round, signals, odds, room, shadow]);
 
   const onNext = () => {
     setRound((r) => r + 1);
@@ -164,13 +190,16 @@ export default function ImperialDuelArena() {
 
   return (
     <div className="min-h-screen bg-[#0A0503] text-amber-50">
+      {/* Near-Miss Edge Vignette — Strong intensity 시 화면 가장자리 비네트 */}
+      <NearMissEdgeVignette intensity={nearMissIntensity} side={nearMissSide} />
+
       <div className="container mx-auto px-3 md:px-6 py-4 md:py-6 max-w-6xl">
-        <header className="flex items-center justify-between mb-3">
-          <Link to="/duel" className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300/80 hover:text-amber-200">
+        <header className="flex items-center justify-between mb-3 gap-2">
+          <Link to="/duel" className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300/80 hover:text-amber-200 shrink-0">
             <ArrowLeft className="w-3.5 h-3.5" /> 대관전 로비
           </Link>
-          <div className="text-center">
-            <div className="text-[10px] tracking-[0.32em] font-black uppercase text-amber-400/85">
+          <div className="text-center min-w-0">
+            <div className="text-[10px] tracking-[0.32em] font-black uppercase text-amber-400/85 truncate">
               {room.title} {isSpectator && " · 관전 모드"}
             </div>
             <h1 className="font-imperial text-xl md:text-2xl text-amber-100 leading-tight"
@@ -180,6 +209,25 @@ export default function ImperialDuelArena() {
           </div>
           <HeatLevelBadge level={room.heat} />
         </header>
+
+        {/* PROOF MODE 영구 배너 — 클릭 시 Verification Oracle 오픈 */}
+        <button
+          type="button"
+          onClick={() => setOracleOpen(true)}
+          className="w-full mb-3 inline-flex items-center justify-center gap-2 rounded-xl py-2 px-3 border border-amber-400/45 bg-gradient-to-r from-[#1a0a05] via-[#160a14] to-[#1a0a05] text-amber-100 active:scale-[0.98] transition"
+          style={{
+            boxShadow: "0 0 16px hsl(38 92% 60% / 0.32), inset 0 0 12px hsl(330 90% 55% / 0.18)",
+            animation: "proof-breath 2.6s ease-in-out infinite",
+          }}
+        >
+          <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
+          <span className="text-[10px] tracking-[0.28em] font-black uppercase text-amber-200">PROOF MODE · 황실 검증 오라클</span>
+          <span className="text-[10px] text-pink-300/90 font-black tabular-nums">{shadow.balance.toLocaleString()} PHON</span>
+        </button>
+        <style>{`@keyframes proof-breath {
+          0%,100% { box-shadow: 0 0 14px hsl(38 92% 60% / 0.28), inset 0 0 10px hsl(330 90% 55% / 0.16); }
+          50% { box-shadow: 0 0 22px hsl(38 92% 60% / 0.55), inset 0 0 14px hsl(330 90% 55% / 0.28); }
+        }`}</style>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-3">
           <div className="space-y-3">
@@ -252,8 +300,10 @@ export default function ImperialDuelArena() {
               disabled={state === "rolling"}
               nearMissSide={state === "settled" ? nearMissSide : null}
               lastPayout={lastPayout}
-              onPlace={odds.place}
+              onPlace={handlePlace}
               myStake={odds.myBet ? { side: odds.myBet.side, amount: odds.myBet.amount } : null}
+              shadowBalance={shadow.balance}
+              serverSeedHashPreview={lastSeedHash}
             />
           </aside>
         </div>
@@ -273,6 +323,15 @@ export default function ImperialDuelArena() {
         signals={signals}
         bettingAudit={auditLog}
       />
+
+      {/* Divine Jackpot Fullscreen Overlay — lazy */}
+      <Suspense fallback={null}>
+        <DivineJackpotOverlay
+          open={divineOpen}
+          winnerName={divineWinnerName}
+          onDone={() => setDivineOpen(false)}
+        />
+      </Suspense>
     </div>
   );
 }
