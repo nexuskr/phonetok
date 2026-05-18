@@ -15,12 +15,20 @@ export type DuelState = {
   total_pot: number;
   settle_at: string | null;
   winner_side: "left" | "right" | null;
+  /** IMPERIAL-SINGULARITY: admin-controlled emergency freeze */
+  emergency_freeze_flag?: boolean;
+  room?: { emergency_freeze_flag?: boolean; status?: string } & Record<string, unknown>;
   signals?: {
     near_miss_intensity?: number;
     cinematic_level?: number;
     perceived_win_rate?: number;
   };
 };
+
+export function isDuelFrozen(state: DuelState | null): boolean {
+  if (!state) return false;
+  return !!(state.emergency_freeze_flag ?? state.room?.emergency_freeze_flag);
+}
 
 export function useImperialDuelRoom(roomId: string | null) {
   const [state, setState] = useState<DuelState | null>(null);
