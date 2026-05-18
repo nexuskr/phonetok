@@ -81,6 +81,7 @@ const SimRealConversion   = lazy(() => import("@/components/admin/growth/SimReal
 const SelfHeal            = lazy(() => import("./ops/SelfHeal"));
 const RegionHealth        = lazy(() => import("./ops/RegionHealth"));
 const AdminDuel           = lazy(() => import("./Duel"));
+const ImperialCommandCenter = lazy(() => import("./imperial/CommandCenter"));
 
 function Section({
   title,
