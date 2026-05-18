@@ -161,10 +161,13 @@ export default function SecurityTotp() {
       ) : (
         <Card className="p-5 space-y-4">
           <div className="font-bold text-sm">앱으로 QR 코드 스캔</div>
-          <div
-            className="flex justify-center bg-white p-4 rounded-xl"
-            dangerouslySetInnerHTML={{ __html: enroll.qr }}
-          />
+          <div className="flex justify-center bg-white p-4 rounded-xl">
+            <img
+              src={`data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(enroll.qr)))}`}
+              alt="TOTP QR Code"
+              className="w-48 h-48"
+            />
+          </div>
           <div className="text-xs text-muted-foreground text-center">
             QR을 스캔할 수 없다면 시크릿 키를 직접 입력:
             <code className="block mt-2 p-2 bg-muted rounded font-mono text-[11px] break-all">

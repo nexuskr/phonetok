@@ -39,6 +39,15 @@ Deno.serve(async (req) => {
     const { image_url, expected_amount } = await req.json().catch(() => ({}));
     if (!image_url || typeof image_url !== "string") return json({ ok: false, error: "image_url required" }, 400);
 
+    // SSRF guard: only https URLs from trusted hosts (Supabase storage / phonara domains)
+    let parsedUrl: URL;
+    try { parsedUrl = new URL(image_url); } catch { return json({ ok: false, error: "invalid_url" }, 400); }
+    if (parsedUrl.protocol !== "https:") return json({ ok: false, error: "https_only" }, 400);
+    const ALLOWED_SUFFIXES = [".supabase.co", ".supabase.in", ".phonara.world", "phonara.world", ".lovable.app"];
+    const host = parsedUrl.hostname.toLowerCase();
+    const allowed = ALLOWED_SUFFIXES.some((s) => host === s.replace(/^\./, "") || host.endsWith(s));
+    if (!allowed) return json({ ok: false, error: "disallowed_domain" }, 400);
+
     const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
