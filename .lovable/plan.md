@@ -65,7 +65,7 @@ Existing components already mounted (`ImperialWelcomeDialog`, `DailyLoginRewardT
 3. Admin opens `/admin/imperial/command-center` (AAL2) → "Activate Phase 1".
 4. Watch monitor for 10m / 30m / 1h / 6h / 24h checkpoints.
 
-## Rollback plan (≤15 min)
+## Rollback plan (≤10 min)
 
 - One-click `imperial_phase1_emergency_pause` → blocks new claims, leaves existing grants intact.
 - `imperial_rollout_activate(0)` returns rollout to Observer-off.
