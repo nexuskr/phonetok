@@ -12112,6 +12112,15 @@ export type Database = {
         Returns: boolean
       }
       imperial_cancel_duel: { Args: { p_room_id: string }; Returns: Json }
+      imperial_compute_display_signals: {
+        Args: {
+          p_actual_roll: number
+          p_loss_streak?: number
+          p_pot_phon?: number
+          p_session_volume?: number
+        }
+        Returns: Json
+      }
       imperial_get_duel_state: { Args: { p_room_id: string }; Returns: Json }
       imperial_place_phon_bet: {
         Args: {
@@ -12120,6 +12129,10 @@ export type Database = {
           p_room_id: string
           p_side: string
         }
+        Returns: Json
+      }
+      imperial_settle_duel: {
+        Args: { p_room_id: string; p_server_seed: string }
         Returns: Json
       }
       ingest_span_quality_alert: {
