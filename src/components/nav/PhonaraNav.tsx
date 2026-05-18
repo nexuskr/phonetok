@@ -40,6 +40,19 @@ function isActive(pathname: string, to: string) {
 export default function PhonaraNav() {
   const loc = useLocation();
   const navigate = useNavigate();
+  const centerLP = useLongPress<HTMLButtonElement>({
+    onShort: () => {
+      haptics.select();
+      navigate("/phon");
+    },
+    onLong: () => {
+      haptics.success?.();
+      notify.success("⚔️ 황제의 대관전", { duration: 800 });
+      navigate("/duel");
+    },
+    ms: 600,
+  });
+  return (
     <nav
       className="
         fixed bottom-0 inset-x-0 z-40 md:sticky md:top-14 md:bottom-auto
