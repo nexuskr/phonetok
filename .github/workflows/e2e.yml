@@ -1,0 +1,32 @@
+name: E2E
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium webkit
+      - name: Run critical (mobile)
+        run: bunx playwright test --config=e2e/playwright.config.ts --project=mobile-ios --project=mobile-android --workers=4
+        env:
+          SLACK_WEBHOOK_E2E: ${{ secrets.SLACK_WEBHOOK_E2E }}
+      - name: Run advisory (low-end / reduced-motion / desktop)
+        if: always()
+        continue-on-error: true
+        run: bunx playwright test --config=e2e/playwright.config.ts --project=mobile-lowend --project=mobile-reduced-motion --project=desktop --workers=2
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
