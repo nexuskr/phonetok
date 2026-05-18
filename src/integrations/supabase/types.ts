@@ -12829,6 +12829,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_withdraw_pin: { Args: never; Returns: boolean }
       imperial_auto_heal_tick: { Args: never; Returns: Json }
       imperial_can_participate: { Args: { _user: string }; Returns: Json }
       imperial_cancel_duel: { Args: { p_room_id: string }; Returns: Json }
