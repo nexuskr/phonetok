@@ -2,8 +2,7 @@
  * /duel — Imperial Duel Lobby.
  */
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Crown, ArrowLeft } from "lucide-react";
+import { Crown } from "lucide-react";
 import { useDuelRooms, useFomoOracle } from "@pkg/duel";
 import { LobbyShell } from "@pkg/duel/components/lobby/LobbyShell";
 import { HallOfSovereigns } from "@pkg/duel/components/lobby/HallOfSovereigns";
@@ -12,6 +11,7 @@ import { QuickAscensionRail } from "@pkg/duel/components/lobby/QuickAscensionRai
 import { FomoFloatingOracle } from "@pkg/duel/components/lobby/FomoFloatingOracle";
 import { HeatLevelBadge } from "@pkg/duel/components/lobby/HeatLevelBadge";
 import { VerificationOracleModal } from "@pkg/duel/components/oracle/VerificationOracleModal";
+import { ImperialHeaderHero } from "@pkg/duel/components/lobby/v2/ImperialHeaderHero";
 
 export default function ImperialDuelLobby() {
   const rooms = useDuelRooms(4);
