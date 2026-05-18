@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import Layout from "@/components/Layout";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { Crown, Sparkles, Zap, TrendingUp, ChevronRight } from "lucide-react";
@@ -6,6 +7,9 @@ import ImperialLiveActivity from "@/components/live/ImperialLiveActivity";
 import ImperialPresenceBar from "@/components/live/ImperialPresenceBar";
 import ImperialTradeSection from "@/components/dashboard/ImperialTradeSection";
 import InviteRailMini from "@/components/onboarding/InviteRailMini";
+import { usePullToRefresh } from "@/packages/native/usePullToRefresh";
+import { PullToRefreshIndicator } from "@/packages/native/components/PullToRefreshIndicator";
+import { dynamicIsland } from "@/packages/native/useDynamicIsland";
 
 /**
  * Dashboard — v19 Round 3 Imperial Empire World #1.
@@ -229,11 +233,20 @@ function Rail({ title, to, items }: { title: string; to: string; items: GameCard
 
 export default function Dashboard() {
   const user = useRequireAuth();
+  const qc = useQueryClient();
+  // Phase 4 Sprint 3 — Pull-to-Refresh (transform/opacity only, 60fps, graceful)
+  const { ref: ptrRef, pull, busy, threshold } = usePullToRefresh<HTMLDivElement>({
+    onRefresh: async () => {
+      try { await qc.invalidateQueries(); } catch { /* swallow */ }
+      dynamicIsland.show({ kind: "success", text: "최신화 완료", ttl: 1600 });
+    },
+  });
   if (!user) return null;
 
   return (
     <Layout>
-      <div className="container pt-6 pb-12 space-y-7 relative">
+      <div ref={ptrRef} className="container pt-6 pb-12 space-y-7 relative" style={{ overscrollBehavior: "contain" }}>
+        <PullToRefreshIndicator pull={pull} threshold={threshold} busy={busy} />
         <InviteRailMini />
         {/* Hero ambient glow */}
         <div
