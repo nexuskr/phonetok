@@ -1,6 +1,19 @@
-# Phonara — Playwright E2E Sovereign Defense Protocol
+# Phonara — Playwright E2E Sovereign Defense Protocol (Phase 0 Final)
 
-1인 운영자가 매일 5분 안에 "오늘 모바일에서 죽은 곳이 있는가?"를 확인하고, Stake/Rollbit/Bybit 유저가 넘어올 때 모바일 첫 30초에서 이탈하지 않도록 보장하는 실전 E2E. 거창한 거버넌스 조직체 없음. 머니플로/imperial_* RPC/Operator Isolation은 0바이트 미터치 — 전부 mock.
+1인 운영자가 매일 5분 안에 "오늘 모바일에서 죽은 곳이 있는가?"를 확인하고, Stake/Rollbit/Bybit 유저가 넘어올 때 **모바일 첫 30초**에서 이탈하지 않도록 보장하는 실전 E2E. 거창한 거버넌스 조직체 없음. 머니플로/imperial_* RPC/Operator Isolation은 0바이트 미터치 — 전부 mock.
+
+## 🔥 TIER 0 — "첫 30초 이탈 방지" 4대 인터랙션 (모든 다른 테스트보다 먼저, 가장 빠르게, 매 PR 차단)
+
+이 4개가 깨지면 신규 유저는 무조건 이탈. 별도 `@critical` 태그 + 전용 shard로 가장 먼저 실행 + 실패 시 즉시 Slack 빨간 알림.
+
+| # | 인터랙션 | 합격 기준 |
+|---|---|---|
+| **T0-1** | `/auth` 가입 CTA 첫 탭 → 입력 폼 노출 | < 800ms, 터치 타깃 ≥44×44, 키보드 자동 포커스, IME 한글 입력 가능 |
+| **T0-2** | 가입 완료 → `/welcome` 진입 → **15,000 PHON 클레임 다이얼로그 자동 노출** | < 2.5s, CTA 1회 탭 성공률 100%, 새로고침해도 동일 단계 복귀 |
+| **T0-3** | `/dashboard` 첫 진입 → **첫 Daily Bonus CTA 시각적 강조 + 1회 탭 클레임** | 잔액 증가 애니메이션 표시, 중복 클릭 차단, 오프라인 시 한국어 토스트 |
+| **T0-4** | `/duel` 첫 진입 → **Top 1 SovereignCard 탭 → DuelGate 탭 → swipe-up Oracle 확장** | 각 단계 ≤ 300ms 응답, 60fps 유지, 핀치줌/회전 중에도 깨짐 없음 |
+
+→ `tests/00-tier0-first-30s.spec.ts` 1개 파일에 위 4개 시나리오만 압축. 실패 = 머지 차단.
 
 ## 디렉터리
 
