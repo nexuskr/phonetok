@@ -101,6 +101,7 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { id: "cron",          name: "Cron · 웹훅",         to: "/admin/ops/cron",          icon: Zap },
       { id: "report",        name: "AI 일일 리포트",      to: "/admin/ops/report",        icon: BarChart3 },
       { id: "thresholds",    name: "임계값 · SLA",        to: "/admin/ops/thresholds",    icon: Sliders },
+      { id: "duel",          name: "⚔️ Imperial Duel (PHON)", to: "/admin/duel",          icon: Crown },
     ],
   },
   {

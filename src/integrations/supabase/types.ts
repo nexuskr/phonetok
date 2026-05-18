@@ -10113,6 +10113,7 @@ export type Database = {
         }
       }
       admin_get_demo_bias_perf: { Args: never; Returns: Json }
+      admin_get_duel_metrics_24h: { Args: never; Returns: Json }
       admin_get_economy_stats: { Args: never; Returns: Json }
       admin_get_empire_realtime: { Args: never; Returns: Json }
       admin_get_ev_history: {
