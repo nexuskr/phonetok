@@ -1,70 +1,71 @@
-# Imperial Empire Phase 4 — Follow-up Slice (Final Completion)
+# Phase 1 Observer Mode Ignition
 
-Phase 4 Core Infrastructure(Circuit Breaker v2, Observability, Auto-Heal, Rollout Activate, Command Center)가 점화 완료된 상태에서 남은 Follow-up Slice를 마무리하여 Limited Rollout Production Launch의 Final Go/No-Go Package를 산출한다.
+Activate Limited Rollout Phase 1 (Tier 0, Observer Mode) with onboarding free-play money, live Command Center monitoring, and a final go-live verification gate. Money-flow 8 paths remain frozen (git diff = 0). All new objects use `imperial_` prefix.
 
-불변 원칙: Money-flow 8경로 git diff = 0 / Operator Isolation PASS / `imperial_` prefix / Atomic·Idempotent·Observable·Rollbackable.
+## 1. Phase 1 Activation (DB)
 
----
+New migration `phase4_observer_ignition.sql`:
 
-## 1. Full Stack Integration & Chaos Test
+- `imperial_onboarding_grants` table (user_id PK, granted_at, amount_phon, source enum: `signup|daily_login|invite`) — RLS self-select, admin-all.
+- RPC `imperial_claim_signup_bonus()` — atomic, idempotent (one row per user, `source='signup'`), credits **10,000 PHON** via existing wallet ledger helper (read-only call into current credit primitive — no edit to money-flow files).
+- RPC `imperial_claim_daily_login_bonus()` — idempotent per UTC day (`source='daily_login'`), +500 PHON. Uses unique `(user_id, source, date_trunc('day', granted_at))` partial index.
+- RPC `imperial_get_onboarding_state()` — returns `{ signup_claimed, daily_claimed_today, next_reset_at, streak }`.
+- Trigger on `auth.users` insert → enqueue signup grant row (claim still requires explicit RPC for auditability).
+- Execute `select imperial_rollout_activate(1, auth.uid())` as an admin-run insert (AAL2) — surfaced as a one-click button in Command Center, not auto-fired in migration.
 
-- `src/__tests__/integration/imperial-fullstack.integration.test.ts`
-  - 300 가상 동시 사용자 시뮬레이션 (in-memory): place → settle → burn → rollback drill
-  - Hybrid SCC + Tarjan 사이클 검출(in-memory wait-for graph), 사이클 0 단언
-  - PID 컨트롤러 setpoint 추종 검증 (정착시간 < 5s, overshoot < 15%)
-  - vitest 환경 only, 네트워크/DB 호출 0 (money-flow 무관)
-- `scripts/chaos/imperial-fullstack-drill.ts`
-  - tsx 실행 가능, 환경변수 없으면 dry-run 보고
-  - kill switch 강제 ON → reject 확인 → unfreeze 후 회복시간 기록
-  - 결과 → `reports/imperial.chaos.<date>.json`
+All RPCs: SECURITY DEFINER, `search_path=public`, registered in `function_permissions_baseline`. Logged via `imperial_log_observability(kind='onboarding', ...)`.
 
-## 2. Comprehensive Load Test
+## 2. Onboarding Flow (UI)
 
-- `scripts/load/imperial-300k-locks.ts`
-  - 300k 분산 잠금 시뮬레이션, Tarjan O(V+E), p50/p95/p99 lock acquire, deadlock 검출률
-  - 결과 → `reports/imperial.loadtest.locks.<date>.json`
-- `scripts/load/imperial-pid-autotune-cycle.ts`
-  - Relay Feedback + Ziegler-Nichols open loop full cycle, Ku/Tu/Kp/Ti/Td 출력
-  - 결과 → `reports/imperial.loadtest.pid.<date>.json`
+New files:
 
-## 3. Final Documentation & Archive
+- `src/components/onboarding/ImperialWelcomeDialog.tsx` — 3-step (Welcome → Claim 10k PHON → "Place your first Duel"), Warm King gradient, framer-motion 60fps, single CTA → `/arena`. Triggered once via `localStorage phonara:imperial_welcome:v1` + server `signup_claimed=false`.
+- `src/components/onboarding/DailyLoginRewardToast.tsx` — first auth event of day calls `imperial_claim_daily_login_bonus`, fires confetti + notify.success.
+- `src/components/onboarding/InviteRailMini.tsx` — reuses existing referral code from `beta_invites`/profile, "Share to earn" card on Dashboard.
+- Mount `<ImperialWelcomeDialog />` + `<DailyLoginRewardToast />` in `src/App.tsx` (App-root, under AuthBridge).
+- Hook `src/hooks/useImperialOnboarding.ts` — wraps the 3 RPCs + Realtime invalidate.
 
-- `docs/duel/phase4-production-launch-bible.md` — 스택 다이어그램(ASCII), Rollout 시나리오, Rollback playbook, On-call runbook
-- `docs/duel/phase4-go-nogo-checklist.md` — 18-item GO/NO-GO 체크리스트
-- `mem://features/phase-4-limited-rollout` 신규 메모
-- `mem://index.md` Core 한 줄 추가
+Tutorial routes user to `/arena` with `?focus=duel` → existing `phonara:imperial-focus` event highlights bet slip. No money-flow file edits.
 
-## 4. Final Verification & Go/No-Go Package
+## 3. Realtime Phase 1 Monitoring
 
-- `check-money-flow-freeze.mjs` / `check-operator-isolation.mjs` 재실행 보고
-- `imperial_get_kernel_summary()` / `admin_get_flywheel_health(24)` Net Deflation ≥ 0 확인
-- Integration + Load test green, p99 lock acquire < 50ms
-- Rollback drill 1회 성공 기록
-- Final Go/No-Go Package(체크리스트 + 리포트 경로 + 다음 단계) 채팅 출력
+Extend Command Center (`src/pages/admin/imperial/CommandCenter.tsx`) with a new top section:
 
----
+- `<Phase1LiveMonitor />` (new file in `src/components/admin/`) — calls `imperial_get_rollout_state()` every 10s + subscribes to `imperial_observability_events` via `useRealtimeChannel` admin partition.
+- KPIs: active Tier-0 users (5m / 1h), signup grants claimed, daily-login claims, first-duel conversion, Observer-mode bet count vs settled=0 invariant, Circuit Breaker state, Auto-Heal last tick, Kill switch matrix.
+- "Activate Phase 1" button → calls `imperial_rollout_activate(1)` (AAL2-gated), writes audit row, shows confirm modal with the 18-item checklist summary.
 
-## Technical Details
+## 4. Go-Live Verification
 
-신규 파일(모두 money-flow와 무관):
+New script `scripts/phase4/phase1-go-live-check.ts`:
 
-```text
-src/__tests__/integration/imperial-fullstack.integration.test.ts
-scripts/chaos/imperial-fullstack-drill.ts
-scripts/load/imperial-300k-locks.ts
-scripts/load/imperial-pid-autotune-cycle.ts
-docs/duel/phase4-production-launch-bible.md
-docs/duel/phase4-go-nogo-checklist.md
-mem://features/phase-4-limited-rollout
-```
+- Re-runs 18-item GO/NO-GO from `docs/duel/phase4-go-nogo-checklist.md` programmatically (money-flow freeze hash, operator isolation marker scan, kernel summary, oracle swap readiness ≥3/5, auto-heal last tick <10m, circuit CLOSED, kill switches OFF baseline, observability events flowing).
+- Output `reports/phase1.go-live.<date>.json` + console PASS/FAIL table.
 
-편집 파일: `mem://index.md` (Core 한 줄 추가)만 수정. 8경로 FREEZE 파일 및 `imperial_place_phon_bet` / `settle_phon_bet` / `_apply_house_edge_split` 일체 무수정.
+Final report: Command Center screenshot description, all gates re-verified, Phase 2 (24h → Tier 1, cap 50k) prep checklist.
 
-Verification Gates:
-1. money-flow freeze PASS
-2. operator isolation PASS
-3. kernel summary 정상
-4. flywheel Net Deflation ≥ 0
-5. integration test green
-6. load test p99 < 50ms
-7. rollback drill 성공
+## Technical notes
+
+- Money-flow 8 paths untouched: `imperial_place_phon_bet`, `imperial_settle_*`, `_apply_house_edge_split`, `credit_crypto_deposit`, `request_withdrawal`, `apply_token_burn`, `_grant_phon_for_deposit`, `_grant_nft_for_deposit` — verified via diff hash in go-live script.
+- Observer Mode enforcement already lives in `imperial_can_participate` (Tier 0 gate); no money-flow change needed — Phase 1 only flips rollout phase + opens onboarding faucet.
+- All new tables/RPCs `imperial_` prefixed. Atomic (single-tx), Idempotent (unique constraints), Observable (`imperial_log_observability`), Auditable (`imperial_rollout_phases`), Rollbackable (`imperial_rollout_activate(0)`).
+- Operator Isolation preserved: Phase1LiveMonitor lives under `src/components/admin/` → operator chunk.
+
+## Files
+
+New:
+- `supabase/migrations/<ts>_phase4_observer_ignition.sql`
+- `src/components/onboarding/ImperialWelcomeDialog.tsx`
+- `src/components/onboarding/DailyLoginRewardToast.tsx`
+- `src/components/onboarding/InviteRailMini.tsx`
+- `src/hooks/useImperialOnboarding.ts`
+- `src/components/admin/Phase1LiveMonitor.tsx`
+- `scripts/phase4/phase1-go-live-check.ts`
+
+Edited:
+- `src/App.tsx` (mount onboarding components)
+- `src/pages/admin/imperial/CommandCenter.tsx` (mount Phase1LiveMonitor + Activate button)
+- `src/pages/Dashboard.tsx` (mount `<InviteRailMini />`)
+- `mem://features/phase-4-limited-rollout` + `mem://index.md` (Phase 1 ignition note)
+
+Money-flow files: **0 edits**.
