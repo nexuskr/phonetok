@@ -1,6 +1,19 @@
-# Phonara — Playwright E2E Sovereign Defense Protocol
+# Phonara — Playwright E2E Sovereign Defense Protocol (Phase 0 Final)
 
-1인 운영자가 매일 5분 안에 "오늘 모바일에서 죽은 곳이 있는가?"를 확인하고, Stake/Rollbit/Bybit 유저가 넘어올 때 모바일 첫 30초에서 이탈하지 않도록 보장하는 실전 E2E. 거창한 거버넌스 조직체 없음. 머니플로/imperial_* RPC/Operator Isolation은 0바이트 미터치 — 전부 mock.
+1인 운영자가 매일 5분 안에 "오늘 모바일에서 죽은 곳이 있는가?"를 확인하고, Stake/Rollbit/Bybit 유저가 넘어올 때 **모바일 첫 30초**에서 이탈하지 않도록 보장하는 실전 E2E. 거창한 거버넌스 조직체 없음. 머니플로/imperial_* RPC/Operator Isolation은 0바이트 미터치 — 전부 mock.
+
+## 🔥 TIER 0 — "첫 30초 이탈 방지" 4대 인터랙션 (모든 다른 테스트보다 먼저, 가장 빠르게, 매 PR 차단)
+
+이 4개가 깨지면 신규 유저는 무조건 이탈. 별도 `@critical` 태그 + 전용 shard로 가장 먼저 실행 + 실패 시 즉시 Slack 빨간 알림.
+
+| # | 인터랙션 | 합격 기준 |
+|---|---|---|
+| **T0-1** | `/auth` 가입 CTA 첫 탭 → 입력 폼 노출 | < 800ms, 터치 타깃 ≥44×44, 키보드 자동 포커스, IME 한글 입력 가능 |
+| **T0-2** | 가입 완료 → `/welcome` 진입 → **15,000 PHON 클레임 다이얼로그 자동 노출** | < 2.5s, CTA 1회 탭 성공률 100%, 새로고침해도 동일 단계 복귀 |
+| **T0-3** | `/dashboard` 첫 진입 → **첫 Daily Bonus CTA 시각적 강조 + 1회 탭 클레임** | 잔액 증가 애니메이션 표시, 중복 클릭 차단, 오프라인 시 한국어 토스트 |
+| **T0-4** | `/duel` 첫 진입 → **Top 1 SovereignCard 탭 → DuelGate 탭 → swipe-up Oracle 확장** | 각 단계 ≤ 300ms 응답, 60fps 유지, 핀치줌/회전 중에도 깨짐 없음 |
+
+→ `tests/00-tier0-first-30s.spec.ts` 1개 파일에 위 4개 시나리오만 압축. 실패 = 머지 차단.
 
 ## 디렉터리
 
@@ -18,10 +31,11 @@ e2e/
     gestures.ts                 # pinch / double-tap / swipe / pull-to-refresh
     visual.ts                   # 스크린샷 diff threshold
   tests/
+    00-tier0-first-30s.spec.ts          # @critical — 첫 30초 4대 인터랙션
     01-onboarding-death-path.spec.ts
     02-duel-lobby-journey.spec.ts
     03-mobile-os-native-feel.spec.ts
-    04-worker-cosmetic-integrity.spec.ts
+    04-worker-cosmetic-integrity.spec.ts # NearMiss / MultiplierCountUp Worker ON/OFF 매트릭스
     05-betting-safety-net.spec.ts
     06-edge-cases-dust.spec.ts          # 회전/오프라인/저전력/입력 IME/탭 백그라운드
     07-a11y-smoke.spec.ts               # axe critical only
@@ -52,10 +66,24 @@ e2e/
 - 클레임 mock: `**/rest/v1/rpc/imperial_claim_signup_bonus` → `{status:"ok", amount_phon:15000, new_balance:15000}`
 - 실패 시나리오: 클레임 RPC 500 / 네트워크 끊김 / 중복 클릭 / 가입 직후 새로고침
 
-### 02 Imperial Duel Lobby Full Journey (Sprint 4 핵심)
+### 02 Imperial Duel Lobby Full Journey (Sprint 4 핵심 + Worker Fallback 강화)
 - `/duel` 진입 → `HallOfSovereigns` Top 1 카드 탭 → `LiveDuelGates` 카드 탭 → swipe-up 으로 `FomoFloatingOracle` 확장 → `VerificationOracleModal` 열림 → 닫기 swipe-down
-- `NearMissOverlay` 진입 시 opacity transition, `MultiplierCountUp` scale 1→1.15→1 검증 (transform 인라인 스타일 읽어서 단언)
 - mock: `useDuelRooms` 의 `imperial_get_duel_rooms` RPC → 4개 방 + spectators 노이즈
+- **NearMissOverlay 검증 (4가지 모드 매트릭스)** — 같은 시각 결과를 모든 모드에서 보장:
+  | 모드 | 환경 조작 | 합격 기준 |
+  |---|---|---|
+  | A. Worker ON (정상) | 기본 | `radial-gradient` overlay 표시, `opacity` 0.25~0.8, `transform: scale(1.x)` 인라인 적용, 900ms 후 unmount |
+  | B. Worker 강제 OFF | `page.addInitScript` 로 `window.Worker = undefined` | cosmetic.ts main-thread fallback 발동, 동일한 score → 동일 overlay 시각 결과 |
+  | C. Worker timeout | route 로 worker 응답 4s 지연 | cosmetic.ts timeout 후 fallback, UI는 끊김 없이 표시 |
+  | D. Reduced motion | `prefers-reduced-motion: reduce` | overlay opacity 0 또는 transition 즉시 완료, transform 잔여 없음 |
+- **MultiplierCountUp 검증 (4가지 모드 매트릭스)**:
+  | 모드 | 환경 조작 | 합격 기준 |
+  |---|---|---|
+  | A. Worker ON | 기본 | `calcMultiplierFrames` Float32Array transferable, scale 1→1.15→1, 마지막 텍스트 = `to.toFixed(2)×` |
+  | B. Worker OFF | `window.Worker = undefined` | main-thread 보간 fallback, 최종 값 동일, 60fps 유지 |
+  | C. Low-end | CPU 4× throttle | 프레임 드롭 허용하되 최종 값 정확, transform leak 0 |
+  | D. Reduced motion | 미디어 쿼리 | 즉시 최종 값으로 점프, scale 변동 없음 |
+- 60fps 검증: `performance.now()` 기반 프레임 카운터 주입, `rAF` 호출/시간 ≥ 50fps (mid-tier), ≥ 30fps (low-end)
 
 ### 03 Mobile OS Native Feel Extreme
 - **Pinch zoom**: `viewport meta`가 줌 허용인지 확인, 두 손가락 핀치 → layout shift 없음, double-tap zoom → 텍스트 재배열 없음
@@ -67,10 +95,10 @@ e2e/
 - **Safe area**: `env(safe-area-inset-top)` 적용 확인 (DynamicIslandPill top 계산)
 - **Reduced motion**: PTR 비활성, framer-motion 트랜지션 즉시 완료
 
-### 04 Worker + Cosmetic Visual Integrity
-- `calcNearMiss` worker on → score ≥ 0.5 시 overlay 표시, off (worker reject) → main-thread fallback 동일 결과
-- `calcMultiplierFrames` Float32Array transferable 경로 + fallback 둘 다 최종 값 동일
-- 60fps 검증: `requestAnimationFrame` 카운트 / 시간 비율 ≥ 50fps on mid-tier emulation
+### 04 Worker + Cosmetic Visual Integrity (02 매트릭스 회귀 + 단위 격리)
+- 02 의 매트릭스를 페이지 컨텍스트 없이 cosmetic 단위로 격리 실행 (테스트 페이지 `/__e2e/cosmetic-harness` 임시 라우트는 만들지 않음 — 기존 `/duel` 활용)
+- worker 메시지 손실/2회 응답/순서 뒤집힘 fuzz → fallback 항상 결정적 결과
+- 메모리 누수: 100회 mount/unmount 후 detached node 0
 
 ### 05 Basic Betting Safety Net (mock)
 - Crash 베팅: `/games/crash` → 베팅 슬립 입력 → 베팅 RPC mock 200 → UI 잔액 차감 반영 → cashout 버튼 활성
