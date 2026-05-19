@@ -149,7 +149,7 @@ const Welcome = lazy(() => import("./pages/Welcome.tsx"));
 const DevConsole = lazy(() => import("./pages/DevConsole.tsx"));
 const ImperialDuelLobby = lazy(() => import("./pages/ImperialDuelLobby.tsx"));
 const ImperialDuelArena = lazy(() => import("./pages/ImperialDuelArena.tsx"));
-// ApexForge — hybrid overlay (7 tabs, neon theme via [data-theme="apex"])
+// ApexForge — hybrid overlay (Phase 2 expanded, neon theme via [data-theme="apex"])
 const ApexShell    = lazy(() => import("./packages/apex/ApexShell.tsx"));
 const ApexHome     = lazy(() => import("./pages/apex/Home.tsx"));
 const ApexFreeMoney = lazy(() => import("./pages/apex/FreeMoney.tsx"));
@@ -158,6 +158,15 @@ const ApexWinReels = lazy(() => import("./pages/apex/WinReels.tsx"));
 const ApexLootbox  = lazy(() => import("./pages/apex/Lootbox.tsx"));
 const ApexSports   = lazy(() => import("./pages/apex/Sports.tsx"));
 const ApexMy       = lazy(() => import("./pages/apex/My.tsx"));
+// Phase 2 — Games + Sportsbook + Community
+const ApexGames        = lazy(() => import("./pages/apex/Games.tsx"));
+const ApexDice         = lazy(() => import("./pages/apex/games/Dice.tsx"));
+const ApexCrash        = lazy(() => import("./pages/apex/games/Crash.tsx"));
+const ApexPlinko       = lazy(() => import("./pages/apex/games/Plinko.tsx"));
+const ApexMines        = lazy(() => import("./pages/apex/games/Mines.tsx"));
+const ApexSlots        = lazy(() => import("./pages/apex/games/Slots.tsx"));
+const ApexSportsbook   = lazy(() => import("./pages/apex/Sportsbook.tsx"));
+const ApexCommunity    = lazy(() => import("./pages/apex/Community.tsx"));
 // v19 Phase 0-R: 글로벌 오버레이 17종 마운트 전면 해제. PracticeModeGate 만 라우트 가드용으로 보존.
 import { PracticeModeGate } from "./components/practice/PracticeModeGate";
 
@@ -264,15 +273,23 @@ const App = () => (
               {/* v14.0 — 4탭 슬림 IA */}
               <Route path="/home" element={<Home />} />
 
-              {/* ApexForge — 7-tab hybrid overlay */}
+              {/* ApexForge — Phase 2: 9-tab hybrid overlay */}
               <Route path="/apex" element={<ApexShell />}>
-                <Route index           element={<ApexHome />} />
-                <Route path="free"     element={<ApexFreeMoney />} />
-                <Route path="vault"    element={<ApexVault />} />
-                <Route path="reels"    element={<ApexWinReels />} />
-                <Route path="lootbox"  element={<ApexLootbox />} />
-                <Route path="sports"   element={<ApexSports />} />
-                <Route path="my"       element={<ApexMy />} />
+                <Route index               element={<ApexHome />} />
+                <Route path="games"        element={<ApexGames />} />
+                <Route path="games/dice"   element={<ApexDice />} />
+                <Route path="games/crash"  element={<ApexCrash />} />
+                <Route path="games/plinko" element={<ApexPlinko />} />
+                <Route path="games/mines"  element={<ApexMines />} />
+                <Route path="games/slots"  element={<ApexSlots />} />
+                <Route path="sportsbook"   element={<ApexSportsbook />} />
+                <Route path="community"    element={<ApexCommunity />} />
+                <Route path="free"         element={<ApexFreeMoney />} />
+                <Route path="vault"        element={<ApexVault />} />
+                <Route path="reels"        element={<ApexWinReels />} />
+                <Route path="lootbox"      element={<ApexLootbox />} />
+                <Route path="sports"       element={<ApexSports />} />
+                <Route path="my"           element={<ApexMy />} />
               </Route>
 
               <Route path="/phon" element={<PhonHub />} />
