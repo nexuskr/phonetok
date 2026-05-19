@@ -1,124 +1,87 @@
-# Phase 3 — Imperial Gold Crash 게임
+# Imperial Gold Empire — 7-Game Suite (Phase 4)
 
-Provably Fair v2 기반 위에 AETHER Crash 게임을 Phonara에 이식합니다. 시각·성능·중독성 3축 모두 Stake/Rollbit 초월을 목표로 합니다. 머니플로 8경로는 절대 건드리지 않고, 기존 BetSlip/PHON 베팅 경로를 그대로 재사용합니다.
+Imperial Crash 의 디자인·성능·머니플로 패턴을 베이스라인으로 6개 게임을 추가하고, Crash 자체도 한 단계 더 폴리시한다. 모든 게임이 동일한 시각 언어·인터랙션 톤·PF v2·realtime 파티션을 공유한다.
 
-## 스코프
+## 범위
 
-- 신규 게임 패키지: `src/packages/games/crash/**` (engine / hooks / store / ui / types)
-- PF v2 완전 연동 (commit → byteStream → reveal → verify)
-- Realtime: `useGameChannel('crash')` (Phase 1 4-파티션 래퍼 사용)
-- 베팅: 기존 BetSlipBridge 재사용 (place_phon_bet RPC는 머니플로 8경로 — 본문 무변경)
-- 라우팅: `/games/crash` 추가 (lazy chunk, Layer 1 번들 영향 최소화)
+- 신규 머니 RPC 0, 신규 테이블 0, WebGL/Three.js 0 (Canvas 2D + Framer Motion + CSS만)
+- 머니플로 8경로 git diff = 0 — 모든 베팅/정산은 기존 `@/lib/*` 래퍼만 호출
+- 게임별 라우트: `/games/<game>/imperial` (lazy)
+- 7 게임 = Crash(폴리시) · Plinko · Roulette · Blackjack · Baccarat · Powerball · Wheel
 
-## 파일 구조
+## 결과물
 
+### 1. Imperial Shared Core 업그레이드
+`src/packages/games/core/imperial/`
+- `theme.ts` — Deep Black + Imperial Gold HSL 토큰 (semantic만)
+- `useGoldParticles.ts` — 풀-기반 60fps 파티클 훅 (Crash 캔버스에서 추출)
+- `useFairnessBadge.ts` — PF commit/reveal 상태 표시 공용
+- `ImperialStage.tsx` — 16:9 캔버스 셸 + 그리드 + 코너 샤인 + viewport pause
+- `ImperialOverlay.tsx` — 중앙 라벨/카운트/멀티 오버레이
+- `ImperialChipRow.tsx` — 퀵 칩 + 커스텀 입력
+- `ImperialPrimaryCta.tsx` — Place/Cashout/Spin 통합 펄싱 CTA
+- `ImperialHistoryRail.tsx` — 컬러 티어 히스토리 (Crash에서 일반화)
+- `ImperialFairnessStrip.tsx` — hash/seed 스트립
+
+### 2. 게임 패키지 (각 `src/packages/games/<game>/`)
+공통 구조:
 ```text
-src/packages/games/crash/
-├── index.ts
-├── types.ts                  # CrashRound, CrashPhase, BetTicket (Zod)
-├── engine/
-│   ├── index.ts
-│   ├── crashEngine.ts        # 60fps tick, growth curve, crash detection
-│   └── pf.ts                 # rng → crash multiplier (Stake 공식 호환)
-├── store/
-│   └── useCrashStore.ts      # Zustand: phase, multiplier, bets, history
-├── hooks/
-│   ├── useCrashRound.ts      # round lifecycle + PF commit/reveal
-│   ├── useCrashChannel.ts    # useGameChannel('crash') 래퍼
-│   └── useCrashAutoCashout.ts
-└── ui/
-    ├── CrashGame.tsx         # 메인 페이지 (route entry)
-    ├── CrashChart.tsx        # Canvas curve + SVG overlay, gold gradient
-    ├── CrashRocket.tsx       # 황금 왕좌 아이콘 (transform-only, GPU)
-    ├── CrashCrackOverlay.tsx # crash 시 화면 균열 + particle
-    ├── BetPanel.tsx          # multi-bet (2 슬롯)
-    ├── AutoCashout.tsx       # preset 1.5/2/5/10× + manual
-    ├── History.tsx           # 최근 50, ProvablyFairBadge
-    └── Leaderboard.tsx       # live players (realtime)
+<game>/
+  index.ts              # barrel
+  types.ts              # zod
+  engine/
+    <game>Engine.ts     # 순수 rAF/물리 (no DOM, no RPC)
+    pf.ts               # imperial_pf_commit/reveal 어댑터
+    index.ts
+  components/
+    Imperial<Game>Canvas.tsx   # 메인 캔버스
+    Imperial<Game>BetPanel.tsx # 베팅 UI
+  store/
+    use<Game>Store.ts   # zustand 프레젠테이션 상태
 ```
 
-라우터 추가: `src/App.tsx` lazy import `/games/crash`.
+게임별 핵심:
+- **Crash** (폴리시): 멀티플라이어 광선 강화, near-miss 색온도 전환, 캐시아웃 슬로우모션 0.15s
+- **Plinko**: 64-볼 풀 + Verlet 통합 + 핀 충돌 분석적 해, 골드 트레일, multiplier rail
+- **Roulette**: 휠 회전(이지아웃 + 마이크로 바운스), 골드 림 반사, 볼 spiral-in
+- **Blackjack**: 카드 deal 시네마틱(스택 → 부채꼴), bust/blackjack 폭발, 더블/스플릿 UI
+- **Baccarat**: Player/Banker 카드 슬로우 리빌, squeeze 텐션, 페어/타이 보너스
+- **Powerball**: 6볼 토네이도 추첨, 골드 글로 + 매치 카운트 펄스
+- **Wheel**: 시네마틱 한바퀴+티커 슬로우, near-miss 인덱스 강조, 폭발 입자
 
-## PF v2 연동
+### 3. 페이지 + 라우트
+`src/pages/games/`
+- `CrashImperial.tsx` (기존 폴리시), `PlinkoImperial.tsx`, `RouletteImperial.tsx`, `BlackjackImperial.tsx`, `BaccaratImperial.tsx`, `PowerballImperial.tsx`, `WheelImperial.tsx`
 
-- `imperial_pf_commit('crash', roundId)` → server_seed_hash 표시
-- multiplier 공식 (Stake 호환, house edge 1%):
-  ```
-  h = hmacSha256(serverSeed, `${clientSeed}:${nonce}`)
-  e = 2^52
-  n = parseInt(h.slice(0,13), 16)
-  crash = floor((100*e - n) / (e - n)) / 100   // 99/100 확률로 ≥1.00, 1/100은 1.00
-  ```
-- crash 직후 `imperial_pf_reveal` → realtime broadcast → 클라이언트 `useProvablyFair.verify`
-- `<ProvablyFairBadge />` 라운드별 표시, 클릭 시 `<FairnessVerifier />` 모달
+`src/App.tsx`: 7개 lazy 라우트 등록 + `/games` 로비 카드에 Imperial 진입점 노출
 
-## 엔진 / 성능
+### 4. 머니플로 어댑터
+각 게임은 `src/lib/<game>.ts`의 기존 `placeBet`/`settle` 류 래퍼만 호출. 래퍼가 없으면 어댑터 추가는 별도 PR로 분리 (이번 PR은 프레젠테이션 only). Crash/Roulette/Blackjack 은 기존 래퍼 확인 후 그대로, 나머지(Plinko/Baccarat/Powerball/Wheel)는 머니 RPC가 없으면 **"데모 모드 + Coming Soon CTA"**로 출시하고 실머니 RPC는 차후 합류.
 
-- 단일 `requestAnimationFrame` 루프, 5ms 미만/tick
-- 곡선: Canvas 2D 경로 + 오프스크린 그라디언트 캐시, 매 프레임 transform만 갱신
-- 모바일: `touch-action: manipulation`, passive listeners, devicePixelRatio cap 2
-- 백그라운드/비가시: `useViewportPause` (Phase 1)로 자동 정지
-- 번들: crash 청크 < 60KB gzip, framer-motion은 이미 공용 청크 사용
-
-## 상태 (Zustand)
-
-```ts
-phase: 'idle' | 'betting' | 'running' | 'crashed' | 'revealing'
-roundId, multiplier, startedAt, crashAt
-bets: { slot1, slot2 }      // amount, autoCashout, status
-history: CrashRound[]       // 최근 50
-players: LivePlayer[]       // realtime
-pf: { hash, seed?, nonce, verified }
-```
-
-## Realtime 이벤트 (`useGameChannel('crash')`)
-
-- `round:start` { roundId, hash, startsAt }
-- `bet:placed` { userId, amount, slot }
-- `cashout` { userId, multiplier, payout }
-- `round:crash` { roundId, multiplier, seed, nonce }
-
-## 베팅 (머니플로 무변경)
-
-- BetPanel → 기존 BetSlipBridge → 기존 `place_phon_bet` 호출만 사용
-- cashout은 기존 settle 경로 호출, 신규 머니 RPC 추가 없음
-- PHON 토큰 베팅 + USDT 베팅 8경로 git diff = 0
-
-## 시각 (Imperial Gold)
-
-- 배경: `#050505` + radial gold haze (CSS conic-gradient, GPU)
-- 곡선: 그라디언트 `#E8B923 → #F5D47A`, 끝점 펄스 글로우
-- 황금 왕좌(rocket 대체): SVG, 곡선 끝 따라 transform
-- Crash 시: 화면 0.4s 균열 SVG mask + gold particle burst (Canvas)
-- 카피: KR 우선, `g('crash.*')` glossary 키 4개 추가
-
-## 접근성 & 모바일
-
-- 키보드: Space=cashout, B=bet, A=auto toggle
-- 탭 타깃 48px, 큰 cashout 버튼 모바일 sticky bottom
-- prefers-reduced-motion: particle/glow off, 곡선만 유지
-- 햅틱: `HapticPulse` (Phase 1)
+### 5. 폴리시 & 가드
+- 모든 캔버스: `useViewportPause`, `prefers-reduced-motion`, dpr cap 2
+- 모든 베팅 패널: haptic select/win/error, notify Warm-King 토스트
+- 모든 PF 사용: `useProvablyFair(game, roundId)`
+- 모든 realtime: `@pkg/realtime` `useGameChannel` 만 사용
+- 머니플로 가드: 신규 코드는 `imperial_place_phon_bet` / `request_withdrawal` 등 8경로 본문에 손대지 않음
 
 ## 머지 게이트
 
-- 머니플로 8경로 git diff = 0 (수동 검증)
-- ESLint: `@/hooks/use-realtime-channel` 직접 import 금지 (Phase 1) — wrapper만
-- size-limit: crash chunk < 60KB gzip, index 영향 0
-- `check_permission_drift()` 0건 (이번 단계 신규 RPC 없음 — PF RPC는 Phase 2 그대로 재사용)
-- 60fps 데스크탑/모바일 Chrome 수동 확인 (Performance Profile)
+1. 빌드 그린 (TS strict)
+2. 7개 라우트 진입 시 화면 렌더 + 60fps 유지
+3. 머니플로 8경로 git diff = 0 (`git diff` 확인)
+4. 신규 패키지가 dependency-cruiser 레이어 룰 위반 없음
+5. Bundle: 각 게임 청크 ≤ 60KB gz (lazy chunk 격리)
 
-## 작업 순서
+## 기술 세부
 
-1. types + Zod + store
-2. engine/pf.ts + crashEngine.ts (단위 PF 시뮬 1만 회 house edge ≈ 1% 확인)
-3. CrashChart + CrashRocket + CrashCrackOverlay
-4. BetPanel + AutoCashout + History + Leaderboard
-5. useCrashRound + useCrashChannel + Realtime 연동
-6. /games/crash 라우트 lazy 등록
-7. Polish: particle, glow, sound placeholder, a11y, mobile pass
-8. 최종 파일 목록 + 머지 게이트 결과 리포트
+- **Tech**: React 18 + Vite + TypeScript + Canvas 2D + Framer Motion + Zustand + Zod
+- **No WebGL/Three** — Canvas 2D 만으로 시네마틱 톤 달성 (Crash 캔버스 검증)
+- **Object pool** — 모든 파티클/볼 GC-free 64~128개 풀
+- **컬러 토큰만** — `hsl(var(--gold))`, `hsl(var(--pink))`, `bg-background`, `text-foreground`. 인라인 hex 금지.
+- **Font**: 프로젝트 기본 폰트 유지 (별도 폰트 추가 없음 — Pretendard/Clash 추가는 별도 PR)
 
 ## 비범위
 
-- 신규 머니 RPC, 신규 테이블, 베팅 한도 변경, 운영자 화면, 멀티게임 통합 — 모두 다음 단계
-- WebGL/Three.js 도입 — 60fps Canvas로 충분, 번들 보호 위해 보류
+- 신규 머니 RPC, 신규 테이블, WebGL/Three, 실시간 멀티플레이어 동기화, AI 코칭 통합, 글로벌 폰트 추가
+- Plinko/Baccarat/Powerball/Wheel 실머니 RPC 작성 — 본 PR 은 프레젠테이션 + PF 데모. 실머니는 후속 PR.
