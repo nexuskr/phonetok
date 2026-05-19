@@ -37,7 +37,7 @@
     hsl(var(--apex-black));
 }
 
-@layer utilities {
+/* Utility classes (no @layer wrapper — file is imported standalone via JS, outside Tailwind context) */
   .apex-glass {
     background: linear-gradient(135deg,
       hsl(var(--apex-ink) / 0.78),

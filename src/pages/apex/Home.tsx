@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Flame, Gift, Vault, Play, Trophy, TrendingUp, Users, Sparkles } from "lucide-react";
+import { Flame, Gift, Vault, Play, Trophy, TrendingUp, Users, Sparkles, Package } from "lucide-react";
 
 function nextKstMidnight(): number {
   const now = new Date();
