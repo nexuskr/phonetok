@@ -149,6 +149,15 @@ const Welcome = lazy(() => import("./pages/Welcome.tsx"));
 const DevConsole = lazy(() => import("./pages/DevConsole.tsx"));
 const ImperialDuelLobby = lazy(() => import("./pages/ImperialDuelLobby.tsx"));
 const ImperialDuelArena = lazy(() => import("./pages/ImperialDuelArena.tsx"));
+// ApexForge — hybrid overlay (7 tabs, neon theme via [data-theme="apex"])
+const ApexShell    = lazy(() => import("./packages/apex/ApexShell.tsx"));
+const ApexHome     = lazy(() => import("./pages/apex/Home.tsx"));
+const ApexFreeMoney = lazy(() => import("./pages/apex/FreeMoney.tsx"));
+const ApexVault    = lazy(() => import("./pages/apex/Vault.tsx"));
+const ApexWinReels = lazy(() => import("./pages/apex/WinReels.tsx"));
+const ApexLootbox  = lazy(() => import("./pages/apex/Lootbox.tsx"));
+const ApexSports   = lazy(() => import("./pages/apex/Sports.tsx"));
+const ApexMy       = lazy(() => import("./pages/apex/My.tsx"));
 // v19 Phase 0-R: 글로벌 오버레이 17종 마운트 전면 해제. PracticeModeGate 만 라우트 가드용으로 보존.
 import { PracticeModeGate } from "./components/practice/PracticeModeGate";
 
@@ -254,6 +263,18 @@ const App = () => (
 
               {/* v14.0 — 4탭 슬림 IA */}
               <Route path="/home" element={<Home />} />
+
+              {/* ApexForge — 7-tab hybrid overlay */}
+              <Route path="/apex" element={<ApexShell />}>
+                <Route index           element={<ApexHome />} />
+                <Route path="free"     element={<ApexFreeMoney />} />
+                <Route path="vault"    element={<ApexVault />} />
+                <Route path="reels"    element={<ApexWinReels />} />
+                <Route path="lootbox"  element={<ApexLootbox />} />
+                <Route path="sports"   element={<ApexSports />} />
+                <Route path="my"       element={<ApexMy />} />
+              </Route>
+
               <Route path="/phon" element={<PhonHub />} />
               <Route path="/swap" element={<Navigate to="/phon" replace />} />
               <Route path="/stake" element={<Navigate to="/phon" replace />} />
