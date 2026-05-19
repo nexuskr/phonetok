@@ -38,7 +38,7 @@ export function ProximityFomoToast({
       const pick = stronger[Math.floor(Math.random() * stronger.length)];
       const line = COPY[Math.floor(Math.random() * COPY.length)](pick);
 
-      toast(line, {
+      notify.passive(line, {
         description: `폐하의 PHON: ${pick.phon.toLocaleString()} · 티어 ${pick.tier}`,
         duration: 4200,
       });
