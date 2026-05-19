@@ -1,6 +1,7 @@
 name: Hybrid Prerender
 
-# CI 안정화: prerender 전체 비차단. Vercel 배포에 영향 없음.
+# Phase 2: strict mode (job-level continue-on-error removed).
+# Lighthouse 외 step 들은 모두 차단형으로 승격.
 
 on:
   pull_request:
@@ -11,20 +12,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: "20"
-          cache: "npm"
-      - run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
-        continue-on-error: true
-      - run: npm run build
-        continue-on-error: true
+          bun-version: latest
+      - name: Install
+        run: bun install --frozen-lockfile
+      - name: Build
+        run: bun run build
       - name: Upload dist
         if: always()
-        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: dist-${{ github.sha }}
@@ -35,32 +33,26 @@ jobs:
   prerender:
     needs: build
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: "20"
-          cache: "npm"
-      - run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
-        continue-on-error: true
+          bun-version: latest
+      - name: Install
+        run: bun install --frozen-lockfile
       - name: Restore dist
-        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: dist-${{ github.sha }}
           path: dist
       - name: Install Playwright (chromium)
-        continue-on-error: true
-        run: npx playwright install --with-deps chromium
-      - name: Run prerender + leak check
-        continue-on-error: true
-        run: |
-          node scripts/prerender.mjs || true
-          node scripts/check-prerender-leak.mjs || true
+        run: bunx playwright install --with-deps chromium
+      - name: Run prerender
+        run: node scripts/prerender.mjs
+      - name: Prerender leak check
+        run: node scripts/check-prerender-leak.mjs
       - name: Upload prerender report
         if: always()
-        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: prerender-report-${{ github.sha }}

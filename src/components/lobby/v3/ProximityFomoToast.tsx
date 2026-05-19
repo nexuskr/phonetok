@@ -3,7 +3,7 @@
  * 1/8s throttle, 최대 분당 3회.
  */
 import { useEffect, useRef } from "react";
-import { toast } from "sonner";
+import { notify } from "@/lib/notify";
 import type { LobbyEmperor } from "./types";
 
 const COPY = [
@@ -38,7 +38,7 @@ export function ProximityFomoToast({
       const pick = stronger[Math.floor(Math.random() * stronger.length)];
       const line = COPY[Math.floor(Math.random() * COPY.length)](pick);
 
-      toast(line, {
+      notify.passive(line, {
         description: `폐하의 PHON: ${pick.phon.toLocaleString()} · 티어 ${pick.tier}`,
         duration: 4200,
       });
