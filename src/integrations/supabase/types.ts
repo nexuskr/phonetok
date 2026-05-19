@@ -699,6 +699,72 @@ export type Database = {
         }
         Relationships: []
       }
+      apex_game_rolls: {
+        Row: {
+          bet_phon: number
+          bet_usdt: number
+          client_seed: string | null
+          created_at: string
+          game_code: string
+          id: string
+          multiplier: number
+          nonce: number | null
+          payout_phon: number
+          payout_usdt: number
+          result_json: Json
+          server_seed_hash: string | null
+          user_id: string
+        }
+        Insert: {
+          bet_phon?: number
+          bet_usdt?: number
+          client_seed?: string | null
+          created_at?: string
+          game_code: string
+          id?: string
+          multiplier?: number
+          nonce?: number | null
+          payout_phon?: number
+          payout_usdt?: number
+          result_json?: Json
+          server_seed_hash?: string | null
+          user_id: string
+        }
+        Update: {
+          bet_phon?: number
+          bet_usdt?: number
+          client_seed?: string | null
+          created_at?: string
+          game_code?: string
+          id?: string
+          multiplier?: number
+          nonce?: number | null
+          payout_phon?: number
+          payout_usdt?: number
+          result_json?: Json
+          server_seed_hash?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      apex_usdt_mock_balances: {
+        Row: {
+          balance: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           active: boolean
@@ -11816,6 +11882,15 @@ export type Database = {
         Args: { _amount: number; _user_id: string }
         Returns: Json
       }
+      apex_play_mock_game: {
+        Args: {
+          _bet_phon?: number
+          _bet_usdt?: number
+          _game_code: string
+          _params?: Json
+        }
+        Returns: Json
+      }
       apply_booster_multipliers: {
         Args: { _base: number; _source: string; _user_id: string }
         Returns: number
@@ -12334,6 +12409,18 @@ export type Database = {
           kind: Database["public"]["Enums"]["ai_bot_kind"]
           runs: number
           total_reward: number
+        }[]
+      }
+      get_apex_recent_rolls: {
+        Args: { _limit?: number }
+        Returns: {
+          bet_phon: number
+          created_at: string
+          game_code: string
+          id: string
+          masked_nick: string
+          multiplier: number
+          payout_phon: number
         }[]
       }
       get_avatar_catalog: { Args: never; Returns: Json }
