@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { loadDB, saveDB, type Tier } from "@/lib/store";
 import { registerCurrentDevice } from "@/lib/deviceFingerprint";
-import { getVerifiedUser, hasVerifiedSession } from "@/lib/auth-recovery";
+import { isInvalidSessionError, clearBrokenLocalSession } from "@/lib/auth-recovery";
+import { verifySessionOnce, invalidateSessionCache } from "@/lib/auth/authSingleFlight";
 
 const RESETTABLE_SESSION_FLAGS = [
   "phonara_disable_dashboard_state_rpc",
@@ -66,9 +67,8 @@ function resetSessionCircuitBreakers() {
 async function assignPersonaSafely() {
   try {
     if (sessionStorage.getItem("phonara_disable_persona_rpc") === "1") return;
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (!sessionData.session?.access_token) return;
-    const user = await getVerifiedUser();
+    // P0-3: single-flight 로 세션 검증 — /user 중복 호출 제거
+    const user = await verifySessionOnce();
     if (!user) return;
     const { error } = await supabase.rpc("assign_persona" as any);
     if (error) {
@@ -84,10 +84,13 @@ async function assignPersonaSafely() {
  * Stale-token guard: 토큰은 살아있지만 user fetch가 403 bad_jwt(missing sub claim)을
  * 반환하는 도메인 cross-storage 케이스. 감지 시 로컬 세션만 정리하고 사용자에게
  * 안내(즉시 무한 루프 회피).
+ *
+ * P0-3: single-flight 캐시 사용 — /user 중복 호출 0
  */
 async function ensureValidSession(session: any): Promise<boolean> {
   if (!session?.user) return false;
-  return hasVerifiedSession();
+  const user = await verifySessionOnce();
+  return !!user?.id;
 }
 
 function isOnGuide(): boolean {
@@ -96,29 +99,48 @@ function isOnGuide(): boolean {
 
 export function useAuthBridge() {
   useEffect(() => {
+    let mounted = true;
+    // P0-3: SIGNED_IN/TOKEN_REFRESHED/INITIAL_SESSION 모두 처리.
+    // INITIAL_SESSION 이 Supabase v2 에서 자동 발사되므로 getSession() 별도 호출 제거.
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+      // 모든 이벤트에서 single-flight 캐시 무효화
+      invalidateSessionCache();
       // Defer to avoid deadlock
-      setTimeout(() => { if (!isOnGuide()) syncFromSession(session); }, 0);
-      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session?.user && !isOnGuide()) {
+      setTimeout(() => { if (mounted && !isOnGuide()) syncFromSession(session); }, 0);
+      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION")
+          && session?.user && !isOnGuide()) {
         resetSessionCircuitBreakers();
-        setTimeout(() => { if (!isOnGuide()) void registerCurrentDevice(); }, 500);
-        setTimeout(() => { if (!isOnGuide()) void assignPersonaSafely(); }, 800);
+        setTimeout(() => { if (mounted && !isOnGuide()) void registerCurrentDevice(); }, 500);
+        setTimeout(() => { if (mounted && !isOnGuide()) void assignPersonaSafely(); }, 800);
+      }
+      if (event === "SIGNED_OUT") {
+        // bad_jwt 자동 정리 후 자연스러운 SIGNED_OUT — 강제 리다이렉트 X
+        syncFromSession(null);
       }
     });
+    // P0-3: INITIAL_SESSION 이벤트가 자동 발사되므로 getSession() 폴백만 안전망으로 유지.
+    // single-flight 가 중복 /user 호출을 막아준다.
     if (!isOnGuide()) {
-      supabase.auth.getSession().then(async ({ data }) => {
-        if (isOnGuide()) return;
-        const ok = await ensureValidSession(data.session);
-        if (!ok) { syncFromSession(null); return; }
-        syncFromSession(data.session);
-        if (data.session?.user) {
-          resetSessionCircuitBreakers();
-          setTimeout(() => { if (!isOnGuide()) void registerCurrentDevice(); }, 500);
-          setTimeout(() => { if (!isOnGuide()) void assignPersonaSafely(); }, 800);
+      void (async () => {
+        try {
+          const user = await verifySessionOnce();
+          if (!mounted || isOnGuide()) return;
+          if (!user) { syncFromSession(null); return; }
+          // INITIAL_SESSION 핸들러가 아직 실행되지 않았을 경우의 폴백.
+          // syncFromSession 은 idempotent.
+          const { data } = await supabase.auth.getSession();
+          if (!mounted) return;
+          syncFromSession(data.session);
+        } catch (e) {
+          if (isInvalidSessionError(e)) await clearBrokenLocalSession();
         }
-      });
+      })();
     }
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { hasVerifiedSession } from "@/lib/auth-recovery";
+import { verifySessionOnce } from "@/lib/auth/authSingleFlight";
 
 export function useAuthReady() {
   const [isReady, setIsReady] = useState(false);
@@ -16,18 +16,18 @@ export function useAuthReady() {
         setIsReady(true);
         return;
       }
-
-      void hasVerifiedSession().then((ok) => {
+      // P0-3: single-flight 캐시. /user 폭주 차단.
+      void verifySessionOnce().then((user) => {
         if (!active) return;
-        setHasSession(ok);
+        setHasSession(!!user);
         setIsReady(true);
       });
     });
 
-    hasVerifiedSession()
-      .then((ok) => {
+    verifySessionOnce()
+      .then((user) => {
         if (!active) return;
-        setHasSession(ok);
+        setHasSession(!!user);
         setIsReady(true);
       })
       .catch(() => {

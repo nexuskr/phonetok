@@ -12,6 +12,7 @@ import { useSessionGuard } from "./hooks/use-session-guard";
 import { useAuthBridge } from "./hooks/use-auth-bridge";
 import { useAdultGate } from "./hooks/use-adult-gate";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { AuthErrorBoundary } from "./components/auth/AuthErrorBoundary";
 import { RouteFallback } from "./components/RouteFallback";
 import { installGlobalErrorLogging } from "./lib/error-logger";
 import { installFetchInstrument, installWebVitals, recordRouteChange } from "./lib/spans";
@@ -261,6 +262,7 @@ function GlobalOverlays() {
 
 const App = () => (
   <ErrorBoundary>
+    <AuthErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
@@ -466,6 +468,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
+    </AuthErrorBoundary>
   </ErrorBoundary>
 );
 
