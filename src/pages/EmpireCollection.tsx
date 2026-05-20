@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Gem, Sparkles, Zap, Rocket, ArrowRight, X, Calendar } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
+import CollectionHubTabs from "@/components/collection/CollectionHubTabs";
 
 const LEVEL_RANK: Record<NFTRow["level"], number> = { bronze: 5, gold: 7, diamond: 10 };
 const LEVEL_TIER_NUM: Record<NFTRow["level"], number> = { bronze: 1, gold: 2, diamond: 3 };
