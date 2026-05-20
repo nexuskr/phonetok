@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Sparkles, Crown } from "lucide-react";
+import { Gem, Sparkles} from "lucide-react";
 import {
   WinCelebrationManager,
   type CelebrationData,
@@ -184,7 +184,7 @@ export default function WinCelebrationOverlay() {
               transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
             >
               {state.tier === "legendary" ? (
-                <Crown className="w-4 h-4 text-amber-300" />
+                <Gem className="w-4 h-4 text-amber-300" />
               ) : (
                 <Sparkles className="w-4 h-4 text-amber-300" />
               )}

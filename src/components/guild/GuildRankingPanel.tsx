@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Trophy, Crown, Users } from "lucide-react";
+import { Gem, Trophy, Users } from "lucide-react";
 
 type Row = {
   rank: number;
@@ -53,7 +53,7 @@ export default function GuildRankingPanel() {
     return (
       <EmptyState
         title="아직 정산된 주간 랭킹이 없습니다"
-        description="매주 월요일 00:05에 자동 정산됩니다. 길드 활동으로 Crown을 모으세요."
+        description="매주 월요일 00:05에 자동 정산됩니다. 길드 활동으로 PHON을 모으세요."
       />
     );
   }
@@ -70,7 +70,7 @@ export default function GuildRankingPanel() {
         </p>
         {myRow && (
           <div className="mt-3 p-2 rounded-lg bg-sim-gold/10 border border-sim-gold/30 text-xs flex items-center gap-2">
-            <Crown className="w-3.5 h-3.5 text-sim-gold" />
+            <Gem className="w-3.5 h-3.5 text-sim-gold" />
             <span>내 길드 <span className="font-bold">{myRow.emblem} {myRow.name}</span></span>
             <span className="ml-auto tabular-nums">#{myRow.rank} · {myRow.reward_pool.toLocaleString()}₡ pool</span>
           </div>
@@ -96,7 +96,7 @@ export default function GuildRankingPanel() {
                 <div className="font-bold truncate text-sm">{r.name}</div>
                 <div className="text-[10px] text-muted-foreground flex items-center gap-2">
                   <span className="flex items-center gap-1"><Users className="w-3 h-3" />{r.member_count}명</span>
-                  <span className="tabular-nums">{r.total_contribution.toLocaleString()} 기여 Crown</span>
+                  <span className="tabular-nums">{r.total_contribution.toLocaleString()} 기여 PHON</span>
                 </div>
               </div>
               <div className="text-right">

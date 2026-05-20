@@ -2,24 +2,24 @@
  * Empire Overview — Mission Control (Day 1 Final)
  *
  * 레이아웃
- *   ┌─ Hero: 월 500억 progress + Today Crown + 온라인 황제
+ *   ┌─ Hero: 월 500억 progress + Today PHON + 온라인 황제
  *   ├─ Main Grid (xl:3-col)
  *   │    Left  (col-span-2): 2x2 dashboard
  *   │      • Live Ghost Empire   • Hot Whale Feed
- *   │      • Crown Moments       • Quick Stats
+ *   │      • PHON Moments       • Quick Stats
  *   │    Right (col-span-1): God Mode Panel (sticky)
  *   └─ Bot Console (collapsed strip)
  *
  * 성능 포인트
  *   • 모든 카드 60s/30s 폴링 — Realtime 구독 ZERO (어드민이 직접 새로고침 부담 X)
- *   • Hero 글로우/Crown 글로우는 정적 CSS — JS 애니메이션 없음
+ *   • Hero 글로우/PHON 글로우는 정적 CSS — JS 애니메이션 없음
  *   • count-up은 단일 rAF 훅, prefers-reduced-motion 자동 비활성
  *   • Bot Console 카드들은 below-the-fold → IntersectionObserver로 mount 지연
  *   • 봇 카드 5개는 Suspense 경계 분리 → 1개 실패해도 나머지 표시
  *   • 무거운 라이브러리(차트/Three) 일체 미사용 — lucide + framer 1회만
  */
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Crown, Zap, Users, TrendingUp, Activity } from "lucide-react";
+import { Gem, Zap, Users, TrendingUp, Activity } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
 import { LoadingCard } from "@/components/ui/loading-state";
@@ -137,14 +137,14 @@ export default function EmpireOverview() {
           {/* Hero KPI 3종 */}
           <div className="grid grid-cols-3 lg:grid-cols-1 gap-2 lg:w-[260px]">
             <HeroKpi
-              icon={<Crown className="h-3.5 w-3.5" />}
-              label="오늘 Crown 폭발"
+              icon={<Gem className="h-3.5 w-3.5" />}
+              label="오늘 PHON 폭발"
               value={Math.round(animExpl).toLocaleString()}
               accent="from-yellow-400 to-orange-500"
             />
             <HeroKpi
               icon={<Zap className="h-3.5 w-3.5" />}
-              label="Crown 총 보상"
+              label="PHON 총 보상"
               value={`${fmtKRW(animAwarded)} ₡`}
               accent="from-fuchsia-500 to-pink-500"
             />

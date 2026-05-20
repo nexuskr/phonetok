@@ -1,8 +1,7 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
-  Zap,
-  Crown,
+  Gem, Zap,
   Wallet,
   LogOut,
   ShieldCheck,
@@ -12,8 +11,7 @@ import {
   Coins,
   Home as HomeIcon,
   Gamepad2,
-  Radio,
-} from "lucide-react";
+  Radio} from "lucide-react";
 import { useDB } from "@/lib/store";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -49,7 +47,7 @@ const SIDEBAR_NAV: NavLeaf[] = [
   { to: "/casino",  label: "수익게임",  icon: Zap,         matches: ["/casino", "/crash", "/jackpot", "/games"] },
   { to: "/live",    label: "라이브",    icon: Radio,       matches: ["/live"] },
   { to: "/wallet",  label: "지갑",      icon: Wallet,      matches: ["/wallet", "/secure-wallet", "/phon"] },
-  { to: "/empire",  label: "황실",      icon: Crown,       matches: ["/empire", "/packages", "/profile"] },
+  { to: "/empire",  label: "황실",      icon: Gem,       matches: ["/empire", "/packages", "/profile"] },
 ];
 
 // Mobile bottom nav — 5 tabs, center FAB = PHON 허브
@@ -59,7 +57,7 @@ const BOTTOM_NAV: BottomItem[] = [
   { to: "/trade",   matches: ["/trade", "/arena"],                     icon: TrendingUp, label: "트레이딩" },
   { to: "/phon",    matches: ["/phon"],                                icon: Coins,      label: "PHON", fab: true },
   { to: "/casino",  matches: ["/games", "/casino", "/crash", "/jackpot"], icon: Gamepad2, label: "게임" },
-  { to: "/empire",  matches: ["/profile", "/wallet", "/empire"],       icon: Crown,      label: "내 제국" },
+  { to: "/empire",  matches: ["/profile", "/wallet", "/empire"],       icon: Gem,      label: "내 제국" },
 ];
 
 function matchActive(matches: string[] | undefined, fallbackTo: string, pathname: string) {

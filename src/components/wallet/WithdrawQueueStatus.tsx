@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useWalletChannel } from "@pkg/realtime";
 import { type ConnState } from "@pkg/realtime";
 import { toast } from "@/hooks/use-toast";
-import { Clock, Crown, CheckCircle2, XCircle, Zap, ArrowRight, RefreshCw, Wifi, WifiOff } from "lucide-react";
+import { Gem, Clock, CheckCircle2, XCircle, Zap, ArrowRight, RefreshCw, Wifi, WifiOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 type Status = "pending" | "processing" | "approved" | "completed" | "rejected" | "canceled";
@@ -133,7 +133,7 @@ export default function WithdrawQueueStatus() {
         </div>
         {isPriority && (
           <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-gold/20 border border-gold/40">
-            <Crown className="w-3 h-3 text-gold" />
+            <Gem className="w-3 h-3 text-gold" />
             <span className="text-[10px] font-black text-gold tracking-wider">{t("priorityBadge")}</span>
           </div>
         )}

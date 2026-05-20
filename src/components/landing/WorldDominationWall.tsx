@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { Crown, Globe2, Sparkles, TrendingUp, Users, Zap } from "lucide-react";
+import { Gem, Globe2, Sparkles, TrendingUp, Users, Zap } from "lucide-react";
 import TopEmperorBanner from "./TopEmperorBanner";
 import CompetitorCompareTicker from "./CompetitorCompareTicker";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
@@ -45,7 +45,7 @@ function useSessionHeadline(): { title: string; sub: string; tone: string } {
     const estH = (utcH + 19) % 24;
 
     if (kstH >= 2 && kstH < 6) {
-      return { title: "Night Crown Rush", sub: "심야 황제들이 움직이는 시간", tone: "from-purple-500/30 to-amber-500/30" };
+      return { title: "Night PHON Rush", sub: "심야 황제들이 움직이는 시간", tone: "from-purple-500/30 to-amber-500/30" };
     }
     if (kstH >= 21 || kstH < 1) {
       return { title: "Korean Prime Hour", sub: "한국 황제 세션 활성", tone: "from-rose-500/30 to-amber-500/30" };
@@ -117,7 +117,7 @@ export default function WorldDominationWall() {
 
   // 빈 피드 시 시드(데모) — 실데이터 1건이라도 오면 즉시 교체
   const displayFeed: Activity[] = feed.length > 0 ? feed : [
-    { kind: "crown_explosion", flag: "💎", title: "Crown Explosion", amount: 2341, user_mask: "Whale a3f1", created_at: new Date().toISOString() },
+    { kind: "crown_explosion", flag: "💎", title: "PHON Explosion", amount: 2341, user_mask: "Whale a3f1", created_at: new Date().toISOString() },
     { kind: "nft_mint", flag: "🪐", title: "DIAMOND emperor", amount: 35, user_mask: "Empire 8c20", created_at: new Date().toISOString() },
     { kind: "baron_promotion", flag: "⚜️", title: "Tier 9", amount: 9, user_mask: "Baron f4d2", created_at: new Date().toISOString() },
   ];
@@ -161,7 +161,7 @@ export default function WorldDominationWall() {
           </div>
         </div>
 
-        {/* Top Emperor of the Day (24h Crown 1위) */}
+        {/* Top Emperor of the Day (24h PHON 1위) */}
         <TopEmperorBanner />
 
         {/* KPI 행 */}
@@ -179,14 +179,14 @@ export default function WorldDominationWall() {
             accent="text-emerald-300"
           />
           <StatCell
-            icon={<Crown className="w-3 h-3" />}
+            icon={<Gem className="w-3 h-3" />}
             label="활성 황제"
             value={fmt(stats?.active_emperors ?? 0)}
             accent="text-rose-300"
           />
           <StatCell
             icon={<Zap className="w-3 h-3" />}
-            label="24H 최대 Crown"
+            label="24H 최대 PHON"
             value={"+" + fmt(stats?.max_crown_24h ?? 0)}
             accent="text-violet-300"
           />

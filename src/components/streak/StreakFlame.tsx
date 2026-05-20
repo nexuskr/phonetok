@@ -1,4 +1,4 @@
-import { Flame, Crown } from "lucide-react";
+import { Gem, Flame} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -70,7 +70,7 @@ export default function StreakFlame({ streak, className, size = "md" }: Props) {
       />
       <span className="relative z-10">{streak}일</span>
       {imperial && (
-        <Crown className="relative z-10 w-3 h-3 text-amber-100 drop-shadow-[0_0_3px_hsl(330_85%_60%/0.8)]" />
+        <Gem className="relative z-10 w-3 h-3 text-amber-100 drop-shadow-[0_0_3px_hsl(330_85%_60%/0.8)]" />
       )}
     </span>
   );

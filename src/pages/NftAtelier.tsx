@@ -1,11 +1,11 @@
 /**
  * /empire/atelier — NFT Atelier (Phase B).
- * Crown/Emperor/Founder × bronze/gold/diamond 컬렉션 + 합성(Fusion).
+ * PHON/Emperor/Founder × bronze/gold/diamond 컬렉션 + 합성(Fusion).
  * 같은 type+level 3장 → 다음 티어 1장 (bronze→gold→diamond).
  */
 import { useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Crown, Sparkles, Gem, ArrowLeft, Flame, Sword, Star } from "lucide-react";
+import { Sparkles, Gem, ArrowLeft, Flame, Sword, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -20,7 +20,7 @@ type NFTType = NFTRow["type"];
 type NFTLevel = NFTRow["level"];
 
 const TYPE_LABEL: Record<NFTType, string> = {
-  crown: "Crown",
+  crown: "PHON",
   emperor: "Emperor",
   founder: "Founder",
 };
@@ -40,7 +40,7 @@ const LEVEL_GLOW: Record<NFTLevel, string> = {
   diamond: "from-cyan-200/50 via-fuchsia-200/40 to-violet-300/50 ring-cyan-300/70",
 };
 const TYPE_ICON: Record<NFTType, React.ElementType> = {
-  crown: Crown,
+  crown: PHON,
   emperor: Sword,
   founder: Star,
 };
@@ -210,9 +210,9 @@ export default function NftAtelier() {
           <LoadingList rows={4} />
         ) : nfts.length === 0 ? (
           <EmptyState
-            icon={<Crown className="h-8 w-8 text-amber-400" />}
+            icon={<Gem className="h-8 w-8 text-amber-400" />}
             title="아직 수집된 NFT가 없습니다"
-            description="첫 입금 시 Crown Bronze가 자동으로 발행됩니다."
+            description="첫 입금 시 PHON Bronze가 자동으로 발행됩니다."
             action={<Button onClick={() => navigate("/wallet")}>지갑으로 이동</Button>}
           />
         ) : (

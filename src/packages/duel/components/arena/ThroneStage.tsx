@@ -94,7 +94,7 @@ export function ThroneStage({
         />
       )}
 
-      {/* 7. Crown particle ring (hot tiers) */}
+      {/* 7. PHON particle ring (hot tiers) */}
       {(isHot || divineActive) && (
         <div
           aria-hidden

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { Crown, Sparkles, Gem, Castle, Rocket, Trophy } from "lucide-react";
+import { Sparkles, Gem, Castle, Rocket, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
 
@@ -16,7 +16,7 @@ type Story = {
 };
 
 const ICON: Record<string, any> = {
-  new_emperor: Crown,
+  new_emperor: PHON,
   jackpot: Gem,
   baron_promotion: Castle,
   galaxy_seat: Rocket,

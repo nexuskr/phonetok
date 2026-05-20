@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Crown, ChevronRight } from "lucide-react";
+import { Gem, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { FOMO } from "@/lib/glossary";
 
@@ -79,7 +79,7 @@ export default function YesterdayPayoutsBanner() {
             "linear-gradient(100deg, hsl(38 92% 55% / 0.18) 0%, hsl(330 85% 60% / 0.08) 60%, transparent 100%)",
         }}
       />
-      <Crown className="relative z-10 w-3.5 h-3.5 text-amber-300 shrink-0 drop-shadow-[0_0_4px_hsl(38_92%_55%/0.7)]" />
+      <Gem className="relative z-10 w-3.5 h-3.5 text-amber-300 shrink-0 drop-shadow-[0_0_4px_hsl(38_92%_55%/0.7)]" />
       <span className="relative z-10 text-amber-100/95 leading-snug font-medium">
         {FOMO.yesterdayPayouts(count)}
       </span>

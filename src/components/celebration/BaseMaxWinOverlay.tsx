@@ -70,7 +70,7 @@ export interface BaseMaxWinOverlayProps {
   confettiBursts?: BurstSpec[];
   /** 타이틀 슬램 시작 딜레이 (ms). cinematic 이후에 슬램 띄우려면 사용. */
   titleDelayMs?: number;
-  /** Phase 3 — Empire/Crown 연동: legendary trigger 직후 1회 호출 (idempotent). */
+  /** Phase 3 — Empire/PHON 연동: legendary trigger 직후 1회 호출 (idempotent). */
   onMaxWinTriggered?: (payload: MaxWinTriggeredPayload) => void;
   slotId?: string;
   themeKey?: string;
@@ -156,7 +156,7 @@ export default function BaseMaxWinOverlay({
       }
     }
 
-    // Phase 3 — Empire/Crown 연동: legendary trigger 1회 호출 (idempotent).
+    // Phase 3 — Empire/PHON 연동: legendary trigger 1회 호출 (idempotent).
     // sound 호출 직후, confetti 와 병행하여 비동기 RPC 발사.
     if (onMaxWinTriggered && slotId) {
       try {

@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { subscribePostgres } from "@/lib/realtime-bus";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Crown, Zap, Percent, Users, Bot, Timer, Flame } from "lucide-react";
+import { Gem, Zap, Percent, Users, Bot, Timer, Flame } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatHMS } from "@/hooks/use-empire-booster";
 
@@ -37,7 +37,7 @@ const VARIANTS: Record<number, Variant> = {
   },
   2: {
     title: "🔥 BARON UNLOCKED — 24h만 살아있는 권력",
-    desc: (s) => `Crown ×1.5 / 수수료 -30% 부스터가 24시간만 가동됩니다. 잔여 ${s}석. 시간이 너의 적이다.`,
+    desc: (s) => `PHON ×1.5 / 수수료 -30% 부스터가 24시간만 가동됩니다. 잔여 ${s}석. 시간이 너의 적이다.`,
     ctaPrimary: "Booster 활성화 →",
     ctaSecondary: "다음 시즌 대기",
     accent: "rose",
@@ -141,7 +141,7 @@ export default function BaronPromotionDialog() {
 
         <DialogHeader className="relative">
           <DialogTitle className={`flex items-center gap-2 font-imperial text-xl tracking-wider ${accent.titleClass}`}>
-            <Crown className="w-5 h-5 text-sim-gold" /> {variant.title}
+            <Gem className="w-5 h-5 text-sim-gold" /> {variant.title}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
             {variant.desc(seats)}
@@ -172,7 +172,7 @@ export default function BaronPromotionDialog() {
         <div className="relative grid grid-cols-2 gap-2 my-3">
           <Perk icon={Zap}     label="레버리지"      value={`${lev}x`} />
           <Perk icon={Percent} label="수수료 할인"   value={`-${fee}%`} highlight />
-          <Perk icon={Crown}   label="Crown 배수"   value={`×${mult}`} highlight />
+          <Perk icon={PHON}   label="PHON 배수"   value={`×${mult}`} highlight />
           <Perk icon={Bot}     label="전용 Advisor" value="ON" />
         </div>
 

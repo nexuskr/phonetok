@@ -4,7 +4,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Swords } from "lucide-react";
+import { Gem, Swords } from "lucide-react";
 import { notify } from "@/lib/notify";
 import { ConfirmBetSheet } from "./ConfirmBetSheet";
 
@@ -71,7 +71,7 @@ export function BettingPanel({
     <div className="rounded-2xl border border-amber-400/30 bg-gradient-to-br from-[#160a05] to-[#0A0503] p-3 space-y-3">
       <div className="flex items-center justify-between">
         <div className="inline-flex items-center gap-1.5">
-          <Crown className="w-4 h-4 text-amber-300" />
+          <Gem className="w-4 h-4 text-amber-300" />
           <span className="font-imperial text-base text-amber-100">옥좌에 베팅을 올리소서</span>
         </div>
         <span className="text-[10px] tracking-[0.22em] font-black uppercase text-pink-300/85">DEMO</span>

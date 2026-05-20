@@ -2,7 +2,7 @@
 // Admin-only. Pulls from feed_events, revenue_events, profiles. Auto-refresh 60s.
 import { useEffect, useState } from "react";
 import { useVisibleInterval } from "@/lib/util/visible-interval";
-import { Activity, MousePointerClick, Users, TrendingUp, Flame, RefreshCw, Crown } from "lucide-react";
+import { Gem, Activity, MousePointerClick, Users, TrendingUp, Flame, RefreshCw} from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useRequireAdmin } from "@/hooks/use-require-auth";
@@ -108,7 +108,7 @@ export default function AdminKpi() {
       <div className="container py-6 space-y-6">
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Crown className="w-5 h-5 text-primary" />
+            <Gem className="w-5 h-5 text-primary" />
             <h1 className="text-xl font-display font-black tracking-wide">제국 KPI 콕핏</h1>
             <span className="text-[10px] tracking-widest text-muted-foreground uppercase">V17 Master</span>
           </div>

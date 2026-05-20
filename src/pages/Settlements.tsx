@@ -5,7 +5,7 @@ import HubTabs from "@/components/HubTabs";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { formatKRW } from "@/lib/store";
-import { Receipt, Clock, CheckCircle2, XCircle, Crown, TrendingUp, ChevronRight, Calendar } from "lucide-react";
+import { Gem, Receipt, Clock, CheckCircle2, XCircle, TrendingUp, ChevronRight, Calendar } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Money } from "@/components/ui/lux";
 
@@ -157,7 +157,7 @@ export default function Settlements() {
                       <span className="font-display font-black text-sm truncate break-keep">{r.package_name}</span>
                       {r.is_empire_founding_member && (
                         <span className="text-[10px] text-gold flex items-center gap-0.5 tabular-nums">
-                          <Crown className="w-3 h-3" /> #{r.founding_seat_no}
+                          <Gem className="w-3 h-3" /> #{r.founding_seat_no}
                         </span>
                       )}
                     </div>

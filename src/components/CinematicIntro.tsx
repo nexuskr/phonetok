@@ -33,7 +33,7 @@ export default function CinematicIntro() {
         <div className="absolute inset-0 bg-primary/30 blur-3xl rounded-full -z-10 animate-ring-pulse" />
         <img
           src={crownPhone}
-          alt="Phonara — Imperial Crown"
+          alt="Phonara — Imperial PHON"
           width={1024}
           height={1024}
           loading="eager"

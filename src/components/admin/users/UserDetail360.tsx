@@ -1,6 +1,6 @@
 /**
  * UserDetail360 — 회원 검색 + 360도 상세 (Day 2)
- * 프로필 / 잔액 / 입출금 / 이상감지 / Crown / 포지션
+ * 프로필 / 잔액 / 입출금 / 이상감지 / PHON / 포지션
  */
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -60,7 +60,7 @@ export default function UserDetail360() {
           <User className="inline h-5 w-5 mr-1" /> 회원 360
         </h1>
         <p className="text-xs text-muted-foreground mt-1">
-          UUID 또는 이메일 prefix로 검색 → 프로필·잔액·입출금·이상감지·Crown 한눈에
+          UUID 또는 이메일 prefix로 검색 → 프로필·잔액·입출금·이상감지·PHON 한눈에
         </p>
       </header>
 
@@ -84,7 +84,7 @@ export default function UserDetail360() {
           <Section title="입금 (최근 20)" rows={data.deposits} cols={["status", "amount", "method", "created_at"]} />
           <Section title="출금 (최근 20)" rows={data.withdrawals} cols={["status", "amount", "method", "created_at"]} />
           <Section title="이상감지 (최근 20)" rows={data.anomalies} cols={["rule", "severity", "acknowledged", "created_at"]} />
-          <Section title="Crown (최근 20)" rows={data.crown_events} cols={["event_type", "base_amount", "awarded_amount", "created_at"]} />
+          <Section title="PHON (최근 20)" rows={data.crown_events} cols={["event_type", "base_amount", "awarded_amount", "created_at"]} />
           <Section title="오픈 포지션" rows={data.positions} cols={["symbol", "side", "size", "leverage"]} />
         </div>
       )}

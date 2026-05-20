@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Crown, Sparkles, KeyRound, Rocket, ChevronRight, X } from "lucide-react";
+import { Gem, Sparkles, KeyRound, Rocket, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -20,7 +20,7 @@ type Step = {
 
 const STEPS: Step[] = [
   {
-    icon: Crown,
+    icon: Gem,
     badge: "PHONARA EMPIRE",
     title: "Baron이 될 준비, 되셨습니까?",
     body: "전 세계 상위 0.3%의 Baron 등급은 매월 평균 12배 빠른 자산 증식을 경험합니다. 첫 60초 안에 시작 등급이 결정됩니다.",
@@ -30,7 +30,7 @@ const STEPS: Step[] = [
     icon: Sparkles,
     badge: "VARIABLE REWARDS",
     title: "예측할 수 없는 보상이 폭발합니다",
-    body: "Crown · Empire Level · 변동성 Jackpot. Phonara의 보상 알고리즘은 0.55x~2.9x 사이에서 무작위로 폭발합니다. 평범한 게임이 아닙니다.",
+    body: "PHON · Empire Level · 변동성 Jackpot. Phonara의 보상 알고리즘은 0.55x~2.9x 사이에서 무작위로 폭발합니다. 평범한 게임이 아닙니다.",
     accent: "from-secondary via-accent to-primary",
   },
   {

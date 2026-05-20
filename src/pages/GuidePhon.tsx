@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Coins, Crown, Heart, Shield, ArrowRight, Sparkles, Zap, Users } from "lucide-react";
+import { Gem, Coins, Heart, Shield, ArrowRight, Sparkles, Zap, Users } from "lucide-react";
 import { useMyPower } from "@/hooks/use-my-power";
 
 export default function GuidePhon() {
@@ -34,7 +34,7 @@ export default function GuidePhon() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
               <Stat icon={Coins} label={t.statPhon} value={phon.toLocaleString()} />
-              <Stat icon={Crown} label={t.statNft} value={String(nfts.length)} />
+              <Stat icon={PHON} label={t.statNft} value={String(nfts.length)} />
               <Stat icon={Zap} label={t.statBoost} value={`+${boostPct}%`} />
               <Stat icon={Shield} label={t.statLev} value={`${maxLeverage}x`} />
             </div>
@@ -59,7 +59,7 @@ export default function GuidePhon() {
         </Section>
 
         {/* NFT 섹션 */}
-        <Section icon={Crown} title={t.nftTitle} subtitle={t.nftSub}>
+        <Section icon={PHON} title={t.nftTitle} subtitle={t.nftSub}>
           <div className="grid md:grid-cols-3 gap-3">
             <TierCard tier="BRONZE" boost="+5~10%" color="from-amber-700/30 to-amber-900/30" border="border-amber-700/40" />
             <TierCard tier="GOLD" boost="+15~30%" color="from-yellow-500/30 to-amber-600/30" border="border-yellow-500/40" />
@@ -159,20 +159,20 @@ const KO = {
   statPhon: "내 PHON", statNft: "내 NFT", statBoost: "부스트", statLev: "최대 레버리지",
 
   phonTitle: "PHON 토큰 — 권력의 혈액",
-  phonSub: "Phonara 내부 토큰. 수수료 할인·부스터 구매·Crown 부스트에 사용.",
+  phonSub: "Phonara 내부 토큰. 수수료 할인·부스터 구매·PHON 부스트에 사용.",
   phonCard1Title: "수수료 50% 할인",
   phonCard1Desc: "1~1,000 PHON 사용 → 다음 출금 1회 수수료 50% 할인 슬롯 적립.",
   phonCard2Title: "Empire Booster 24h",
-  phonCard2Desc: "5,000 PHON → 24시간 수수료 −30% · Crown ×1.5 · 레버리지 7x 동시 적용.",
-  phonCard3Title: "Crown 부스트 24h",
-  phonCard3Desc: "1,000 PHON → 24시간 모든 Crown 적립 1.5배.",
+  phonCard2Desc: "5,000 PHON → 24시간 수수료 −30% · PHON ×1.5 · 레버리지 7x 동시 적용.",
+  phonCard3Title: "PHON 부스트 24h",
+  phonCard3Desc: "1,000 PHON → 24시간 모든 PHON 적립 1.5배.",
   phonValueTitle: "PHON은 어떻게 가치를 가지나?",
   phonValueDesc: "PHON은 입금/패키지 구매/미션 보상으로 발행되고, 사용 시 소각됩니다. 발행과 소각이 균형을 이루며, 1만명 이상 사용자 도달 시 외부 블록체인 NFT/토큰으로 1:1 마이그레이션이 보장됩니다.",
   ctaUsePhon: "PHON 사용하기",
   ctaEarnPhon: "PHON 적립 패키지",
 
   nftTitle: "NFT — 왕관의 등급",
-  nftSub: "Crown / Emperor / Founder × Bronze / Gold / Diamond. 보유 시 부스트 +5~50% 자동. 대표 NFT는 프로필·헤더·채팅 아바타로 표시되어 제국 내 신분이 됩니다 (변경: 첫 3회 무료 → 이후 100 PHON, 24h 쿨다운).",
+  nftSub: "PHON / Emperor / Founder × Bronze / Gold / Diamond. 보유 시 부스트 +5~50% 자동. 대표 NFT는 프로필·헤더·채팅 아바타로 표시되어 제국 내 신분이 됩니다 (변경: 첫 3회 무료 → 이후 100 PHON, 24h 쿨다운).",
   nftMigrationNote: "현재 NFT는 Phonara 내부 NFT입니다. 1만명 도달 시 외부 블록체인(Polygon/Solana 등) 1:1 마이그레이션이 보장되며, 그 전까지는 안전하게 잠금 보관됩니다.",
   ctaCollection: "내 컬렉션 보기",
 
@@ -194,25 +194,25 @@ const KO = {
 
 const EN = {
   heroTag: "PHON · NFT · DYNASTY",
-  heroTitle: "Your Empire —\nBlood, Crown, Legacy",
+  heroTitle: "Your Empire —\nBlood, PHON, Legacy",
   heroSub: "PHON is the blood of power, NFTs are crowns, and Dynasty is what you leave to your children.",
   statPhon: "My PHON", statNft: "My NFTs", statBoost: "Boost", statLev: "Max Leverage",
 
   phonTitle: "PHON Token — Blood of Power",
-  phonSub: "Phonara internal token. Use for fee discount, booster purchase, Crown boost.",
+  phonSub: "Phonara internal token. Use for fee discount, booster purchase, PHON boost.",
   phonCard1Title: "50% Fee Discount",
   phonCard1Desc: "Spend 1~1,000 PHON → next withdrawal gets a 50% fee discount slot.",
   phonCard2Title: "Empire Booster 24h",
-  phonCard2Desc: "5,000 PHON → 24h fee −30% · Crown ×1.5 · leverage 7x simultaneously.",
-  phonCard3Title: "Crown Boost 24h",
-  phonCard3Desc: "1,000 PHON → 24h all Crown earnings ×1.5.",
+  phonCard2Desc: "5,000 PHON → 24h fee −30% · PHON ×1.5 · leverage 7x simultaneously.",
+  phonCard3Title: "PHON Boost 24h",
+  phonCard3Desc: "1,000 PHON → 24h all PHON earnings ×1.5.",
   phonValueTitle: "How does PHON hold value?",
   phonValueDesc: "PHON is minted via deposits / package purchases / mission rewards, and burned on use. Mint & burn balance each other. When user count reaches 10,000+, a 1:1 migration to external blockchain NFT/token is guaranteed.",
   ctaUsePhon: "Use PHON",
   ctaEarnPhon: "Earn via Packages",
 
-  nftTitle: "NFT — Tier of the Crown",
-  nftSub: "Crown / Emperor / Founder × Bronze / Gold / Diamond. Auto +5~50% boost when held. Your main NFT is shown as your profile, header and chat avatar — your face in the empire (change: first 3 free, then 100 PHON with 24h cooldown).",
+  nftTitle: "NFT — Tier of the PHON",
+  nftSub: "PHON / Emperor / Founder × Bronze / Gold / Diamond. Auto +5~50% boost when held. Your main NFT is shown as your profile, header and chat avatar — your face in the empire (change: first 3 free, then 100 PHON with 24h cooldown).",
   nftMigrationNote: "NFTs are currently Phonara internal NFTs. At 10,000 users, a 1:1 external blockchain (Polygon/Solana) migration is guaranteed; until then they're safely locked.",
   ctaCollection: "View My Collection",
 

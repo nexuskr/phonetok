@@ -74,7 +74,7 @@ export function ShareReplayButton({ token, variant = "compact", className = "" }
               </button>
             </div>
             <div className="mt-2 text-[10px] text-center text-muted-foreground">
-              공유할수록 더 큰 Crown이 당신을 기다립니다 💎
+              공유할수록 더 큰 PHON이 당신을 기다립니다 💎
             </div>
           </motion.div>
         )}

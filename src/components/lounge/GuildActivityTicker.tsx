@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Flame, Users, Sword, Crown } from "lucide-react";
+import { Gem, Flame, Users, Sword} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const NICKS = [

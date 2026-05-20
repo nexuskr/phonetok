@@ -3,17 +3,15 @@ import { useEffect, useState, lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import SEOHead from "@/components/seo/SEOHead";
 import {
-  ShieldCheck,
+  Gem, ShieldCheck,
   Zap,
   Lock,
   Sparkles,
   ArrowRight,
   TrendingUp,
-  Crown,
   Cpu,
   Users,
-  Heart,
-} from "lucide-react";
+  Heart} from "lucide-react";
 import Particles from "@/components/Particles";
 import PayoutTicker from "@/components/PayoutTicker";
 import WhaleStrikeRail from "@/components/empire/WhaleStrikeRail";
@@ -129,7 +127,7 @@ export default function Index() {
         <div className="container flex items-center justify-between h-20">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-imperial glow-imperial flex items-center justify-center">
-              <Crown className="w-5 h-5 text-primary-foreground" />
+              <Gem className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-xl tracking-[0.2em] text-gradient-imperial">
               PHONARA
@@ -164,7 +162,7 @@ export default function Index() {
       {/* Hero */}
       <section className="relative z-10 container pt-10 pb-24 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-8 animate-fade-up border border-primary/30">
-          <Crown className="w-3 h-3 text-primary" />
+          <Gem className="w-3 h-3 text-primary" />
           <span className="text-xs text-primary font-bold tracking-[0.2em]">{t("badge")}</span>
         </div>
 
@@ -312,7 +310,7 @@ export default function Index() {
                 onClick={() => onCta("council")}
                 className="mt-5 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-imperial text-primary-foreground font-bold text-sm glow-imperial hover:scale-105 transition"
               >
-                <Crown className="w-4 h-4" /> {t("councilCta")}
+                <Gem className="w-4 h-4" /> {t("councilCta")}
               </Link>
             </div>
           </div>
@@ -354,7 +352,7 @@ export default function Index() {
         <div className="grid md:grid-cols-3 gap-5">
           {[
             { icon: Cpu, title: t("featImperialTitle"), desc: t("featImperialDesc") },
-            { icon: Crown, title: t("featTierTitle"), desc: t("featTierDesc") },
+            { icon: Gem, title: t("featTierTitle"), desc: t("featTierDesc") },
             { icon: TrendingUp, title: t("featTreasuryTitle"), desc: t("featTreasuryDesc") },
           ].map((f, i) => (
             <div key={i} className="glass-strong rounded-3xl p-6 border border-primary/30 tilt-card relative overflow-hidden">
@@ -397,7 +395,7 @@ export default function Index() {
           onClick={() => onCta("final")}
           className="mt-8 inline-flex items-center gap-2 px-10 py-5 rounded-2xl font-display font-bold text-lg bg-gradient-imperial text-primary-foreground glow-imperial animate-pulse-glow hover:scale-105 transition"
         >
-          <Crown className="w-5 h-5" /> {t("finalCta")}
+          <Gem className="w-5 h-5" /> {t("finalCta")}
         </Link>
         <div className="mt-12 text-xs text-muted-foreground flex items-center justify-center gap-3">
           <Link to="/trust"

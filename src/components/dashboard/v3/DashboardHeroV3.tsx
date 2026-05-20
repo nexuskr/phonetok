@@ -7,7 +7,7 @@
  * see a fully static hero.
  */
 import { motion } from "framer-motion";
-import { Crown, Coins } from "lucide-react";
+import { Gem, Coins } from "lucide-react";
 import CosmicBackdrop from "@/components/cosmic/CosmicBackdrop";
 import { useMyPower, topNftLevel, type NFTRow } from "@/hooks/use-my-power";
 import { useReducedMotionPref } from "@/lib/app-settings";
@@ -52,13 +52,13 @@ export default function DashboardHeroV3({
         className="relative z-10 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-gold/55 bg-background/40"
         style={{ boxShadow: "0 0 24px -8px hsl(var(--gold)/0.5)" }}
       >
-        <Crown className="w-3.5 h-3.5 text-gold" />
+        <Gem className="w-3.5 h-3.5 text-gold" />
         <span className="text-[10px] tracking-[0.42em] text-gold font-black">
           ⟡ PHONARA · EST. 2026
         </span>
       </div>
 
-      {/* Crown — one-shot entrance only; no infinite glow */}
+      {/* PHON — one-shot entrance only; no infinite glow */}
       <motion.div
         initial={reduced ? false : { y: 30, opacity: 0, scale: 0.85 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -74,7 +74,7 @@ export default function DashboardHeroV3({
               "0 0 60px hsl(var(--gold) / 0.55), 0 0 120px hsl(var(--gold) / 0.28), inset 0 4px 16px hsl(48 100% 90% / 0.5)",
           }}
         >
-          <Crown className="w-14 h-14 md:w-20 md:h-20 text-[hsl(240_28%_3%)]" strokeWidth={1.5} />
+          <Gem className="w-14 h-14 md:w-20 md:h-20 text-[hsl(240_28%_3%)]" strokeWidth={1.5} />
         </div>
       </motion.div>
 
@@ -110,7 +110,7 @@ export default function DashboardHeroV3({
           <span className="text-[10px] md:text-xs tracking-widest text-primary/80 font-bold">PHON</span>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 rounded-2xl border border-gold/40 bg-card/60">
-          <Crown className="w-4 h-4 md:w-5 md:h-5 text-gold" />
+          <Gem className="w-4 h-4 md:w-5 md:h-5 text-gold" />
           <span className="font-imperial font-black text-xl md:text-3xl text-gold">{tier}</span>
         </div>
       </div>

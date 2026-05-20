@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { getFingerprint } from "@/lib/deviceFingerprint";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 
 type Inf = { code: string; display_name: string; channel: string | null; bonus_phon: number; bonus_crown: number };
 
@@ -44,7 +44,7 @@ export default function InfluencerLanding() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="text-center max-w-md space-y-4">
-        <Crown className="h-12 w-12 mx-auto text-primary animate-pulse" />
+        <Gem className="h-12 w-12 mx-auto text-primary animate-pulse" />
         {loading ? (
           <p className="text-muted-foreground">코드 확인 중...</p>
         ) : inf ? (
@@ -53,7 +53,7 @@ export default function InfluencerLanding() {
             <p className="text-muted-foreground text-sm">
               {inf.bonus_phon > 0 && <>가입 시 +{inf.bonus_phon.toLocaleString()} PHON</>}
               {inf.bonus_phon > 0 && inf.bonus_crown > 0 && " · "}
-              {inf.bonus_crown > 0 && <>+{inf.bonus_crown.toLocaleString()} Crown</>}
+              {inf.bonus_crown > 0 && <>+{inf.bonus_crown.toLocaleString()} PHON</>}
             </p>
             <div className="text-xs text-muted-foreground">잠시 후 자동 이동합니다...</div>
           </>

@@ -10,9 +10,8 @@ import {
 import PinPad from "@/components/PinPad";
 import { toast } from "@/hooks/use-toast";
 import {
-  Wallet as WalletIcon, ShieldCheck, ArrowDownToLine, ArrowUpFromLine,
-  Clock, Sparkles, Zap, LogOut, Banknote, Coins, Flame, Crown, TrendingUp,
-} from "lucide-react";
+  Gem, Wallet as WalletIcon, ShieldCheck, ArrowDownToLine, ArrowUpFromLine,
+  Clock, Sparkles, Zap, LogOut, Banknote, Coins, Flame, TrendingUp} from "lucide-react";
 import WithdrawIntentInterceptor from "@/components/conversion/WithdrawIntentInterceptor";
 
 type ActionTab = "play" | "withdraw" | "history";
@@ -172,7 +171,7 @@ export default function SecureWallet() {
               tier === "god" ? "bg-gradient-cyber text-black" :
               tier === "vip" ? "bg-gradient-primary text-primary-foreground" :
               "glass text-muted-foreground"}`}>
-              {tier === "empire" && <Crown className="w-3 h-3 inline mr-1" />}{cfg.label}
+              {tier === "empire" && <Gem className="w-3 h-3 inline mr-1" />}{cfg.label}
             </span>
             <button onClick={logout} className="p-2 rounded-lg glass text-muted-foreground hover:text-foreground"><LogOut className="w-4 h-4" /></button>
           </div>
@@ -189,7 +188,7 @@ export default function SecureWallet() {
             <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-border/40">
               <Stat label="Total" value={fmtKRW(wallet?.total_balance ?? 0)} />
               <Stat label="Locked" value={fmtKRW(wallet?.locked_balance ?? 0)} icon={<Clock className="w-3 h-3" />} />
-              <Stat label="Reward Pool" value={fmtKRW(wallet?.profit_share_balance ?? 0)} icon={<Crown className="w-3 h-3" />} />
+              <Stat label="Reward Pool" value={fmtKRW(wallet?.profit_share_balance ?? 0)} icon={<Gem className="w-3 h-3" />} />
             </div>
 
             {/* Daily cap */}

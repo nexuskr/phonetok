@@ -2,7 +2,7 @@
  * ConfirmBetSheet — 봉납 확정 BottomSheet (Shadow PROOF MODE).
  */
 import { BottomSheet } from "@/components/ui/bottom-sheet";
-import { Crown, Swords, ShieldCheck } from "lucide-react";
+import { Gem, Swords, ShieldCheck } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -76,7 +76,7 @@ export function ConfirmBetSheet({
           className="w-full inline-flex items-center justify-center gap-2 rounded-2xl py-4 font-imperial tracking-[0.22em] text-sm bg-gradient-to-r from-amber-400 via-amber-300 to-pink-500 text-[#1a0a05] font-black active:scale-[0.97] will-change-transform disabled:opacity-40"
           style={{ minHeight: 56, boxShadow: "0 0 18px hsl(38 92% 60% / 0.55)" }}
         >
-          <Crown className="w-4 h-4" />
+          <Gem className="w-4 h-4" />
           봉납 확정 · 결투 입장
           <Swords className="w-4 h-4" />
         </button>

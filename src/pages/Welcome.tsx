@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Crown, Gift, Sparkles, ArrowRight, Coins, Gamepad2, Target } from "lucide-react";
+import { Gem, Gift, Sparkles, ArrowRight, Coins, Gamepad2, Target } from "lucide-react";
 import ImperialLogo from "@/components/brand/ImperialLogo";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 
@@ -52,7 +52,7 @@ const SLIDES = [
       </>
     ),
     sub: "폐하의 자리는 항상 비워두었습니다. 첫 입금 시 +30% 보너스가 자동 적용됩니다.",
-    icon: Crown,
+    icon: Gem,
     cta: "제국에 입성하기",
   },
 ] as const;

@@ -3,7 +3,7 @@ import Layout from "@/components/Layout";
 import HubTabs from "@/components/HubTabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useDB, formatKRW } from "@/lib/store";
-import { Trophy, Lock, Crown } from "lucide-react";
+import { Gem, Trophy, Lock} from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import PaymentStickyCTA from "@/components/missions/PaymentStickyCTA";
@@ -122,7 +122,7 @@ export default function Achievements() {
           className="press flex items-center justify-between rounded-2xl p-4 min-h-[56px] bg-gradient-to-r from-gold/20 via-primary/10 to-accent/15 border border-gold/30 hover:border-gold/60 transition"
         >
           <div className="flex items-center gap-3">
-            <Crown className="w-5 h-5 text-gold" />
+            <Gem className="w-5 h-5 text-gold" />
             <div>
               <div className="font-imperial font-black text-sm text-gradient-gold break-keep">{t("hofTitle")}</div>
               <div className="text-[11px] text-muted-foreground break-keep">{t("hofSub")}</div>

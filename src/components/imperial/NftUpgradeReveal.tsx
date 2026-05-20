@@ -34,7 +34,7 @@ export default function NftUpgradeReveal({
             animate={{ scaleY: 1, opacity: [0, 1, 1, 0.4] }}
             transition={{ duration: 2.4, ease: "easeOut" }}
           />
-          {/* Crown particles */}
+          {/* PHON particles */}
           {Array.from({ length: 18 }).map((_, i) => {
             const a = (i / 18) * Math.PI * 2;
             return (

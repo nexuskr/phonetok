@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Trophy, TrendingUp, Zap, Crown } from "lucide-react";
+import { Gem, Trophy, TrendingUp, Zap} from "lucide-react";
 import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
 import { notify } from "@/lib/notify";
@@ -67,7 +67,7 @@ export default function SlotLeaderboard({ gameCode }: { gameCode?: string }) {
     <div className="rounded-xl border border-border/40 bg-card/60 backdrop-blur p-4 space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Crown className="w-4 h-4 text-primary" />
+          <Gem className="w-4 h-4 text-primary" />
           <h3 className="font-imperial tracking-[0.18em] text-sm">SLOT 리더보드</h3>
         </div>
         <div className="inline-flex rounded-full bg-muted/40 p-0.5 border border-border/40">

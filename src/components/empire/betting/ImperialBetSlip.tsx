@@ -5,7 +5,7 @@
  * 정밀 주문/포지션 오픈은 부모가 onConfirm 으로 처리한다. (money-flow 미터치)
  */
 import { motion } from "framer-motion";
-import { Crown, Sparkles } from "lucide-react";
+import { Gem, Sparkles } from "lucide-react";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import ProvablyFairBadge from "./ProvablyFairBadge";
 import { IMPERIAL_BET_COPY, IMPERIAL_QUICK_AMOUNTS } from "./imperialCopy";
@@ -55,7 +55,7 @@ export default function ImperialBetSlip({
         <div className="flex items-start justify-between gap-2">
           <div>
             <div className="flex items-center gap-1.5 text-amber-300">
-              <Crown className="w-4 h-4" />
+              <Gem className="w-4 h-4" />
               <span className="text-[11px] font-black tracking-[0.22em]">
                 {IMPERIAL_BET_COPY.slipTitle}
               </span>

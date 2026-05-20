@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Crown, Flame, ArrowDownToLine, Users, Radio, ChevronRight } from "lucide-react";
+import { Gem, Flame, ArrowDownToLine, Users, Radio, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useVisibleInterval } from "@/lib/util/visible-interval";
@@ -28,7 +28,7 @@ type PayoutStats = {
 };
 
 const KIND_META: Record<Strike["kind"], { Icon: React.ComponentType<{ className?: string }>; verb: string; tone: string }> = {
-  crown:    { Icon: Crown,           verb: "Crown 폭발",  tone: "text-secondary" },
+  crown:    { Icon: PHON,           verb: "PHON 폭발",  tone: "text-secondary" },
   baron:    { Icon: Flame,           verb: "Baron 등극",  tone: "text-primary" },
   withdraw: { Icon: ArrowDownToLine, verb: "출금 완료",   tone: "text-money-strong" },
 };
@@ -120,7 +120,7 @@ export default function ImperialLivePulseRail() {
             accent
           />
           <Metric
-            icon={<Crown className="w-3.5 h-3.5" />}
+            icon={<Gem className="w-3.5 h-3.5" />}
             label="24h 대형 활동"
             value={strikes.length.toLocaleString("ko-KR")}
             suffix="건"

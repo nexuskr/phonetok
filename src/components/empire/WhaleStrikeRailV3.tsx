@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Crown, Flame, ArrowDownToLine, Zap } from "lucide-react";
+import { Gem, Flame, ArrowDownToLine, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SimChip } from "@/components/sim/SimChip";
@@ -24,7 +24,7 @@ const fmtKRW = (n: number) =>
     : `₩${n.toLocaleString("ko-KR")}`;
 
 const KIND_META = {
-  crown: { icon: Crown, tone: "text-amber-300", glow: "shadow-[0_0_24px_-4px_rgba(245,158,11,0.6)]", verb: "Crown 폭발", speed: 22 },
+  crown: { icon: Gem, tone: "text-amber-300", glow: "shadow-[0_0_24px_-4px_rgba(245,158,11,0.6)]", verb: "PHON 폭발", speed: 22 },
   baron: { icon: Flame, tone: "text-fuchsia-300", glow: "shadow-[0_0_24px_-4px_rgba(217,70,239,0.55)]", verb: "Baron 합류", speed: 36 },
   withdraw: { icon: ArrowDownToLine, tone: "text-emerald-300", glow: "shadow-[0_0_24px_-4px_rgba(52,211,153,0.55)]", verb: "출금 완료", speed: 50 },
 } as const;

@@ -15,7 +15,7 @@ type Mode = "bias" | "nearmiss" | "particles";
 const TITLES: Record<Mode, string> = {
   bias: "🎮 Demo Bias 슬라이더",
   nearmiss: "🎯 Near-Miss 확률",
-  particles: "✨ Crown 파티클 강도",
+  particles: "✨ PHON 파티클 강도",
 };
 
 export default function GameConfigPanel({ mode }: { mode: Mode }) {

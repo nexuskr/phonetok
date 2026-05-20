@@ -106,7 +106,7 @@ function ImperialMark({ px }: { px: number }) {
           <circle r="14" fill="none" stroke={`url(#${strokeId})`} strokeWidth="1.25" />
         </g>
 
-        {/* Imperial Crown peaks */}
+        {/* Imperial PHON peaks */}
         <g transform="translate(24 14)" fill={`url(#${gradId})`}>
           <path d="M-8 0 L-4.5 -4 L-1.5 -1.5 L0 -5 L1.5 -1.5 L4.5 -4 L8 0 Z" />
           <circle cx="0" cy="-5.5" r="1.1" />

@@ -6,7 +6,7 @@
  * Falls back to hooks when used standalone.
  */
 import { useEffect, useState } from "react";
-import { Wallet, Users, Crown, Sparkles } from "lucide-react";
+import { Gem, Wallet, Users, Sparkles } from "lucide-react";
 import { useOnline, useTodayPayout } from "@/components/LiveStats";
 import { useMyPower, topNftLevel, type NFTRow } from "@/hooks/use-my-power";
 import { formatKRW } from "@/lib/store";
@@ -44,7 +44,7 @@ export default function KpiGridV3({
   const cards: Array<{ icon: any; micro: string; value: string; tone: "money" | "gold" | "primary" | "accent" }> = [
     { icon: Wallet, micro: "오늘 출금", value: formatKRW(today), tone: "money" },
     { icon: Users, micro: "활동 중", value: `${online.toLocaleString()}명`, tone: "primary" },
-    { icon: Crown, micro: "내 제국", value: tier, tone: "gold" },
+    { icon: Gem, micro: "내 제국", value: tier, tone: "gold" },
     { icon: Sparkles, micro: "Jackpot", value: formatKRW(jackpot), tone: "accent" },
   ];
 

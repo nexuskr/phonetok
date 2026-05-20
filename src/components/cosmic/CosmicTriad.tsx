@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Wallet, Users, Crown } from "lucide-react";
+import { Gem, Wallet, Users} from "lucide-react";
 import { useDB, formatKRW } from "@/lib/store";
 import { useOnline, useTodayPayout } from "@/components/LiveStats";
 
@@ -26,7 +26,7 @@ function CountUp({ value, format }: { value: number; format: (n: number) => stri
 const cards = [
   { key: "payout", icon: Wallet, micro: "TODAY", label: "오늘 출금액" },
   { key: "online", icon: Users, micro: "LIVE", label: "활동 중인 황제" },
-  { key: "level", icon: Crown, micro: "YOU", label: "내 제국 레벨" },
+  { key: "level", icon: Gem, micro: "YOU", label: "내 제국 레벨" },
 ] as const;
 
 export default function CosmicTriad() {

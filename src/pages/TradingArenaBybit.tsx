@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useSyncExternalStore, useCallback, lazy, Suspense } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
-import { Swords, Flame, Wallet as WalletIcon, Crown } from "lucide-react";
+import { Gem, Swords, Flame, Wallet as WalletIcon} from "lucide-react";
 import Layout from "@/components/Layout";
 import HubTabs from "@/components/HubTabs";
 import { useRequireAuth } from "@/hooks/use-require-auth";
@@ -355,7 +355,7 @@ export default function TradingArenaBybit() {
         <header className="flex items-end justify-between gap-3 flex-wrap">
           <div>
             <h1 className="font-imperial text-2xl sm:text-3xl tracking-[0.18em] text-gradient-imperial flex items-center gap-2">
-              <Crown className="w-5 h-5 text-gold" /> 황제의 실전 트레이딩 홀
+              <Gem className="w-5 h-5 text-gold" /> 황제의 실전 트레이딩 홀
             </h1>
             <p className="text-[11px] text-muted-foreground mt-0.5 tracking-wide">
               바이비트급 차트 · 25 페어 · 최대 100× · Paper ↔ Real

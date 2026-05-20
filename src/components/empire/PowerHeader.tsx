@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Coins, Zap, Rocket } from "lucide-react";
+import { Gem, Coins, Zap, Rocket } from "lucide-react";
 import { useMyPower, topNftLevel } from "@/hooks/use-my-power";
 import CrownAura from "@/components/empire/CrownAura";
 import NftAvatar from "@/components/profile/NftAvatar";
@@ -49,7 +49,7 @@ export default function PowerHeader() {
             <EquippedAvatarChip />
             <VipPassBadge compact />
             <span className="relative inline-flex items-center justify-center w-6 h-6">
-              {lv ? <CrownAura level={auraLevel} size={24} /> : <Crown className="w-4 h-4 text-primary" />}
+              {lv ? <CrownAura level={auraLevel} size={24} /> : <Gem className="w-4 h-4 text-primary" />}
             </span>
             <span className="text-[10px] font-imperial tracking-widest text-primary">
               {lv ? LEVEL_LABEL[lv] : "ROOKIE"}

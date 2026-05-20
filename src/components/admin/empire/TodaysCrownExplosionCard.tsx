@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
 
@@ -22,7 +22,7 @@ export function TodaysCrownExplosionCard() {
       <div className="absolute -top-6 -right-6 h-20 w-20 rounded-full bg-yellow-500/20 blur-2xl" />
       <div className="relative">
         <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-muted-foreground">
-          <Crown className="h-3.5 w-3.5 text-yellow-400" /> Today Crown
+          <Gem className="h-3.5 w-3.5 text-yellow-400" /> Today PHON
         </div>
         <div className="mt-2 grid grid-cols-3 gap-2">
           <Stat n={d?.count ?? 0} l="발행" />

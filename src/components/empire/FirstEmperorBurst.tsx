@@ -9,7 +9,7 @@
  */
 import { create } from "zustand";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Sparkles, Zap, Rocket, X, ArrowUp } from "lucide-react";
+import { Gem, Sparkles, Zap, Rocket, X, ArrowUp } from "lucide-react";
 import { useEffect } from "react";
 import CrownAura from "@/components/empire/CrownAura";
 import { Button } from "@/components/ui/button";

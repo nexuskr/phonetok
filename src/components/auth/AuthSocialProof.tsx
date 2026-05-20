@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Crown, TrendingUp, Trophy, ShieldCheck, Lock, Globe2, Activity, Cpu } from "lucide-react";
+import { Gem, TrendingUp, Trophy, ShieldCheck, Lock, Globe2, Activity, Cpu } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCountUp } from "@/hooks/use-count-up";
 import {
@@ -209,7 +209,7 @@ export function AuthSocialProof({
       <div className="relative z-20 mx-auto mt-2 grid w-full max-w-[640px] grid-cols-4 gap-2 px-2">
         {[
           { icon: Activity, label: "ACTIVE 24H", value: Math.round(usersA).toLocaleString() },
-          { icon: Crown, label: "EMPERORS", value: Math.round(empA).toLocaleString() },
+          { icon: Gem, label: "EMPERORS", value: Math.round(empA).toLocaleString() },
           { icon: TrendingUp, label: "GMV 24H", value: Math.round(gmvA).toLocaleString() },
           { icon: Trophy, label: "PAID OUT", value: Math.round(paidA).toLocaleString() },
         ].map((k, i) => {

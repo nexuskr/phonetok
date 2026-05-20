@@ -1,6 +1,6 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { ChevronUp, ChevronDown, Crown } from "lucide-react";
+import { Gem, ChevronUp, ChevronDown} from "lucide-react";
 import ImperialLogo from "@/components/brand/ImperialLogo";
 
 interface Props {
@@ -79,7 +79,7 @@ export default function MobileOrderSheet({ children }: Props) {
         aria-expanded={open}
         aria-label="주문 패널 열기"
       >
-        <Crown className="w-4 h-4" strokeWidth={2.5} />
+        <Gem className="w-4 h-4" strokeWidth={2.5} />
         <span>황제의 주문 패널 · 롱 / 숏 진입</span>
         <ChevronUp className="w-4 h-4" />
       </motion.button>

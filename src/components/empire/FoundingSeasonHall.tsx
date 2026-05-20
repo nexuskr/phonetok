@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Crown, Loader2, Sparkles } from "lucide-react";
+import { Gem, Loader2, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -100,7 +100,7 @@ export default function FoundingSeasonHall() {
         </div>
         <div className="relative">
           <div className="flex items-center gap-2 text-primary">
-            <Crown className="w-5 h-5" />
+            <Gem className="w-5 h-5" />
             <span className="text-[11px] font-bold tracking-widest uppercase">{state.season.code}</span>
           </div>
           <h2 className="font-imperial font-black text-2xl sm:text-3xl mt-1 text-gradient-imperial">
@@ -161,7 +161,7 @@ export default function FoundingSeasonHall() {
                 size="lg"
                 className="w-full"
               >
-                {busy ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Crown className="w-4 h-4 mr-2" />}
+                {busy ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Gem className="w-4 h-4 mr-2" />}
                 {(state.remaining ?? 0) <= 0 ? "마감 — 다음 시즌을 기다려주세요" : "지금 좌석 청구하기 (1회 한정)"}
               </Button>
             )}
@@ -186,7 +186,7 @@ export default function FoundingSeasonHall() {
       {/* Seat grid */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Crown className="w-4 h-4 text-primary" />
+          <Gem className="w-4 h-4 text-primary" />
           <h3 className="font-imperial font-bold text-lg">명예의 전당</h3>
         </div>
         {!seats ? <LoadingList rows={3} /> : (
@@ -203,7 +203,7 @@ export default function FoundingSeasonHall() {
                     : "border-border/40 bg-muted/10 text-muted-foreground"
                 }`}
               >
-                <div>{s.masked_nick ? <Crown className="w-3 h-3" /> : "·"}</div>
+                <div>{s.masked_nick ? <Gem className="w-3 h-3" /> : "·"}</div>
                 <div className="text-[8px] opacity-70">#{s.seat_no}</div>
               </div>
             ))}

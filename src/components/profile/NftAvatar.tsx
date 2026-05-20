@@ -1,12 +1,12 @@
 /**
  * NftAvatar — circular avatar that displays a user's main NFT image with rarity glow.
- * - If the user has no NFT, falls back to an Empire Crown emblem with subtle breathing glow.
+ * - If the user has no NFT, falls back to an Empire PHON emblem with subtle breathing glow.
  * - Sizes: xs (24), sm (32), md (48), lg (64), xl (96), 2xl (128).
  * - For other users (chat): pass `userId` and the component fetches via batched RPC.
  * - For self: pass `mainNft` directly.
  */
 import { useEffect, useState } from "react";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import { motion } from "framer-motion";
 import { getMainNft, type MainNftRow, invalidateMainNftCache } from "@/lib/mainNft";
 import { getNftImage, getRarityRingClass } from "@/lib/nftImage";
@@ -99,7 +99,7 @@ export default function NftAvatar({ userId, mainNft, size = "md", className, sho
           animate={{ opacity: [0.85, 1, 0.85] }}
           transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
         >
-          <Crown className="text-primary/60" style={{ width: px * 0.5, height: px * 0.5 }} />
+          <Gem className="text-primary/60" style={{ width: px * 0.5, height: px * 0.5 }} />
         </motion.div>
       )}
       {showBadge && hasNft && resolved?.level && (

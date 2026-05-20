@@ -4,7 +4,7 @@ import { Trans, useTranslation } from "react-i18next";
 import Layout from "@/components/Layout";
 import HubTabs from "@/components/HubTabs";
 import { useDB, PACKAGES, formatKRW, type Pkg } from "@/lib/store";
-import { Crown, Check, Upload, Sparkles, X } from "lucide-react";
+import { Gem, Check, Upload, Sparkles, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import PackageBoostPreview from "@/components/PackageBoostPreview";
@@ -83,7 +83,7 @@ export default function Packages() {
     <Layout>
       <SEOHead
         title="Empire Packages — 황제 등극 패키지"
-        description="Founding Seat · Cosmos · Booster — Empire 티어 진입을 위한 모든 패키지를 한곳에서. 결제 즉시 PHON·NFT·Crown 보너스 자동 지급."
+        description="Founding Seat · Cosmos · Booster — Empire 티어 진입을 위한 모든 패키지를 한곳에서. 결제 즉시 PHON·NFT·PHON 보너스 자동 지급."
         path="/packages"
       />
       <AdultOnlyBanner />
@@ -116,7 +116,7 @@ export default function Packages() {
         <PackageUpgradeCards />
         <div className="mb-6">
           <h1 className="font-imperial font-black text-2xl sm:text-3xl flex items-center gap-2 tracking-[0.04em] break-keep">
-            <Crown className="w-5 h-5 text-gold shrink-0" /> <span className="text-gradient-gold">{t("headline")}</span>
+            <Gem className="w-5 h-5 text-gold shrink-0" /> <span className="text-gradient-gold">{t("headline")}</span>
           </h1>
           <p className="text-xs text-muted-foreground mt-1 break-keep">{t("sub")}</p>
           <div className="mt-2"><ActiveBoostCounter /></div>

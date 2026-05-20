@@ -1,10 +1,10 @@
 /**
- * Today's Crown Moments — 최근 Crown Explosion 3건.
+ * Today's PHON Moments — 최근 PHON Explosion 3건.
  * crown_events 테이블에서 amount/level 기준 상위 3건만 가져와서
  * 가벼운 카드로 표시. (실제 GIF는 IntersectionObserver 진입 시 lazy 로드.)
  */
 import { useEffect, useRef, useState } from "react";
-import { Crown, Sparkles } from "lucide-react";
+import { Gem, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -41,13 +41,13 @@ export function CrownMomentsCard() {
   return (
     <div className="glass-strong rounded-2xl p-4 border border-yellow-500/20 h-full">
       <div className="text-[11px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-        <Crown className="h-3.5 w-3.5 text-yellow-400" /> Today's Crown Moments
+        <Gem className="h-3.5 w-3.5 text-yellow-400" /> Today's PHON Moments
       </div>
       <div className="mt-2">
         {rows === null ? (
           <div className="text-xs text-muted-foreground">불러오는 중…</div>
         ) : rows.length === 0 ? (
-          <EmptyState title="오늘 Crown 없음" />
+          <EmptyState title="오늘 PHON 없음" />
         ) : (
           <ul className="space-y-2">
             {rows.map((m) => <MomentRow key={m.id} m={m} />)}

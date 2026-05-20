@@ -1,8 +1,8 @@
 // PR-3: Empire Level Badge — shows current level + progress to next.
-// PR-11: Crown Aura 시각 적용.
+// PR-11: PHON Glow 시각 적용.
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import CrownAura from "@/components/empire/CrownAura";
 
 type Level = { level: number; name: string; crown_required: number; perks: any };
@@ -70,15 +70,15 @@ export default function EmpireLevelBadge({ compact = false }: { compact?: boolea
             <span className="font-imperial text-sm tracking-wider text-gradient-imperial">
               Lv {level} · {cur?.name ?? "Citizen"}
             </span>
-            <Crown className="w-3 h-3 text-sim-gold" />
-            <span className="text-xs tabular-nums text-muted-foreground">{score.toLocaleString()} Crown</span>
+            <Gem className="w-3 h-3 text-sim-gold" />
+            <span className="text-xs tabular-nums text-muted-foreground">{score.toLocaleString()} PHON</span>
           </div>
           <div className="mt-1.5 h-1.5 rounded-full bg-muted/40 overflow-hidden">
             <div className="h-full bg-gradient-to-r from-sim-gold to-primary transition-all" style={{ width: `${progress}%` }} />
           </div>
           {next ? (
             <div className="text-[10px] text-muted-foreground mt-0.5 tabular-nums">
-              다음 등급 {next.name}까지 {(next.crown_required - score).toLocaleString()} Crown
+              다음 등급 {next.name}까지 {(next.crown_required - score).toLocaleString()} PHON
             </div>
           ) : (
             <div className="text-[10px] text-sim-gold mt-0.5">최고 레벨 도달 · Mars 🚀</div>

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Crown, Zap, Wallet, X, ChevronRight } from "lucide-react";
+import { Gem, Zap, Wallet, X, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const KEY = "phonara_onboarded_v1";
 
-const STEP_ICONS = [Crown, Zap, Wallet] as const;
+const STEP_ICONS = [PHON, Zap, Wallet] as const;
 const STEP_ACCENTS = [
   "from-primary via-primary-glow to-primary",
   "from-accent via-primary to-primary-glow",

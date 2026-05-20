@@ -3,9 +3,8 @@ import { useVisibleInterval } from "@/lib/util/visible-interval";
 import { useNowTick } from "@/hooks/use-now-tick";
 import { motion } from "framer-motion";
 import {
-  Crown, Flame, Shield, Activity, Zap, ArrowDownToLine,
-  ArrowUpToLine, Users, Bot, AlertTriangle, RefreshCw, Target, Swords,
-} from "lucide-react";
+  Gem, Flame, Shield, Activity, Zap, ArrowDownToLine,
+  ArrowUpToLine, Users, Bot, AlertTriangle, RefreshCw, Target, Swords} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRequireAdmin } from "@/hooks/use-require-auth";
 import { LoadingList } from "@/components/ui/loading-state";
@@ -143,7 +142,7 @@ export default function Cockpit() {
       <header className="sticky top-0 z-30 backdrop-blur-xl bg-background/80 border-b border-white/10">
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Crown className="w-5 h-5 text-gold" />
+            <Gem className="w-5 h-5 text-gold" />
             <div>
               <div className="font-display font-black text-sm tracking-[0.2em] text-gold">EMPIRE COCKPIT</div>
               <div className="text-[10px] text-muted-foreground">제국 전체 현황 · 5초 라이브</div>
@@ -198,7 +197,7 @@ export default function Cockpit() {
           </Card>
         </div>
 
-        {/* Crown War */}
+        {/* PHON War */}
         {cw.id && (
           <Card glow={cw.status === "live" ? "destructive" : "primary"} className="p-4 relative overflow-hidden">
             {cw.status === "live" && (
@@ -238,7 +237,7 @@ export default function Cockpit() {
         <div className="grid grid-cols-2 gap-3">
           <Card glow="gold" className="p-3">
             <div className="flex items-center gap-1.5 mb-1">
-              <Crown className="w-3.5 h-3.5 text-gold" />
+              <Gem className="w-3.5 h-3.5 text-gold" />
               <span className="text-[9px] tracking-[0.2em] font-black text-muted-foreground uppercase">BARON+</span>
             </div>
             <div className="font-display font-black text-xl tabular-nums text-gold">{fmt(b.active)}</div>
@@ -281,7 +280,7 @@ export default function Cockpit() {
           </div>
           <FunnelStep label="가입" value={fu.signups_30d} pct={100} tone="primary" />
           <FunnelStep label="Practice" value={fu.practiced_30d} pct={fu.practice_rate_pct} tone="primary" />
-          <FunnelStep label="Crown" value={fu.crowned_30d} pct={fu.crown_rate_pct} tone="gold" />
+          <FunnelStep label="PHON" value={fu.crowned_30d} pct={fu.crown_rate_pct} tone="gold" />
           <FunnelStep label="Baron" value={fu.baron_30d} pct={fu.baron_rate_pct} tone="gold" last />
         </Card>
 

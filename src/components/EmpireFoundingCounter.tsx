@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
 
 export default function EmpireFoundingCounter({ compact }: { compact?: boolean }) {
@@ -49,7 +49,7 @@ export default function EmpireFoundingCounter({ compact }: { compact?: boolean }
             : "border-primary/30 bg-primary/5 text-primary/90"
         }`}
       >
-        <Crown className="w-3 h-3" />
+        <Gem className="w-3 h-3" />
         <span className="tabular-nums">{remaining}</span>
         <span className="opacity-60">/30</span>
       </span>
@@ -70,7 +70,7 @@ export default function EmpireFoundingCounter({ compact }: { compact?: boolean }
       <div className="relative flex items-center justify-between mb-2">
         <div className="flex items-center gap-1.5">
           <div className="w-7 h-7 rounded-lg bg-gradient-imperial flex items-center justify-center glow-imperial shrink-0">
-            <Crown className="w-3.5 h-3.5 text-primary-foreground" />
+            <Gem className="w-3.5 h-3.5 text-primary-foreground" />
           </div>
           <div>
             <div className="text-[10px] tracking-[0.25em] text-primary font-bold">EMPIRE FOUNDING</div>

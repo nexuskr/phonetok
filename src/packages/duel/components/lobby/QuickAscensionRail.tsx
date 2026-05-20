@@ -2,7 +2,7 @@
  * QuickAscensionRail — Right wing: 빠른 입장 + 잭팟 진행률.
  */
 import { Link } from "react-router-dom";
-import { Crown, Zap } from "lucide-react";
+import { Gem, Zap } from "lucide-react";
 import type { DuelRoom } from "@pkg/duel";
 
 export function QuickAscensionRail({ rooms }: { rooms: DuelRoom[] }) {
@@ -67,7 +67,7 @@ export function QuickAscensionRail({ rooms }: { rooms: DuelRoom[] }) {
           className="mt-3 w-full inline-flex items-center justify-center gap-2 rounded-2xl py-3 font-imperial tracking-[0.22em] text-sm bg-gradient-to-r from-amber-400 via-amber-300 to-pink-500 text-[#1a0a05] font-black active:scale-[0.97] will-change-transform"
           style={{ boxShadow: "0 0 22px hsl(38 92% 60% / 0.55), 0 0 38px hsl(330 90% 60% / 0.3)" }}
         >
-          <Crown className="w-4 h-4" /> 옥좌에 오르소서
+          <Gem className="w-4 h-4" /> 옥좌에 오르소서
         </button>
       </div>
     </aside>

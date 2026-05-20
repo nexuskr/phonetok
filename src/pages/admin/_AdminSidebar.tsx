@@ -5,7 +5,7 @@ import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar,
 } from "@/components/ui/sidebar";
-import { Crown, ShieldCheck } from "lucide-react";
+import { Gem, ShieldCheck } from "lucide-react";
 import { ADMIN_NAV, type AdminBadgeSource } from "./_nav";
 import { cn } from "@/lib/utils";
 
@@ -46,7 +46,7 @@ function AdminSidebarBase({ pending = {} }: AdminSidebarProps) {
     <Sidebar collapsible="icon" className="border-r border-border/40">
       <SidebarHeader className="border-b border-border/40 px-3 py-3">
         <div className="flex items-center gap-2">
-          <Crown className="w-5 h-5 text-gold shrink-0" />
+          <Gem className="w-5 h-5 text-gold shrink-0" />
           {!collapsed && (
             <div className="leading-tight">
               <div className="font-imperial text-sm tracking-[0.18em] text-gradient-imperial">

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import Layout from "@/components/Layout";
 import { useRequireAuth } from "@/hooks/use-require-auth";
-import { Crown, Sparkles, Zap, TrendingUp, ChevronRight } from "lucide-react";
+import { Gem, Sparkles, Zap, TrendingUp, ChevronRight } from "lucide-react";
 import ImperialLiveActivity from "@/components/live/ImperialLiveActivity";
 import ImperialPresenceBar from "@/components/live/ImperialPresenceBar";
 import ImperialTradeSection from "@/components/dashboard/ImperialTradeSection";
@@ -47,7 +47,7 @@ const CATEGORIES = [
   { to: "/casino", icon: Sparkles, label: "슬롯" },
   { to: "/crash", icon: Zap, label: "Crash" },
   { to: "/trade", icon: TrendingUp, label: "트레이딩" },
-  { to: "/empire", icon: Crown, label: "제국" },
+  { to: "/empire", icon: Gem, label: "제국" },
 ];
 
 function toneClasses(tone: GameCard["tone"]) {

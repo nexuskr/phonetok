@@ -5,8 +5,7 @@
  */
 import { Link } from "react-router-dom";
 import {
-  Wand2, Crown, Rocket, Image as ImageIcon, Megaphone, ShieldCheck,
-} from "lucide-react";
+  Gem, Wand2, Rocket, Image as ImageIcon, Megaphone, ShieldCheck} from "lucide-react";
 import RiskEngineDashboard from "./RiskEngineDashboard";
 import StressTestDashboard from "./StressTestDashboard";
 
@@ -28,9 +27,9 @@ const ACTIONS: Action[] = [
   },
   {
     to: "/admin/game/crown-trigger",
-    label: "Manual Crown",
-    hint: "황제에게 Crown Explosion",
-    icon: Crown,
+    label: "Manual PHON",
+    hint: "황제에게 PHON Explosion",
+    icon: Gem,
     glow: "from-yellow-400/40 to-orange-500/20",
   },
   {

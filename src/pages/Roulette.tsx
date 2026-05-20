@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import { useDB, formatKRW } from "@/lib/store";
 import { toast } from "@/hooks/use-toast";
-import { Sparkles, Crown, History as HistoryIcon, Gift } from "lucide-react";
+import { Gem, Sparkles, History as HistoryIcon, Gift } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LuxButton, Money } from "@/components/ui/lux";
 import { JackpotEmpireBanner } from "@/components/empire/JackpotEmpireBanner";
@@ -200,7 +200,7 @@ export default function Roulette() {
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-imperial font-black text-lg flex items-center gap-2 break-keep">
-                  <Crown className="w-5 h-5 text-gold" /> {t("gachaTitle")}
+                  <Gem className="w-5 h-5 text-gold" /> {t("gachaTitle")}
                 </h3>
                 <div className="text-[10px] text-muted-foreground tabular-nums">{t("gachaCost")}</div>
               </div>

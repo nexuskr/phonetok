@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ChevronDown, Flame, Crown, TrendingUp, Clock, Users, Shield, MessageCircle, Type, CheckCircle2 } from "lucide-react";
+import { Gem, ChevronDown, Flame, TrendingUp, Clock, Users, Shield, MessageCircle, Type, CheckCircle2 } from "lucide-react";
 import Layout from "@/components/Layout";
 import { useDB, formatKRW } from "@/lib/store";
 import EarningsSimulator from "@/components/guide/EarningsSimulator";
@@ -531,7 +531,7 @@ function SceneTiers() {
       <div className="relative max-w-md mx-auto w-full">
         <div className="text-center mb-5">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass border border-gold/40 text-[10px] font-black tracking-[0.3em] text-gold mb-3">
-            <Crown className="w-3 h-3" /> 등급이 곧 수익
+            <Gem className="w-3 h-3" /> 등급이 곧 수익
           </div>
           <h2 className="font-imperial text-2xl sm:text-3xl break-keep">
             높은 등급일수록<br />
@@ -673,7 +673,7 @@ function SceneFinalCTA({ isLoggedIn }: { isLoggedIn: boolean }) {
         transition={{ duration: 4, repeat: Infinity }}
       />
       <div id="guide-final-anchor" className="relative max-w-md mx-auto w-full text-center">
-        <Crown className="w-12 h-12 text-gold mx-auto mb-3 animate-crown" />
+        <Gem className="w-12 h-12 text-gold mx-auto mb-3 animate-crown" />
         <h2 className="font-imperial text-3xl sm:text-4xl text-gradient-gold leading-tight break-keep">
           오늘 가입하면<br />지급되는 보너스
         </h2>

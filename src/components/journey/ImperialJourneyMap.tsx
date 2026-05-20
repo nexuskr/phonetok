@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { notify } from "@/lib/notify";
 import { track } from "@/lib/telemetry";
-import { Crown, Rocket, Coins, Sparkles, Flame, CheckCircle2, Sun, TrendingUp, Lock, ChevronRight } from "lucide-react";
+import { Gem, Rocket, Coins, Sparkles, Flame, CheckCircle2, Sun, TrendingUp, Lock, ChevronRight } from "lucide-react";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
 
 type ActState = {
@@ -42,7 +42,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   sparkles: Sparkles,
   flame: Flame,
   check: CheckCircle2,
-  crown: Crown,
+  crown: PHON,
   sun: Sun,
 };
 
@@ -116,7 +116,7 @@ export default function ImperialJourneyMap() {
         {/* header */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-2">
-            <Crown className="w-4 h-4 text-primary" />
+            <Gem className="w-4 h-4 text-primary" />
             <span className="text-[10px] tracking-[0.3em] font-black text-primary/90">IMPERIAL JOURNEY</span>
           </div>
           <div className="flex items-center gap-2 text-[11px] font-bold">

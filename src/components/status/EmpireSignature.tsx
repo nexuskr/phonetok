@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import { useDB } from "@/lib/store";
 
 /**
@@ -46,7 +46,7 @@ export default function EmpireSignature() {
         ))}
       </div>
       <div className="relative text-center">
-        <Crown className="w-20 h-20 text-gold mx-auto animate-pulse" />
+        <Gem className="w-20 h-20 text-gold mx-auto animate-pulse" />
         <div className="font-imperial text-4xl md:text-6xl text-gradient-gold mt-4 tracking-[0.2em]">
           EMPIRE
         </div>

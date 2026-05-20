@@ -1,6 +1,6 @@
 /** /games/blackjack/imperial — Imperial Blackjack (demo). */
 import { useState } from "react";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import {
   ImperialBlackjackTable, ImperialBlackjackBetPanel, useBlackjackStore,
   startRound, dealerPlay, settle, handValue,
@@ -93,7 +93,7 @@ export default function BlackjackImperial() {
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-4">
         <header className="flex items-center gap-3">
           <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-[hsl(var(--gold))] to-[hsl(var(--pink))] flex items-center justify-center shadow-[0_0_24px_hsla(45,90%,55%,0.5)]">
-            <Crown className="w-5 h-5 text-background" />
+            <Gem className="w-5 h-5 text-background" />
           </span>
           <div>
             <h1 className="text-xl font-black text-foreground">Imperial Blackjack</h1>

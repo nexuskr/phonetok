@@ -2,7 +2,7 @@
  * VipTierBadge — tier-aware gradient pill (silver / gold / platinum / diamond).
  * Renders crown icon + tier label. Falls back to muted "Free" chip when tier is null.
  */
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type VipTier = "silver" | "gold" | "platinum" | "diamond";
@@ -57,7 +57,7 @@ export default function VipTierBadge({ tier, size = "md", className }: Props) {
       )}
       aria-label={`VIP tier ${TIER_LABEL[t]}`}
     >
-      <Crown className={cn("w-3 h-3", size === "md" && "w-3.5 h-3.5")} />
+      <Gem className={cn("w-3 h-3", size === "md" && "w-3.5 h-3.5")} />
       {TIER_LABEL[t]}
     </span>
   );

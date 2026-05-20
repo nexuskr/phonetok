@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
 
 type TopEmperor = {
@@ -42,7 +42,7 @@ export default function TopEmperorBanner() {
     >
       <div className="flex items-center gap-2 flex-wrap">
         <div className="flex items-center gap-1.5">
-          <Crown className="w-4 h-4 text-amber-300" />
+          <Gem className="w-4 h-4 text-amber-300" />
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-300">
             Emperor of the Day
           </span>
@@ -51,7 +51,7 @@ export default function TopEmperorBanner() {
         <span className="font-bold text-foreground">{emp.user_mask}</span>
         <span className="text-xs text-muted-foreground">Tier {emp.empire_level}</span>
         <span className="ml-auto text-amber-200 font-bold tabular-nums">
-          +{fmt(Number(emp.total_crown))} Crown / 24h
+          +{fmt(Number(emp.total_crown))} PHON / 24h
         </span>
       </div>
     </motion.div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Crown, Zap } from "lucide-react";
+import { Gem, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { G } from "@/lib/glossary";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
@@ -45,7 +45,7 @@ export default function VipBoostCard({ active, multiplier, endsAt }: Props) {
 
       <header className="flex items-center gap-2 relative">
         <span className={`w-9 h-9 rounded-xl flex items-center justify-center ${active ? "bg-pink-500/20 text-pink-300" : "bg-muted/30 text-muted-foreground"}`}>
-          <Crown className="w-5 h-5" />
+          <Gem className="w-5 h-5" />
         </span>
         <div>
           <div className="text-base font-bold text-foreground">

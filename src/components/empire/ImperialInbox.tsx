@@ -5,7 +5,7 @@
  */
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Bell, Inbox as InboxIcon, Check, Crown } from "lucide-react";
+import { Gem, Bell, Inbox as InboxIcon, Check} from "lucide-react";
 import { inbox, type InboxItem } from "@/lib/notify";
 
 function timeAgo(ts: number): string {
@@ -95,7 +95,7 @@ export default function ImperialInbox({ className = "" }: { className?: string }
           >
             <header className="px-4 py-3 flex items-center justify-between border-b border-amber-300/20 bg-gradient-to-r from-amber-500/10 via-transparent to-pink/10">
               <div className="flex items-center gap-2">
-                <Crown className="w-4 h-4 text-amber-400" />
+                <Gem className="w-4 h-4 text-amber-400" />
                 <span className="font-imperial text-sm tracking-[0.2em] text-gradient-imperial">
                   황제 소식함
                 </span>

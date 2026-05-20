@@ -9,7 +9,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Zap, TrendingUp, Sparkles, X } from "lucide-react";
+import { Gem, Zap, TrendingUp, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { startCashLoop, advanceCashLoop, type CashLoopSession } from "@/lib/cashLoop";
 import { notify } from "@/lib/notify";
@@ -185,7 +185,7 @@ export default function ThreeMinuteCashLoop({ onConvert, onDismiss }: Props) {
           {phase === "deposit_prompt" && (
             <motion.div key="prompt" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="mt-5 text-center">
               <div className="inline-flex items-center gap-1.5 text-xs font-black text-amber-300">
-                <Crown className="w-3.5 h-3.5" /> God Mode 발동 준비 완료
+                <Gem className="w-3.5 h-3.5" /> God Mode 발동 준비 완료
               </div>
               <p className="text-sm mt-2 leading-relaxed">
                 <span className="font-bold text-foreground">시뮬에서 ₡{simPnl.toLocaleString()}을 벌었습니다.</span><br />
@@ -196,7 +196,7 @@ export default function ThreeMinuteCashLoop({ onConvert, onDismiss }: Props) {
                 size="lg"
                 className="mt-4 w-full bg-gradient-imperial text-primary-foreground font-black text-base glow-imperial hover:scale-[1.02] transition animate-pulse-glow"
               >
-                <Crown className="w-4 h-4 mr-2" /> 갓모드 청구 · 첫 입금
+                <Gem className="w-4 h-4 mr-2" /> 갓모드 청구 · 첫 입금
               </Button>
               <button onClick={handleSkip} className="mt-2 text-[10px] text-muted-foreground hover:text-foreground underline">
                 나중에 (보너스 만료될 수 있음)

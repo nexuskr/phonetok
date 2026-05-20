@@ -2,7 +2,7 @@
  * /duel — Imperial Duel Lobby.
  */
 import { useState } from "react";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import { useDuelRooms, useFomoOracle } from "@pkg/duel";
 import { LobbyShell } from "@pkg/duel/components/lobby/LobbyShell";
 import { HallOfSovereigns } from "@pkg/duel/components/lobby/HallOfSovereigns";
@@ -37,7 +37,7 @@ export default function ImperialDuelLobby() {
       <FomoFloatingOracle signals={signals} onOpenOracle={() => setOracleOpen(true)} />
       <VerificationOracleModal open={oracleOpen} onOpenChange={setOracleOpen} result={null} signals={signals} />
       {/* SR-only Empire CTA */}
-      <span className="sr-only"><Crown /></span>
+      <span className="sr-only"><Gem /></span>
     </>
   );
 }

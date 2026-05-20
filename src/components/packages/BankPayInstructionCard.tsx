@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Copy, Check, Crown, MessageCircle, Send } from "lucide-react";
+import { Gem, Copy, Check, MessageCircle, Send } from "lucide-react";
 import { formatKRW, type Pkg } from "@/lib/store";
 import { notify } from "@/lib/notify";
 
@@ -92,7 +92,7 @@ export default function BankPayInstructionCard({ pkg }: { pkg: Pkg }) {
           <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-gold/20 blur-3xl pointer-events-none" />
           <div className="relative">
             <div className="flex items-center gap-2 mb-1">
-              <Crown className="w-4 h-4 text-gold" />
+              <Gem className="w-4 h-4 text-gold" />
               <span className="font-display font-black text-sm text-gradient-gold">
                 VIP 전용 컨시어지
               </span>

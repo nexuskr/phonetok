@@ -77,7 +77,7 @@ export function HallOfSovereigns() {
                   #{s.rank} · {s.nick}
                 </div>
                 <div className="text-[10px] text-amber-300/70 tabular-nums">
-                  Crown {s.crowns}
+                  PHON {s.crowns}
                 </div>
               </div>
               {isEmperor && (

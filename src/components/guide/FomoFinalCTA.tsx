@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Flame, ArrowRight, Crown, ShieldCheck, Eye } from "lucide-react";
+import { Gem, Flame, ArrowRight, ShieldCheck, Eye } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import DepositCTA from "@/components/onboarding/DepositCTA";
 import { useOnline } from "@/components/LiveStats";
@@ -39,7 +39,7 @@ export default function FomoFinalCTA({ large = false }: { large?: boolean }) {
           transition={{ duration: 0.5 }}
           className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass border border-gold/60 text-[10px] font-black tracking-[0.3em] text-gold mb-5 shadow-[0_0_18px_hsl(var(--gold)/0.4)]"
         >
-          <Crown className="w-3 h-3" /> 마지막 한 걸음
+          <Gem className="w-3 h-3" /> 마지막 한 걸음
         </motion.div>
 
         <motion.h2
@@ -72,7 +72,7 @@ export default function FomoFinalCTA({ large = false }: { large?: boolean }) {
         <div className="flex flex-wrap items-center justify-center gap-2 mb-5">
           {[
             { icon: <ShieldCheck className="w-3 h-3" />, label: "환불보장" },
-            { icon: <Crown className="w-3 h-3" />, label: "19+ 본인인증" },
+            { icon: <Gem className="w-3 h-3" />, label: "19+ 본인인증" },
             { icon: <Flame className="w-3 h-3" />, label: "OTP 필수" },
           ].map((p) => (
             <span key={p.label} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full glass border border-gold/35 text-[10px] font-black tracking-widest text-gold">

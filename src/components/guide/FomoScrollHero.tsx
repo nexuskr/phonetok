@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { Flame, Users, ChevronDown, Shield, Clock, Coins, Crown } from "lucide-react";
+import { Gem, Flame, Users, ChevronDown, Shield, Clock, Coins} from "lucide-react";
 import { useOnline } from "@/components/LiveStats";
 import {
   GoldNebulaBg,
@@ -100,7 +100,7 @@ export default function FomoScrollHero({
                 "0 0 28px -6px hsl(var(--gold)/0.55), inset 0 1px 0 hsl(var(--gold)/0.45), inset 0 -1px 0 hsl(var(--gold)/0.18)",
             }}
           >
-            <Crown className="w-4 h-4 text-gold drop-shadow-[0_0_7px_hsl(var(--gold)/0.7)]" />
+            <Gem className="w-4 h-4 text-gold drop-shadow-[0_0_7px_hsl(var(--gold)/0.7)]" />
             <span
               className="text-[10px] tracking-[0.42em] text-gold font-black"
               style={{ textShadow: "0 0 10px hsl(var(--gold)/0.45)" }}

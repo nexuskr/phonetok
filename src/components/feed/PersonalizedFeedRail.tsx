@@ -2,7 +2,7 @@
 // Loads recommendations from `rank_feed_for_user` RPC; if empty, asks the
 // `feed-personalize` Edge function to build them, then re-loads.
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, RefreshCw, Crown, Target, Eye } from "lucide-react";
+import { Gem, Sparkles, RefreshCw, Target, Eye } from "lucide-react";
 import { rankFeedForUser, type FeedRecommendation } from "@/lib/feed-rpc";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingList } from "@/components/ui/loading-state";
@@ -20,7 +20,7 @@ const BIAS_LABEL: Record<Bias, string> = {
 };
 const BIAS_ICON: Record<Bias, React.ReactNode> = {
   auto: <Sparkles className="w-3 h-3" />,
-  tier: <Crown className="w-3 h-3" />,
+  tier: <Gem className="w-3 h-3" />,
   missions: <Target className="w-3 h-3" />,
   watch: <Eye className="w-3 h-3" />,
 };

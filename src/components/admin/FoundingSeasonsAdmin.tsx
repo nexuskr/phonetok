@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Crown, Plus, Pencil, Square, Unlock, RefreshCw } from "lucide-react";
+import { Gem, Plus, Pencil, Square, Unlock, RefreshCw } from "lucide-react";
 import { LuxButton, LuxInput } from "@/components/ui/lux";
 import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -45,7 +45,7 @@ export default function FoundingSeasonsAdmin() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="font-imperial font-bold text-sm flex items-center gap-2">
-          <Crown className="w-4 h-4 text-gold" /> Founding Emperor 시즌 관리
+          <Gem className="w-4 h-4 text-gold" /> Founding Emperor 시즌 관리
         </h3>
         <div className="flex gap-2">
           <LuxButton variant="ghost" size="sm" onClick={load}><RefreshCw className="w-3.5 h-3.5" /></LuxButton>

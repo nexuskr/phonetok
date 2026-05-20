@@ -1,6 +1,6 @@
-// PR-C: Crown Wars HUD — compact live leaderboard rail (Dashboard top).
+// PR-C: PHON Wars HUD — compact live leaderboard rail (Dashboard top).
 import { motion } from "framer-motion";
-import { Crown, Swords, Users, Timer } from "lucide-react";
+import { Gem, Swords, Users, Timer } from "lucide-react";
 import { useCrownWar, formatMSS } from "@/hooks/use-crown-war";
 import { Link } from "react-router-dom";
 
@@ -41,7 +41,7 @@ export default function CrownWarHUD() {
           </motion.div>
           <div>
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground leading-none">
-              Crown Wars · LIVE
+              PHON Wars · LIVE
             </div>
             <div className={`text-sm font-bold leading-tight ${finale ? "text-rose-300" : "text-amber-300"}`}>
               {finale ? "🔥 Finale" : "제국 전쟁 진행중"}
@@ -65,7 +65,7 @@ export default function CrownWarHUD() {
 
         {/* My rank */}
         <div className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg bg-primary/10 text-primary">
-          <Crown className="h-3.5 w-3.5" />
+          <Gem className="h-3.5 w-3.5" />
           {me.rank ? `${me.rank}위 · ${me.score}` : "미참여"}
         </div>
       </div>

@@ -1,10 +1,9 @@
 import { memo, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  Home, Swords, Sparkles, Gamepad2, Dice5, TrendingUp, Radio,
-  Castle, Crown, Wallet, ListChecks, User, Shield,
-  type LucideIcon,
-} from "lucide-react";
+  Gem, Home, Swords, Sparkles, Gamepad2, Dice5, TrendingUp, Radio,
+  Castle, Wallet, ListChecks, User, Shield,
+  type LucideIcon} from "lucide-react";
 
 /**
  * StakeStyleSidebar — PC 영구 좌측 사이드바 (md+).
@@ -47,7 +46,7 @@ const SECTIONS: Section[] = [
     title: "황실",
     items: [
       { to: "/empire", label: "황실",   icon: Castle },
-      { to: "/phon",   label: "PHON",   icon: Crown,  variant: "gold" },
+      { to: "/phon",   label: "PHON",   icon: Gem,  variant: "gold" },
       { to: "/vip",    label: "VIP Pass", icon: Sparkles },
     ],
   },

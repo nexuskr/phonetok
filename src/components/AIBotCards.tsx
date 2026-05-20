@@ -13,9 +13,7 @@ import ClaimResultModal from "@/components/ai/ClaimResultModal";
 import { useClaimFlow } from "@/hooks/use-claim-flow";
 import type { Database } from "@/integrations/supabase/types";
 import {
-  Bot, Sparkles, TrendingUp, ImageIcon, Loader2, Check, Lock,
-  Crown, Zap, RefreshCw, Wallet, Clock, Flame,
-} from "lucide-react";
+  Gem, Bot, Sparkles, TrendingUp, ImageIcon, Loader2, Check, Lock, Zap, RefreshCw, Wallet, Clock, Flame} from "lucide-react";
 
 type DbTier = Database["public"]["Enums"]["user_tier"];
 
@@ -106,7 +104,7 @@ export default function AIBotCards() {
           <div>
             <h2 className="font-display font-black text-lg leading-tight flex items-center gap-2">
               {t("headerTitle")}
-              {isEmpire && <Crown className="w-4 h-4 text-gold animate-pulse" />}
+              {isEmpire && <Gem className="w-4 h-4 text-gold animate-pulse" />}
             </h2>
             <p className="text-[10px] text-muted-foreground break-keep">{t("headerSub")}</p>
           </div>

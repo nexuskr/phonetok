@@ -1,5 +1,5 @@
 // PR-12: Floating Empire Booster countdown chip — visible only while a 24h Baron booster is active.
-import { Crown, Zap, Timer } from "lucide-react";
+import { Gem, Zap, Timer } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEmpireBooster, formatHMS } from "@/hooks/use-empire-booster";
 import { FloatingSlot } from "@/components/ui/floating-dock";
@@ -42,7 +42,7 @@ export default function EmpireBoosterTimer() {
               ? "border-rose-400/60 bg-gradient-to-r from-rose-950/70 to-rose-900/40"
               : "border-sim-gold/60 bg-gradient-to-r from-amber-950/70 to-amber-900/40"}`}
         >
-          <Crown className={`w-3.5 h-3.5 ${critical ? "text-rose-300" : "text-sim-gold"}`} />
+          <Gem className={`w-3.5 h-3.5 ${critical ? "text-rose-300" : "text-sim-gold"}`} />
           <div className="flex flex-col leading-tight">
             <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
               Empire Booster
@@ -56,7 +56,7 @@ export default function EmpireBoosterTimer() {
               <Zap className="w-3 h-3" /> -{fee}% 수수료
             </span>
             <span className="text-[10px] flex items-center gap-1 text-emerald-300">
-              <Timer className="w-3 h-3" /> Crown ×{mult}
+              <Timer className="w-3 h-3" /> PHON ×{mult}
             </span>
           </div>
         </div>

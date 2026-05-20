@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Crown, Rocket, Globe, Zap } from "lucide-react";
+import { Gem, Sparkles, Rocket, Globe, Zap } from "lucide-react";
 import { LuxButton } from "@/components/ui/lux";
 import { track } from "@/lib/telemetry";
 import { submitPackagePurchase } from "@/lib/packages-rpc";
@@ -29,7 +29,7 @@ const COSMOS_PACKAGES: CosmosPkg[] = [
     priceUsd: 300,
     dailyPct: 1.5,
     durationDays: 30,
-    unlocks: ["🏅 Bronze Crown NFT 즉시 발급", "🎰 슬롯 10회/일 무료", "⚡ 첫 3일 +0.5% 가속 부스트"],
+    unlocks: ["🏅 Bronze PHON NFT 즉시 발급", "🎰 슬롯 10회/일 무료", "⚡ 첫 3일 +0.5% 가속 부스트"],
     accent: "earth",
   },
   {
@@ -41,7 +41,7 @@ const COSMOS_PACKAGES: CosmosPkg[] = [
     dailyPct: 2.0,
     durationDays: 30,
     unlocks: [
-      "🥇 Gold Crown NFT 즉시 발급",
+      "🥇 Gold PHON NFT 즉시 발급",
       "🚀 레버리지 25× 잠금해제",
       "⚡ 30일 Empire Booster",
       "💎 PHON 결제 시 -20% 할인",
@@ -57,9 +57,9 @@ const COSMOS_PACKAGES: CosmosPkg[] = [
     dailyPct: 2.8,
     durationDays: 30,
     unlocks: [
-      "💠 Diamond Crown NFT 즉시 발급",
+      "💠 Diamond PHON NFT 즉시 발급",
       "💎 Baron 즉시 승급",
-      "🔥 Crown ×2 영구 부스트",
+      "🔥 PHON ×2 영구 부스트",
       "🏛️ Founding Seat 우선권",
       "🛰️ Empire Rocket Stack 스킨",
       "💬 관리자 채팅 우선 응답",
@@ -92,7 +92,7 @@ const ACCENTS: Record<CosmosPkg["accent"], { ring: string; bg: string; chip: str
     bg: "from-violet-500/20 via-fuchsia-500/15 to-gold/15",
     chip: "bg-gold/20 text-gold border-gold/50",
     glow: "shadow-[0_30px_100px_-20px_hsl(var(--gold)/0.6)]",
-    icon: Crown,
+    icon: Gem,
   },
 };
 

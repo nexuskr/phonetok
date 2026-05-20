@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Crown, Lock, Sparkles, TrendingUp, Shield, Zap, ChevronUp, HelpCircle, Table2, ArrowRight } from "lucide-react";
+import { Gem, Lock, Sparkles, TrendingUp, Shield, Zap, ChevronUp, HelpCircle, Table2, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { Card } from "@/components/ui/card";
@@ -285,7 +285,7 @@ export default function PackageUpgradeCards() {
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="min-w-0">
             <h2 className="font-imperial font-black text-xl sm:text-2xl text-gradient-gold flex items-center gap-2">
-              <Crown className="w-6 h-6 text-gold" /> 제국 군주 카드
+              <Gem className="w-6 h-6 text-gold" /> 제국 군주 카드
               <span className="text-xs sm:text-sm font-normal text-muted-foreground">— 내 혜택 등급</span>
             </h2>
             <p className="text-xs sm:text-sm text-foreground/85 mt-1.5 leading-snug break-keep">
@@ -323,7 +323,7 @@ export default function PackageUpgradeCards() {
             <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto overscroll-contain">
               <DialogHeader>
                 <DialogTitle className="font-imperial text-gradient-gold flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-gold" /> 단계별 혜택 비교
+                  <Gem className="w-5 h-5 text-gold" /> 단계별 혜택 비교
                 </DialogTitle>
               </DialogHeader>
               <div className="min-w-0 overflow-x-auto">

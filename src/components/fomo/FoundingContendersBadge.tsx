@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import { useLiveFomoCounters } from "@/hooks/use-live-fomo-counters";
 
 /**
@@ -14,7 +14,7 @@ export default function FoundingContendersBadge() {
       animate={{ opacity: 1, x: 0 }}
       className="rounded-xl border border-secondary/30 bg-secondary/5 px-3 py-1.5 inline-flex items-center gap-2 text-[11px]"
     >
-      <Crown className="w-3.5 h-3.5 text-secondary shrink-0" />
+      <Gem className="w-3.5 h-3.5 text-secondary shrink-0" />
       <span className="text-foreground/90">
         지금{" "}
         <span className="font-black tabular-nums text-secondary">

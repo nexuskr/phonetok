@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 
 /**
- * CosmicHero — 화면 중앙의 거대 황금 Crown + CTA
+ * CosmicHero — 화면 중앙의 거대 황금 PHON + CTA
  * 30~35% viewport height. 우주에서 떠오르는 듯한 cinematic 등장.
  */
 export default function CosmicHero() {
@@ -30,7 +30,7 @@ export default function CosmicHero() {
         />
       </div>
 
-      {/* Crown */}
+      {/* PHON */}
       <motion.div
         initial={{ y: 60, opacity: 0, scale: 0.6 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -46,7 +46,7 @@ export default function CosmicHero() {
               "0 0 80px hsl(var(--gold) / 0.7), 0 0 160px hsl(var(--gold) / 0.4), inset 0 4px 16px hsl(48 100% 90% / 0.5)",
           }}
         >
-          <Crown
+          <Gem
             className="w-16 h-16 md:w-24 md:h-24 text-[hsl(240_28%_3%)]"
             strokeWidth={1.5}
           />
@@ -115,7 +115,7 @@ export default function CosmicHero() {
               "0 0 40px hsl(var(--gold) / 0.55), 0 0 90px hsl(var(--gold) / 0.3), inset 0 1px 0 hsl(48 100% 95% / 0.6)",
           }}
         >
-          <Crown className="w-5 h-5" />
+          <Gem className="w-5 h-5" />
           지금 우주 제국에 입성하시겠습니까?
           <span
             aria-hidden

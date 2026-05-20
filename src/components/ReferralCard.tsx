@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Users, Copy, Share2, Crown, TrendingUp, Sparkles } from "lucide-react";
+import { Gem, Users, Copy, Share2, TrendingUp, Sparkles } from "lucide-react";
 import ShareBar from "@/components/share/ShareBar";
 
 type Stats = {
@@ -96,7 +96,7 @@ export default function ReferralCard() {
       <div className="relative">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-10 h-10 rounded-xl bg-gradient-gold flex items-center justify-center glow-gold">
-            <Crown className="w-5 h-5 text-black" />
+            <Gem className="w-5 h-5 text-black" />
           </div>
           <div>
             <h3 className="font-display font-black text-base flex items-center gap-1.5 break-keep">
@@ -134,7 +134,7 @@ export default function ReferralCard() {
           <Stat label={t("invited")} value={t("countUnit", { n: stats?.invited ?? 0 })} icon={<Users className="w-3.5 h-3.5" />} accent="text-secondary" />
           <Stat label={t("active7")} value={t("countUnit", { n: stats?.active_7d ?? 0 })} icon={<TrendingUp className="w-3.5 h-3.5" />} accent="text-primary" />
           <Stat label={t("todayCom")} value={`₩${(stats?.today_commission ?? 0).toLocaleString()}`} icon={<Sparkles className="w-3.5 h-3.5" />} accent="text-gold" />
-          <Stat label={t("totalCom")} value={`₩${(stats?.total_commission ?? 0).toLocaleString()}`} icon={<Crown className="w-3.5 h-3.5" />} accent="text-gold" />
+          <Stat label={t("totalCom")} value={`₩${(stats?.total_commission ?? 0).toLocaleString()}`} icon={<Gem className="w-3.5 h-3.5" />} accent="text-gold" />
         </div>
 
         {!hasInviter && (

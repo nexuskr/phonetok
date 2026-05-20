@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useVisibleInterval } from "@/lib/util/visible-interval";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
-import { Trophy, Crown, Flame, ArrowRight } from "lucide-react";
+import { Gem, Trophy, Flame, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -79,7 +79,7 @@ export default function Whales() {
                       : r.rank <= 3 ? "bg-primary/20 text-primary border border-primary/40"
                       : "bg-muted/40 text-muted-foreground")
                   }>
-                    {r.rank <= 3 ? <Crown className="w-4 h-4" /> : `#${r.rank}`}
+                    {r.rank <= 3 ? <Gem className="w-4 h-4" /> : `#${r.rank}`}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-bold truncate">{r.nickname_masked || `Anonymous #${r.rank}`}</div>

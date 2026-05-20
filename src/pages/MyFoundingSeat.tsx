@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Layout from "@/components/Layout";
-import { Crown, Sparkles, Calendar, History as HistoryIcon, ArrowLeft } from "lucide-react";
+import { Gem, Sparkles, Calendar, History as HistoryIcon, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getMyFoundingSeat, getMyFoundingSeatHistory } from "@/lib/foundingSeason";
 import { LoadingList } from "@/components/ui/loading-state";
@@ -47,7 +47,7 @@ export default function MyFoundingSeat() {
         </button>
 
         <div className="flex items-center gap-2">
-          <Crown className="w-5 h-5 text-gold" />
+          <Gem className="w-5 h-5 text-gold" />
           <h1 className="font-imperial text-2xl tracking-[0.18em] text-gradient-imperial">내 Founding 좌석</h1>
         </div>
 
@@ -125,7 +125,7 @@ export default function MyFoundingSeat() {
                     </div>
                     {h.note && <div className="text-[11px] text-muted-foreground mt-0.5 break-keep">{h.note}</div>}
                     {h.payload?.crown_multiplier && (
-                      <div className="text-[11px] text-emerald-300 mt-0.5">Crown ×{h.payload.crown_multiplier}</div>
+                      <div className="text-[11px] text-emerald-300 mt-0.5">PHON ×{h.payload.crown_multiplier}</div>
                     )}
                   </div>
                   <div className="text-[10px] text-muted-foreground tabular-nums shrink-0">

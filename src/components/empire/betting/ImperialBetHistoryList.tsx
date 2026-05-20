@@ -1,10 +1,10 @@
 /**
  * ImperialBetHistoryList — 황제의 승전 기록.
- * Won = Crown + Gold row + Replay. Lost = Warm King 위로 + 역전 입금 CTA.
+ * Won = PHON + Gold row + Replay. Lost = Warm King 위로 + 역전 입금 CTA.
  * 데이터 fetching 은 부모가 담당. (money-flow 미터치)
  */
 import { Link } from "react-router-dom";
-import { Crown, PlayCircle, Wallet } from "lucide-react";
+import { Gem, PlayCircle, Wallet } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { IMPERIAL_BET_COPY } from "./imperialCopy";
 import ProvablyFairBadge from "./ProvablyFairBadge";
@@ -67,7 +67,7 @@ export default function ImperialBetHistoryList({ rows, onReplay }: Props) {
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 {won && (
-                  <Crown
+                  <Gem
                     className={`w-4 h-4 shrink-0 ${
                       isJackpot ? "text-amber-300" : "text-emerald-300"
                     }`}

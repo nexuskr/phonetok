@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Coins, Crown, Radio, ShieldCheck, Sparkles } from "lucide-react";
+import { Gem, ArrowRight, Coins, Radio, ShieldCheck, Sparkles } from "lucide-react";
 import PhonaraTopBar from "@/components/nav/PhonaraTopBar";
 import ImperialLogo from "@/components/brand/ImperialLogo";
 import ImperialLiveActivity from "@/components/live/ImperialLiveActivity";
@@ -69,7 +69,7 @@ function Hero() {
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[hsl(var(--gold)/.45)] bg-[hsl(var(--gold)/.08)] text-[10px] font-black tracking-[0.32em] text-[hsl(var(--gold))] uppercase"
         >
-          <Crown className="w-3 h-3" /> The Imperial World
+          <Gem className="w-3 h-3" /> The Imperial World
         </motion.div>
 
         <motion.h1
@@ -106,7 +106,7 @@ function Hero() {
             to="/auth?mode=signup"
             className="group imperial-jackpot-breathe inline-flex items-center gap-2.5 h-[64px] px-9 rounded-2xl bg-gradient-to-r from-[hsl(var(--gold))] via-[hsl(var(--gold))] to-[hsl(var(--pink))] text-background font-black text-lg md:text-xl press glow-pink-xl hover:scale-[1.04] transition-transform"
           >
-            <Crown className="w-5 h-5" />
+            <Gem className="w-5 h-5" />
             지금 무료로 황제가 되기
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Link>

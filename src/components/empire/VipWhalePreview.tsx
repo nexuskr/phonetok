@@ -4,7 +4,7 @@
  */
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Eye, Crown, ArrowDownToLine } from "lucide-react";
+import { Gem, Eye, ArrowDownToLine } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useVipPass } from "@/hooks/use-vip-pass";
@@ -66,7 +66,7 @@ export default function VipWhalePreview() {
             className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-background/60 px-2.5 py-1 text-xs"
           >
             {s.kind === "crown" ? (
-              <Crown className="w-3 h-3 text-amber-300" />
+              <Gem className="w-3 h-3 text-amber-300" />
             ) : (
               <ArrowDownToLine className="w-3 h-3 text-emerald-300" />
             )}

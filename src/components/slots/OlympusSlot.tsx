@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Crown, Loader2, Play, RefreshCw, ShieldCheck, Volume2, VolumeX, Zap } from "lucide-react";
+import { Gem, Loader2, Play, RefreshCw, ShieldCheck, Volume2, VolumeX, Zap } from "lucide-react";
 import { spinReal, spinDemo, getDemoBalance, claimDemoRefill, type SpinResult } from "@/lib/slots-rpc";
 import { notify } from "@/lib/notify";
 import { useDB } from "@/lib/store";
@@ -576,7 +576,7 @@ export default function OlympusSlot({ theme = OLYMPUS_THEME }: { theme?: SlotThe
                   : "text-muted-foreground"
               }`}
             >
-              <Crown className="w-3 h-3" /> REAL
+              <Gem className="w-3 h-3" /> REAL
             </button>
           </div>
           <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">

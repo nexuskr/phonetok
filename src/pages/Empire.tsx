@@ -8,7 +8,7 @@ import { useRequireAuth } from "@/hooks/use-require-auth";
 import EmpireFoundingCounter from "@/components/EmpireFoundingCounter";
 import FoundingSeasonHall from "@/components/empire/FoundingSeasonHall";
 import EmpireDayCountdown from "@/components/EmpireDayCountdown";
-import { Crown, Trophy, Lock, Users, Flame, Swords, Gem, Award, Activity } from "lucide-react";
+import { Trophy, Lock, Users, Flame, Swords, Gem, Award, Activity } from "lucide-react";
 import { formatKRW } from "@/lib/store";
 import { useTranslation } from "react-i18next";
 import { LuxButton, Money } from "@/components/ui/lux";
@@ -54,8 +54,8 @@ function useTotalUsers() {
 
 const ENTRIES = [
   { to: "/lounge",   icon: Gem,    title: "제국 라운지",    desc: "길드 랭킹 · VIP 라운드테이블", accent: "from-primary/30 to-accent/10" },
-  { to: "/whales",   icon: Flame,  title: "고래 랭킹",      desc: "Crown 폭발 · 대형 출금 24h",   accent: "from-gold/30 to-primary/10" },
-  { to: "/arena",    icon: Swords, title: "Crown War",     desc: "실전 트레이딩 · Real/Paper",    accent: "from-destructive/25 to-gold/10" },
+  { to: "/whales",   icon: Flame,  title: "고래 랭킹",      desc: "PHON 폭발 · 대형 출금 24h",   accent: "from-gold/30 to-primary/10" },
+  { to: "/arena",    icon: Swords, title: "PHON War",     desc: "실전 트레이딩 · Real/Paper",    accent: "from-destructive/25 to-gold/10" },
   { to: "/jackpot",  icon: Award,  title: "제국 대박 보상", desc: "Jackpot 룰렛 · 일 1회 무료",   accent: "from-accent/30 to-gold/10" },
 ] as const;
 
@@ -109,7 +109,7 @@ export default function Empire() {
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gold/10 border border-gold/30 text-[10px] font-imperial tracking-[0.24em] text-gold">
-              <Crown className="w-3 h-3" /> PHONARA EMPIRE OS
+              <Gem className="w-3 h-3" /> PHONARA EMPIRE OS
             </div>
             <h1 className="font-imperial font-black text-3xl sm:text-5xl lg:text-6xl mt-3 leading-[1.05] tracking-[0.01em] break-keep">
               <span className="text-gradient-gold">조 단위 제국을 짓는 운영체제.</span>
@@ -121,20 +121,20 @@ export default function Empire() {
 
             <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
               <KpiTile icon={Users} label="제국 시민" value={totalUsers.toLocaleString()} hint="실시간 동시접속 추정" />
-              <KpiTile icon={Activity} label="24h 고래 사건" value={whales24h.toLocaleString()} hint="Crown 폭발 · 대형 출금" />
+              <KpiTile icon={Activity} label="24h 고래 사건" value={whales24h.toLocaleString()} hint="PHON 폭발 · 대형 출금" />
               <KpiTile icon={Trophy} label="Founding 잔여석" value={seatsLeft != null ? `${seatsLeft}/30` : "—"} hint="Empire 패키지 한정" gold />
-              <KpiTile icon={Crown} label="내 좌석" value={me?.founding_seat_no ? `#${me.founding_seat_no}` : "미보유"} hint={me ? "영구 보존" : "Empire 패키지 필요"} />
+              <KpiTile icon={PHON} label="내 좌석" value={me?.founding_seat_no ? `#${me.founding_seat_no}` : "미보유"} hint={me ? "영구 보존" : "Empire 패키지 필요"} />
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2">
               <LuxButton variant="gold" size="lg" onClick={() => nav("/packages")}>
-                <Crown className="w-4 h-4" /> 제국 패키지 보기
+                <Gem className="w-4 h-4" /> 제국 패키지 보기
               </LuxButton>
               <Link
                 to="/arena"
                 className="press inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold border border-primary/40 text-primary hover:bg-primary/10 transition"
               >
-                <Swords className="w-4 h-4" /> Crown War 입장
+                <Swords className="w-4 h-4" /> PHON War 입장
               </Link>
             </div>
           </motion.div>
@@ -189,7 +189,7 @@ export default function Empire() {
                 <EmpireDayCountdown />
               </div>
               <LuxButton variant="gold" size="lg" block onClick={() => nav("/packages")} className="mt-5 max-w-sm mx-auto">
-                <Crown className="w-4 h-4" /> {t("goPackages")}
+                <Gem className="w-4 h-4" /> {t("goPackages")}
               </LuxButton>
             </div>
           </div>
@@ -199,7 +199,7 @@ export default function Empire() {
               <div aria-hidden className="pointer-events-none absolute -top-10 -right-10 w-40 h-40 rounded-full bg-gold/30 blur-3xl" />
               <div className="relative">
                 <div className="flex items-center gap-2 text-xs text-gold font-bold mb-1 tabular-nums">
-                  <Crown className="w-4 h-4" /> {t("seat", { n: me.founding_seat_no })}
+                  <Gem className="w-4 h-4" /> {t("seat", { n: me.founding_seat_no })}
                 </div>
                 <h2 className="font-imperial font-black text-xl break-keep">{me.package_name}</h2>
                 <p className="text-[11px] text-muted-foreground mt-1 break-keep">{t("foreverBadge")}</p>

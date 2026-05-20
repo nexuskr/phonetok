@@ -1,4 +1,4 @@
-import { Users, TrendingUp, Crown, UsersRound, Star } from "lucide-react";
+import { Gem, Users, TrendingUp, UsersRound, Star } from "lucide-react";
 import { useCountUp } from "@/hooks/use-count-up";
 import type { LiveKpi } from "@/hooks/use-auth-live-data";
 
@@ -54,7 +54,7 @@ export default function AuthLiveNowBar({ kpi }: Props) {
         ">
           <Cell icon={<Users className="w-4 h-4" />}      label="현재접속 황제"  value={kpi.active_users}     accent="text-foreground" suffix="명" />
           <Cell icon={<TrendingUp className="w-4 h-4 text-emerald-400" />} label="24시간 거래액" value={kpi.gmv_24h} accent="text-emerald-400" suffix="" />
-          <Cell icon={<Crown className="w-4 h-4 text-gold" />} label="오늘 Crown 폭발" value={kpi.crown_explosion} accent="text-gold" suffix="" />
+          <Cell icon={<Gem className="w-4 h-4 text-gold" />} label="오늘 PHON 폭발" value={kpi.crown_explosion} accent="text-gold" suffix="" />
           <Cell icon={<UsersRound className="w-4 h-4 text-sky-400" />} label="활성 황제" value={kpi.active_emperors} accent="text-sky-400" suffix="명" />
           <Cell icon={<Star className="w-4 h-4 text-rose-400" />} label="신규 황제 오늘" value={kpi.new_today} accent="text-rose-400" suffix="명" />
         </div>

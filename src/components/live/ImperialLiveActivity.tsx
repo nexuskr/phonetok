@@ -3,13 +3,13 @@
  *
  * 슬롯머신 방식. 외곽은 고정 높이 + overflow-hidden + contain:layout paint
  * 각 row 는 position:absolute + transform:translateY() 로 위로 밀어올림 →
- * reflow 0, layout shift 0. Jackpot(8%) 행은 트리플 글로우 링 + Crown +
+ * reflow 0, layout shift 0. Jackpot(8%) 행은 트리플 글로우 링 + PHON +
  * Imperial Seal SVG + "BIG WIN" 칩 + pulse.
  *
  * 머니플로 0, RPC 0, 외부 이미지 0.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Crown, TrendingUp, ArrowDownToLine, Coins, Sparkles } from "lucide-react";
+import { Gem, TrendingUp, ArrowDownToLine, Coins, Sparkles } from "lucide-react";
 
 /* ───────── 데이터 풀 ───────── */
 const NICKS_KR = [
@@ -101,7 +101,7 @@ function actionLabel(a: ActionKind): string {
   return "JACKPOT";
 }
 function ActionIcon({ a }: { a: ActionKind }) {
-  if (a === "jackpot") return <Crown className="w-3.5 h-3.5" />;
+  if (a === "jackpot") return <Gem className="w-3.5 h-3.5" />;
   if (a === "withdraw") return <ArrowDownToLine className="w-3.5 h-3.5" />;
   if (a === "deposit") return <Coins className="w-3.5 h-3.5" />;
   return <TrendingUp className="w-3.5 h-3.5" />;

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Crown, Flame, Target, ChevronRight, TrendingUp } from "lucide-react";
+import { Gem, Flame, Target, ChevronRight, TrendingUp } from "lucide-react";
 import { useDB, formatKRW, DEFAULT_MISSIONS } from "@/lib/store";
 import EmpireFoundingCounter from "@/components/EmpireFoundingCounter";
 import throneBg from "@/assets/command-throne-bg.jpg";

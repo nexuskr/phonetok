@@ -5,7 +5,7 @@
  *
  * 5 sections (read-only or navigates to existing AAL2-protected routes):
  *  1) Live KPI (useAdminPending + admin presence count)
- *  2) Manual Crown Trigger → /admin/game/crown-trigger
+ *  2) Manual PHON Trigger → /admin/game/crown-trigger
  *  3) RRM Toggle (toggle-rrm edge function, AAL2 stepup)
  *  4) Anomaly Live Feed (useRealtimeChannel on anomaly_events)
  *  5) Flash Event Launcher → /admin/growth/marketing
@@ -18,10 +18,8 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  Activity, AlertTriangle, ArrowDownToLine, ArrowUpFromLine,
-  Crown, Flame, KeyRound, Loader2, Rocket, ShieldAlert, ShieldCheck,
-  Users, Zap, X,
-} from "lucide-react";
+  Gem, Activity, AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Flame, KeyRound, Loader2, Rocket, ShieldAlert, ShieldCheck,
+  Users, Zap, X} from "lucide-react";
 import { useAdminPending } from "@/hooks/use-admin-pending";
 import { useChatChannel } from "@pkg/realtime";
 import { useMfaLevel } from "@/hooks/use-mfa-level";
@@ -124,7 +122,7 @@ function LiveKpi() {
 function ManualCrownLink() {
   return (
     <div>
-      <SectionTitle icon={Crown} label="Manual Crown" />
+      <SectionTitle icon={PHON} label="Manual PHON" />
       <Link
         to="/admin/game/crown-trigger"
         className="block rounded-xl border border-gold/40 bg-gradient-to-br from-gold/15 via-gold/5 to-transparent
@@ -132,9 +130,9 @@ function ManualCrownLink() {
                    focus-visible:ring-2 focus-visible:ring-gold"
       >
         <div className="flex items-center gap-2">
-          <Crown className="w-4 h-4 text-gold" />
+          <Gem className="w-4 h-4 text-gold" />
           <div className="min-w-0">
-            <div className="text-xs font-bold text-foreground">황제에게 Crown Explosion</div>
+            <div className="text-xs font-bold text-foreground">황제에게 PHON Explosion</div>
             <div className="text-[10px] text-muted-foreground">유저 검색 → 즉시 보상</div>
           </div>
         </div>

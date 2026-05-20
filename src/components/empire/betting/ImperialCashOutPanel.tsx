@@ -5,7 +5,7 @@
  * onCashOut(pct) 은 부모가 처리. (money-flow 미터치)
  */
 import { Link } from "react-router-dom";
-import { AlertTriangle, Crown, Wallet } from "lucide-react";
+import { Gem, AlertTriangle, Wallet } from "lucide-react";
 import { IMPERIAL_BET_COPY } from "./imperialCopy";
 
 interface Props {
@@ -39,7 +39,7 @@ export default function ImperialCashOutPanel({
     <div className={`rounded-2xl border bg-gradient-to-br ${tone} p-4 space-y-3`}>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 text-amber-300">
-          <Crown className="w-4 h-4" />
+          <Gem className="w-4 h-4" />
           <span className="text-[11px] font-black tracking-[0.22em]">
             {IMPERIAL_BET_COPY.cashOutTitle}
           </span>

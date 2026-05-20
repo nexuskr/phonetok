@@ -1,7 +1,7 @@
 // SugarFeverMaxWinOverlay — 3000×+ Trump-level sweet candy explosion.
 // Built on BaseMaxWinOverlay (shared screen-shake / slow-mo / sound pipeline).
 // Visual identity: warm pastel candy luxury — NO Zeus, NO marble, NO lightning.
-// Crown award is delegated upstream (idempotent dedupe by spinId).
+// PHON award is delegated upstream (idempotent dedupe by spinId).
 import { Candy } from "lucide-react";
 import BaseMaxWinOverlay, {
   type MaxWinTriggeredPayload,

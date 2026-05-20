@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Crown, Sparkles } from "lucide-react";
+import { Gem, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useImperialOnboarding } from "@/hooks/useImperialOnboarding";
 import { notify } from "@/lib/notify";
@@ -65,7 +65,7 @@ export default function ImperialWelcomeDialog() {
           <>
             <DialogHeader>
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/15 ring-2 ring-amber-400/40 animate-[pulse_2s_ease-in-out_infinite]">
-                <Crown className="h-8 w-8 text-amber-300" />
+                <Gem className="h-8 w-8 text-amber-300" />
               </div>
               <DialogTitle className="text-center text-2xl font-bold animate-fade-in">
                 Imperial Empire 입성을 환영합니다
@@ -108,7 +108,7 @@ export default function ImperialWelcomeDialog() {
           <>
             <DialogHeader>
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/15 ring-2 ring-amber-400/40">
-                <Crown className="h-8 w-8 text-amber-300" />
+                <Gem className="h-8 w-8 text-amber-300" />
               </div>
               <DialogTitle className="text-center text-2xl font-bold">첫 Duel을 시작하세요</DialogTitle>
               <DialogDescription className="text-center">

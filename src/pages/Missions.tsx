@@ -18,7 +18,7 @@ import {
   type Mission,
   type Tier,
 } from "@/lib/store";
-import { CheckCircle2, Sparkles, Lock, Crown, Upload, Gamepad2, X, Zap, Flame, Trophy, Heart } from "lucide-react";
+import { Gem, CheckCircle2, Sparkles, Lock, Upload, Gamepad2, X, Zap, Flame, Trophy, Heart } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { settleMission } from "@/lib/missions-rpc";
@@ -340,7 +340,7 @@ export default function Missions() {
             <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-gold/40 blur-3xl" />
             <div className="relative flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-gradient-gold flex items-center justify-center glow-gold">
-                <Crown className="w-7 h-7 text-gold-foreground" />
+                <Gem className="w-7 h-7 text-gold-foreground" />
               </div>
               <div className="flex-1">
                 <div className="text-[10px] tracking-widest text-gold font-black">{t("premiumLocked")}</div>

@@ -5,7 +5,7 @@
  * - 입금 ≥ ₩50,000 시 +200% 보너스 + Founding Avatar + PHON + 7d 손실보호
  */
 import { useEffect, useState } from "react";
-import { Crown, Sparkles, Shield, Coins, Loader2 } from "lucide-react";
+import { Gem, Sparkles, Shield, Coins, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,7 +63,7 @@ export default function FirstDepositGodModeModal({ open, onOpenChange, onClaimed
       <DialogContent className="max-w-md border-2 border-primary/40 bg-gradient-to-br from-background via-background to-primary/5">
         <DialogHeader>
           <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/50 text-[10px] font-black text-amber-300 tracking-[0.2em] w-fit">
-            <Crown className="w-3 h-3" /> GOD MODE · 1회 한정
+            <Gem className="w-3 h-3" /> GOD MODE · 1회 한정
           </div>
           <DialogTitle className="font-display font-black text-2xl text-gradient-imperial mt-2">
             첫 입금 갓모드
@@ -114,7 +114,7 @@ export default function FirstDepositGodModeModal({ open, onOpenChange, onClaimed
             <div className="space-y-2 p-4 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/30">
               <Reward icon={<Sparkles className="w-4 h-4" />} label="+200% 보너스" value={`₩${bonus.toLocaleString()}`} highlight />
               <Reward icon={<Coins className="w-4 h-4" />} label="PHON 사전 크레딧" value={`${phon.toLocaleString()} PHON`} />
-              <Reward icon={<Crown className="w-4 h-4" />} label="Founding Avatar" value={`Tier ${tier}`} />
+              <Reward icon={<Gem className="w-4 h-4" />} label="Founding Avatar" value={`Tier ${tier}`} />
               <Reward icon={<Shield className="w-4 h-4" />} label="손실 보호" value="7일간 70%" />
             </div>
 
@@ -124,7 +124,7 @@ export default function FirstDepositGodModeModal({ open, onOpenChange, onClaimed
               size="lg"
               className="w-full bg-gradient-imperial text-primary-foreground font-black glow-imperial hover:scale-[1.02] transition"
             >
-              {busy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Crown className="w-4 h-4 mr-2" />}
+              {busy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Gem className="w-4 h-4 mr-2" />}
               갓모드 청구 · ₩{amount.toLocaleString()}
             </Button>
             <p className="text-[10px] text-muted-foreground text-center">

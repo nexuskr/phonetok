@@ -62,7 +62,7 @@ export function computeFomo(input: FomoInput): FomoSignals {
 
 /**
  * Variable Reward 5단계.
- * Base 64% / Surge 23% / Crown 8.5% / Empyrean 3.2% / Divine 1.3%
+ * Base 64% / Surge 23% / PHON 8.5% / Empyrean 3.2% / Divine 1.3%
  * (꼬리 두텁게 — 잭팟 체감 유지, expected payout ≈ 0.938)
  */
 export function rewardTierFromRoll(roll: number): RewardTier {

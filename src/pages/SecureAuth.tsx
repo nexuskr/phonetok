@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { Crown, ShieldCheck, Mail, Lock, ChevronDown, ChevronUp, Sparkles, Zap } from "lucide-react";
+import { Gem, ShieldCheck, Mail, Lock, ChevronDown, ChevronUp, Sparkles, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "@/hooks/use-toast";
@@ -135,7 +135,7 @@ export default function SecureAuth() {
         {/* Hero */}
         <section className="text-center">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-imperial glow-imperial mb-4">
-            <Crown className="w-7 h-7 text-primary-foreground" />
+            <Gem className="w-7 h-7 text-primary-foreground" />
           </div>
           <div className="text-[10px] tracking-[0.32em] font-black text-primary/85">
             PHONARA · EMPIRE OS

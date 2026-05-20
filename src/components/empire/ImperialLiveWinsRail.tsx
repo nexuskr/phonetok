@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Flame, ChevronRight } from "lucide-react";
+import { Gem, Flame, ChevronRight } from "lucide-react";
 import { useVisibleInterval } from "@/lib/util/visible-interval";
 import { trackClick, useTrackView } from "@/lib/telemetry";
 
@@ -288,7 +288,7 @@ export default function ImperialLiveWinsRail({ variant = "compact" }: { variant?
                 {/* Desktop row */}
                 <div className={`hidden sm:grid grid-cols-[1.4fr_1fr_56px_56px_1fr_56px_1.2fr] gap-2 items-center px-2 ${isFull ? "py-2.5 min-h-[60px]" : "py-2 min-h-[52px]"}`}>
                   <div className="flex items-center gap-1.5 min-w-0">
-                    {r.jackpot && <Crown className={`${isFull ? "w-4 h-4" : "w-3.5 h-3.5"} text-amber-300 shrink-0 drop-shadow-[0_0_6px_hsl(var(--gold)/0.7)]`} />}
+                    {r.jackpot && <Gem className={`${isFull ? "w-4 h-4" : "w-3.5 h-3.5"} text-amber-300 shrink-0 drop-shadow-[0_0_6px_hsl(var(--gold)/0.7)]`} />}
                     <span className={`${isFull ? "text-lg" : "text-base"} shrink-0`}>{r.gameEmoji}</span>
                     <span className={`${isFull ? "text-[13px]" : "text-[12px]"} font-bold truncate`}>{r.game}</span>
                   </div>

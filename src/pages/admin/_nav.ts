@@ -3,14 +3,12 @@
  * Single source of truth for sidebar sections, routes, AAL2 protection,
  * pending-badge sources, and ⌘K command palette entries.
  */
-import {
-  Crown, Activity, TrendingUp, GitBranch,
+import { Activity, TrendingUp, GitBranch,
   ArrowDownToLine, ArrowUpFromLine, Coins, ShieldCheck, ShieldAlert,
   HeartHandshake, ScrollText, Flame, Lock, Users, Wallet,
   Gauge, KeyRound, FlaskConical, Bot, HeartPulse, BarChart3,
   Target, MessageSquare, LifeBuoy, Zap, AlertTriangle, Send, Sliders,
-  Gem, Megaphone, Bell, FileSearch, Sparkles, Rocket,
-} from "lucide-react";
+  Gem, Megaphone, Bell, FileSearch, Sparkles, Rocket} from "lucide-react";
 
 export type AdminBadgeSource =
   | "deposits_pending"
@@ -47,7 +45,7 @@ export const ADMIN_NAV: AdminNavSection[] = [
     aal2: false,
     items: [
       { id: "empire",   name: "🌍 Empire Overview", to: "/admin",            icon: Gem },
-      { id: "cockpit",  name: "콕핏 (구버전)",      to: "/admin/cockpit",    icon: Crown },
+      { id: "cockpit",  name: "콕핏 (구버전)",      to: "/admin/cockpit",    icon: Gem },
       { id: "funnel",   name: "퍼널 분석",          to: "/admin/funnel",     icon: GitBranch },
       { id: "revenue",  name: "매출 · 코호트",      to: "/admin/revenue",    icon: TrendingUp },
     ],
@@ -60,7 +58,7 @@ export const ADMIN_NAV: AdminNavSection[] = [
     items: [
       { id: "deposits",    name: "충전 신청",          to: "/admin/treasury/deposits",    icon: ArrowUpFromLine, badge: "deposits_pending" },
       { id: "withdrawals", name: "출금 신청",          to: "/admin/treasury/withdrawals", icon: ArrowDownToLine, badge: "withdrawals_pending" },
-      { id: "packages",    name: "패키지 구매",        to: "/admin/treasury/packages",    icon: Crown },
+      { id: "packages",    name: "패키지 구매",        to: "/admin/treasury/packages",    icon: Gem },
       { id: "coin",        name: "코인 주소 관리",     to: "/admin/treasury/coin",        icon: Coins },
       { id: "accounting",  name: "회계 (제로로스)",    to: "/admin/treasury/accounting",  icon: Wallet },
       { id: "insurance",   name: "보험 기금",          to: "/admin/treasury/insurance",   icon: ShieldCheck },
@@ -101,8 +99,8 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { id: "cron",          name: "Cron · 웹훅",         to: "/admin/ops/cron",          icon: Zap },
       { id: "report",        name: "AI 일일 리포트",      to: "/admin/ops/report",        icon: BarChart3 },
       { id: "thresholds",    name: "임계값 · SLA",        to: "/admin/ops/thresholds",    icon: Sliders },
-      { id: "duel",          name: "⚔️ Imperial Duel (PHON)", to: "/admin/duel",          icon: Crown },
-      { id: "imperial-cmd",  name: "💎 Imperial Command",     to: "/admin/ops/imperial-command", icon: Crown },
+      { id: "duel",          name: "⚔️ Imperial Duel (PHON)", to: "/admin/duel",          icon: Gem },
+      { id: "imperial-cmd",  name: "💎 Imperial Command",     to: "/admin/ops/imperial-command", icon: Gem },
     ],
   },
   {
@@ -129,8 +127,8 @@ export const ADMIN_NAV: AdminNavSection[] = [
     items: [
       { id: "bias",          name: "Demo Bias 슬라이더",  to: "/admin/game/bias",          icon: Sliders },
       { id: "nearmiss",      name: "Near-Miss 확률",      to: "/admin/game/nearmiss",      icon: Target },
-      { id: "particles",     name: "Crown 파티클 강도",   to: "/admin/game/particles",     icon: Sparkles },
-      { id: "crown-trigger", name: "💎 Manual Crown",     to: "/admin/game/crown-trigger", icon: Rocket },
+      { id: "particles",     name: "PHON 파티클 강도",   to: "/admin/game/particles",     icon: Sparkles },
+      { id: "crown-trigger", name: "💎 Manual PHON",     to: "/admin/game/crown-trigger", icon: Rocket },
       { id: "slot-sfx",      name: "🔊 슬롯 사운드 SFX",  to: "/admin/game/slot-sfx",      icon: Sparkles },
     ],
   },
@@ -143,7 +141,7 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { id: "users",    name: "회원 관리",         to: "/admin/product/users",    icon: Users },
       { id: "support",  name: "고객 지원",         to: "/admin/product/support",  icon: LifeBuoy },
       { id: "missions", name: "AI 미션",           to: "/admin/product/missions", icon: Target },
-      { id: "founding", name: "창립 시즌",         to: "/admin/product/founding", icon: Crown },
+      { id: "founding", name: "창립 시즌",         to: "/admin/product/founding", icon: Gem },
       { id: "beta",     name: "베타 코드",         to: "/admin/product/beta",     icon: KeyRound },
     ],
   },

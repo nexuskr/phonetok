@@ -1,9 +1,9 @@
 // OlympusLegacyMaxWinOverlay — 5000× Hollywood-cinematic, "Warm Olympus Luxury".
 // Built on BaseMaxWinOverlay (same screen-shake / slow-mo / sound facade pipeline
 // the other Signature Slots use). Visual identity: warm amber gold only, no cold
-// blue. Crown award at ≥4000× is delegated to onMaxWinTriggered (idempotent
+// blue. PHON award at ≥4000× is delegated to onMaxWinTriggered (idempotent
 // dedupe by spinId is enforced inside SlotSignatureWrapper → useEmpireCrown).
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import BaseMaxWinOverlay, {
   type MaxWinTriggeredPayload,
 } from "@/components/celebration/BaseMaxWinOverlay";
@@ -55,7 +55,7 @@ export default function OlympusLegacyMaxWinOverlay({
       soundKeys={{ primary: "legendary_win", voice: "zeus_decree" }}
       titleText="OLYMPUS LEGACY"
       icon={
-        <Crown
+        <Gem
           className="h-20 w-20 sm:h-28 sm:w-28 text-amber-200 mb-3"
           style={{
             willChange: "transform, filter",

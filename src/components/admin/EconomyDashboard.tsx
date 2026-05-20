@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LoadingList } from "@/components/ui/loading-state";
 import { notify } from "@/lib/notify";
-import { Coins, TrendingUp, Crown, Camera } from "lucide-react";
+import { Gem, Coins, TrendingUp, Camera } from "lucide-react";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
 
 type Stats = {
@@ -116,7 +116,7 @@ export default function EconomyDashboard() {
       {/* NFT 분포 */}
       <Card className="p-4">
         <div className="text-xs font-bold mb-3 flex items-center gap-1.5">
-          <Crown className="w-3.5 h-3.5 text-amber-300" /> NFT 발행 분포
+          <Gem className="w-3.5 h-3.5 text-amber-300" /> NFT 발행 분포
         </div>
         {Object.keys(stats.nft_distribution).length === 0 ? (
           <div className="text-xs text-muted-foreground">아직 발행된 NFT가 없습니다.</div>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Crown, TrendingUp, TrendingDown } from "lucide-react";
+import { Gem, TrendingUp, TrendingDown } from "lucide-react";
 
 /**
  * ImperialTradeFomoBar — 황제의 실전 트레이딩 홀 전용 글로벌 FOMO Bar.
@@ -92,7 +92,7 @@ export default function ImperialTradeFomoBar() {
       <div className="relative flex flex-wrap items-center gap-x-4 gap-y-2 justify-between">
         <div className="flex items-center gap-2.5 min-w-0">
           <span className="relative inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-rose-500 text-black shadow-[0_0_24px_hsl(var(--gold)/0.55)]">
-            <Crown className="w-4.5 h-4.5" strokeWidth={2.5} />
+            <Gem className="w-4.5 h-4.5" strokeWidth={2.5} />
             {!reduce && (
               <span className="absolute inset-0 rounded-full ring-2 ring-amber-300/60 animate-ping" />
             )}

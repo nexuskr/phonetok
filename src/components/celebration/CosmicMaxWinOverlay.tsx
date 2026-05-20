@@ -1,5 +1,5 @@
 // CosmicMaxWinOverlay — Cosmic Emperor cinematic on BaseMaxWinOverlay.
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import BaseMaxWinOverlay, { type MaxWinTriggeredPayload } from "@/components/celebration/BaseMaxWinOverlay";
 
 interface Props {
@@ -22,7 +22,7 @@ export default function CosmicMaxWinOverlay({ triggerAt = 5000, durationMs = 300
       soundKeys={{ primary: "legendary_win", voice: "emperor_voice" }}
       titleText="COSMIC EMPEROR"
       icon={
-        <Crown
+        <Gem
           className="h-20 w-20 sm:h-28 sm:w-28 text-yellow-300 mb-3"
           style={{
             filter:

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Crown, Sparkles, ArrowRight, Eye, Share2 } from "lucide-react";
+import { Gem, Sparkles, ArrowRight, Eye, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ShareReplayButton } from "@/components/empire/ShareReplayButton";
 import { LoadingList } from "@/components/ui/loading-state";
@@ -24,7 +24,7 @@ export default function ReplayLanding() {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    document.title = "💎 Crown Reveal · Phonara Empire";
+    document.title = "💎 PHON Reveal · Phonara Empire";
     if (!token) return;
     (async () => {
       const { data: r } = await supabase.rpc("get_public_crown_replay", { _token: token });
@@ -112,7 +112,7 @@ export default function ReplayLanding() {
           <div className="text-xs text-gold tracking-[0.25em] font-black mb-2">EMPIRE에 자리가 비어있습니다</div>
           <div className="font-display font-black text-2xl mb-2 leading-tight">
             지금 입성하면<br />
-            첫 Crown은 당신의 것
+            첫 PHON은 당신의 것
           </div>
           <p className="text-sm text-muted-foreground mb-5">
             Practice Mode로 무료 체험 후, Empire의 일원이 되어 다음 변동성 폭발의 주인공이 되세요.
@@ -121,7 +121,7 @@ export default function ReplayLanding() {
             to="/auth"
             className="inline-flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gradient-to-r from-gold via-yellow-300 to-gold text-background font-display font-black text-lg shadow-[0_0_28px_-4px_hsl(var(--gold)/0.8)] active:scale-[0.98] transition"
           >
-            <Crown className="w-5 h-5" />
+            <Gem className="w-5 h-5" />
             제국 입성하기
             <ArrowRight className="w-5 h-5" />
           </Link>

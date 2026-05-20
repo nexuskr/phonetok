@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, Crown } from "lucide-react";
+import { Gem, Sparkles} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeRealtime } from "@pkg/realtime";
 
@@ -107,7 +107,7 @@ export default function JackpotMeter({ gameCode }: { gameCode: string }) {
           {pool.last_winner_masked ? (
             <>
               <div className="flex items-center justify-end gap-1">
-                <Crown className="w-3 h-3 text-amber-300" />
+                <Gem className="w-3 h-3 text-amber-300" />
                 <span className="font-bold">{pool.last_winner_masked}</span>
               </div>
               <div className="font-mono">+{fmt(Number(pool.last_amount ?? 0))} · {ago}</div>

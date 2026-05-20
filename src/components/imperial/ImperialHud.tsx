@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Flame, Trophy, Crown } from "lucide-react";
+import { Gem, Flame, Trophy} from "lucide-react";
 import { useImperialState, useBoosterCountdown } from "@/hooks/use-imperial-state";
 
 function fmt(n: number) {
@@ -20,7 +20,7 @@ export default function ImperialHud() {
           {/* Imperial Score */}
           <Link to="/whales" className="px-2 py-2.5 hover:bg-primary/5 transition">
             <div className="text-[9px] font-bold tracking-[0.18em] text-primary/80 uppercase flex items-center justify-center gap-1">
-              <Crown className="w-2.5 h-2.5" /> IS
+              <Gem className="w-2.5 h-2.5" /> IS
             </div>
             <div className="font-imperial font-black text-base sm:text-lg text-gradient-imperial tabular-nums mt-0.5">
               {fmt(state.total_is)}

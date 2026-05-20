@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Crown } from "lucide-react";
+import { Gem, X} from "lucide-react";
 import { ShareReplayButton } from "./ShareReplayButton";
 import { replayLanding } from "@/lib/crownReplay";
 

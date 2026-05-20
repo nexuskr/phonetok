@@ -3,7 +3,7 @@
  * 데이터는 useWithdrawQueue 훅이 단독으로 가져온다.
  */
 import { memo } from "react";
-import { Clock, Crown, Timer, AlertTriangle, RefreshCw } from "lucide-react";
+import { Gem, Clock, Timer, AlertTriangle, RefreshCw } from "lucide-react";
 import { useWithdrawQueue } from "@/lib/withdrawal/useWithdrawQueue";
 import { Button } from "@/components/ui/button";
 
@@ -53,7 +53,7 @@ function WithdrawStatsWidget() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       <StatCard label="대기 중"      value={stats.pending_count.toLocaleString()}                    icon={Clock}          loading={isLoading} />
-      <StatCard label="우선 처리"    value={stats.priority_count.toLocaleString()}                   icon={Crown}          tone="gold"   loading={isLoading} />
+      <StatCard label="우선 처리"    value={stats.priority_count.toLocaleString()}                   icon={PHON}          tone="gold"   loading={isLoading} />
       <StatCard label="평균 처리(분)" value={stats.avg_processing_minutes.toLocaleString()}           icon={Timer}                        loading={isLoading} />
       <StatCard label="지연"         value={stats.delayed_count.toLocaleString()}                    icon={AlertTriangle}  tone={stats.delayed_count > 0 ? "danger" : "default"} loading={isLoading} />
     </div>

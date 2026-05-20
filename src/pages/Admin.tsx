@@ -4,7 +4,7 @@ import { useChatChannel } from "@pkg/realtime";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useDB, formatKRW, uid, type Mission, type MissionTier } from "@/lib/store";
-import { ShieldCheck, Users, TrendingUp, ArrowDownToLine, ArrowUpFromLine, Plus, MessageSquare, Send, Coins, Target, Crown, BarChart3, ShieldAlert, GitBranch, Newspaper } from "lucide-react";
+import { Gem, ShieldCheck, Users, TrendingUp, ArrowDownToLine, ArrowUpFromLine, Plus, MessageSquare, Send, Coins, Target, BarChart3, ShieldAlert, GitBranch, Newspaper } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useRequireAdmin } from "@/hooks/use-require-auth";
 import { useTranslation } from "react-i18next";
@@ -146,7 +146,7 @@ export default function Admin() {
     { id: "referrals", label: "추천 윈도우", icon: Users },
     { id: "server_dep", label: t("tabDeposits"), icon: ArrowUpFromLine },
     { id: "server_wd", label: t("tabWithdrawals"), icon: ArrowDownToLine },
-    { id: "packages", label: t("tabPackages"), icon: Crown },
+    { id: "packages", label: t("tabPackages"), icon: Gem },
     { id: "missions", label: t("tabMissions"), icon: Target },
     { id: "users", label: t("tabUsers"), icon: Users },
     { id: "chats", label: t("tabChats"), icon: MessageSquare },
@@ -160,7 +160,7 @@ export default function Admin() {
     { id: "ab_experiments", label: "A/B 실험", icon: FlaskConical },
     { id: "beta", label: "베타 코드", icon: KeyRound },
     { id: "trust_v2", label: "Trust v2 (환불·손실보호)", icon: HeartHandshake },
-    { id: "founding", label: "Founding 시즌", icon: Crown },
+    { id: "founding", label: "Founding 시즌", icon: Gem },
     { id: "kernel", label: "Kernel (v3.2)", icon: Cpu },
     { id: "oracle", label: "Oracle Fortress", icon: Radio },
     { id: "economy", label: "PHON·NFT 경제", icon: Coins },

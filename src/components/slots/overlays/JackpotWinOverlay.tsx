@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Crown, Sparkles, X } from "lucide-react";
+import { Gem, Sparkles, X } from "lucide-react";
 
 type Props = {
   open: boolean;
@@ -99,7 +99,7 @@ export default function JackpotWinOverlay({ open, amount, gameTitle, onClose }: 
               animate={{ rotate: [0, -8, 8, -4, 4, 0], scale: [1, 1.08, 1] }}
               transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
             >
-              <Crown className="w-11 h-11 text-yellow-50" />
+              <Gem className="w-11 h-11 text-yellow-50" />
             </motion.div>
 
             <motion.div

@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { notify } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
-import { Crown, CheckCircle2, Lock, Gift } from "lucide-react";
+import { Gem, CheckCircle2, Lock, Gift } from "lucide-react";
 import { LoadingList } from "@/components/ui/loading-state";
 
 type StageRow = {
@@ -42,7 +42,7 @@ export default function JourneyClaimPanel() {
       return;
     }
     notify.success(`🎁 단계 ${stage_no} 보상 수령`, {
-      description: `+${(data as any)?.phon ?? 0} PHON · +${(data as any)?.crown ?? 0} Crown`,
+      description: `+${(data as any)?.phon ?? 0} PHON · +${(data as any)?.crown ?? 0} PHON`,
     });
     void load();
   };
@@ -71,7 +71,7 @@ export default function JourneyClaimPanel() {
             <div className="min-w-0 flex-1">
               <div className="text-sm font-bold truncate">{r.title}</div>
               <div className="text-[11px] text-muted-foreground tabular-nums">
-                +{Number(r.reward_phon).toLocaleString()} PHON · +{r.reward_crown} <Crown className="inline w-3 h-3 -mt-0.5" />
+                +{Number(r.reward_phon).toLocaleString()} PHON · +{r.reward_crown} <Gem className="inline w-3 h-3 -mt-0.5" />
               </div>
             </div>
             {r.claimed ? (

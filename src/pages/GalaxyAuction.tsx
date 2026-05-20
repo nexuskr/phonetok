@@ -5,7 +5,7 @@ import { notify } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Rocket, Crown, ArrowLeft } from "lucide-react";
+import { Gem, Rocket, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -84,7 +84,7 @@ export default function GalaxyAuction() {
           <h1 className="font-imperial font-black text-2xl sm:text-3xl">🌌 Galaxy Emperor 100석</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             좌석을 입찰로 획득하면 <strong className="text-primary">30일 Galaxy Booster</strong>가 자동 적용됩니다 ·
-            수수료 -50%, Crown ×2.0, 레버리지 +2x. 더 높은 입찰자가 등장하면 이전 보유자에게 90%가 환불됩니다.
+            수수료 -50%, PHON ×2.0, 레버리지 +2x. 더 높은 입찰자가 등장하면 이전 보유자에게 90%가 환불됩니다.
           </p>
           <p className="mt-1 text-xs text-amber-400">최소 입찰가는 현재가의 110% 이상이어야 합니다.</p>
         </section>
@@ -117,7 +117,7 @@ export default function GalaxyAuction() {
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-black tracking-wider text-muted-foreground">#{s.seat_no.toString().padStart(2,"0")}</span>
-                    {isMine && <Crown className="w-3 h-3 text-emerald-400" />}
+                    {isMine && <Gem className="w-3 h-3 text-emerald-400" />}
                   </div>
                   <div className="mt-1 text-xs font-black tabular-nums">{Number(s.current_bid).toLocaleString()} <span className="text-[9px] font-bold text-muted-foreground">PHON</span></div>
                   <div className="text-[9px] truncate text-muted-foreground">
@@ -142,7 +142,7 @@ export default function GalaxyAuction() {
               <div className="flex justify-between"><span className="text-muted-foreground">최소 입찰가 (110%)</span><span className="font-black tabular-nums text-primary">{Math.ceil(Number(picked.current_bid) * 1.1).toLocaleString()} PHON</span></div>
               <Input type="number" inputMode="decimal" value={bid} onChange={(e) => setBid(e.target.value)} placeholder="입찰가" />
               <p className="text-[11px] text-muted-foreground">
-                낙찰 시 <strong className="text-primary">30일 Booster</strong>(수수료 -50% / Crown ×2 / 레버리지 +2)가 즉시 활성화됩니다.
+                낙찰 시 <strong className="text-primary">30일 Booster</strong>(수수료 -50% / PHON ×2 / 레버리지 +2)가 즉시 활성화됩니다.
               </p>
             </div>
           )}

@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDB, formatKRW, MAIN_MILESTONE_AMOUNT, MAIN_MAX_INTERVAL_MS, MINI_MAX_INTERVAL_MS, jackpotPayoutPct, jackpotResetBase, miniJackpotResetBase, miniJackpotAmount, randomFakeNick, type Tier, type JackpotState } from "@/lib/store";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
 import CountUp from "@/components/intelligence/CountUp";
-import { Flame, Crown, Trophy, Sparkles, ArrowRight } from "lucide-react";
+import { Gem, Flame, Trophy, Sparkles, ArrowRight } from "lucide-react";
 
 // Live jackpot — runs in memory, syncs to DB every 30s only (avoids global rerender storm).
 function useJackpotState() {
@@ -100,7 +100,7 @@ export default function JackpotBanner({ compact = false }: { compact?: boolean }
         <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-gold/40 blur-2xl animate-pulse" />
         <div className="relative flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-gold flex items-center justify-center glow-gold animate-crown">
-            <Crown className="w-5 h-5 text-gold-foreground" />
+            <Gem className="w-5 h-5 text-gold-foreground" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-[9px] tracking-widest text-gold font-black flex items-center gap-1">
@@ -213,7 +213,7 @@ function RouletteCtaButton() {
       }}
       className="mt-3 group flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-gold text-gold-foreground font-black py-2.5 text-sm shadow-neon-gold hover:shadow-[0_0_30px_hsl(44_95%_65%/0.9)] transition-all"
     >
-      <Crown className="w-4 h-4" />
+      <Gem className="w-4 h-4" />
       지금 룰렛 돌리기
       <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
     </button>

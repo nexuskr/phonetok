@@ -1,5 +1,5 @@
 import { useOnline, useTodayPayout } from "@/components/LiveStats";
-import { Sparkles, Users, TrendingUp, Crown } from "lucide-react";
+import { Gem, Sparkles, Users, TrendingUp} from "lucide-react";
 import { motion } from "framer-motion";
 import { SimChip } from "@/components/sim/SimChip";
 import { useEmpireBooster } from "@/hooks/use-empire-booster";
@@ -40,7 +40,7 @@ export default function EmpirePopulationPulse() {
         <SimChip />
         {active && (
           <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-sim-gold/20 border border-sim-gold/40 text-sim-gold font-bold tracking-wider">
-            <Crown className="w-3 h-3" /> BARON
+            <Gem className="w-3 h-3" /> BARON
           </span>
         )}
         <div className="flex items-center gap-1.5 min-w-0">

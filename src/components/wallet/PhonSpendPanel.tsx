@@ -1,14 +1,14 @@
 /**
  * PhonSpendPanel — /wallet 상단 PHON 사용처 카드 3종
  * 1) Fee Discount (1~1000 PHON, 50% 수수료 할인 슬롯)
- * 2) Booster 24h (5,000 PHON, 수수료 -30% / Crown ×1.5 / 레버리지 7x)
- * 3) Crown Boost 24h (1,000 PHON, Crown ×1.5)
+ * 2) Booster 24h (5,000 PHON, 수수료 -30% / PHON ×1.5 / 레버리지 7x)
+ * 3) PHON Boost 24h (1,000 PHON, PHON ×1.5)
  */
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Coins, Zap, Crown, Sparkles, Loader2 } from "lucide-react";
+import { Gem, Coins, Zap, Sparkles, Loader2 } from "lucide-react";
 import { useMyPower } from "@/hooks/use-my-power";
 import { spendPhonForFeeDiscount, spendPhonForBooster, spendPhonForCrownBoost, PHON_COSTS } from "@/lib/phonSpend";
 import { notify } from "@/lib/notify";
@@ -37,7 +37,7 @@ export default function PhonSpendPanel() {
     setBusy("boost");
     try {
       await spendPhonForBooster();
-      notify.success("24h Empire Booster 활성 — 수수료 -30% · Crown ×1.5 · 레버리지 7x");
+      notify.success("24h Empire Booster 활성 — 수수료 -30% · PHON ×1.5 · 레버리지 7x");
     } catch (e: any) {
       notify.error(e.message ?? "사용 실패");
     } finally { setBusy(null); }
@@ -47,7 +47,7 @@ export default function PhonSpendPanel() {
     setBusy("crown");
     try {
       await spendPhonForCrownBoost();
-      notify.success("24h Crown ×1.5 부스트 활성");
+      notify.success("24h PHON ×1.5 부스트 활성");
     } catch (e: any) {
       notify.error(e.message ?? "사용 실패");
     } finally { setBusy(null); }
@@ -111,7 +111,7 @@ export default function PhonSpendPanel() {
                 <span className="text-xs font-black">Empire Booster 24h</span>
               </div>
               <p className="text-[10px] text-muted-foreground leading-relaxed mb-3">
-                수수료 −30% · Crown ×1.5 · 레버리지 7x
+                수수료 −30% · PHON ×1.5 · 레버리지 7x
               </p>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] text-muted-foreground">비용</span>
@@ -128,14 +128,14 @@ export default function PhonSpendPanel() {
             </div>
           </div>
 
-          {/* 3. Crown Boost */}
+          {/* 3. PHON Boost */}
           <div className="glass rounded-xl p-4 border border-border/40 hover:border-primary/40 transition group">
             <div className="flex items-center gap-2 mb-2">
-              <Crown className="w-4 h-4 text-primary group-hover:scale-110 transition" />
-              <span className="text-xs font-black">Crown ×1.5 24h</span>
+              <Gem className="w-4 h-4 text-primary group-hover:scale-110 transition" />
+              <span className="text-xs font-black">PHON ×1.5 24h</span>
             </div>
             <p className="text-[10px] text-muted-foreground leading-relaxed mb-3">
-              모든 Crown 적립 1.5배 · 24시간 지속
+              모든 PHON 적립 1.5배 · 24시간 지속
             </p>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] text-muted-foreground">비용</span>

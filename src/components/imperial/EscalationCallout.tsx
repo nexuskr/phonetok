@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Crown, ArrowRight } from "lucide-react";
+import { Gem, ArrowRight } from "lucide-react";
 import { useImperialState } from "@/hooks/use-imperial-state";
 
 function formatKRW(n: number) {
@@ -25,7 +25,7 @@ export default function EscalationCallout({ className = "" }: { className?: stri
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.2em] text-primary uppercase">
-            <Crown className="w-3 h-3" /> 다음 사다리
+            <Gem className="w-3 h-3" /> 다음 사다리
           </div>
           <div className="font-imperial font-black text-lg mt-1 truncate">{m.label}</div>
           <div className="text-xs text-muted-foreground mt-0.5">

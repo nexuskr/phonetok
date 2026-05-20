@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Crown, Flame, Zap, ArrowDownToLine } from "lucide-react";
+import { Gem, Flame, Zap, ArrowDownToLine } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,7 +22,7 @@ const fmtKRW = (n: number) =>
   : `₩${n.toLocaleString("ko-KR")}`;
 
 const KIND_META: Record<Strike["kind"], { icon: React.ComponentType<{ className?: string }>; tone: string; verb: string }> = {
-  crown:    { icon: Crown,           tone: "text-secondary",     verb: "Crown 폭발" },
+  crown:    { icon: Gem,           tone: "text-secondary",     verb: "PHON 폭발" },
   baron:    { icon: Flame,           tone: "text-primary",       verb: "Baron 합류" },
   withdraw: { icon: ArrowDownToLine, tone: "text-money-strong",  verb: "출금 완료" },
 };

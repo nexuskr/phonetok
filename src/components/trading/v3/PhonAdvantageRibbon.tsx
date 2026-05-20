@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Sparkles, Crown } from "lucide-react";
+import { Gem, Sparkles} from "lucide-react";
 import { useMyPower } from "@/hooks/use-my-power";
 
 /**
@@ -21,7 +21,7 @@ export default function PhonAdvantageRibbon() {
       />
       <div className="relative flex items-center gap-3 flex-wrap">
         <div className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-amber-300 to-pink-500 text-white shadow-lg shadow-pink-500/30">
-          <Crown className="w-5 h-5" />
+          <Gem className="w-5 h-5" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-[11px] font-black tracking-[0.18em] text-amber-300/95">

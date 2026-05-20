@@ -18,7 +18,7 @@ const TEMPLATES: Array<(n: string) => { icon: string; text: string }> = [
   (n) => ({ icon: "🚀", text: `${n} LONG 적중 +${(Math.floor(Math.random() * 50) + 10) * 1000}원` }),
   (n) => ({ icon: "🚀", text: `${n} SHORT 적중 +${(Math.floor(Math.random() * 50) + 10) * 1000}원` }),
   (n) => ({ icon: "💸", text: `${n} ${(Math.floor(Math.random() * 400) + 50) * 10000}원 출금 완료` }),
-  (n) => ({ icon: "🌌", text: `${n} Crown 폭발` }),
+  (n) => ({ icon: "🌌", text: `${n} PHON 폭발` }),
 ];
 
 function makeEvent(): { id: number; icon: string; text: string } {

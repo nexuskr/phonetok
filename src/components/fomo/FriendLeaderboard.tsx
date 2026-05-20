@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Trophy, Crown } from "lucide-react";
+import { Gem, Trophy} from "lucide-react";
 import { useFriendRanking } from "@/hooks/use-friend-ranking";
 
 /**
@@ -52,7 +52,7 @@ export default function FriendLeaderboard({ limit = 5 }: { limit?: number } = {}
             }`}
           >
             <span className={`w-6 text-center text-[12px] font-black tabular-nums ${r.rnk === 1 ? "text-amber-300" : "text-muted-foreground"}`}>
-              {r.rnk === 1 ? <Crown className="w-3.5 h-3.5 inline text-amber-300" /> : r.rnk}
+              {r.rnk === 1 ? <Gem className="w-3.5 h-3.5 inline text-amber-300" /> : r.rnk}
             </span>
             <div className="flex-1 min-w-0">
               <div className={`text-sm truncate ${r.is_me ? "font-black text-primary" : "font-bold text-foreground"}`}>

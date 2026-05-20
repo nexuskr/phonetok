@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Zap } from "lucide-react";
+import { Gem, Zap } from "lucide-react";
 
 /**
  * 3-second cinematic between scatter trigger and the bonus wheel.
@@ -56,9 +56,9 @@ export default function BonusIntroOverlay({
             className="relative text-center px-6"
           >
             <div className="flex items-center justify-center gap-2 mb-3">
-              <Crown className="w-6 h-6 text-amber-300" />
+              <Gem className="w-6 h-6 text-amber-300" />
               <Zap className="w-5 h-5 text-amber-200" />
-              <Crown className="w-6 h-6 text-amber-300" />
+              <Gem className="w-6 h-6 text-amber-300" />
             </div>
             <div className="font-imperial text-3xl sm:text-5xl text-gradient-imperial tracking-[0.22em] font-black">
               BONUS UNLOCKED

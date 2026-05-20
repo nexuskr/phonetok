@@ -1,12 +1,12 @@
-import { Crown, Dice5, Gem, TrendingUp, Bot, Gift } from "lucide-react";
+import { Dice5, Gem, TrendingUp, Bot, Gift } from "lucide-react";
 
 const ITEMS = [
-  { icon: Crown,       title: "CROWN WAR",    line1: "실시간 제국 전쟁",   line2: "전 세계와 경쟁",    tone: "text-gold" },
+  { icon: Gem,       title: "CROWN WAR",    line1: "실시간 제국 전쟁",   line2: "전 세계와 경쟁",    tone: "text-gold" },
   { icon: Dice5,       title: "SLOT & GAMES", line1: "자체 슬롯 & 카지노", line2: "RTP 96% 이상",     tone: "text-amber-300" },
   { icon: Gem,         title: "NFT ATELIER",  line1: "전설의 NFT 제작",   line2: "수집하고 거래",     tone: "text-sky-300" },
   { icon: TrendingUp,  title: "REAL TRADING", line1: "실시간 시장 거래",  line2: "1000+ 마켓",       tone: "text-emerald-400" },
   { icon: Bot,         title: "AI COACH",     line1: "AI 황제 코치",      line2: "승리를 도와드립니다", tone: "text-violet-300" },
-  { icon: Gift,        title: "DAILY REWARDS",line1: "매일 보상 & 이벤트", line2: "Crown & PHON",     tone: "text-rose-300" },
+  { icon: Gift,        title: "DAILY REWARDS",line1: "매일 보상 & 이벤트", line2: "PHON & PHON",     tone: "text-rose-300" },
 ];
 
 export default function AuthFeatureGrid() {

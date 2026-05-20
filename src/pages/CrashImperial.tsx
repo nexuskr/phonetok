@@ -8,7 +8,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Crown, History, Sparkles } from "lucide-react";
+import { Gem, History, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -156,7 +156,7 @@ export default function CrashImperial() {
         <header className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-[hsl(var(--gold))] to-[hsl(var(--pink))] flex items-center justify-center shrink-0 shadow-[0_0_24px_hsla(45,90%,55%,0.5)]">
-              <Crown className="w-5 h-5 text-background" />
+              <Gem className="w-5 h-5 text-background" />
             </span>
             <div className="min-w-0">
               <h1 className="text-xl font-black text-foreground flex items-center gap-2">
@@ -232,7 +232,7 @@ export default function CrashImperial() {
         {/* Recent wins */}
         <section className="rounded-2xl border border-border/60 bg-card p-4">
           <h2 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-            <Crown className="w-4 h-4 text-[hsl(var(--gold))]" /> 최근 황실 대박
+            <Gem className="w-4 h-4 text-[hsl(var(--gold))]" /> 최근 황실 대박
           </h2>
           {wins.length === 0 ? (
             <p className="text-xs text-muted-foreground py-4 text-center">첫 대박의 주인공이 되어보세요.</p>

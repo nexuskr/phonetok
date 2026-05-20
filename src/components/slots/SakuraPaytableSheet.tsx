@@ -7,7 +7,7 @@ import BasePaytableSheet, {
 } from "@/components/slots/BasePaytableSheet";
 
 const HIGH: SymRow[] = [
-  { emoji: "🌸", name: "Sakura Crown", pay: "5x: ×100 · 4x: ×40 · 3x: ×12" },
+  { emoji: "🌸", name: "Sakura PHON", pay: "5x: ×100 · 4x: ×40 · 3x: ×12" },
   { emoji: "🏯", name: "Pagoda", pay: "5x: ×60 · 4x: ×24 · 3x: ×8" },
   { emoji: "🍶", name: "Sake", pay: "5x: ×40 · 4x: ×16 · 3x: ×6" },
   { emoji: "🎴", name: "Hanafuda", pay: "5x: ×25 · 4x: ×10 · 3x: ×4" },

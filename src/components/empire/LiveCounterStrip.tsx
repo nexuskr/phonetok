@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Flame, Globe2 } from "lucide-react";
+import { Gem, Flame, Globe2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SimChip } from "@/components/sim/SimChip";
 import { useReducedMotionPref } from "@/lib/app-settings";
@@ -98,7 +98,7 @@ export default function LiveCounterStrip() {
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
         <SimChip />
         <div className="flex items-center gap-2 min-w-0">
-          <Crown className={`w-4 h-4 text-sim-gold ${reduce ? "" : "animate-pulse"}`} />
+          <Gem className={`w-4 h-4 text-sim-gold ${reduce ? "" : "animate-pulse"}`} />
           <span className="font-black tabular-nums text-foreground text-base sm:text-lg">
             {users.toLocaleString("ko-KR")}
           </span>

@@ -1,9 +1,9 @@
-// Week 3 Viral — OBS Live Overlay (1080p) for Crown War tournaments
+// Week 3 Viral — OBS Live Overlay (1080p) for PHON War tournaments
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { Crown, Radio, Trophy } from "lucide-react";
+import { Gem, Radio, Trophy } from "lucide-react";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
 
 type Row = { rank: number; masked_name: string; score: number; crown_count: number };
@@ -51,7 +51,7 @@ export default function LiveOverlay() {
           <span className="inline-flex items-center gap-2 text-red-500 font-bold text-lg">
             <Radio className="h-5 w-5 animate-pulse" /> LIVE
           </span>
-          <h1 className="text-3xl font-extrabold">{t?.title ?? "Crown War"}</h1>
+          <h1 className="text-3xl font-extrabold">{t?.title ?? "PHON War"}</h1>
           {t?.subtitle && <span className="text-white/60 text-lg">· {t.subtitle}</span>}
         </div>
         <div className="text-right">
@@ -95,7 +95,7 @@ export default function LiveOverlay() {
                   <div className="font-semibold text-lg">{r.masked_name}</div>
                 </div>
                 <div className="flex items-center gap-2 text-yellow-400 font-bold text-lg">
-                  <Crown className="h-5 w-5" /> {Math.round(r.score).toLocaleString()}
+                  <Gem className="h-5 w-5" /> {Math.round(r.score).toLocaleString()}
                 </div>
               </motion.div>
             ))}

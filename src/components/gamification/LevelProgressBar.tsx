@@ -1,4 +1,4 @@
-import { Crown, Star } from "lucide-react";
+import { Gem, Star } from "lucide-react";
 import { usePhonLevel } from "@/hooks/use-phon-level";
 import { PHON_MAX_LEVEL } from "@/lib/gamification";
 
@@ -27,7 +27,7 @@ export default function LevelProgressBar({ compact = false, className }: Props) 
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2 text-sm font-semibold text-amber-200">
-          <Crown className="w-4 h-4" aria-hidden />
+          <Gem className="w-4 h-4" aria-hidden />
           <span>PHON Lv {level}</span>
           {isMax && <span className="text-[10px] uppercase tracking-wider text-amber-300/80">MAX</span>}
         </div>

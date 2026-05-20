@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Sword, Shield, Users, Send, Plus, Trophy, Flame, Eye } from "lucide-react";
+import { Gem, Sword, Shield, Users, Send, Plus, Trophy, Flame, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { Card } from "@/components/ui/card";
@@ -264,7 +264,7 @@ export default function Lounge() {
                           <h2 className="text-2xl font-bold flex items-center gap-2">
                             {myGuild.name}
                             {myGuild.leader_id === user?.id && (
-                              <Crown className="h-5 w-5 text-primary" />
+                              <Gem className="h-5 w-5 text-primary" />
                             )}
                           </h2>
                           <div className="flex gap-3 mt-2 text-sm">

@@ -3,17 +3,17 @@
  * 4-step 시각화 + Client/Server Seed 설명 + 검증 코드 예시.
  */
 import { useEffect } from "react";
-import { Crown, ShieldCheck, KeyRound, Hash, RefreshCcw } from "lucide-react";
+import { Gem, ShieldCheck, KeyRound, Hash, RefreshCcw } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const STEPS: Array<{ icon: typeof Crown; title: string; body: string }> = [
+const STEPS: Array<{ icon: typeof PHON; title: string; body: string }> = [
   {
     icon: KeyRound,
     title: "1. 서버가 미리 약속합니다",
     body: "승부가 시작되기 전, 서버는 server_seed 의 SHA-256 해시(server_seed_hash)를 먼저 공개합니다. 이 시점 이후로는 서버도 결과를 바꿀 수 없습니다.",
   },
   {
-    icon: Crown,
+    icon: Gem,
     title: "2. 폐하의 client_seed 가 더해집니다",
     body: "client_seed 는 언제든지 직접 변경 가능합니다. 서버 시드와 합쳐져 최종 RNG 시드가 만들어집니다 — 양측 모두 결과를 단독으로 조작할 수 없습니다.",
   },
@@ -94,7 +94,7 @@ export default function Fairness() {
           to="/games"
           className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-pink-500 text-white font-black text-sm tracking-wide press shadow-lg shadow-pink-500/30"
         >
-          <Crown className="w-4 h-4 inline mr-1.5" />
+          <Gem className="w-4 h-4 inline mr-1.5" />
           황실 승부장으로 돌아가기
         </Link>
       </div>

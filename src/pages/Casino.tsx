@@ -1,6 +1,6 @@
 import CasinoLayout from "@/components/casino/CasinoLayout";
 import { Link } from "react-router-dom";
-import { Crown, Lock, Sparkles } from "lucide-react";
+import { Gem, Lock, Sparkles } from "lucide-react";
 import logoImage from "@/assets/slots/olympus/logo.png";
 import bgImage from "@/assets/slots/olympus/bg.jpg";
 import bgWizard from "@/assets/slots/wizard/bg.jpg";
@@ -163,7 +163,7 @@ export default function CasinoLobby() {
                     {g.title}
                   </div>
                   <div className="text-[11px] text-muted-foreground tracking-wider mt-1 flex items-center gap-2">
-                    <Crown className="w-3 h-3 text-primary" /> {g.subtitle}
+                    <Gem className="w-3 h-3 text-primary" /> {g.subtitle}
                   </div>
                   {g.fomo && (
                     <div className="text-[10px] text-amber-200/80 mt-1.5 leading-snug">

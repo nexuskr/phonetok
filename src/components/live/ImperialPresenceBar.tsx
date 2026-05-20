@@ -8,7 +8,7 @@
  * - 머니플로/RPC/DB 0줄. document.hidden 가드.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import { useCountUp } from "@/hooks/use-count-up";
 
 function seed(): number {
@@ -92,7 +92,7 @@ export default function ImperialPresenceBar() {
 
       <div className="flex items-center gap-3">
         <span className="relative inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(var(--gold))] to-[hsl(var(--pink))] text-background shadow-[0_0_22px_hsl(var(--gold)/0.7)] shrink-0">
-          <Crown className="w-4.5 h-4.5" />
+          <Gem className="w-4.5 h-4.5" />
           <span aria-hidden className="absolute inset-0 rounded-xl ring-2 ring-[hsl(var(--gold)/0.4)] animate-pulse" />
         </span>
 

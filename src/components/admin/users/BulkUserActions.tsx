@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { notify } from "@/lib/notify";
-import { Snowflake, ThermometerSun, Crown, Loader2 } from "lucide-react";
+import { Gem, Snowflake, ThermometerSun, Loader2 } from "lucide-react";
 
 type Tier = "normal" | "vip" | "god" | "empire";
 const TIERS: Tier[] = ["normal", "vip", "god", "empire"];
@@ -100,7 +100,7 @@ export default function BulkUserActions({ selectedIds, onDone }: Props) {
             onClick={bulkTier} disabled={disabled}
             className="w-full px-3 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-1 disabled:opacity-50"
           >
-            {busy === "tier" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Crown className="w-3.5 h-3.5" />}
+            {busy === "tier" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Gem className="w-3.5 h-3.5" />}
             적용
           </button>
         </div>

@@ -1,4 +1,4 @@
-import { Crown, Zap, Sparkles, Star } from "lucide-react";
+import { Gem, Zap, Sparkles, Star } from "lucide-react";
 import type { Tier } from "@/lib/store";
 
 /** 티어 배지 — 닉네임 옆 항상 노출. VIP 이상은 금테 + 왕관. */
@@ -34,7 +34,7 @@ export default function TierBadge({
 
 const TIER_CONF: Record<
   Tier,
-  { label: string; cls: string; icon?: typeof Crown; glow?: string }
+  { label: string; cls: string; icon?: typeof PHON; glow?: string }
 > = {
   NORMAL: {
     label: "NORMAL",
@@ -54,7 +54,7 @@ const TIER_CONF: Record<
   EMPIRE: {
     label: "EMPIRE",
     cls: "bg-gradient-gold text-gold-foreground border border-gold animate-pulse",
-    icon: Crown,
+    icon: Gem,
     glow: "bg-gold/40 blur-lg animate-ring-pulse",
   },
 };

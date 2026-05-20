@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingList } from "@/components/ui/loading-state";
 import { notify } from "@/lib/notify";
-import { Crown, UserPlus, Send, Clock, X, Check, Copy } from "lucide-react";
+import { Gem, UserPlus, Send, Clock, X, Check, Copy } from "lucide-react";
 import {
   requestDynasty, acceptDynasty, cancelDynasty, getMyDynastyLinks,
   requestBequest, executeBequest, cancelBequest, getMyBequests,
@@ -116,7 +116,7 @@ export default function Dynasty() {
     <div className="container mx-auto max-w-3xl py-6 px-4 space-y-6">
       <header className="space-y-1.5 text-center">
         <h1 className="font-imperial text-3xl text-gradient-imperial tracking-wider flex items-center justify-center gap-2">
-          <Crown className="w-7 h-7 text-amber-300" /> 왕조 양도
+          <Gem className="w-7 h-7 text-amber-300" /> 왕조 양도
         </h1>
         <p className="text-xs text-muted-foreground">
           PHON·NFT를 자녀에게 양도합니다 — KYC 완료 성인만 · 48시간 쿨다운 · TOTP 2단계 필수

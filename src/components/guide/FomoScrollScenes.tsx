@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { AlertTriangle, ArrowUp, ArrowDown, ShieldCheck, Clock, Crown, Sparkles, Swords } from "lucide-react";
+import { Gem, AlertTriangle, ArrowUp, ArrowDown, ShieldCheck, Clock, Sparkles, Swords } from "lucide-react";
 import LivePayoutSlaBadge from "@/components/landing/LivePayoutSlaBadge";
 import PayoutTicker from "@/components/PayoutTicker";
 import { GoldNebulaBg, ParticleField, AnimatedCounter, GoldDivider, ImperialSeal, senior } from "./EmpireFX";
@@ -299,7 +299,7 @@ export function ScenePackage({ large = false }: { large?: boolean }) {
       <div className="relative max-w-md mx-auto w-full">
         <div className="text-center mb-5">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass border border-gold/60 text-[10px] font-black tracking-[0.3em] text-gold mb-3 shadow-[0_0_14px_hsl(var(--gold)/0.4)]">
-            <Crown className="w-3 h-3" /> 제국 군주 패키지
+            <Gem className="w-3 h-3" /> 제국 군주 패키지
           </div>
           <h2 className={`font-imperial text-3xl sm:text-4xl break-keep leading-[1.15] ${senior.h2}`}>
             패키지 1회로<br />
@@ -316,7 +316,7 @@ export function ScenePackage({ large = false }: { large?: boolean }) {
         >
           <div className="rounded-3xl bg-card/95 backdrop-blur p-5 space-y-3 border border-gold/40">
             {/* 코너 crown */}
-            <Crown className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 text-gold drop-shadow-[0_0_10px_hsl(var(--gold)/0.8)]" />
+            <Gem className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 text-gold drop-shadow-[0_0_10px_hsl(var(--gold)/0.8)]" />
 
             <div className="text-center mb-2">
               <div className="text-[10px] tracking-widest font-black text-gold/80">EMPIRE MONARCH</div>

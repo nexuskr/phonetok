@@ -1,8 +1,8 @@
-// PR-C: Crown Wars Finale Modal — fullscreen FOMO when <5min left and user is participating.
+// PR-C: PHON Wars Finale Modal — fullscreen FOMO when <5min left and user is participating.
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Swords, Crown, X } from "lucide-react";
+import { Gem, Swords, X } from "lucide-react";
 import { useCrownWar, formatMSS } from "@/hooks/use-crown-war";
 import { track } from "@/lib/analytics";
 
@@ -64,10 +64,10 @@ export default function CrownWarFinaleModal() {
           </motion.div>
 
           <div className="text-center">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-rose-300 mb-1">Crown Wars · Finale</div>
+            <div className="text-[10px] uppercase tracking-[0.3em] text-rose-300 mb-1">PHON Wars · Finale</div>
             <h2 className="text-2xl font-extrabold mb-2">남은 시간 <span className="font-mono text-rose-300">{formatMSS(remainingMs)}</span></h2>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              지금 제국 전체가 Crown을 놓고 전쟁 중입니다.<br />
+              지금 제국 전체가 PHON을 놓고 전쟁 중입니다.<br />
               당신의 자리는 어디인가?
             </p>
 
@@ -87,8 +87,8 @@ export default function CrownWarFinaleModal() {
               className="relative overflow-hidden w-full rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-black font-bold text-base py-3 shadow-[0_0_28px_hsl(45_100%_55%/0.55)] hover:scale-[1.02] active:scale-[0.98] transition"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
-                <Crown className="h-5 w-5" />
-                지금 Practice로 Crown 사냥
+                <Gem className="h-5 w-5" />
+                지금 Practice로 PHON 사냥
               </span>
               <motion.span
                 className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent"

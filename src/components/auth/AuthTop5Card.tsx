@@ -26,7 +26,7 @@ export default function AuthTop5Card({ rows }: Props) {
                 <span className="text-base leading-none">{r.flag}</span>
               )}
               <span className="flex-1 min-w-0 truncate font-bold text-foreground/90">{r.nick}</span>
-              <span className="tabular-nums text-foreground/75">{r.score.toLocaleString()} <span className="text-[10px] text-muted-foreground">Crown</span></span>
+              <span className="tabular-nums text-foreground/75">{r.score.toLocaleString()} <span className="text-[10px] text-muted-foreground">PHON</span></span>
             </li>
           );
         })}

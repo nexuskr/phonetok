@@ -10,7 +10,7 @@ import AdminCommandTrigger from "./_AdminCommandTrigger";
 import AdminAal2Gate from "@/components/admin/AdminAal2Gate";
 import { isAal2Path, ADMIN_NAV_FLAT } from "./_nav";
 import { schedulePrefetch } from "@/lib/route-prefetch";
-import { Crown, KeyRound } from "lucide-react";
+import { Gem, KeyRound } from "lucide-react";
 import PinResetDialog from "@/components/PinResetDialog";
 
 const GodModePanel = lazy(() => import("@/components/admin/GodModePanel"));
@@ -77,7 +77,7 @@ export default function AdminLayout() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3 text-muted-foreground">
-          <Crown className="w-8 h-8 text-gold animate-pulse" />
+          <Gem className="w-8 h-8 text-gold animate-pulse" />
           <span className="text-[11px] tracking-[0.3em] uppercase font-black">
             관리자 인증 확인 중…
           </span>
@@ -96,7 +96,7 @@ export default function AdminLayout() {
           <header className="sticky top-0 z-30 h-14 border-b border-border/40 bg-background/85 backdrop-blur flex items-center gap-2 px-3 sm:px-4">
             <SidebarTrigger className="shrink-0" />
             <div className="hidden sm:flex items-center gap-1.5 min-w-0">
-              <Crown className="w-4 h-4 text-gold shrink-0" />
+              <Gem className="w-4 h-4 text-gold shrink-0" />
               <span className="text-[10px] tracking-[0.3em] text-muted-foreground font-black uppercase truncate">
                 {active ? `${active.sectionLabel} · ` : ""}
                 <span className="text-foreground">{active?.name ?? "Admin"}</span>

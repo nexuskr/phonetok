@@ -7,7 +7,7 @@
 import { useVipRoom } from "@/hooks/use-vip-room";
 import { useMyPhonLeverageBonus } from "@/hooks/use-my-phon-leverage-bonus";
 import { useHotSymbols } from "@/hooks/use-hot-symbols";
-import { Crown, Flame, Lock } from "lucide-react";
+import { Gem, Flame, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { LoadingList } from "@/components/ui/loading-state";
 
@@ -48,7 +48,7 @@ export default function VipTradingRoom() {
     <div className="rounded-2xl border border-pink/40 bg-gradient-to-br from-pink/10 via-card/60 to-primary/5 p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2 text-pink">
-          <Crown className="w-4 h-4" />
+          <Gem className="w-4 h-4" />
           <span className="font-imperial text-sm tracking-wide">VIP 트레이딩 룸</span>
         </div>
         <span className="text-[10px] tracking-widest font-black text-pink/80 bg-pink/10 border border-pink/40 px-2 py-0.5 rounded-full">

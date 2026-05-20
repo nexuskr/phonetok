@@ -5,9 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import {
-  Crown, Copy, Share2, Rocket, Users, Sparkles, TrendingUp,
-  Trophy, ChevronDown, MessageCircle, Instagram, Music2, Youtube, Globe, Send,
-} from "lucide-react";
+  Gem, Copy, Share2, Rocket, Users, Sparkles, TrendingUp,
+  Trophy, ChevronDown, MessageCircle, Instagram, Music2, Youtube, Globe, Send} from "lucide-react";
 import DMComposer from "@/components/guide/DMComposer";
 import EmpireTreePreview from "@/components/referral/EmpireTreePreview";
 

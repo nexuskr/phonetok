@@ -1,4 +1,4 @@
-import { Crown, ShieldCheck, Swords } from "lucide-react";
+import { Gem, ShieldCheck, Swords } from "lucide-react";
 
 export function DuelHud({
   round,

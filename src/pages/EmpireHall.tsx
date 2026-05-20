@@ -1,7 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Crown, Sparkles, Swords, Zap, Share2, ArrowRight } from "lucide-react";
+import { Gem, Sparkles, Swords, Zap, Share2, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useEmpireBooster } from "@/hooks/use-empire-booster";
@@ -77,7 +77,7 @@ export default function EmpireHall() {
     <Layout>
       <SEOHead
         title="Empire Hall — 황제의 대전"
-        description="당신의 Empire 티어, Crown War 랭킹, Booster 상태를 한눈에. 24시간 살아있는 제국."
+        description="당신의 Empire 티어, PHON War 랭킹, Booster 상태를 한눈에. 24시간 살아있는 제국."
         path="/empire/hall"
       />
       <div className="relative min-h-[calc(100vh-4rem)] bg-gradient-to-b from-background via-background to-black">
@@ -106,16 +106,16 @@ export default function EmpireHall() {
             </div>
           </motion.div>
 
-          {/* Bottom — floating Crown counter */}
+          {/* Bottom — floating PHON counter */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.7 }}
             className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl glass-strong border border-gold/40 shadow-[0_0_40px_-10px_hsl(var(--gold)/0.6)] flex items-center gap-3"
           >
-            <Crown className="w-5 h-5 text-gold" />
+            <Gem className="w-5 h-5 text-gold" />
             <div>
-              <div className="text-[9px] tracking-[0.25em] font-black text-muted-foreground uppercase">내 제국의 Crown</div>
+              <div className="text-[9px] tracking-[0.25em] font-black text-muted-foreground uppercase">내 제국의 PHON</div>
               <div className="font-display font-black text-2xl tabular-nums text-gold">
                 {profile.crown_score.toLocaleString()} ₡
               </div>
@@ -141,7 +141,7 @@ export default function EmpireHall() {
                 <Sparkles className="w-5 h-5 text-gold" />
                 <div className="flex-1">
                   <div className="text-[10px] tracking-[0.25em] font-black text-gold uppercase">EMPIRE BOOSTER 활성</div>
-                  <div className="text-sm font-bold">수수료 -{Math.round((1 - booster!.fee_discount) * 100)}% · Crown ×{booster!.crown_multiplier} · 레버리지 {booster!.leverage}x</div>
+                  <div className="text-sm font-bold">수수료 -{Math.round((1 - booster!.fee_discount) * 100)}% · PHON ×{booster!.crown_multiplier} · 레버리지 {booster!.leverage}x</div>
                 </div>
                 <Zap className="w-5 h-5 text-gold animate-pulse" />
               </div>
@@ -151,12 +151,12 @@ export default function EmpireHall() {
           {/* Stats row */}
           <div className="grid grid-cols-2 gap-3">
             <Card>
-              <Label icon={Crown} text="오늘 Crown" tone="gold" />
+              <Label icon={PHON} text="오늘 PHON" tone="gold" />
               <Value>+{todayCrown.toLocaleString()}</Value>
               <Sub>{todayPractice}회 Practice 승리</Sub>
             </Card>
             <Card>
-              <Label icon={Swords} text="Crown War" tone={isFinaleWindow ? "destructive" : "primary"} />
+              <Label icon={Swords} text="PHON War" tone={isFinaleWindow ? "destructive" : "primary"} />
               <Value>{myWarRank ? `#${myWarRank}` : "—"}</Value>
               <Sub>{warSnap?.war ? formatMSS(remainingMs) + " 남음" : "다음 라운드 대기"}</Sub>
             </Card>
@@ -186,7 +186,7 @@ export default function EmpireHall() {
                   <div className="text-[10px] tracking-[0.25em] font-black text-gold uppercase">BARON 승급</div>
                   <div className="font-display font-black text-lg">제국의 귀족이 되어 24시간 부스터를 잠금 해제</div>
                 </div>
-                <Crown className="w-5 h-5 text-gold" />
+                <Gem className="w-5 h-5 text-gold" />
               </div>
             </Link>
           )}

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Crown, Gift, Users, Shield, TrendingUp, Flame, Heart } from "lucide-react";
+import { Gem, Activity, Gift, Users, Shield, TrendingUp, Flame, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { notify } from "@/lib/notify";
 import ApocalypseProtocolPanel from "./ApocalypseProtocolPanel";
@@ -74,7 +74,7 @@ export default function Phase1LiveMonitor() {
       <Card className="border-amber-400/30 bg-gradient-to-br from-amber-950/10 to-background p-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Crown className="h-5 w-5 text-amber-300" />
+            <Gem className="h-5 w-5 text-amber-300" />
             <h3 className="text-lg font-bold">Phase 1 Live Monitor — Hyperion</h3>
             {phase.phase !== null && (
               <Badge variant="outline" className="border-amber-400/50 text-amber-300">

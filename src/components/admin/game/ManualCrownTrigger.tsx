@@ -1,5 +1,5 @@
 /**
- * Manual Crown Trigger — 관리자가 특정 유저에게 즉시 Crown 발행
+ * Manual PHON Trigger — 관리자가 특정 유저에게 즉시 PHON 발행
  * idempotency_key = manual:admin:uid:ts (서버 강제)
  */
 import { useState } from "react";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { notify } from "@/lib/notify";
-import { Rocket, Crown } from "lucide-react";
+import { Gem, Rocket} from "lucide-react";
 
 export default function ManualCrownTrigger() {
   const [uid, setUid] = useState("");
@@ -23,7 +23,7 @@ export default function ManualCrownTrigger() {
     if (!uid.trim()) return notify.warning("대상 UUID를 입력하세요");
     if (base < 0 || base > 100000) return notify.warning("Base는 0~100,000 범위입니다");
     if (mult < 0.1 || mult > 10) return notify.warning("Multiplier는 0.1~10 범위입니다");
-    if (!confirm(`정말로 ${uid.slice(0, 8)}…에게 Crown ${base}×${mult} = ${Math.floor(base * mult)}₡ 를 발행할까요?`)) return;
+    if (!confirm(`정말로 ${uid.slice(0, 8)}…에게 PHON ${base}×${mult} = ${Math.floor(base * mult)}₡ 를 발행할까요?`)) return;
     setBusy(true);
     const { data, error } = await supabase.rpc("admin_trigger_crown" as any, {
       _uid: uid.trim(),
@@ -39,13 +39,13 @@ export default function ManualCrownTrigger() {
         : msg.includes("invalid_uid") || msg.includes("user_not_found") ? "존재하지 않는 사용자입니다"
         : msg.includes("rate_limited") ? "잠시 후 다시 시도해주세요 (속도 제한)"
         : msg;
-      return notify.error("Crown 발행 실패", { description: friendly });
+      return notify.error("PHON 발행 실패", { description: friendly });
     }
     setLast(data);
     if ((data as any).duplicate) {
       notify.warning("동일 idem 키 — 중복 방지로 무시됨");
     } else {
-      notify.success(`Crown ${(data as any).awarded}₡ 발행 완료`);
+      notify.success(`PHON ${(data as any).awarded}₡ 발행 완료`);
     }
   };
 
@@ -53,7 +53,7 @@ export default function ManualCrownTrigger() {
     <div className="space-y-4">
       <header>
         <h1 className="font-display font-black text-xl sm:text-2xl">
-          <Rocket className="inline h-5 w-5 mr-1" /> Manual Crown Trigger
+          <Rocket className="inline h-5 w-5 mr-1" /> Manual PHON Trigger
         </h1>
         <p className="text-xs text-muted-foreground mt-1">
           멱등키 <code className="font-mono">manual:admin:uid:timestamp</code> 자동 생성 — 동일 키 중복 발행 차단
@@ -85,7 +85,7 @@ export default function ManualCrownTrigger() {
             예상 발행: <span className="font-display font-black text-2xl bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">{Math.floor(base * mult).toLocaleString()}</span> ₡
           </div>
           <Button onClick={fire} disabled={busy} size="lg" className="bg-gradient-to-r from-yellow-500 to-orange-500">
-            <Crown className="h-4 w-4 mr-1" /> {busy ? "발행 중…" : "Crown 발행"}
+            <Gem className="h-4 w-4 mr-1" /> {busy ? "발행 중…" : "PHON 발행"}
           </Button>
         </div>
 

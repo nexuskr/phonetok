@@ -5,7 +5,7 @@
  */
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -88,7 +88,7 @@ export function DivineJackpotOverlay({ open, winnerName, onDone }: Props) {
                 className="absolute inset-2 rounded-full bg-[#0A0503] flex items-center justify-center"
                 style={{ boxShadow: "inset 0 0 22px hsl(38 92% 60% / 0.45)" }}
               >
-                <Crown className="w-20 h-20 md:w-28 md:h-28 text-amber-300" strokeWidth={1.2}
+                <Gem className="w-20 h-20 md:w-28 md:h-28 text-amber-300" strokeWidth={1.2}
                        style={{ filter: "drop-shadow(0 0 18px hsl(38 92% 65% / 0.8))" }} />
               </div>
             </div>

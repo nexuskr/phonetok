@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNowTick } from "@/hooks/use-now-tick";
 import { useNavigate } from "react-router-dom";
-import { Crown, Zap, Sparkles, X, ChevronRight, Coins } from "lucide-react";
+import { Gem, Zap, Sparkles, X, ChevronRight, Coins } from "lucide-react";
 import { track } from "@/lib/analytics";
 import { isFlagOn } from "@/lib/conversion-flags";
 import { formatKRW } from "@/lib/store";
@@ -76,7 +76,7 @@ export default function SixtySecondFlow({ enabled, onClosed }: { enabled: boolea
       grad: "from-primary via-secondary to-primary",
     },
     {
-      icon: Crown,
+      icon: Gem,
       title: "지금 시작",
       sub: "첫 미션은 지금 추천 노출",
       body: "1초라도 빠를수록 더 많은 보상이 들어옵니다.",

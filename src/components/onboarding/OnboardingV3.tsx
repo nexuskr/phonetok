@@ -258,7 +258,7 @@ function StepCharge({ onLater, onCharge }: { onLater: () => void; onCharge: () =
         {[
           "첫 충전 +10% PHON 보너스",
           "NFT 자동 지급으로 평생 부스트",
-          "VIP Pass 시 Crown ×3 가산",
+          "VIP Pass 시 PHON ×3 가산",
         ].map((t) => (
           <li key={t} className="flex items-center gap-2 text-foreground/90">
             <span className="w-5 h-5 rounded-full bg-[hsl(var(--gold)/.18)] border border-[hsl(var(--gold)/.5)] flex items-center justify-center">

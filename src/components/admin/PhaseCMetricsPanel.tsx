@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRequireAdmin } from "@/hooks/use-require-auth";
 import { LoadingList } from "@/components/ui/loading-state";
-import { Hammer, ShoppingBag, Rocket, Map, Sparkles, Crown, Trophy } from "lucide-react";
+import { Gem, Hammer, ShoppingBag, Rocket, Map, Sparkles, Trophy } from "lucide-react";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
 
 type Metrics = {
@@ -38,7 +38,7 @@ export default function PhaseCMetricsPanel() {
     ["Galaxy 좌석", `${m.galaxy_seats_held}/100`, Rocket, `lock ${fmt(m.galaxy_total_locked)} PHON · 24h 입찰 ${m.galaxy_bids_24h}`],
     ["Journey 수령 24h", `${m.journey_claims_24h}`, Map, `7d 지급 ${fmt(m.journey_phon_paid_7d)} PHON`],
     ["Live Stories", `${m.stories_active}`, Sparkles],
-    ["황제 배당 30d", `${fmt(m.dividend_paid_30d)} PHON`, Crown],
+    ["황제 배당 30d", `${fmt(m.dividend_paid_30d)} PHON`, PHON],
     ["Legendary NFT", `${m.crown_war_legendary_total}`, Trophy],
   ];
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { isFlagOn } from "@/lib/conversion-flags";
 import { trackClick } from "@/lib/telemetry";
@@ -130,7 +130,7 @@ export default function LivePurchaseTicker() {
           hiddenByScroll ? "opacity-0 translate-y-2 pointer-events-none" : "opacity-100 translate-y-0 animate-fade-up"
         }`}
       >
-        <Crown className="w-3.5 h-3.5 text-gold shrink-0" />
+        <Gem className="w-3.5 h-3.5 text-gold shrink-0" />
         <div className="text-[11px] truncate">
           <span className="font-bold text-gradient-gold">{it.nickname}</span>
           <span className="text-muted-foreground"> · </span>

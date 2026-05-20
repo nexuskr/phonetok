@@ -8,9 +8,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import CronJobsCard from "@/components/admin/CronJobsCard";
 import { Link } from "react-router-dom";
 import {
-  Users, TrendingUp, ShieldCheck, AlertTriangle, Crown,
-  ArrowDownToLine, Activity, Zap, Globe, Flame, Snowflake, RefreshCw,
-} from "lucide-react";
+  Gem, Users, TrendingUp, ShieldCheck, AlertTriangle,
+  ArrowDownToLine, Activity, Zap, Globe, Flame, Snowflake, RefreshCw} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 
@@ -102,7 +101,7 @@ export default function AdminCockpit() {
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
             <h1 className="font-display font-black text-2xl sm:text-3xl flex items-center gap-2">
-              <Crown className="w-7 h-7 text-gold" /> CEO Cockpit
+              <Gem className="w-7 h-7 text-gold" /> CEO Cockpit
             </h1>
             <p className="text-xs text-muted-foreground mt-1">
               실시간 플랫폼 건강 한눈에 보기 · 60초마다 자동 갱신
@@ -230,7 +229,7 @@ export default function AdminCockpit() {
               {[
                 { to: "/admin/support", label: "Support Hub", icon: AlertTriangle },
                 { to: "/admin/ops-report", label: "AI 일일 리포트", icon: Zap },
-                { to: "/admin", label: "전체 어드민", icon: Crown },
+                { to: "/admin", label: "전체 어드민", icon: Gem },
                 { to: "/trust", label: "Trust 리포트", icon: ShieldCheck },
                 { to: "/status", label: "Status", icon: Activity },
                 { to: "/", label: "랜딩 보기", icon: Globe },

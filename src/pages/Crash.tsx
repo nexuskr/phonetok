@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Rocket, Flame, Crown, History, Loader2, CheckCircle2, RotateCw } from "lucide-react";
+import { Gem, Rocket, Flame, History, Loader2, CheckCircle2, RotateCw } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import CrashCanvas from "@/components/crash/CrashCanvas";
 import CrashSettingsSheet from "@/components/crash/CrashSettingsSheet";
@@ -311,7 +311,7 @@ export default function Crash() {
         {/* Recent Wins Feed */}
         <div className="rounded-2xl border border-border/60 bg-card p-4">
           <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-            <Crown className="w-4 h-4 text-[hsl(var(--gold))]" /> 최근 대박
+            <Gem className="w-4 h-4 text-[hsl(var(--gold))]" /> 최근 대박
           </h3>
           {wins.length === 0 ? (
             <p className="text-xs text-muted-foreground py-4 text-center">아직 대박이 없어요. 첫 주인공이 되어보세요!</p>

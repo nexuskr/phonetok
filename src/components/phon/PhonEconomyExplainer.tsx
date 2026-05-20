@@ -3,7 +3,7 @@
  *
  * Pass 1 표시 전용. 실제 할인/배당 정산은 Pass 2 PR.
  */
-import { Zap, TrendingUp, Crown, Gift } from "lucide-react";
+import { Gem, Zap, TrendingUp, Gift } from "lucide-react";
 import { HOUSE_EDGE_DISCOUNT_RATE, PHON_STAKING_APY_RANGE } from "@/lib/phonEconomy";
 
 const PILLARS = [
@@ -22,9 +22,9 @@ const PILLARS = [
     badge: "지금 적용 중",
   },
   {
-    icon: Crown,
-    title: "Crown 보상 ×1.5",
-    desc: "Empire Booster 활성 시 모든 Crown 획득량이 증가합니다. 등급 상승이 가속됩니다.",
+    icon: Gem,
+    title: "PHON 보상 ×1.5",
+    desc: "Empire Booster 활성 시 모든 PHON 획득량이 증가합니다. 등급 상승이 가속됩니다.",
     accent: "from-violet-500/15 to-fuchsia-500/5 border-violet-500/40",
     badge: "지금 적용 중",
   },

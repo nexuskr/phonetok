@@ -7,7 +7,7 @@ import { memo, useMemo, useState, useCallback } from "react";
 import { useWithdrawQueue, type WithdrawalRow } from "@/lib/withdrawal/useWithdrawQueue";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Crown, AlertTriangle, RefreshCw, Loader2 } from "lucide-react";
+import { Gem, AlertTriangle, RefreshCw, Loader2 } from "lucide-react";
 import { LoadingList } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
 import { supabase } from "@/integrations/supabase/client";
@@ -56,7 +56,7 @@ const Row = memo(function Row({
       <td className="px-3 py-2 font-mono text-[11px] text-muted-foreground">{row.tx_code}</td>
       <td className="px-3 py-2 text-xs uppercase tracking-wider">
         <span className="inline-flex items-center gap-1">
-          {priority && <Crown className="w-3 h-3 text-gold" />}
+          {priority && <Gem className="w-3 h-3 text-gold" />}
           {row.tier_at_request}
         </span>
       </td>

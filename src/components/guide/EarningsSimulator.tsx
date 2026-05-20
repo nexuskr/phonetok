@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { TrendingUp, Sparkles, Crown } from "lucide-react";
+import { Gem, TrendingUp, Sparkles} from "lucide-react";
 import { formatKRW } from "@/lib/store";
 import Disclaimer from "@/components/Disclaimer";
 
@@ -99,7 +99,7 @@ export default function EarningsSimulator() {
                     : "glass text-muted-foreground"
                 }`}
               >
-                {p === "empire" && <Crown className="w-3 h-3 mx-auto mb-0.5" />}
+                {p === "empire" && <Gem className="w-3 h-3 mx-auto mb-0.5" />}
                 {t(`simulator.${p}`)}
               </button>
             ))}

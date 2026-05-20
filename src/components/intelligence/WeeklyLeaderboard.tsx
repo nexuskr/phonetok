@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Trophy, Crown, Medal } from "lucide-react";
+import { Gem, Trophy, Medal } from "lucide-react";
 import { usePaperStore } from "@/lib/paper-trading/store";
 
 interface Row {
@@ -72,7 +72,7 @@ export default function WeeklyLeaderboard() {
               }`}
             >
               <div className="w-8 text-center font-display font-black text-sm">
-                {r.rank === 1 ? <Crown className="w-4 h-4 text-primary mx-auto" /> :
+                {r.rank === 1 ? <Gem className="w-4 h-4 text-primary mx-auto" /> :
                  r.rank === 2 ? <Medal className="w-4 h-4 text-foreground/70 mx-auto" /> :
                  r.rank === 3 ? <Medal className="w-4 h-4 text-amber-700 mx-auto" /> :
                  `#${r.rank}`}

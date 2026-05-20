@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, ShoppingBag, Tag, Crown, Sword, Star, Flame, X } from "lucide-react";
+import { Gem, ArrowLeft, ShoppingBag, Tag, Sword, Star, Flame, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -31,14 +31,14 @@ type Listing = {
   } | null;
 };
 
-const TYPE_LABEL = { crown: "Crown", emperor: "Emperor", founder: "Founder" } as const;
+const TYPE_LABEL = { crown: "PHON", emperor: "Emperor", founder: "Founder" } as const;
 const LEVEL_LABEL = { bronze: "BRONZE", gold: "GOLD", diamond: "DIAMOND" } as const;
 const LEVEL_GLOW = {
   bronze: "from-orange-400/30 to-amber-600/30 ring-amber-500/40",
   gold: "from-yellow-300/40 to-amber-500/40 ring-yellow-400/60",
   diamond: "from-cyan-200/50 via-fuchsia-200/40 to-violet-300/50 ring-cyan-300/70",
 } as const;
-const TYPE_ICON = { crown: Crown, emperor: Sword, founder: Star } as const;
+const TYPE_ICON = { crown: PHON, emperor: Sword, founder: Star } as const;
 
 export default function Marketplace() {
   const navigate = useNavigate();
@@ -215,7 +215,7 @@ export default function Marketplace() {
             <ShoppingBag className="h-5 w-5 text-amber-300" />
             <div className="flex-1 text-xs text-muted-foreground">
               플랫폼 수수료 <span className="text-amber-300 font-mono font-bold">6%</span>
-              <span className="opacity-70"> (3% burn · 3% Crown Pool 적립)</span> · 거래 즉시 보유 PHON 차감
+              <span className="opacity-70"> (3% burn · 3% PHON Pool 적립)</span> · 거래 즉시 보유 PHON 차감
             </div>
           </div>
         </Card>

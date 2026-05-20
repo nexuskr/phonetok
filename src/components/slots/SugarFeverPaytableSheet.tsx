@@ -116,7 +116,7 @@ const SECTIONS: PaytableSection[] = [
         <p className="text-sm text-pink-50/95 leading-relaxed">
           단일 스핀 최대 배율 도달 시{" "}
           <b className="text-amber-200">Sugar Fever</b> 시네마틱과{" "}
-          <b className="text-pink-200">Crown 자동 보상</b>이 발동됩니다.
+          <b className="text-pink-200">PHON 자동 보상</b>이 발동됩니다.
         </p>
         <p className="text-xs text-pink-300/80 mt-2">
           RTP 96.0% (Real) · Demo 모드는 학습용으로 RTP가 다를 수 있습니다.

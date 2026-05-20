@@ -1,5 +1,5 @@
 /**
- * Crown War HUD v2 — 황제 교체 처형식 오버레이.
+ * PHON War HUD v2 — 황제 교체 처형식 오버레이.
  * 실시간으로 Top 1 (황제)이 바뀌면 3.2초간 전체 화면 드라마틱 연출.
  * 마운트는 Layout 단일.
  *
@@ -11,7 +11,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Crown, Swords } from "lucide-react";
+import { Gem, Swords } from "lucide-react";
 import { useCrownWar } from "@/hooks/use-crown-war";
 
 export default function CrownThroneOverlay() {
@@ -94,7 +94,7 @@ export default function CrownThroneOverlay() {
                   transition={{ duration: 1.4, repeat: Infinity }}
                   className="h-14 w-14 rounded-2xl bg-gradient-to-br from-amber-300 to-amber-600 text-black flex items-center justify-center shadow-[0_0_30px_hsl(45_100%_55%/0.7)]"
                 >
-                  <Crown className="h-7 w-7" />
+                  <Gem className="h-7 w-7" />
                 </motion.div>
                 <Swords className="h-5 w-5 text-rose-400" />
               </div>

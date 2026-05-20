@@ -5,7 +5,7 @@
  * 실행 자체는 부모 onStart(preset) 이 처리.
  */
 import { useState } from "react";
-import { Crown, Repeat, Sparkles, X } from "lucide-react";
+import { Gem, Repeat, Sparkles, X } from "lucide-react";
 import { AUTO_BET_PRESETS, IMPERIAL_BET_COPY, type AutoBetPreset } from "./imperialCopy";
 
 interface Props {
@@ -62,7 +62,7 @@ export default function ImperialAutoBetPanel({
   return (
     <div className="rounded-2xl border border-amber-300/40 bg-card/60 p-4 space-y-3">
       <div className="flex items-center gap-1.5 text-amber-300">
-        <Crown className="w-4 h-4" />
+        <Gem className="w-4 h-4" />
         <span className="text-[11px] font-black tracking-[0.22em]">
           {IMPERIAL_BET_COPY.autoTitle}
         </span>

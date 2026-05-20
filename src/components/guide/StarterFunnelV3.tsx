@@ -25,7 +25,7 @@ const FOMO_TEMPLATES: ((n: string) => string)[] = [
   (n) => `${n} 입금 완료`,
   (n) => `${n} 첫 베팅 적중`,
   (n) => `${n} +${(Math.floor(Math.random() * 80) + 20) * 1000}원 폭발`,
-  (n) => `${n} Crown 획득`,
+  (n) => `${n} PHON 획득`,
 ];
 
 function makeFomoLine(): string {

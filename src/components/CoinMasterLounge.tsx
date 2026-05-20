@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Crown, Coins, Zap, ShieldCheck, Sparkles, Lock } from "lucide-react";
+import { Gem, Coins, Zap, ShieldCheck, Sparkles, Lock } from "lucide-react";
 import { LoadingCard } from "@/components/ui/loading-state";
 
 interface Stats {
@@ -47,7 +47,7 @@ export default function CoinMasterLounge() {
         <div className="relative">
           <header className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
-              <Crown className="w-7 h-7 text-amber-950" />
+              <Gem className="w-7 h-7 text-amber-950" />
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-[0.25em] text-amber-400 font-bold">VIP · COIN MASTER</div>

@@ -1,4 +1,4 @@
-import { Globe2, Crown } from "lucide-react";
+import { Gem, Globe2} from "lucide-react";
 import { usePaperStore } from "@/lib/paper-trading/store";
 
 const SEED_LEADERS = [
@@ -34,7 +34,7 @@ export default function GlobalContributionBar() {
 
       <div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-          <Crown className="w-3.5 h-3.5 text-primary" /> Weekly Top Trader (Paper)
+          <Gem className="w-3.5 h-3.5 text-primary" /> Weekly Top Trader (Paper)
         </div>
         <ul className="space-y-1">
           {leaders.map((l, i) => (

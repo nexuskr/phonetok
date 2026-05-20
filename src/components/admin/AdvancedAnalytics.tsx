@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatKRW } from "@/lib/store";
 import { LineMini, DonutMini } from "@/components/ui/mini-chart";
-import { Bot, Crown, Trophy, UserPlus, TrendingUp } from "lucide-react";
+import { Gem, Bot, Trophy, UserPlus, TrendingUp } from "lucide-react";
 import { LoadingPage } from "@/components/ui/loading-state";
 
 type BotRow = { day: string; kind: "content"|"trading"|"image"; runs: number; claimed: number; failed: number; total_reward: number; avg_pnl_pct: number };

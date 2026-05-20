@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { X, Crown, Users, Phone, Sparkles, Check, Lock } from "lucide-react";
+import { Gem, X, Users, Phone, Sparkles, Check, Lock } from "lucide-react";
 import { formatKRW } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import { useTrackView, trackClick, trackDismiss } from "@/lib/telemetry";
@@ -47,7 +47,7 @@ export default function UnlockWall({
             </span>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-gold flex items-center justify-center glow-imperial shrink-0">
-                <Crown className="w-5 h-5 text-gold-foreground" />
+                <Gem className="w-5 h-5 text-gold-foreground" />
               </div>
               <div className="flex-1">
                 <div className="font-display font-black text-sm">{t("pathATitle")}</div>

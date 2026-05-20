@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence, LazyMotion, domAnimation } from "framer-motion";
-import { Flame, Crown, Sword, Coins, TrendingUp, Users, Filter, Loader2 } from "lucide-react";
+import { Gem, Flame, Sword, Coins, TrendingUp, Users, Filter, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type FeedAction = "join" | "contribute" | "war_declare" | "raid_win" | "level_up" | "donate" | "recruit";
@@ -18,10 +18,10 @@ const ACTION_META: Record<FeedAction, { icon: any; color: string; label: string;
   join:         { icon: Users,      color: "text-secondary",    label: "가입",   verb: () => "에 입성했습니다" },
   contribute:   { icon: Flame,      color: "text-primary",      label: "기여",   verb: (a) => `에 +${formatMan(a)}만원 전투력 기여` },
   war_declare:  { icon: Sword,      color: "text-destructive",  label: "전쟁",   verb: () => "에 전쟁 선포!" },
-  raid_win:     { icon: Crown,      color: "text-money-strong", label: "승리",   verb: (a) => `전쟁 승리 — +${formatMan(a)}만원 분배` },
+  raid_win:     { icon: Gem,      color: "text-money-strong", label: "승리",   verb: (a) => `전쟁 승리 — +${formatMan(a)}만원 분배` },
   level_up:     { icon: TrendingUp, color: "text-gold",         label: "레벨업", verb: (a) => `Lv.${a ?? 1} 달성` },
   donate:       { icon: Coins,      color: "text-money-strong", label: "후원",   verb: (a) => `금고에 +${formatMan(a)}만원 입금` },
-  recruit:      { icon: Crown,      color: "text-gold",         label: "영입",   verb: () => "이(가) 길드장 자리 획득" },
+  recruit:      { icon: Gem,      color: "text-gold",         label: "영입",   verb: () => "이(가) 길드장 자리 획득" },
 };
 
 const FILTERS: { key: FeedAction | "all" | "mine"; label: string }[] = [

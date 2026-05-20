@@ -9,9 +9,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import TodayKpiCards from "@/components/admin/TodayKpiCards";
 import PredictiveSlaPanel from "@/components/admin/PredictiveSlaPanel";
 import {
-  ArrowDownToLine, ArrowUpFromLine, AlertTriangle, HeartHandshake,
-  ShieldAlert, ChevronRight, Flame, Activity, Snowflake, RefreshCw, Crown,
-} from "lucide-react";
+  Gem, ArrowDownToLine, ArrowUpFromLine, AlertTriangle, HeartHandshake,
+  ShieldAlert, ChevronRight, Flame, Activity, Snowflake, RefreshCw} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 
@@ -176,7 +175,7 @@ export default function AdminCockpitV2() {
 
   if (!user) return null;
   if (!user.isAdmin) {
-    return <EmptyState icon={<Crown className="w-6 h-6" />} title="권한 없음" description="관리자 전용" />;
+    return <EmptyState icon={<Gem className="w-6 h-6" />} title="권한 없음" description="관리자 전용" />;
   }
 
   return (
@@ -186,7 +185,7 @@ export default function AdminCockpitV2() {
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="font-display font-black text-2xl sm:text-3xl flex items-center gap-2">
-            <Crown className="w-6 h-6 text-gold" /> Mission Control
+            <Gem className="w-6 h-6 text-gold" /> Mission Control
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
             액션 우선 콕핏 · 45초마다 자동 갱신
@@ -399,7 +398,7 @@ export default function AdminCockpitV2() {
     <div className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border/60 bg-background/95 backdrop-blur-xl">
       <div className="grid grid-cols-5 text-[10px] font-black uppercase tracking-wider">
         {[
-          { to: "/admin", label: "콕핏",  icon: Crown },
+          { to: "/admin", label: "콕핏",  icon: Gem },
           { to: "/admin/treasury/deposits", label: "충전", icon: ArrowUpFromLine, n: pending.deposits_pending },
           { to: "/admin/treasury/withdrawals", label: "출금", icon: ArrowDownToLine, n: pending.withdrawals_pending },
           { to: "/admin/ops/errors", label: "이상", icon: AlertTriangle, n: pending.anomalies_unack },

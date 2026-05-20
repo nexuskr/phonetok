@@ -2,14 +2,14 @@ import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import SlimShell from "@/components/layout/SlimShell";
 import { useRequireAuth } from "@/hooks/use-require-auth";
-import { Crown, Trophy, Users } from "lucide-react";
+import { Gem, Trophy, Users } from "lucide-react";
 
 const WhaleStrikeRail = lazy(() => import("@/components/empire/WhaleStrikeRail"));
 const LiveRanking = lazy(() => import("@/components/LiveRanking"));
 
 /**
  * /live — 지금 벌고 있는 사람들.
- * 기존 Empire/Crown/Founding/Galaxy 콘텐츠가 이리로 흡수됨.
+ * 기존 Empire/PHON/Founding/Galaxy 콘텐츠가 이리로 흡수됨.
  */
 export default function Live() {
   const user = useRequireAuth();
@@ -42,7 +42,7 @@ export default function Live() {
             to="/vip"
             className="rounded-2xl border border-amber-500/40 bg-gradient-to-br from-amber-500/15 to-yellow-500/5 p-4 press hover:border-primary/60 transition"
           >
-            <Crown className="w-5 h-5 text-amber-400 mb-2" />
+            <Gem className="w-5 h-5 text-amber-400 mb-2" />
             <div className="font-imperial text-base text-foreground">VIP 패스</div>
             <div className="text-xs text-muted-foreground mt-0.5">전용 라운지 · 환전 보너스 · 수수료 0%</div>
           </Link>

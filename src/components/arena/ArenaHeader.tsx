@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import { FOMO } from "@/lib/glossary";
 
 type Props = {
@@ -23,7 +23,7 @@ function ArenaHeaderInner({ symbol, price, delta1s, mode, onModeChange, symbols,
             data-tutorial="title"
             className="h-imperial text-2xl sm:text-3xl imperial-halfoff-text tracking-[0.18em] flex items-center gap-2"
           >
-            <Crown className="w-5 h-5 text-gold" /> 비트코인 군대 전투
+            <Gem className="w-5 h-5 text-gold" /> 비트코인 군대 전투
           </h1>
           <p className="text-[11px] text-muted-foreground">
             가격이 폐하의 군대를 전진시킵니다. 망설이는 자에게 왕좌는 없습니다.

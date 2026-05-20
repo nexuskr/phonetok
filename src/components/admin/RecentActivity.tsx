@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, RefreshCw, Target, Gamepad2, Crown, Coins, AlertTriangle } from "lucide-react";
+import { Gem, Activity, RefreshCw, Target, Gamepad2, Coins, AlertTriangle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 type Kind = "mission" | "roulette" | "package" | "settlement" | "anomaly";
@@ -18,7 +18,7 @@ type ActivityItem = {
 const KIND_META: Record<Kind, { label: string; icon: any; tone: string }> = {
   mission:    { label: "미션",   icon: Target,         tone: "text-primary" },
   roulette:   { label: "룰렛",   icon: Gamepad2,       tone: "text-gold" },
-  package:    { label: "패키지", icon: Crown,          tone: "text-gold" },
+  package:    { label: "패키지", icon: Gem,          tone: "text-gold" },
   settlement: { label: "정산",   icon: Coins,          tone: "text-secondary" },
   anomaly:    { label: "이상치", icon: AlertTriangle,  tone: "text-destructive" },
 };

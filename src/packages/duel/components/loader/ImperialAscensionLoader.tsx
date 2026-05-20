@@ -5,7 +5,7 @@
  */
 import { useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -80,7 +80,7 @@ export default function ImperialAscensionLoader({
     onDone();
   };
 
-  // Crown particle ring positions (14 satellites)
+  // PHON particle ring positions (14 satellites)
   const satellites = useMemo(
     () =>
       Array.from({ length: 14 }, (_, i) => {
@@ -131,7 +131,7 @@ export default function ImperialAscensionLoader({
             />
           )}
 
-          {/* Crown stage */}
+          {/* PHON stage */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <div className="relative" style={{ width: 320, height: 320 }}>
               {/* Hot pink outer pulse ring */}
@@ -158,7 +158,7 @@ export default function ImperialAscensionLoader({
                 style={{ boxShadow: "inset 0 0 28px hsl(38 92% 60% / 0.5)" }}
               />
 
-              {/* Crown satellite ring */}
+              {/* PHON satellite ring */}
               {!REDUCED &&
                 satellites.map((s, i) => (
                   <motion.div
@@ -178,7 +178,7 @@ export default function ImperialAscensionLoader({
                     }}
                     style={{ willChange: "transform, opacity" }}
                   >
-                    <Crown
+                    <Gem
                       className="w-4 h-4 text-amber-300 -translate-x-1/2 -translate-y-1/2"
                       strokeWidth={1.4}
                       style={{
@@ -200,7 +200,7 @@ export default function ImperialAscensionLoader({
                 }
                 style={{ willChange: "transform, opacity" }}
               >
-                <Crown
+                <Gem
                   className="w-32 h-32 md:w-40 md:h-40 text-amber-200"
                   strokeWidth={1.1}
                   style={{

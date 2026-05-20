@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles, X, Crown, Zap } from "lucide-react";
+import { Gem, Sparkles, X, Zap } from "lucide-react";
 import { useConcierge } from "@/hooks/use-concierge";
 import { track } from "@/lib/analytics";
 import { supabase } from "@/integrations/supabase/client";
@@ -103,7 +103,7 @@ export default function EmpireConcierge() {
                   <p className="text-sm text-foreground leading-relaxed mb-3">{suggestion.message}</p>
                   <div className="flex items-center gap-2 mb-3 text-[11px] text-muted-foreground">
                     <span className="inline-flex items-center gap-1">
-                      <Crown className="h-3 w-3 text-amber-400" />
+                      <Gem className="h-3 w-3 text-amber-400" />
                       Lv.{suggestion.ctx.level} · {suggestion.ctx.crown}₡
                     </span>
                     {suggestion.ctx.boosterActive && (
@@ -147,7 +147,7 @@ export default function EmpireConcierge() {
           animate={open ? { rotate: 0 } : { rotate: [0, -6, 6, 0] }}
           transition={open ? {} : { duration: 4, repeat: Infinity, repeatDelay: 2 }}
         >
-          <Crown className="h-5 w-5" />
+          <Gem className="h-5 w-5" />
           {suggestion && !open && (
             <motion.span
               className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-rose-500 ring-2 ring-background"

@@ -1,4 +1,4 @@
-import { Clock, Crown, Zap } from "lucide-react";
+import { Gem, Clock, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface Props {
@@ -40,7 +40,7 @@ function computeETA(tier: string, amount: number) {
 
   if (isVIP && !huge) {
     return {
-      icon: Crown,
+      icon: Gem,
       tone: "border-primary/60 bg-gradient-imperial/10 text-foreground",
       label: "5분 ~ 30분",
       labelEn: "5 – 30 min",

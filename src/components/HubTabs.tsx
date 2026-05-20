@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { Target, Sparkles, Gamepad2, Crown, Layers, Users, Wallet, ArrowDownToLine, ArrowUpFromLine, Receipt, Trophy, Award, Share2, TrendingUp, BarChart3, LayoutDashboard, Heart, BookOpen } from "lucide-react";
+import { Gem, Target, Sparkles, Gamepad2, Layers, Users, Wallet, ArrowDownToLine, ArrowUpFromLine, Receipt, Trophy, Award, Share2, TrendingUp, BarChart3, LayoutDashboard, Heart, BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { ComponentType } from "react";
 
@@ -17,12 +17,12 @@ const HUBS: Record<HubKey, { tabs: Tab[] }> = {
     tabs: [
       { to: "/arena/army", tKey: "earn.tradingArena", icon: TrendingUp },
       { to: "/missions",   tKey: "earn.missions",    icon: Target },
-      { to: "/packages",   tKey: "empire.packages",  icon: Crown },
+      { to: "/packages",   tKey: "empire.packages",  icon: Gem },
     ],
   },
   empire: {
     tabs: [
-      { to: "/packages",            tKey: "empire.packages", icon: Crown },
+      { to: "/packages",            tKey: "empire.packages", icon: Gem },
       { to: "/empire",              tKey: "empire.tier",     icon: Layers },
       { to: "/empire?view=founding",tKey: "empire.founding", icon: Users },
     ],

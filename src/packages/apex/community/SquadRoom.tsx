@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Crown, Copy as CopyIcon } from "lucide-react";
+import { Gem, Copy as CopyIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { notify } from "@/lib/notify";
 import { SquadCreatePanel } from "./SquadCreatePanel";
@@ -74,7 +74,7 @@ export default function SquadRoom() {
               }`}>
                 {uid ? (
                   <div className="flex flex-col items-center gap-1">
-                    {uid === squad.host_user_id && <Crown className="w-3 h-3" />}
+                    {uid === squad.host_user_id && <Gem className="w-3 h-3" />}
                     <span className="font-mono">{uid.slice(0, 8)}</span>
                   </div>
                 ) : "EMPTY"}

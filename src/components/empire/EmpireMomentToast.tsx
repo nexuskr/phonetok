@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown } from "lucide-react";
+import {  Gem} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type Moment = {
@@ -69,7 +69,7 @@ export default function EmpireMomentToast() {
             role="status"
             aria-live="polite"
           >
-            <Crown className="w-5 h-5 text-sim-gold animate-pulse shrink-0" />
+            <Gem className="w-5 h-5 text-sim-gold animate-pulse shrink-0" />
             <div className="flex-1 min-w-0">
               <div className="text-xs sm:text-sm font-bold text-foreground truncate">
                 {current.message}

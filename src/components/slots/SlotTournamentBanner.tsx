@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Trophy, Clock, Crown } from "lucide-react";
+import { Gem, Trophy, Clock} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingList } from "@/components/ui/loading-state";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
@@ -148,7 +148,7 @@ export default function SlotTournamentBanner() {
         </div>
       ) : (
         <div className="text-[11px] text-foreground/50 text-center flex items-center justify-center gap-1">
-          <Crown className="w-3 h-3" /> 스핀할수록 누적 페이아웃이 올라가 순위에 진입합니다
+          <Gem className="w-3 h-3" /> 스핀할수록 누적 페이아웃이 올라가 순위에 진입합니다
         </div>
       )}
     </div>
