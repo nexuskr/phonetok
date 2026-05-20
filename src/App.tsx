@@ -27,6 +27,7 @@ import { DynamicIslandPill } from "@/packages/native/components/DynamicIslandPil
 import { ClientMetricsBinder } from "@/components/system/ClientMetricsBinder";
 import { registerSW } from "./lib/pwa/registerSW";
 import MobileShell from "./components/nav/MobileShell";
+import StakeStyleSidebar from "./components/nav/StakeStyleSidebar";
 
 installGlobalErrorLogging();
 registerSW();
@@ -283,6 +284,8 @@ const App = () => (
             <DailyLoginRewardToast />
             <ApexLiveChatFab />
           </Suspense>
+          {/* PC 영구 좌측 사이드바 — md+ 노출, 라우트별 자동 숨김. */}
+          <StakeStyleSidebar />
           {/* 모바일 한손 조작 셸 — 5탭 + 더보기 시트 + 빠른 입금 FAB. md+ 자동 숨김. */}
           <MobileShell />
           <Suspense fallback={<RouteFallback />}>
