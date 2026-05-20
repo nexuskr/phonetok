@@ -45,7 +45,7 @@ export default function ApexWinReels() {
   return (
     <div className="space-y-3">
       <Suspense fallback={null}>
-        <EmperrorVoiceMount />
+        <EmperorVoicePlayer slot="ko/win_big" autoEvent={BIGWIN_EVENT} autoThreshold={BIGWIN_THRESHOLD_PHON} silent />
       </Suspense>
       <header className="flex items-center justify-between">
         <div>
