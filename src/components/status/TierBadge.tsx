@@ -1,5 +1,6 @@
 import { Gem, Zap, Sparkles, Star } from "lucide-react";
 import type { Tier } from "@/lib/store";
+import { formatVipLevelFromTier } from "@/lib/branding/tierLabel";
 
 /** 티어 배지 — 닉네임 옆 항상 노출. VIP 이상은 금테 + 왕관. */
 export default function TierBadge({
@@ -41,18 +42,18 @@ const TIER_CONF: Record<
     cls: "bg-muted/60 text-muted-foreground",
   },
   VIP: {
-    label: "VIP",
+    label: formatVipLevelFromTier("VIP", { short: true }),
     cls: "bg-primary/20 text-primary border border-primary/40",
     icon: Zap,
   },
   GOD: {
-    label: "GOD",
+    label: formatVipLevelFromTier("GOD", { short: true }),
     cls: "bg-accent/25 text-accent border border-accent/50 shadow-lg shadow-accent/30",
     icon: Sparkles,
     glow: "bg-accent/20 blur-md animate-pulse",
   },
   EMPIRE: {
-    label: "EMPIRE",
+    label: formatVipLevelFromTier("EMPIRE", { short: true }),
     cls: "bg-gradient-gold text-gold-foreground border border-gold animate-pulse",
     icon: Gem,
     glow: "bg-gold/40 blur-lg animate-ring-pulse",
