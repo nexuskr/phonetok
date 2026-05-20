@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { apexGetMySummary, apexGetLiveBigwins, type ApexSummary, type ApexBigWin } from "@/packages/apex/lib/api";
+import { detectCaps, HybridRenderer, type EngineCapsSnapshot, type EngineStats, type EngineBackend } from "@/packages/apex/engine";
 
 type Vitals = { lcp?: number; cls?: number; inp?: number; fps?: number };
 
@@ -44,21 +45,29 @@ function useWebVitals(): Vitals {
   return v;
 }
 
-function useGpuCaps() {
-  const [caps, setCaps] = useState<{ webgpu: boolean; vendor?: string; adapter?: string }>({ webgpu: false });
+function useEngineProbe() {
+  const [caps, setCaps] = useState<EngineCapsSnapshot | null>(null);
+  const [backend, setBackend] = useState<EngineBackend | null>(null);
+  const [stats, setStats] = useState<EngineStats | null>(null);
   useEffect(() => {
+    let disposed = false;
+    let eng: any = null;
+    let iv = 0;
     (async () => {
-      const nav = navigator as any;
-      if (!nav.gpu) { setCaps({ webgpu: false }); return; }
-      try {
-        const adapter = await nav.gpu.requestAdapter();
-        if (!adapter) { setCaps({ webgpu: false }); return; }
-        const info = (adapter as any).info ?? {};
-        setCaps({ webgpu: true, vendor: info.vendor, adapter: info.architecture });
-      } catch { setCaps({ webgpu: false }); }
+      const c = await detectCaps();
+      if (disposed) return;
+      setCaps(c);
+      eng = await HybridRenderer.create({ kind: "particles" });
+      if (disposed) { eng.dispose(); return; }
+      setBackend(eng.backend);
+      // exercise the engine every 250ms for live computeMs avg
+      iv = window.setInterval(() => {
+        try { eng.read(2048); setStats(eng.stats()); } catch {}
+      }, 250);
     })();
+    return () => { disposed = true; window.clearInterval(iv); eng?.dispose(); };
   }, []);
-  return caps;
+  return { caps, backend, stats };
 }
 
 const Card = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -79,7 +88,7 @@ export default function ApexHealth() {
   const [search] = useSearchParams();
   const allowedByQuery = search.get("dev") === "1";
   const vitals = useWebVitals();
-  const gpu = useGpuCaps();
+  const { caps, backend, stats } = useEngineProbe();
   const [summary, setSummary] = useState<ApexSummary | null>(null);
   const [bigwins, setBigwins] = useState<ApexBigWin[]>([]);
   const [tab, setTab] = useState<"vitals" | "gpu" | "money" | "bundle" | "pwa" | "viral">("vitals");
@@ -138,13 +147,28 @@ export default function ApexHealth() {
         {tab === "gpu" && (
           <>
             <Card title="WebGPU">
-              <Stat k="지원" v={gpu.webgpu ? "✅ ON" : "❌ OFF (CPU fallback)"} />
-              <Stat k="Vendor" v={gpu.vendor ?? "—"} />
-              <Stat k="Adapter" v={gpu.adapter ?? "—"} />
+              <Stat k="지원" v={caps?.webgpu ? "✅ ON" : "❌ OFF (CPU fallback)"} />
+              <Stat k="Vendor" v={caps?.vendor ?? "—"} />
+              <Stat k="Adapter" v={caps?.adapter ?? "—"} />
+              <Stat k="Reason" v={caps?.reason ?? "ok"} />
             </Card>
-            <Card title="WASM">
-              <Stat k="WebAssembly" v={typeof WebAssembly !== "undefined" ? "✅" : "❌"} />
-              <Stat k="SIMD" v={"placeholder (PR 후속)"} />
+            <Card title="WASM / SIMD">
+              <Stat k="WebAssembly" v={caps?.wasm ? "✅" : "❌"} />
+              <Stat k="SIMD (v128)" v={caps?.simd ? "✅ v128" : "❌"} />
+              <Stat k="Cores" v={caps?.cores ?? "?"} />
+              <Stat k="Tier" v={caps?.tier ?? "—"} hint="low / mid / high" />
+            </Card>
+            <Card title="Active Engine">
+              <Stat k="Backend" v={backend?.toUpperCase() ?? "…"} />
+              <Stat k="Compute (avg)" v={stats ? `${stats.computeMs} ms / 2048 floats` : "…"} />
+              <Stat k="Produced" v={stats ? stats.produced.toLocaleString() : "—"} />
+            </Card>
+            <Card title="Hybrid Router">
+              <div className="text-xs text-muted-foreground leading-relaxed">
+                자동 라우팅: <b>WebGPU → WASM-SIMD → CPU</b>.<br/>
+                ApexBackdrop는 <code>/apex/games/*</code>에서 OFF로 LCP 회수.<br/>
+                머니플로 8경로 git diff = 0 (visual-only stream).
+              </div>
             </Card>
           </>
         )}
