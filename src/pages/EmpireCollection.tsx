@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Gem, Sparkles, Zap, Rocket, ArrowRight, X, Calendar } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
+import CollectionHubTabs from "@/components/collection/CollectionHubTabs";
 
 const LEVEL_RANK: Record<NFTRow["level"], number> = { bronze: 5, gold: 7, diamond: 10 };
 const LEVEL_TIER_NUM: Record<NFTRow["level"], number> = { bronze: 1, gold: 2, diamond: 3 };
@@ -47,6 +48,7 @@ export default function EmpireCollection() {
 
   return (
     <div className="container mx-auto max-w-3xl py-6 px-4 space-y-6">
+      <CollectionHubTabs />
       <header className="space-y-1.5 text-center">
         <h1 className="font-imperial text-3xl text-gradient-imperial tracking-wider">💎 내 NFT 컬렉션</h1>
         <p className="text-xs text-muted-foreground">NFT는 단순 이미지가 아니라 <b className="text-amber-300">레버리지의 힘</b>입니다.</p>

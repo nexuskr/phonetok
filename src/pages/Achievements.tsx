@@ -7,6 +7,7 @@ import { Gem, Trophy, Lock} from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import PaymentStickyCTA from "@/components/missions/PaymentStickyCTA";
+import CollectionHubTabs from "@/components/collection/CollectionHubTabs";
 
 type Ach = {
   key: string; name: string; description: string; category: string;
@@ -103,6 +104,7 @@ export default function Achievements() {
   return (
     <Layout>
       <HubTabs hub="legacy" />
+      <div className="container pt-3"><CollectionHubTabs /></div>
       <div className="space-y-6 pb-24">
         <header className="rounded-3xl bg-gradient-to-br from-primary/15 via-background to-background border border-primary/20 p-6">
           <div className="flex items-center gap-3">

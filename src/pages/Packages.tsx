@@ -112,9 +112,17 @@ export default function Packages() {
           </div>
         </section>
 
-        {/* P6-2: Axie-style Empire Unit cards (XP/진화/스탯) */}
-        <PackageUpgradeCards />
-        <div className="mb-6">
+        {/* Slice 2: Axie 스타일 진화 카드는 보조 컨텐츠로 collapse — 메인은 COSMOS */}
+        <details className="mb-6 rounded-2xl border border-border/40 bg-card/30">
+          <summary className="cursor-pointer select-none px-4 py-3 text-xs font-bold tracking-[0.18em] text-muted-foreground uppercase hover:text-foreground">
+            🛡️ Empire Unit · XP/진화 (상세보기)
+          </summary>
+          <div className="px-2 pt-3 pb-2">
+            <PackageUpgradeCards />
+          </div>
+        </details>
+        <div className="mb-6 pt-4 border-t border-border/30">
+          <div className="text-[10px] tracking-[0.3em] text-muted-foreground font-bold mb-1 uppercase">기본 충전 · 단순 비교</div>
           <h1 className="font-imperial font-black text-2xl sm:text-3xl flex items-center gap-2 tracking-[0.04em] break-keep">
             <Gem className="w-5 h-5 text-gold shrink-0" /> <span className="text-gradient-gold">{t("headline")}</span>
           </h1>

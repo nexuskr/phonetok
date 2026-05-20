@@ -367,6 +367,12 @@ export default function Wallet() {
         {/* Tri-currency display layer (KRW / USDT / PHON) */}
         <MultiCurrencyBalance className="mb-5" />
 
+        {/* Slice 2: legacy 수동 입출금 UI 는 collapse — 주요 입출금은 위 WalletTopSection 사용 */}
+        <details className="mt-2 mb-4 rounded-2xl border border-border/40 bg-card/30">
+          <summary className="cursor-pointer select-none px-4 py-3 text-xs font-bold tracking-[0.18em] text-muted-foreground uppercase hover:text-foreground">
+            고급 옵션 · 수동 영수증 / 상세 이력
+          </summary>
+          <div className="px-1 sm:px-2 pt-4 pb-2">
         {/* Asset switcher */}
         <div className="grid grid-cols-2 gap-3 mb-5">
           {([
@@ -714,6 +720,8 @@ export default function Wallet() {
             </div>
           </div>
         )}
+          </div>
+        </details>
         <Disclaimer variant="withdraw" className="mt-4" />
       </div>
       <AMLGate open={amlOpen} level={amlLevel} onClose={() => setAmlOpen(false)} onApproved={() => setAmlOpen(false)} />
