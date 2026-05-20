@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { TrendingUp, Flame, Zap, Crown } from "lucide-react";
+import { TrendingUp, Flame, Zap, Sparkles } from "lucide-react";
 
 type Row = {
   amount: number;
@@ -12,9 +12,9 @@ type Row = {
 };
 
 function iconFor(kind: string) {
-  if (kind?.includes("crown")) return <Crown className="w-3.5 h-3.5 text-amber-300" />;
   if (kind?.includes("baron") || kind?.includes("vip")) return <Flame className="w-3.5 h-3.5 text-pink-400" />;
   if (kind?.includes("withdraw")) return <Zap className="w-3.5 h-3.5 text-emerald-300" />;
+  if (kind?.includes("win") || kind?.includes("payout")) return <Sparkles className="w-3.5 h-3.5 text-amber-300" />;
   return <TrendingUp className="w-3.5 h-3.5 text-amber-300" />;
 }
 
@@ -25,21 +25,31 @@ function fmt(n: number) {
   return n.toLocaleString();
 }
 
+function timeAgo(iso: string) {
+  const s = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  return `${m}m`;
+}
+
 export default function LiveBetFeed() {
   const [rows, setRows] = useState<Row[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const seenKey = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     let alive = true;
     const load = async () => {
-      const { data } = await supabase.rpc("get_live_activity_60s", { _limit: 20 });
-      if (alive && data) setRows(data as Row[]);
+      const { data } = await supabase.rpc("get_live_activity_60s", { _limit: 24 });
+      if (!alive) return;
+      const next = (data as Row[] | null) ?? [];
+      setRows(next);
+      setLoaded(true);
     };
     load();
     const t = window.setInterval(load, 1800);
     return () => { alive = false; window.clearInterval(t); };
   }, []);
-
-  if (!rows.length) return null;
 
   return (
     <section className="w-full max-w-5xl mx-auto px-4 my-6">
@@ -55,25 +65,56 @@ export default function LiveBetFeed() {
         </div>
         <span className="text-[10px] text-muted-foreground tracking-widest">1.8s 갱신</span>
       </div>
-      <div className="relative rounded-2xl border border-amber-300/20 bg-gradient-to-br from-background/80 to-card/40 backdrop-blur p-2 max-h-[280px] overflow-y-auto no-scrollbar">
-        <ul className="space-y-1">
-          {rows.map((r, i) => (
-            <li
-              key={`${r.created_at}-${i}`}
-              className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-card/40 border border-border/30 hover:border-amber-300/40 transition"
-            >
-              <div className="flex items-center gap-2 min-w-0">
-                {iconFor(r.kind)}
-                <span className="text-xs font-bold text-foreground/90 truncate">{r.user_mask}</span>
-                <span className="text-[11px] text-muted-foreground truncate">{r.title}</span>
-              </div>
-              <span className="text-xs font-black tabular-nums text-amber-300 shrink-0">
-                {fmt(Number(r.amount) || 0)}
-              </span>
-            </li>
-          ))}
-        </ul>
+
+      <div className="relative rounded-2xl border border-amber-300/20 bg-gradient-to-br from-background/80 to-card/40 backdrop-blur p-2 max-h-[320px] overflow-y-auto no-scrollbar">
+        {!loaded ? (
+          <ul className="space-y-1" aria-hidden>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <li key={i} className="h-10 rounded-xl bg-card/40 border border-border/20 animate-pulse" />
+            ))}
+          </ul>
+        ) : rows.length === 0 ? (
+          <div className="py-6 text-center text-[11px] text-muted-foreground">
+            지금 활성 사용자가 모이는 중이에요 · 잠시 후 다시 표시됩니다
+          </div>
+        ) : (
+          <ul className="space-y-1">
+            {rows.map((r, i) => {
+              const k = `${r.created_at}-${r.user_mask}-${r.kind}`;
+              const isNew = !seenKey.current.has(k);
+              if (isNew) seenKey.current.add(k);
+              return (
+                <li
+                  key={k}
+                  style={{
+                    animation: isNew ? "live-slide-in 320ms cubic-bezier(.2,.8,.2,1)" : undefined,
+                  }}
+                  className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-card/40 border border-border/30 hover:border-amber-300/40 transition"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    {iconFor(r.kind)}
+                    <span className="text-xs font-bold text-foreground/90 truncate max-w-[6.5rem]">{r.user_mask}</span>
+                    <span className="text-[11px] text-muted-foreground truncate">{r.title}</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-[10px] text-muted-foreground/70 tabular-nums">{timeAgo(r.created_at)}</span>
+                    <span className="text-xs font-black tabular-nums text-amber-300">
+                      {fmt(Number(r.amount) || 0)}
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
+
+      <style>{`
+        @keyframes live-slide-in {
+          from { opacity: 0; transform: translateY(-6px) scale(0.985); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
     </section>
   );
 }
