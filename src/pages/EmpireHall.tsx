@@ -151,7 +151,7 @@ export default function EmpireHall() {
           {/* Stats row */}
           <div className="grid grid-cols-2 gap-3">
             <Card>
-              <Label icon={PHON} text="오늘 PHON" tone="gold" />
+              <Label icon={Gem} text="오늘 PHON" tone="gold" />
               <Value>+{todayCrown.toLocaleString()}</Value>
               <Sub>{todayPractice}회 Practice 승리</Sub>
             </Card>

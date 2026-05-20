@@ -122,7 +122,7 @@ function LiveKpi() {
 function ManualCrownLink() {
   return (
     <div>
-      <SectionTitle icon={PHON} label="Manual PHON" />
+      <SectionTitle icon={Gem} label="Manual PHON" />
       <Link
         to="/admin/game/crown-trigger"
         className="block rounded-xl border border-gold/40 bg-gradient-to-br from-gold/15 via-gold/5 to-transparent

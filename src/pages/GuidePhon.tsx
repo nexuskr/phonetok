@@ -34,7 +34,7 @@ export default function GuidePhon() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
               <Stat icon={Coins} label={t.statPhon} value={phon.toLocaleString()} />
-              <Stat icon={PHON} label={t.statNft} value={String(nfts.length)} />
+              <Stat icon={Gem} label={t.statNft} value={String(nfts.length)} />
               <Stat icon={Zap} label={t.statBoost} value={`+${boostPct}%`} />
               <Stat icon={Shield} label={t.statLev} value={`${maxLeverage}x`} />
             </div>
@@ -59,7 +59,7 @@ export default function GuidePhon() {
         </Section>
 
         {/* NFT 섹션 */}
-        <Section icon={PHON} title={t.nftTitle} subtitle={t.nftSub}>
+        <Section icon={Gem} title={t.nftTitle} subtitle={t.nftSub}>
           <div className="grid md:grid-cols-3 gap-3">
             <TierCard tier="BRONZE" boost="+5~10%" color="from-amber-700/30 to-amber-900/30" border="border-amber-700/40" />
             <TierCard tier="GOLD" boost="+15~30%" color="from-yellow-500/30 to-amber-600/30" border="border-yellow-500/40" />
