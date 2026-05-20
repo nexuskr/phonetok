@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { FOMO_POLL_MS } from "@/lib/fomo";
 import { useDocumentVisible } from "@/lib/util/visible-interval";
+import { useGlobalPolling } from "@/hooks/polling/useGlobalPolling";
 
 export type LiveFomoCounters = {
   withdrawing_now: number;
