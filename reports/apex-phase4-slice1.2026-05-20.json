@@ -1,0 +1,53 @@
+{
+  "phase": "Phase 4 — Slice 1",
+  "date": "2026-05-20",
+  "slices": {
+    "P4-A": {
+      "name": "Landing Apocalypse",
+      "routes": ["/apex (index → LandingApocalypse)", "/landing", "/safe"],
+      "components": [
+        "@pkg/apex/landing/LandingApocalypse",
+        "@pkg/apex/landing/LandingBigWinTicker",
+        "@pkg/apex/landing/LandingRaceCountdown",
+        "@pkg/apex/landing/TierSTeaserGrid",
+        "@pkg/apex/landing/TrustStrip",
+        "src/pages/SafePublic.tsx"
+      ],
+      "lcp_target_ms": 1200,
+      "lcp_strategy": "text+CSS gradient only; all sub-widgets Suspense-lazy",
+      "seo": {
+        "canonical": "https://phonara.world/safe",
+        "jsonld": ["WebSite", "FAQPage"],
+        "sitemap_entries": 13
+      }
+    },
+    "P4-D": {
+      "name": "VRF v2.5 — Drand × Ed25519 hybrid",
+      "db": {
+        "table": "apex_randomness_requests",
+        "rpc": "apex_record_randomness (service_role only)"
+      },
+      "edge": "supabase/functions/apex-vrf-oracle",
+      "drand_sources": ["api.drand.sh", "drand.cloudflare.com"],
+      "client": [
+        "@pkg/apex/oracle/useVrfTrace",
+        "@pkg/apex/oracle/VrfTraceCard"
+      ],
+      "ephemeral_key_fallback": true,
+      "money_flow_touch": 0
+    }
+  },
+  "guardrails": {
+    "money_flow_freeze_8_paths_diff": 0,
+    "house_edge_formula_touched": false,
+    "layer1_gz_kb_target": 180,
+    "operator_isolation": true,
+    "notify_4tier": true,
+    "use_channels_only": true
+  },
+  "next": [
+    "P4-B PWA Final (Workbox + InstallPrompt + Web Push)",
+    "P4-C Health Dock Polish (Run-book + Apocalypse Protocol + Oracle Status)",
+    "P4-E Global (i18n ko/en/ja/pt/es/zh + 5 currency packs)"
+  ]
+}
