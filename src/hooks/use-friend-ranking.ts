@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { FOMO_FRIEND_POLL_MS } from "@/lib/fomo";
 import { useDocumentVisible } from "@/lib/util/visible-interval";
+import { useGlobalPolling } from "@/hooks/polling/useGlobalPolling";
 
 export type FriendRow = {
   user_id: string;
@@ -35,10 +36,29 @@ export function useFriendRanking(limit = 5) {
       }
     };
     void load();
-    if (!visible) return () => { alive = false; };
-    const id = window.setInterval(load, FOMO_FRIEND_POLL_MS);
-    return () => { alive = false; window.clearInterval(id); };
+    return () => { alive = false; };
   }, [limit, visible]);
+
+  // PR-P0-2: 단일 PollingManager 사용 (ref-count, adaptive interval, backoff)
+  useGlobalPolling({
+    key: `friend-ranking:v2:${limit}`,
+    fn: async () => {
+      const { data, error } = await supabase.rpc("get_friend_weekly_ranking" as any, { _limit: limit });
+      if (error) { setRows(null); return; }
+      setRows(((data as any[]) || []).map((r) => ({
+        user_id: String(r.user_id),
+        nickname: String(r.nickname ?? "황제***"),
+        weekly_phon: Number(r.weekly_phon ?? 0),
+        is_me: Boolean(r.is_me),
+        rnk: Number(r.rnk ?? 0),
+      })));
+    },
+    baseMs: FOMO_FRIEND_POLL_MS,
+    enabled: visible,
+    priority: "cosmetic",
+    category: "social",
+    owner: "useFriendRanking",
+  });
 
   return { rows, loading };
 }

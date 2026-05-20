@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { FOMO_POLL_MS } from "@/lib/fomo";
 import { useDocumentVisible } from "@/lib/util/visible-interval";
+import { useGlobalPolling } from "@/hooks/polling/useGlobalPolling";
 
 export type LiveFomoCounters = {
   withdrawing_now: number;
@@ -58,11 +59,15 @@ export function useLiveFomoCounters(): LiveFomoCounters | null {
     };
   }, []);
 
-  useEffect(() => {
-    if (!visible) return;
-    const id = window.setInterval(() => { void fetchOnce(); }, FOMO_POLL_MS);
-    return () => window.clearInterval(id);
-  }, [visible]);
+  useGlobalPolling({
+    key: "live-fomo-counters",
+    fn: async () => { await fetchOnce(); },
+    baseMs: FOMO_POLL_MS,
+    enabled: visible,
+    priority: "cosmetic",
+    category: "social",
+    owner: "useLiveFomoCounters",
+  });
 
   return state;
 }
