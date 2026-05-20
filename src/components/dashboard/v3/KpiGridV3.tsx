@@ -11,8 +11,7 @@ import { useOnline, useTodayPayout } from "@/components/LiveStats";
 import { useMyPower, topNftLevel, type NFTRow } from "@/hooks/use-my-power";
 import { formatKRW } from "@/lib/store";
 import { setVisibleInterval } from "@/lib/util/visible-interval";
-
-const LEVEL_LABEL: Record<string, string> = { bronze: "BRONZE", gold: "GOLD", diamond: "DIAMOND" };
+import { formatVipLevelFromNft } from "@/lib/branding/tierLabel";
 
 function useJackpot() {
   const [v, setV] = useState(12_480_000);
@@ -38,7 +37,7 @@ export default function KpiGridV3({
   const jackpot = useJackpot();
   const tier = (() => {
     const lv = topNftLevel(nfts);
-    return lv ? LEVEL_LABEL[lv] : "ROOKIE";
+    return formatVipLevelFromNft(lv);
   })();
 
   const cards: Array<{ icon: any; micro: string; value: string; tone: "money" | "gold" | "primary" | "accent" }> = [
