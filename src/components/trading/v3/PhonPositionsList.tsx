@@ -86,7 +86,7 @@ export default function PhonPositionsList() {
             </div>
             <button
               type="button"
-              onClick={() => close(p.id, pnlPct)}
+              onClick={() => close(p.id, pnlPct, p.leverage)}
               disabled={busy}
               className="shrink-0 min-h-11 min-w-11 rounded-xl bg-card border border-border/60 hover:border-rose-400/60 flex items-center justify-center press disabled:opacity-50"
               aria-label="청산"
