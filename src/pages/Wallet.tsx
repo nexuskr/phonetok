@@ -720,6 +720,8 @@ export default function Wallet() {
             </div>
           </div>
         )}
+          </div>
+        </details>
         <Disclaimer variant="withdraw" className="mt-4" />
       </div>
       <AMLGate open={amlOpen} level={amlLevel} onClose={() => setAmlOpen(false)} onApproved={() => setAmlOpen(false)} />
