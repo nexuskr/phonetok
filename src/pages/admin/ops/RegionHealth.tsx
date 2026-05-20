@@ -11,6 +11,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { notify } from "@/lib/notify";
 import { supabase } from "@/integrations/supabase/client";
 import { setRegion, getRegion, type RealtimeRegion } from "@pkg/realtime";
+import { RealtimeStatusCard } from "@/components/admin/RealtimeStatusCard";
 import { Globe, Zap, AlertTriangle } from "lucide-react";
 
 type Row = {
