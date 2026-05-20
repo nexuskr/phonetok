@@ -1,71 +1,59 @@
-import { memo, useCallback } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Home, Gamepad2, Swords, MoreHorizontal, Sparkles, type LucideIcon } from "lucide-react";
-import { useAuthReady } from "@/hooks/use-auth-ready";
+import { memo } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { Home, Gift, Swords, LineChart, Gem, type LucideIcon } from "lucide-react";
 
 /**
- * MobileBottomNav — 50~70대 한손(엄지) 조작 최적화 5탭 네비.
+ * MobileBottomNav (PR-P1-A) — 5탭 모바일 OS 네이티브 thumb-zone 네비.
  *
- * 한손 강제 스펙:
+ * 5탭: 홈 / 무료돈벌기 / 실시간대결 / 실시간예측 / 내PHON
  *  - 컨테이너 72px + env(safe-area-inset-bottom)
- *  - hit-box ≥ 72×72px
- *  - 아이콘 34px / 라벨 17.5px font-black
+ *  - hit-box ≥ 72×72px, 아이콘 34px, 라벨 17.5px font-black
  *  - touch-action:manipulation, -webkit-tap-highlight-color:transparent
- *  - Active 140ms / Pressed 100ms transform·opacity only
- *  - prefers-reduced-motion 자동 존중 (transition motion-reduce:transition-none)
+ *  - prefers-reduced-motion 자동 존중
  *
- * 에이펙스 탭은 Gold gradient + glow + scale-1.05 로 강한 시선 유도.
- * /apex/*, /auth*, /secure-auth*, /legal*, /admin* 에서는 자동 숨김 (각 화면에 자체 셸 존재).
+ * 실시간대결 = crimson glow (FOMO 강조)
+ * 내PHON = gold glow (브랜드 톤)
  */
 
-type TabId = "home" | "apex" | "duel" | "games" | "more";
+type TabId = "home" | "earn" | "duel" | "trade" | "phon";
 
 type Tab = {
   id: TabId;
-  to?: string;
+  to: string;
   label: string;
   icon: LucideIcon;
   emphasis?: "gold" | "crimson";
 };
 
 const TABS: Tab[] = [
-  { id: "home",   to: "/",      label: "홈",       icon: Home },
-  { id: "apex",   to: "/apex",  label: "에이펙스", icon: Sparkles, emphasis: "gold" },
-  { id: "duel",   to: "/duel",  label: "대관전",   icon: Swords,   emphasis: "crimson" },
-  { id: "games",  to: "/games", label: "게임",     icon: Gamepad2 },
-  { id: "more",                  label: "더보기",   icon: MoreHorizontal },
+  { id: "home",  to: "/",      label: "홈",         icon: Home },
+  { id: "earn",  to: "/earn",  label: "무료돈벌기", icon: Gift },
+  { id: "duel",  to: "/duel",  label: "실시간대결", icon: Swords,    emphasis: "crimson" },
+  { id: "trade", to: "/trade", label: "실시간예측", icon: LineChart },
+  { id: "phon",  to: "/phon",  label: "내PHON",     icon: Gem,       emphasis: "gold" },
 ];
 
 const HIDDEN_PREFIX = ["/apex", "/auth", "/secure-auth", "/legal", "/admin", "/welcome", "/guide", "/landing", "/safe", "/forgot-password", "/reset-password", "/auth/callback", "/complete-profile", "/live/", "/r/", "/i/", "/c/", "/unsubscribe"];
 
-function isActivePath(pathname: string, to?: string) {
-  if (!to) return false;
+function isActivePath(pathname: string, to: string) {
   const base = to.split("?")[0];
-  if (base === "/")     return pathname === "/" || pathname === "/dashboard";
-  if (base === "/apex") return pathname === "/apex" || pathname.startsWith("/apex/");
-  if (base === "/duel") return pathname === "/duel" || pathname.startsWith("/duel/");
-  if (base === "/games")return pathname === "/games" || pathname.startsWith("/games/") || pathname.startsWith("/casino");
+  if (base === "/")      return pathname === "/" || pathname === "/dashboard";
+  if (base === "/earn")  return pathname === "/earn" || pathname.startsWith("/earn/") || pathname.startsWith("/missions");
+  if (base === "/duel")  return pathname === "/duel" || pathname.startsWith("/duel/");
+  if (base === "/trade") return pathname === "/trade" || pathname.startsWith("/trade/") || pathname.startsWith("/arena");
+  if (base === "/phon")  return pathname === "/phon" || pathname.startsWith("/phon/") || pathname.startsWith("/wallet");
   return pathname === base;
 }
 
 interface Props {
-  onMoreOpen: () => void;
+  onMoreOpen?: () => void;
 }
 
-function MobileBottomNavInner({ onMoreOpen }: Props) {
+function MobileBottomNavInner(_props: Props) {
   const loc = useLocation();
-  const navigate = useNavigate();
-  const { hasSession } = useAuthReady();
 
-  const handleHome = useCallback(
-    (e: React.MouseEvent) => {
-      if (hasSession) {
-        e.preventDefault();
-        navigate("/dashboard");
-      }
-    },
-    [hasSession, navigate],
-  );
+  if (HIDDEN_PREFIX.some((p) => loc.pathname.startsWith(p))) return null;
+
 
   if (HIDDEN_PREFIX.some((p) => loc.pathname.startsWith(p))) return null;
 
@@ -145,30 +133,18 @@ function MobileBottomNavInner({ onMoreOpen }: Props) {
 
           return (
             <li key={t.id} className="flex-1 flex items-center justify-center">
-              {t.to ? (
-                <NavLink
-                  to={t.to}
-                  onClick={t.id === "home" ? handleHome : undefined}
-                  aria-current={active ? "page" : undefined}
-                  aria-label={t.label}
-                  className={sharedClass}
-                  style={itemStyle}
-                >
-                  {inner}
-                </NavLink>
-              ) : (
-                <button
-                  type="button"
-                  onClick={onMoreOpen}
-                  aria-label="더보기 메뉴 열기"
-                  className={sharedClass}
-                  style={itemStyle}
-                >
-                  {inner}
-                </button>
-              )}
+              <NavLink
+                to={t.to}
+                aria-current={active ? "page" : undefined}
+                aria-label={t.label}
+                className={sharedClass}
+                style={itemStyle}
+              >
+                {inner}
+              </NavLink>
             </li>
           );
+
         })}
       </ul>
     </nav>
