@@ -1,17 +1,13 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Home, TrendingUp, Gamepad2, User, Crown, Swords, type LucideIcon } from "lucide-react";
+import { Home, Gift, Gem, Swords, LineChart, type LucideIcon } from "lucide-react";
 import { haptics } from "@/lib/haptics";
 import { useLongPress } from "@/hooks/use-long-press";
 import { notify } from "@/lib/notify";
 
 /**
- * v19 Slice 3 — Imperial 5-tab nav + center Half-Off FAB.
- *
- * 50~70대도 한눈에 이해할 수 있게 라벨은 한글 단독.
- * 중앙(3번 슬롯)은 빈 자리, 그 위에 absolute -top-5 로 PHON FAB 떠 있음.
- *
- * 모바일: 화면 하단 고정 + safe-area inset.
- * 데스크탑(md+): TopBar 아래 sticky 유지.
+ * PR-P1-A — 5탭 Bottom Navigation.
+ * 홈 / 무료돈벌기 / 내PHON(center FAB) / 실시간예측 / 실시간대결.
+ * 중앙 PHON FAB은 짧게=내PHON, 길게=실시간대결.
  */
 
 type Tab = {
@@ -21,21 +17,22 @@ type Tab = {
 };
 
 const TABS: Tab[] = [
-  { to: "/",        icon: Home,       label: "홈" },
-  { to: "/trade",   icon: TrendingUp, label: "거래" },
-  { to: "/phon",    icon: Crown,      label: "PHON" }, // 중앙 FAB
-  { to: "/games",   icon: Gamepad2,   label: "게임" },
-  { to: "/profile", icon: User,       label: "내정보" },
+  { to: "/",      icon: Home,      label: "홈" },
+  { to: "/earn",  icon: Gift,      label: "무료돈벌기" },
+  { to: "/phon",  icon: Gem,       label: "내PHON" }, // center FAB
+  { to: "/trade", icon: LineChart, label: "실시간예측" },
+  { to: "/duel",  icon: Swords,    label: "실시간대결" },
 ];
 
 function isActive(pathname: string, to: string) {
-  if (to === "/")        return pathname === "/" || pathname === "/dashboard";
-  if (to === "/trade")   return pathname === to || pathname.startsWith("/trade/") || pathname.startsWith("/arena");
-  if (to === "/phon")    return pathname === to || pathname.startsWith("/phon/");
-  if (to === "/games")   return pathname === to || pathname.startsWith("/games/") || pathname.startsWith("/casino");
-  if (to === "/profile") return pathname === to || pathname.startsWith("/profile/") || pathname.startsWith("/security");
+  if (to === "/")      return pathname === "/" || pathname === "/dashboard";
+  if (to === "/earn")  return pathname === to || pathname.startsWith("/earn/") || pathname.startsWith("/missions");
+  if (to === "/phon")  return pathname === to || pathname.startsWith("/phon/") || pathname.startsWith("/wallet");
+  if (to === "/trade") return pathname === to || pathname.startsWith("/trade/") || pathname.startsWith("/arena");
+  if (to === "/duel")  return pathname === to || pathname.startsWith("/duel/");
   return pathname === to;
 }
+
 
 export default function PhonaraNav() {
   const loc = useLocation();
@@ -47,7 +44,8 @@ export default function PhonaraNav() {
     },
     onLong: () => {
       haptics.win();
-      notify.success("⚔️ 황제의 대관전", { duration: 800 });
+      notify.success("⚔️ 실시간 대결", { duration: 800 });
+
       navigate("/duel");
     },
     ms: 600,
@@ -76,7 +74,7 @@ export default function PhonaraNav() {
                   <button
                     type="button"
                     {...centerLP.bind}
-                    aria-label="PHON 허브 — 길게 누르면 황제의 대관전으로 입장"
+                    aria-label="내PHON 허브 — 길게 누르면 실시간 대결로 입장"
                     className="
                       absolute -top-5 group
                       flex flex-col items-center justify-center gap-0.5
@@ -90,8 +88,9 @@ export default function PhonaraNav() {
                       -webkit-touch-callout-none
                     "
                   >
-                    <Crown className="w-6 h-6" strokeWidth={2.5} />
+                    <Gem className="w-6 h-6" strokeWidth={2.5} />
                     <span className="text-[9px] font-black tracking-tight leading-none">PHON</span>
+
                     {/* Long-press sword overlay — transform/opacity only */}
                     <Swords
                       aria-hidden
@@ -116,11 +115,12 @@ export default function PhonaraNav() {
                       `}
                     />
                   </button>
-                  <span className="sr-only">짧게 누르면 PHON 허브, 길게 누르면 황제의 대관전(/duel)로 이동합니다.</span>
+                  <span className="sr-only">짧게 누르면 내PHON 허브, 길게 누르면 실시간 대결(/duel)로 이동합니다.</span>
                   {/* 라벨 — 첫 입금 보너스 칩 */}
                   <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full text-[8px] font-black tracking-wide bg-rose-500/20 text-rose-200 border border-rose-400/40 whitespace-nowrap">
                     첫입금 +50%
                   </span>
+
                 </div>
               );
             }
