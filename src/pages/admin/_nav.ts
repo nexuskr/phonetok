@@ -87,20 +87,22 @@ export const ADMIN_NAV: AdminNavSection[] = [
     emoji: "⚙️",
     aal2: true,
     items: [
-      { id: "self-heal",     name: "🛟 Self-Heal 콘솔",   to: "/admin/ops/self-heal",     icon: HeartPulse },
-      { id: "region-health", name: "🌍 리전 헬스",         to: "/admin/ops/region-health", icon: Activity },
-      { id: "observability", name: "관측 (옵저버빌리티)", to: "/admin/ops/observability", icon: Activity },
-      { id: "errors",        name: "에러 · 이상감지",     to: "/admin/ops/errors",        icon: AlertTriangle, badge: "anomalies_unack" },
-      { id: "audit",         name: "📜 감사 로그",        to: "/admin/ops/audit",         icon: FileSearch },
-      { id: "audit-log",     name: "🔍 감사 검색 + RLS",  to: "/admin/ops/audit-log",     icon: FileSearch },
-      { id: "notify",        name: "🔔 공지 센터",        to: "/admin/ops/notify",        icon: Bell },
-      { id: "recovery",      name: "🔐 관리자 복구",      to: "/admin/ops/recovery",      icon: KeyRound },
-      
-      { id: "cron",          name: "Cron · 웹훅",         to: "/admin/ops/cron",          icon: Zap },
-      { id: "report",        name: "AI 일일 리포트",      to: "/admin/ops/report",        icon: BarChart3 },
-      { id: "thresholds",    name: "임계값 · SLA",        to: "/admin/ops/thresholds",    icon: Sliders },
-      { id: "duel",          name: "⚔️ Imperial Duel (PHON)", to: "/admin/duel",          icon: Gem },
-      { id: "imperial-cmd",  name: "💎 Imperial Command",     to: "/admin/ops/imperial-command", icon: Gem },
+      // ── 헬스 (실시간 시스템 상태) ──
+      { id: "self-heal",     name: "🛟 Self-Heal 콘솔",       to: "/admin/ops/self-heal",        icon: HeartPulse },
+      { id: "region-health", name: "🌍 리전 헬스",             to: "/admin/ops/region-health",    icon: Activity },
+      { id: "observability", name: "📈 관측 (옵저버빌리티)",   to: "/admin/ops/observability",    icon: Activity },
+      { id: "errors",        name: "⚠️ 에러 · 이상감지",       to: "/admin/ops/errors",           icon: AlertTriangle, badge: "anomalies_unack" },
+      { id: "thresholds",    name: "🎚️ 임계값 · SLA",          to: "/admin/ops/thresholds",       icon: Sliders },
+      // ── 감사 / 통보 ──
+      { id: "audit",         name: "📜 감사 로그",             to: "/admin/ops/audit",            icon: FileSearch },
+      { id: "audit-log",     name: "🔍 감사 검색 + RLS",       to: "/admin/ops/audit-log",        icon: FileSearch },
+      { id: "notify",        name: "🔔 공지 센터",             to: "/admin/ops/notify",           icon: Bell },
+      { id: "report",        name: "🤖 AI 일일 리포트",         to: "/admin/ops/report",           icon: BarChart3 },
+      { id: "recovery",      name: "🔐 관리자 복구",           to: "/admin/ops/recovery",         icon: KeyRound },
+      // ── 엔진 / Cron ──
+      { id: "cron",          name: "⏱️ Cron · 웹훅",            to: "/admin/ops/cron",             icon: Zap },
+      { id: "duel",          name: "⚔️ Imperial Duel (PHON)",  to: "/admin/duel",                 icon: Gem },
+      { id: "imperial-cmd",  name: "💎 Imperial Command",      to: "/admin/ops/imperial-command", icon: Gem },
     ],
   },
   {
