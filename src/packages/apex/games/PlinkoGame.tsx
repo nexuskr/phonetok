@@ -5,11 +5,13 @@ import { NeonButton } from "../components/NeonButton";
 import { ParticleBurst } from "../components/ParticleBurst";
 import { ApexFairBadge } from "./ProvablyFairBadge";
 import { useApexGame } from "./useApexGame";
+import type { HybridEngine } from "../engine";
 
 const ROWS = 12;
 const MULTS = [33, 11, 4, 2, 1.1, 0.6, 0.3, 0.6, 1.1, 2, 4, 11, 33];
 
-export default function PlinkoGame() {
+export default function PlinkoGame({ engine }: { engine?: HybridEngine }) {
+  void engine;
   const [bet, setBet] = useState(100);
   const [bin, setBin] = useState<number | null>(null);
   const [burst, setBurst] = useState(0);

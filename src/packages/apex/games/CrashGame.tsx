@@ -5,8 +5,10 @@ import { NeonButton } from "../components/NeonButton";
 import { ParticleBurst } from "../components/ParticleBurst";
 import { ApexFairBadge } from "./ProvablyFairBadge";
 import { useApexGame } from "./useApexGame";
+import type { HybridEngine } from "../engine";
 
-export default function CrashGame() {
+export default function CrashGame({ engine }: { engine?: HybridEngine }) {
+  void engine; // visual hybrid engine — money flow untouched (server RPC owns RNG)
   const [bet, setBet] = useState(100);
   const [autoCashout, setAutoCashout] = useState(2);
   const [phase, setPhase] = useState<"idle" | "flying" | "crashed">("idle");

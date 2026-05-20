@@ -5,10 +5,12 @@ import { NeonButton } from "../components/NeonButton";
 import { ParticleBurst } from "../components/ParticleBurst";
 import { ApexFairBadge } from "./ProvablyFairBadge";
 import { useApexGame } from "./useApexGame";
+import type { HybridEngine } from "../engine";
 
 const SYMS = ["💎", "🍒", "⭐", "7️⃣", "👑", "🍋"];
 
-export default function SlotsLiteGame() {
+export default function SlotsLiteGame({ engine }: { engine?: HybridEngine }) {
+  void engine;
   const [bet, setBet] = useState(100);
   const [reels, setReels] = useState<string[]>(["?", "?", "?"]);
   const [burst, setBurst] = useState(0);

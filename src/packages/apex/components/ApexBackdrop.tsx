@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
+import type { HybridEngine } from "../engine";
 
-/** ApexBackdrop — neon particle field, 60fps cap, visibility-paused. */
-export function ApexBackdrop() {
+/** ApexBackdrop — neon particle field, 60fps cap, visibility-paused.
+ *  Optional `engine` prop (visual only). Money flow untouched. */
+export function ApexBackdrop({ engine: _engine }: { engine?: HybridEngine } = {}) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current;

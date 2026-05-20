@@ -5,8 +5,10 @@ import { NeonButton } from "../components/NeonButton";
 import { ParticleBurst } from "../components/ParticleBurst";
 import { ApexFairBadge } from "./ProvablyFairBadge";
 import { useApexGame } from "./useApexGame";
+import type { HybridEngine } from "../engine";
 
-export default function MinesGame() {
+export default function MinesGame({ engine }: { engine?: HybridEngine }) {
+  void engine;
   const [bet, setBet] = useState(100);
   const [mines, setMines] = useState(3);
   const [grid, setGrid] = useState<Array<"hidden" | "gem" | "bomb">>(Array(25).fill("hidden"));

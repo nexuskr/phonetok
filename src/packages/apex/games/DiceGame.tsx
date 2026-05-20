@@ -5,8 +5,10 @@ import { NeonButton } from "../components/NeonButton";
 import { ParticleBurst } from "../components/ParticleBurst";
 import { ApexFairBadge } from "./ProvablyFairBadge";
 import { useApexGame } from "./useApexGame";
+import type { HybridEngine } from "../engine";
 
-export default function DiceGame() {
+export default function DiceGame({ engine }: { engine?: HybridEngine }) {
+  void engine;
   const [target, setTarget] = useState(50);
   const [side, setSide] = useState<"under" | "over">("under");
   const [bet, setBet] = useState(100);

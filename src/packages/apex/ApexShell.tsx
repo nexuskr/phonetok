@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { ApexThemeProvider } from "./ApexThemeProvider";
 import { ApexBackdrop } from "./components/ApexBackdrop";
@@ -27,11 +27,14 @@ const MORE = [
 
 export default function ApexShell() {
   const [moreOpen, setMoreOpen] = useState(false);
+  const { pathname } = useLocation();
+  // LCP recovery: kill heavy backdrop on game routes.
+  const showBackdrop = !pathname.startsWith("/apex/games");
 
   return (
     <ApexThemeProvider>
       <div className="relative min-h-screen text-foreground apex-particle-burst">
-        <ApexBackdrop />
+        {showBackdrop && <ApexBackdrop />}
         <div className="absolute inset-0 apex-grid-bg pointer-events-none" />
 
         <header className="sticky top-0 z-40 apex-glass border-b border-primary/20">
