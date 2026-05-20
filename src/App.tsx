@@ -13,23 +13,13 @@ import { useAuthBridge } from "./hooks/use-auth-bridge";
 import { useAdultGate } from "./hooks/use-adult-gate";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AuthErrorBoundary } from "./components/auth/AuthErrorBoundary";
-import AccountFrozenDialog from "./components/withdrawal/AccountFrozenDialog";
 import { RouteFallback } from "./components/RouteFallback";
 import { installGlobalErrorLogging } from "./lib/error-logger";
 import { installFetchInstrument, installWebVitals, recordRouteChange } from "./lib/spans";
 import { schedulePrefetch, recordNavigation } from "./lib/route-prefetch";
 import { ReviewerGuard } from "./components/ReviewerGuard";
-import { ReviewerMaskRoot } from "./components/ReviewerMaskRoot";
-import ReviewerBadge from "./components/ReviewerBadge";
 import { AdultGate } from "./components/AdultGate";
-import MaintenanceGate from "./components/MaintenanceGate";
-import { DegradeModeBinder } from "./components/system/DegradeModeBinder";
-import { DegradeModeBanner } from "./components/system/DegradeModeBanner";
-import { DynamicIslandPill } from "@/packages/native/components/DynamicIslandPill";
-import { ClientMetricsBinder } from "@/components/system/ClientMetricsBinder";
 import { registerSW } from "./lib/pwa/registerSW";
-import MobileShell from "./components/nav/MobileShell";
-import StakeStyleSidebar from "./components/nav/StakeStyleSidebar";
 
 installGlobalErrorLogging();
 registerSW();
@@ -63,6 +53,16 @@ if (typeof window !== "undefined") {
 const EntropyChip = (import.meta as { env?: { DEV?: boolean } }).env?.DEV
   ? lazy(() => import("@pkg/entropy/EntropyChip"))
   : null;
+const AccountFrozenDialog = lazy(() => import("./components/withdrawal/AccountFrozenDialog"));
+const MaintenanceGate = lazy(() => import("./components/MaintenanceGate"));
+const DegradeModeBinder = lazy(() => import("./components/system/DegradeModeBinder"));
+const DegradeModeBanner = lazy(() => import("./components/system/DegradeModeBanner"));
+const DynamicIslandPill = lazy(() => import("@/packages/native/components/DynamicIslandPill"));
+const ClientMetricsBinder = lazy(() => import("@/components/system/ClientMetricsBinder"));
+const ReviewerMaskRoot = lazy(() => import("./components/ReviewerMaskRoot").then((m) => ({ default: m.ReviewerMaskRoot })));
+const ReviewerBadge = lazy(() => import("./components/ReviewerBadge"));
+const MobileShell = lazy(() => import("./components/nav/MobileShell"));
+const StakeStyleSidebar = lazy(() => import("./components/nav/StakeStyleSidebar"));
 
 const Auth = lazy(() => import("./pages/Auth.tsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
@@ -271,14 +271,14 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <DegradeModeBanner />
-          <DegradeModeBinder />
-          <DynamicIslandPill />
-          <AccountFrozenDialog />
-          <ClientMetricsBinder />
+          <Suspense fallback={null}><DegradeModeBanner /></Suspense>
+          <Suspense fallback={null}><DegradeModeBinder /></Suspense>
+          <Suspense fallback={null}><DynamicIslandPill /></Suspense>
+          <Suspense fallback={null}><AccountFrozenDialog /></Suspense>
+          <Suspense fallback={null}><ClientMetricsBinder /></Suspense>
           <SessionWatcher />
-          <ReviewerMaskRoot />
-          <ReviewerBadge />
+          <Suspense fallback={null}><ReviewerMaskRoot /></Suspense>
+          <Suspense fallback={null}><ReviewerBadge /></Suspense>
           <GlobalOverlays />
           {EntropyChip && (
             <Suspense fallback={null}><EntropyChip /></Suspense>
@@ -293,9 +293,9 @@ const App = () => (
             <ApexLiveChatFab />
           </Suspense>
           {/* PC 영구 좌측 사이드바 — md+ 노출, 라우트별 자동 숨김. */}
-          <StakeStyleSidebar />
+          <Suspense fallback={null}><StakeStyleSidebar /></Suspense>
           {/* 모바일 한손 조작 셸 — 5탭 + 더보기 시트 + 빠른 입금 FAB. md+ 자동 숨김. */}
-          <MobileShell />
+          <Suspense fallback={null}><MobileShell /></Suspense>
           <Suspense fallback={<RouteFallback />}>
             <MaintenanceGate>
             <Routes>
