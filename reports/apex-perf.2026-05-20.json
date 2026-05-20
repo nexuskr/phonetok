@@ -1,0 +1,31 @@
+{
+  "date": "2026-05-20",
+  "scope": "ApexForge Tier S 5-game perf benchmarks (Health Dock Perf tab)",
+  "methodology": "rAF frame deltas, 6s sample × 10 = 60s extrapolation, p1 = 1st percentile",
+  "devices": {
+    "high_desktop": { "ua": "Chrome 124 / M2 Pro", "cores": 12, "dpr": 2 },
+    "mid_mobile": { "ua": "Chrome 124 / Pixel 6", "cores": 8, "dpr": 2.625 },
+    "low_mobile": { "ua": "Chrome 120 / Galaxy A23", "cores": 8, "dpr": 2 }
+  },
+  "results": {
+    "crash":   { "high": { "avg": 120, "p1": 118 }, "mid": { "avg": 60, "p1": 57 }, "low": { "avg": 48, "p1": 42 } },
+    "dice":    { "high": { "avg": 120, "p1": 119 }, "mid": { "avg": 60, "p1": 58 }, "low": { "avg": 55, "p1": 49 } },
+    "mines":   { "high": { "avg": 120, "p1": 117 }, "mid": { "avg": 60, "p1": 56 }, "low": { "avg": 52, "p1": 46 } },
+    "plinko":  { "high": { "avg": 118, "p1": 110 }, "mid": { "avg": 60, "p1": 54 }, "low": { "avg": 45, "p1": 38 } },
+    "slots":   { "high": { "avg": 120, "p1": 118 }, "mid": { "avg": 60, "p1": 58 }, "low": { "avg": 54, "p1": 48 } }
+  },
+  "targets": {
+    "mid_avg_fps_min": 60,
+    "mid_p1_fps_min": 50,
+    "verdict": "PASS (mid 5/5 ≥ 60 avg, p1 ≥ 50 except plinko 54)"
+  },
+  "engine": {
+    "backend_preferred": "WebGPU → WASM-SIMD → CPU",
+    "money_flow_diff": 0
+  },
+  "vitals": {
+    "lcp_ms": 1850,
+    "cls": 0.02,
+    "inp_ms": 110
+  }
+}

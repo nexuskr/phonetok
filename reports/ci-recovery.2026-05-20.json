@@ -1,0 +1,40 @@
+{
+  "date": "2026-05-20",
+  "phase": "ApexForge Phase 2~4 close-out",
+  "money_flow_freeze": {
+    "paths_total": 8,
+    "diff_zero": 8,
+    "status": "PASS"
+  },
+  "house_edge_freeze": {
+    "apex_play_mock_game": "untouched",
+    "status": "PASS"
+  },
+  "dependency_cruiser": {
+    "rules_added": [
+      "apex-no-operator (error) — src/packages/apex → operator/admin",
+      "apex-no-money-flow-mutation (error) — src/packages/apex → wallet/useDeposit, crash/useCrashRound, use-auto-bet"
+    ],
+    "existing_layers_preserved": true,
+    "status": "PASS"
+  },
+  "eslint": {
+    "no-direct-sonner": "PASS",
+    "no-raw-channel": "PASS",
+    "apex_overrides_needed": false
+  },
+  "workflows": {
+    "perf-gate": "green",
+    "bundle-budget": "green",
+    "db-permissions": "green",
+    "pr3-operator-isolation": "green",
+    "prerender": "green",
+    "e2e-tier-0": "green"
+  },
+  "bundle": {
+    "layer_1_gz_kb": 37,
+    "cap_kb": 180,
+    "apex_chunk_cap_kb": 120,
+    "operator_chunk_isolated": true
+  }
+}
