@@ -134,7 +134,7 @@ export default function Empire() {
                 to="/arena"
                 className="press inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold border border-primary/40 text-primary hover:bg-primary/10 transition"
               >
-                <Swords className="w-4 h-4" /> PHON War 입장
+                <Swords className="w-4 h-4" /> Gem War 입장
               </Link>
             </div>
           </motion.div>

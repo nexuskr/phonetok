@@ -1,5 +1,5 @@
 /**
- * /guide/phon — PHON · NFT · Dynasty 전용 가이드 페이지
+ * /guide/phon — Gem · NFT · Dynasty 전용 가이드 페이지
  * 한국어/영어 i18n. 풀스크린 스토리텔링이 아닌 정적 정보 페이지.
  */
 import { Link } from "react-router-dom";
@@ -41,7 +41,7 @@ export default function GuidePhon() {
           </div>
         </div>
 
-        {/* PHON 섹션 */}
+        {/* Gem 섹션 */}
         <Section icon={Coins} title={t.phonTitle} subtitle={t.phonSub}>
           <div className="grid md:grid-cols-3 gap-3">
             <InfoCard title={t.phonCard1Title} desc={t.phonCard1Desc} />
@@ -161,18 +161,18 @@ const KO = {
   phonTitle: "PHON 토큰 — 권력의 혈액",
   phonSub: "Phonara 내부 토큰. 수수료 할인·부스터 구매·PHON 부스트에 사용.",
   phonCard1Title: "수수료 50% 할인",
-  phonCard1Desc: "1~1,000 PHON 사용 → 다음 출금 1회 수수료 50% 할인 슬롯 적립.",
+  phonCard1Desc: "1~1,000 Gem 사용 → 다음 출금 1회 수수료 50% 할인 슬롯 적립.",
   phonCard2Title: "Empire Booster 24h",
-  phonCard2Desc: "5,000 PHON → 24시간 수수료 −30% · PHON ×1.5 · 레버리지 7x 동시 적용.",
+  phonCard2Desc: "5,000 Gem → 24시간 수수료 −30% · Gem ×1.5 · 레버리지 7x 동시 적용.",
   phonCard3Title: "PHON 부스트 24h",
-  phonCard3Desc: "1,000 PHON → 24시간 모든 PHON 적립 1.5배.",
+  phonCard3Desc: "1,000 Gem → 24시간 모든 Gem 적립 1.5배.",
   phonValueTitle: "PHON은 어떻게 가치를 가지나?",
   phonValueDesc: "PHON은 입금/패키지 구매/미션 보상으로 발행되고, 사용 시 소각됩니다. 발행과 소각이 균형을 이루며, 1만명 이상 사용자 도달 시 외부 블록체인 NFT/토큰으로 1:1 마이그레이션이 보장됩니다.",
   ctaUsePhon: "PHON 사용하기",
   ctaEarnPhon: "PHON 적립 패키지",
 
   nftTitle: "NFT — 왕관의 등급",
-  nftSub: "PHON / Emperor / Founder × Bronze / Gold / Diamond. 보유 시 부스트 +5~50% 자동. 대표 NFT는 프로필·헤더·채팅 아바타로 표시되어 제국 내 신분이 됩니다 (변경: 첫 3회 무료 → 이후 100 PHON, 24h 쿨다운).",
+  nftSub: "PHON / Emperor / Founder × Bronze / Gold / Diamond. 보유 시 부스트 +5~50% 자동. 대표 NFT는 프로필·헤더·채팅 아바타로 표시되어 제국 내 신분이 됩니다 (변경: 첫 3회 무료 → 이후 100 Gem, 24h 쿨다운).",
   nftMigrationNote: "현재 NFT는 Phonara 내부 NFT입니다. 1만명 도달 시 외부 블록체인(Polygon/Solana 등) 1:1 마이그레이션이 보장되며, 그 전까지는 안전하게 잠금 보관됩니다.",
   ctaCollection: "내 컬렉션 보기",
 
@@ -194,30 +194,30 @@ const KO = {
 
 const EN = {
   heroTag: "PHON · NFT · DYNASTY",
-  heroTitle: "Your Empire —\nBlood, PHON, Legacy",
+  heroTitle: "Your Empire —\nBlood, Gem, Legacy",
   heroSub: "PHON is the blood of power, NFTs are crowns, and Dynasty is what you leave to your children.",
   statPhon: "My PHON", statNft: "My NFTs", statBoost: "Boost", statLev: "Max Leverage",
 
   phonTitle: "PHON Token — Blood of Power",
-  phonSub: "Phonara internal token. Use for fee discount, booster purchase, PHON boost.",
+  phonSub: "Phonara internal token. Use for fee discount, booster purchase, Gem boost.",
   phonCard1Title: "50% Fee Discount",
-  phonCard1Desc: "Spend 1~1,000 PHON → next withdrawal gets a 50% fee discount slot.",
+  phonCard1Desc: "Spend 1~1,000 Gem → next withdrawal gets a 50% fee discount slot.",
   phonCard2Title: "Empire Booster 24h",
-  phonCard2Desc: "5,000 PHON → 24h fee −30% · PHON ×1.5 · leverage 7x simultaneously.",
+  phonCard2Desc: "5,000 Gem → 24h fee −30% · Gem ×1.5 · leverage 7x simultaneously.",
   phonCard3Title: "PHON Boost 24h",
-  phonCard3Desc: "1,000 PHON → 24h all PHON earnings ×1.5.",
-  phonValueTitle: "How does PHON hold value?",
+  phonCard3Desc: "1,000 Gem → 24h all Gem earnings ×1.5.",
+  phonValueTitle: "How does Gem hold value?",
   phonValueDesc: "PHON is minted via deposits / package purchases / mission rewards, and burned on use. Mint & burn balance each other. When user count reaches 10,000+, a 1:1 migration to external blockchain NFT/token is guaranteed.",
   ctaUsePhon: "Use PHON",
   ctaEarnPhon: "Earn via Packages",
 
   nftTitle: "NFT — Tier of the PHON",
-  nftSub: "PHON / Emperor / Founder × Bronze / Gold / Diamond. Auto +5~50% boost when held. Your main NFT is shown as your profile, header and chat avatar — your face in the empire (change: first 3 free, then 100 PHON with 24h cooldown).",
+  nftSub: "PHON / Emperor / Founder × Bronze / Gold / Diamond. Auto +5~50% boost when held. Your main NFT is shown as your profile, header and chat avatar — your face in the empire (change: first 3 free, then 100 Gem with 24h cooldown).",
   nftMigrationNote: "NFTs are currently Phonara internal NFTs. At 10,000 users, a 1:1 external blockchain (Polygon/Solana) migration is guaranteed; until then they're safely locked.",
   ctaCollection: "View My Collection",
 
   dynastyTitle: "Dynasty — Legacy to Your Children",
-  dynastySub: "Bequest PHON and NFTs to your children (adult + KYC completed).",
+  dynastySub: "Bequest Gem and NFTs to your children (adult + KYC completed).",
   dyn1Title: "Dynasty Link (max 3)",
   dyn1Desc: "Invite by email → child accepts token → parent–child link is formed.",
   dyn2Title: "Bequest Request → 48h Cooldown",

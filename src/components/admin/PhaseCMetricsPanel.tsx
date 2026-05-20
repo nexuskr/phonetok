@@ -35,10 +35,10 @@ export default function PhaseCMetricsPanel() {
   const cards: Array<[string, string, any, string?]> = [
     ["합성 매출 24h", `${fmt(m.atelier_24h)} PHON`, Hammer, `7d ${fmt(m.atelier_7d)} · 잭팟 ${m.atelier_jackpots_7d}`],
     ["마켓플레이스 24h", `${fmt(m.marketplace_volume_24h)} PHON`, ShoppingBag, `7d ${fmt(m.marketplace_volume_7d)}`],
-    ["Galaxy 좌석", `${m.galaxy_seats_held}/100`, Rocket, `lock ${fmt(m.galaxy_total_locked)} PHON · 24h 입찰 ${m.galaxy_bids_24h}`],
+    ["Galaxy 좌석", `${m.galaxy_seats_held}/100`, Rocket, `lock ${fmt(m.galaxy_total_locked)} Gem · 24h 입찰 ${m.galaxy_bids_24h}`],
     ["Journey 수령 24h", `${m.journey_claims_24h}`, Map, `7d 지급 ${fmt(m.journey_phon_paid_7d)} PHON`],
     ["Live Stories", `${m.stories_active}`, Sparkles],
-    ["황제 배당 30d", `${fmt(m.dividend_paid_30d)} PHON`, PHON],
+    ["황제 배당 30d", `${fmt(m.dividend_paid_30d)} PHON`, Gem],
     ["Legendary NFT", `${m.crown_war_legendary_total}`, Trophy],
   ];
 

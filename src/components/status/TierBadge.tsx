@@ -34,7 +34,7 @@ export default function TierBadge({
 
 const TIER_CONF: Record<
   Tier,
-  { label: string; cls: string; icon?: typeof PHON; glow?: string }
+  { label: string; cls: string; icon?: typeof Gem; glow?: string }
 > = {
   NORMAL: {
     label: "NORMAL",

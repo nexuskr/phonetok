@@ -5,7 +5,7 @@
  *
  * 5 sections (read-only or navigates to existing AAL2-protected routes):
  *  1) Live KPI (useAdminPending + admin presence count)
- *  2) Manual PHON Trigger → /admin/game/crown-trigger
+ *  2) Manual Gem Trigger → /admin/game/crown-trigger
  *  3) RRM Toggle (toggle-rrm edge function, AAL2 stepup)
  *  4) Anomaly Live Feed (useRealtimeChannel on anomaly_events)
  *  5) Flash Event Launcher → /admin/growth/marketing
@@ -132,7 +132,7 @@ function ManualCrownLink() {
         <div className="flex items-center gap-2">
           <Gem className="w-4 h-4 text-gold" />
           <div className="min-w-0">
-            <div className="text-xs font-bold text-foreground">황제에게 PHON Explosion</div>
+            <div className="text-xs font-bold text-foreground">황제에게 Gem Explosion</div>
             <div className="text-[10px] text-muted-foreground">유저 검색 → 즉시 보상</div>
           </div>
         </div>

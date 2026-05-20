@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { Gem, ShieldCheck, KeyRound, Hash, RefreshCcw } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const STEPS: Array<{ icon: typeof PHON; title: string; body: string }> = [
+const STEPS: Array<{ icon: typeof Gem; title: string; body: string }> = [
   {
     icon: KeyRound,
     title: "1. 서버가 미리 약속합니다",

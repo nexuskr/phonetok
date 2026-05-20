@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 const KEY = "phonara_onboarded_v1";
 
-const STEP_ICONS = [PHON, Zap, Wallet] as const;
+const STEP_ICONS = [Gem, Zap, Wallet] as const;
 const STEP_ACCENTS = [
   "from-primary via-primary-glow to-primary",
   "from-accent via-primary to-primary-glow",

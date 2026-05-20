@@ -77,7 +77,7 @@ export default function EmpireHall() {
     <Layout>
       <SEOHead
         title="Empire Hall — 황제의 대전"
-        description="당신의 Empire 티어, PHON War 랭킹, Booster 상태를 한눈에. 24시간 살아있는 제국."
+        description="당신의 Empire 티어, Gem War 랭킹, Booster 상태를 한눈에. 24시간 살아있는 제국."
         path="/empire/hall"
       />
       <div className="relative min-h-[calc(100vh-4rem)] bg-gradient-to-b from-background via-background to-black">
@@ -106,7 +106,7 @@ export default function EmpireHall() {
             </div>
           </motion.div>
 
-          {/* Bottom — floating PHON counter */}
+          {/* Bottom — floating Gem counter */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -141,7 +141,7 @@ export default function EmpireHall() {
                 <Sparkles className="w-5 h-5 text-gold" />
                 <div className="flex-1">
                   <div className="text-[10px] tracking-[0.25em] font-black text-gold uppercase">EMPIRE BOOSTER 활성</div>
-                  <div className="text-sm font-bold">수수료 -{Math.round((1 - booster!.fee_discount) * 100)}% · PHON ×{booster!.crown_multiplier} · 레버리지 {booster!.leverage}x</div>
+                  <div className="text-sm font-bold">수수료 -{Math.round((1 - booster!.fee_discount) * 100)}% · Gem ×{booster!.crown_multiplier} · 레버리지 {booster!.leverage}x</div>
                 </div>
                 <Zap className="w-5 h-5 text-gold animate-pulse" />
               </div>

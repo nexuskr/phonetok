@@ -40,7 +40,7 @@ const LEVEL_GLOW: Record<NFTLevel, string> = {
   diamond: "from-cyan-200/50 via-fuchsia-200/40 to-violet-300/50 ring-cyan-300/70",
 };
 const TYPE_ICON: Record<NFTType, React.ElementType> = {
-  crown: PHON,
+  crown: Gem,
   emperor: Sword,
   founder: Star,
 };
@@ -123,7 +123,7 @@ export default function NftAtelier() {
       } else if (r.outcome === "success") {
         notify.success("합성 성공", { description: `${TYPE_LABEL[r.type]} ${LEVEL_LABEL[r.level]} +${r.boost_pct}% Boost` });
       } else {
-        notify.warning("합성 실패", { description: `재료 1장 + ${r.refund_phon} PHON 환불되었습니다` });
+        notify.warning("합성 실패", { description: `재료 1장 + ${r.refund_phon} Gem 환불되었습니다` });
       }
       refresh();
       window.setTimeout(() => setBurst(null), 3500);
@@ -212,7 +212,7 @@ export default function NftAtelier() {
           <EmptyState
             icon={<Gem className="h-8 w-8 text-amber-400" />}
             title="아직 수집된 NFT가 없습니다"
-            description="첫 입금 시 PHON Bronze가 자동으로 발행됩니다."
+            description="첫 입금 시 Gem Bronze가 자동으로 발행됩니다."
             action={<Button onClick={() => navigate("/wallet")}>지갑으로 이동</Button>}
           />
         ) : (
@@ -228,7 +228,7 @@ export default function NftAtelier() {
                   <span className="text-[11px] text-muted-foreground tabular-nums">{g.items.length}장</span>
                   {g.fusable && (
                     <span className="ml-auto text-[10px] tracking-wider px-2 py-0.5 rounded-md bg-amber-400/15 text-amber-300 ring-1 ring-amber-400/30 animate-pulse">
-                      → {LEVEL_LABEL[LEVEL_NEXT[g.level]!]} · {g.level === "bronze" ? "250" : "750"} PHON
+                      → {LEVEL_LABEL[LEVEL_NEXT[g.level]!]} · {g.level === "bronze" ? "250" : "750"} Gem
                     </span>
                   )}
                 </div>
@@ -291,7 +291,7 @@ export default function NftAtelier() {
                   선택 {selected.size}/3
                   {fusionCost > 0 && (
                     <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-400/15 text-amber-200">
-                      비용 {fusionCost} PHON
+                      비용 {fusionCost} Gem
                     </span>
                   )}
                 </div>
@@ -309,7 +309,7 @@ export default function NftAtelier() {
                 disabled={selected.size !== 3 || busy}
                 className="bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black hover:opacity-90"
               >
-                {busy ? "주조 중…" : `🔥 ${fusionCost} PHON 합성`}
+                {busy ? "주조 중…" : `🔥 ${fusionCost} Gem 합성`}
               </Button>
             </div>
           </motion.div>
