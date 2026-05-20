@@ -7,6 +7,7 @@ import { detectCaps, HybridRenderer, type EngineCapsSnapshot, type EngineStats, 
 
 const OracleStatusCard = lazy(() => import("@/packages/apex/health/OracleStatusCard"));
 const RunbookCard = lazy(() => import("@/packages/apex/health/RunbookCard"));
+const Phase5KpiCard = lazy(() => import("@/packages/apex/health/Phase5KpiCard"));
 
 type Vitals = { lcp?: number; cls?: number; inp?: number; fps?: number };
 
