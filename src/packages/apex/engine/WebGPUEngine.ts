@@ -2,6 +2,14 @@
 // SAFETY: visual-only. Server-side payouts NEVER use this output.
 import type { CreateOptions, EngineBackend, EngineKind, EngineStats, HybridEngine } from "./types";
 
+// WebGPU bitflags (avoid needing @webgpu/types in tsconfig.lib).
+const BUF = {
+  MAP_READ: 0x0001, COPY_SRC: 0x0004, COPY_DST: 0x0008,
+  UNIFORM: 0x0040, STORAGE: 0x0080,
+} as const;
+// Loose GPU type aliases (runtime checked).
+type GPUDevice = any; type GPUBuffer = any; type GPUComputePipeline = any;
+
 const WGSL = /* wgsl */`
 struct Cfg { seed: u32, base: u32, count: u32, kind: u32 };
 @group(0) @binding(0) var<uniform> cfg: Cfg;
