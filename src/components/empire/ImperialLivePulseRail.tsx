@@ -28,7 +28,7 @@ type PayoutStats = {
 };
 
 const KIND_META: Record<Strike["kind"], { Icon: React.ComponentType<{ className?: string }>; verb: string; tone: string }> = {
-  crown:    { Icon: PHON,           verb: "PHON 폭발",  tone: "text-secondary" },
+  crown:    { Icon: Gem,           verb: "PHON 폭발",  tone: "text-secondary" },
   baron:    { Icon: Flame,           verb: "Baron 등극",  tone: "text-primary" },
   withdraw: { Icon: ArrowDownToLine, verb: "출금 완료",   tone: "text-money-strong" },
 };

@@ -118,7 +118,7 @@ export default function OlympusLegacyPaytableSheet() {
   return (
     <BasePaytableSheet
       title="Olympus Legacy 5000 — 배당표"
-      TitleIcon={PHON}
+      TitleIcon={Gem}
       titleIconClassName="text-amber-200"
       titleClassName="text-amber-100"
       triggerClassName="border-amber-400/60 bg-amber-950/40 text-amber-100 hover:bg-amber-900/50 hover:text-amber-50 backdrop-blur-sm"

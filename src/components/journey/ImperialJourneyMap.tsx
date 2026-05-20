@@ -42,7 +42,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   sparkles: Sparkles,
   flame: Flame,
   check: CheckCircle2,
-  crown: PHON,
+  crown: Gem,
   sun: Sun,
 };
 

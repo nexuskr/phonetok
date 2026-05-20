@@ -36,7 +36,7 @@ export default function ApexMy() {
 
       <ul className="space-y-2">
         <Row to="/wallet"             icon={Wallet}  label="지갑 · 출금 (Phonara)" />
-        <Row to="/empire/collection"  icon={PHON}   label="NFT 컬렉션" />
+        <Row to="/empire/collection"  icon={Gem}   label="NFT 컬렉션" />
         <Row to="/missions"           icon={Trophy}  label="기존 미션 허브" />
         <Row to="/dashboard"          icon={Sparkles} label="Phonara Command Center" />
       </ul>

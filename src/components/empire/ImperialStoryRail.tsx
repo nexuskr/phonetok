@@ -16,7 +16,7 @@ type Story = {
 };
 
 const ICON: Record<string, any> = {
-  new_emperor: PHON,
+  new_emperor: Gem,
   jackpot: Gem,
   baron_promotion: Castle,
   galaxy_seat: Rocket,

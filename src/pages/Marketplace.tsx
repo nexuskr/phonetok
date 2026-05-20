@@ -1,6 +1,6 @@
 /**
  * /marketplace — NFT P2P Marketplace 1.0 (fixed-price)
- * Phase C-1. Buyers pay PHON, 6% platform fee (3% burn / 3% pool).
+ * Phase C-1. Buyers pay Gem, 6% platform fee (3% burn / 3% pool).
  */
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -38,7 +38,7 @@ const LEVEL_GLOW = {
   gold: "from-yellow-300/40 to-amber-500/40 ring-yellow-400/60",
   diamond: "from-cyan-200/50 via-fuchsia-200/40 to-violet-300/50 ring-cyan-300/70",
 } as const;
-const TYPE_ICON = { crown: PHON, emperor: Sword, founder: Star } as const;
+const TYPE_ICON = { crown: Gem, emperor: Sword, founder: Star } as const;
 
 export default function Marketplace() {
   const navigate = useNavigate();
@@ -111,7 +111,7 @@ export default function Marketplace() {
         msg.includes("already_listed") ? "이미 판매 중인 NFT입니다." :
         msg.includes("not_owner") ? "본인 NFT만 등록 가능합니다." :
         msg.includes("nft_locked") ? "이전 마이그레이션 잠금 NFT는 판매할 수 없습니다." :
-        msg.includes("price_too_high") ? "가격이 너무 높습니다 (최대 10,000,000 PHON)." :
+        msg.includes("price_too_high") ? "가격이 너무 높습니다 (최대 10,000,000 Gem)." :
         "판매 등록에 실패했습니다.";
       notify.error("등록 실패", { description: friendly });
     } finally {
@@ -215,7 +215,7 @@ export default function Marketplace() {
             <ShoppingBag className="h-5 w-5 text-amber-300" />
             <div className="flex-1 text-xs text-muted-foreground">
               플랫폼 수수료 <span className="text-amber-300 font-mono font-bold">6%</span>
-              <span className="opacity-70"> (3% burn · 3% PHON Pool 적립)</span> · 거래 즉시 보유 PHON 차감
+              <span className="opacity-70"> (3% burn · 3% Gem Pool 적립)</span> · 거래 즉시 보유 Gem 차감
             </div>
           </div>
         </Card>
@@ -316,7 +316,7 @@ export default function Marketplace() {
               })}
             </div>
             <div>
-              <div className="text-xs text-muted-foreground mb-1">가격 (PHON)</div>
+              <div className="text-xs text-muted-foreground mb-1">가격 (Gem)</div>
               <Input
                 type="number"
                 min={1}
@@ -326,7 +326,7 @@ export default function Marketplace() {
               />
               <div className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
                 <Flame className="h-3 w-3 text-amber-300" />
-                정산 시 수령액: {Math.max(0, Number(listPrice) * 0.94).toLocaleString()} PHON
+                정산 시 수령액: {Math.max(0, Number(listPrice) * 0.94).toLocaleString()} Gem
               </div>
             </div>
           </div>
@@ -352,7 +352,7 @@ export default function Marketplace() {
               {confirmBuy && (
                 <>
                   <span className="text-amber-300 font-mono font-bold">
-                    {Number(confirmBuy.price_phon).toLocaleString()} PHON
+                    {Number(confirmBuy.price_phon).toLocaleString()} Gem
                   </span>
                   으로 {TYPE_LABEL[confirmBuy.nft_collection!.type]} {LEVEL_LABEL[confirmBuy.nft_collection!.level]}{" "}
                   (+{confirmBuy.nft_collection!.boost_pct}% Boost) 를 구매합니다.

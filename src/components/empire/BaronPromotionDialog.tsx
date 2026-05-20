@@ -172,7 +172,7 @@ export default function BaronPromotionDialog() {
         <div className="relative grid grid-cols-2 gap-2 my-3">
           <Perk icon={Zap}     label="레버리지"      value={`${lev}x`} />
           <Perk icon={Percent} label="수수료 할인"   value={`-${fee}%`} highlight />
-          <Perk icon={PHON}   label="PHON 배수"   value={`×${mult}`} highlight />
+          <Perk icon={Gem}   label="PHON 배수"   value={`×${mult}`} highlight />
           <Perk icon={Bot}     label="전용 Advisor" value="ON" />
         </div>
 

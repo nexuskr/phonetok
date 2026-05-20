@@ -123,7 +123,7 @@ export default function Empire() {
               <KpiTile icon={Users} label="제국 시민" value={totalUsers.toLocaleString()} hint="실시간 동시접속 추정" />
               <KpiTile icon={Activity} label="24h 고래 사건" value={whales24h.toLocaleString()} hint="PHON 폭발 · 대형 출금" />
               <KpiTile icon={Trophy} label="Founding 잔여석" value={seatsLeft != null ? `${seatsLeft}/30` : "—"} hint="Empire 패키지 한정" gold />
-              <KpiTile icon={PHON} label="내 좌석" value={me?.founding_seat_no ? `#${me.founding_seat_no}` : "미보유"} hint={me ? "영구 보존" : "Empire 패키지 필요"} />
+              <KpiTile icon={Gem} label="내 좌석" value={me?.founding_seat_no ? `#${me.founding_seat_no}` : "미보유"} hint={me ? "영구 보존" : "Empire 패키지 필요"} />
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2">
@@ -134,7 +134,7 @@ export default function Empire() {
                 to="/arena"
                 className="press inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold border border-primary/40 text-primary hover:bg-primary/10 transition"
               >
-                <Swords className="w-4 h-4" /> PHON War 입장
+                <Swords className="w-4 h-4" /> Gem War 입장
               </Link>
             </div>
           </motion.div>
