@@ -13,6 +13,7 @@ import { useAuthBridge } from "./hooks/use-auth-bridge";
 import { useAdultGate } from "./hooks/use-adult-gate";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AuthErrorBoundary } from "./components/auth/AuthErrorBoundary";
+import AccountFrozenDialog from "./components/withdrawal/AccountFrozenDialog";
 import { RouteFallback } from "./components/RouteFallback";
 import { installGlobalErrorLogging } from "./lib/error-logger";
 import { installFetchInstrument, installWebVitals, recordRouteChange } from "./lib/spans";
@@ -271,6 +272,7 @@ const App = () => (
           <DegradeModeBanner />
           <DegradeModeBinder />
           <DynamicIslandPill />
+          <AccountFrozenDialog />
           <ClientMetricsBinder />
           <SessionWatcher />
           <ReviewerMaskRoot />

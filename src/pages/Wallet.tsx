@@ -211,17 +211,15 @@ export default function Wallet() {
           return;
         }
         if (msg.includes("account_frozen")) {
-          toast({
-            title: "계정이 일시 동결되었습니다",
-            description: "단시간 내 출금 시도가 비정상적으로 많아 24시간 자동 동결되었습니다. 본인이 한 시도가 아니라면 즉시 고객센터로 문의해주세요.",
-            variant: "destructive",
-          });
+          const { emitAccountFrozen } = await import("@/lib/withdrawal/errors");
+          emitAccountFrozen({ source: "wallet_page" });
           return;
         }
         const friendly = msg.includes("pin mismatch") ? tw("pinError")
           : msg.includes("below_min") ? tw("belowMin")
           : msg.includes("insufficient_funds") ? tw("insufficient")
           : msg.includes("daily_withdraw_limit") ? tw("dailyLimit")
+          : msg.includes("duplicate_in_flight") || msg.includes("idempotency_hit") ? "이미 처리 중인 요청이 있어요. 잠시만 기다려 주세요."
           : msg;
         toast({ title: tw("withdrawFail"), description: friendly, variant: "destructive" });
         return;
