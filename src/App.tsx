@@ -177,6 +177,7 @@ const ApexKeno         = lazy(() => import("./pages/apex/games/Keno.tsx"));
 const ApexHiLo         = lazy(() => import("./pages/apex/games/HiLo.tsx"));
 const ApexRace         = lazy(() => import("./pages/apex/Race.tsx"));
 const ApexCashout      = lazy(() => import("./pages/apex/Cashout.tsx"));
+const ApexLiveChatFab  = lazy(() => import("./packages/apex/support/LiveChatFab.tsx"));
 // Phase 4 P4-A — Landing Apocalypse + Meta-safe SEO
 const LandingApocalypse = lazy(() => import("./packages/apex/landing/LandingApocalypse.tsx"));
 const SafePublic        = lazy(() => import("./pages/SafePublic.tsx"));
@@ -274,6 +275,7 @@ const App = () => (
           <Suspense fallback={null}>
             <ImperialWelcomeDialog />
             <DailyLoginRewardToast />
+            <ApexLiveChatFab />
           </Suspense>
           <Suspense fallback={<RouteFallback />}>
             <MaintenanceGate>

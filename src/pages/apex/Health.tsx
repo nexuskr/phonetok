@@ -1,9 +1,12 @@
 // ApexForge Health Dock — 통합 진단 1페이지 (admin AAL2 또는 ?dev=1).
 // Read-only. money-flow 0 터치.
-import { useEffect, useMemo, useState } from "react";
+import { lazy, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { apexGetMySummary, apexGetLiveBigwins, type ApexSummary, type ApexBigWin } from "@/packages/apex/lib/api";
 import { detectCaps, HybridRenderer, type EngineCapsSnapshot, type EngineStats, type EngineBackend } from "@/packages/apex/engine";
+
+const OracleStatusCard = lazy(() => import("@/packages/apex/health/OracleStatusCard"));
+const RunbookCard = lazy(() => import("@/packages/apex/health/RunbookCard"));
 
 type Vitals = { lcp?: number; cls?: number; inp?: number; fps?: number };
 
@@ -264,11 +267,15 @@ export default function ApexHealth() {
           </Card>
         )}
         {tab === "pwa" && (
-          <Card title="Service Worker">
-            <Stat k="SW" v={"serviceWorker" in navigator ? "✅ supported" : "❌"} />
-            <Stat k="Online" v={navigator.onLine ? "✅" : "❌"} />
-            <Stat k="Storage" v={"estimate API 사용 가능"} />
-          </Card>
+          <>
+            <Card title="Service Worker">
+              <Stat k="SW" v={"serviceWorker" in navigator ? "✅ supported" : "❌"} />
+              <Stat k="Online" v={navigator.onLine ? "✅" : "❌"} />
+              <Stat k="Storage" v={"estimate API 사용 가능"} />
+            </Card>
+            <OracleStatusCard />
+            <RunbookCard />
+          </>
         )}
         {tab === "viral" && (
           <Card title="Live BigWin (최근 6h, mult ≥ 5×)">
