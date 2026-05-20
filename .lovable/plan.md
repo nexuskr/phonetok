@@ -1,66 +1,105 @@
-# PR-P0-6 — Push / Deep-link Stabilization
+# P0-7 — 결제/입금 흐름 안정화
 
-푸시 알림과 딥링크 흐름을 철벽화. money-flow 8경로 git diff = 0.
+## 목표
 
-## 현황 진단
+입금/결제 흐름의 race condition · idempotency · 다중 탭 동기화 · 모니터링 폴링을 철벽으로 안정화. 머니플로 8경로 RPC 본문 git diff = 0, RPC wrapper만 사용.
 
-- `src/lib/push.ts` — `subscribePush / unsubscribePush / isPushActive` 만 있음. VAPID 키는 하드코딩, 변경 감지 가드 없음 → 키 회전 시 옛 endpoint 가 좀비로 남음.
-- `src/hooks/push/` 디렉토리 자체가 없음 — `usePushSubscription` hook 신규 필요.
-- `push_send_log` 서버 cap 은 있지만 클라이언트 측 예측 캡 없음 → 사용자에게 "왜 안 와요?" 혼동.
-- `ImperialDeepLinkListener` 는 App.tsx 에서 해제 상태(주석 "v19 Phase 0-R: 마운트 해제"). 강화판 재마운트 필요.
-- SW (`public/sw-push.js`) `notificationclick` — `tag` 만 dedup, 동일 알림 빠른 더블클릭 시 `focus → navigate` 2회 가능. 메시지 채널을 통한 in-app 라우팅도 없음(SW 가 직접 navigate).
-- 미인증 deep-link 처리 없음 — auth 페이지로 가도 `returnTo` 없이 `/dashboard` 로 떨어짐 (P0-3 의 `useRequireAuth` returnTo 는 SPA 내부에서만 작동).
+## 현재 상태 (조사 결과)
 
-## 변경 계획
+- `src/packages/wallet/hooks/useDeposit.ts` — coin/bank/voucher 오케스트레이션. **머니플로 FREEZE 파일**, 본문 미변경.
+- `src/packages/wallet/hooks/useDepositRealtime.ts` — single-intent UPDATE 구독. FREEZE 파일.
+- 모니터링 폴링: `useDeposit.ts` 내부 `setInterval(pollPending, 30_000)` — PollingManager 비연동 (백그라운드/idle 가드 약함).
+- `src/components/empire/PhonaraPayPanel.tsx` — `supabase.channel(...)` raw 구독 + 다중 탭 dedup 없음 + 모든 UPDATE 수신.
+- `src/hooks/deposit/*`, `src/lib/deposit/*` 없음.
+- idempotency: `clientReqIdRef = crypto.randomUUID()` 한번 — localStorage 캐시/재진입 가드 없음.
 
-### 1. `src/lib/push/pushVapidGuard.ts` (신규)
-- `getVapidFingerprint(key)` — VAPID 공개키의 SHA-256 8-byte prefix 를 localStorage `phonara:push:vapid_fp` 와 비교.
-- `ensureVapidConsistent()` — fingerprint mismatch 시 기존 subscription 자동 `unsubscribe()` + DB `push_subscriptions` 제거 + 새 키로 silent 재구독. fingerprint 저장.
-- `subscribePush()` 흐름의 첫 단계로 호출.
+## 변경 범위
 
-### 2. `src/lib/push/pushRateLimit.ts` (신규)
-- localStorage `phonara:push:daily:{YYYY-MM-DD}` = received count.
-- `recordPushReceived()` — SW → page postMessage 핸들러에서 카운트.
-- `getDailyPushCap()` — 3/day. `isPushCapped()` boolean.
-- 단순 hint UX 용 (서버 cap 이 진실의 원천 — UI 안내만).
+### 신규: `src/lib/deposit/`
 
-### 3. `src/hooks/push/usePushSubscription.ts` (신규)
-- 상태: `permission / isActive / loading / capped`.
-- `enable() / disable()` 액션 → `subscribePush`/`unsubscribePush` 래핑 + VAPID guard 적용.
-- mount 시 1회 `ensureVapidConsistent()` 자동 호출 (silent — UI 토스트 없음).
+1. **`depositIdempotencyCache.ts`**
+   - `getOrMintIdemKey(scope, payloadHash)` — localStorage `phonara:dep:idem:{scope}` JSON `{key, hash, ts}`, 10분 TTL.
+   - `isDuplicateInFlight(key)` — 같은 key가 cache에 있고 status≠filled 면 true.
+   - `markIdemConsumed(key)` — TTL 즉시 만료.
+   - `hashDepositPayload({method,amount,bank?,voucher?})` — SHA-256 8byte prefix.
 
-### 4. `src/components/nav/ImperialDeepLinkListener.tsx` (신규 / 강화 재마운트)
-- 지원 경로: `/dashboard`, `/wallet`, `/packages`, `/vip`, `/apex/*`, `/duel`, `/cup`, `/empire/*`, `/trust`, `/legal/*`.
-- `?from=push&intent=<kind>` 쿼리 파싱 → `phonara:imperial-focus` CustomEvent dispatch (기존 컨슈머와 호환).
-- **미인증 가드**: `supabase.auth.getSession()` 이 null 이면 현재 URL 을 localStorage `phonara:push:pending_deep_link` 에 저장 + `navigate(/auth?returnTo=${encodeURIComponent(currentPath)})`.
-- SIGNED_IN 이벤트 onAuthStateChange 구독 → pending deep link 있으면 즉시 navigate + 키 삭제.
-- **background → foreground 처리**: `document.visibilitychange` visible 시 pending deep link 1회 flush.
-- **클릭 race 방지**: 동일 deep-link URL 을 500ms 안에 두 번 받으면 무시 (in-memory `lastHandledAt + lastUrl` mutex).
-- App.tsx 에 다시 마운트.
+2. **`depositToastDedupe.ts`**
+   - module-scope `Map<intentId, ts>` + `BroadcastChannel('phonara:dep:fill')` 브로드캐스트.
+   - `claimFilledToast(intentId): boolean` — 30s 내 첫 호출만 true. BroadcastChannel 으로 타 탭 suppression.
+   - SW push와 페이지 양쪽에서 같은 키로 dedupe.
 
-### 5. `public/sw-push.js` 강화
-- `notificationclick` 에 in-flight Promise mutex (`self.__nc_lock`) — 동일 tag 동시 처리 1회만.
-- `clients.matchAll` 에서 같은 origin client 있으면 `postMessage({type:"deep-link", url})` 후 focus — listener 가 router 로 처리. 클라이언트 없을 때만 `openWindow`.
-- `tag` 기본을 알림 ID 단위로 부여 (`data.id || data.kind`) — 중복 알림 1개만 표시.
+### 신규: `src/hooks/deposit/`
 
-### 6. `docs/operations/push-deep-link.md` (신규)
-VAPID 회전 / fingerprint 가드 / daily cap / deep-link 매트릭스 / 미인증 returnTo / 클릭 race 가드 한 페이지.
+3. **`useDepositMonitoring.ts`**
+   - PollingManager 어댑터: priority `high`, category `cosmetic`, baseMs 30_000.
+   - intent active 동안만 register, filled/expired 시 unregister.
+   - visibility는 PollingManager가 처리 → useDeposit 내부 `setInterval` 제거 대상 (옵션 props로 wiring만, FREEZE 파일 본문 변경 X).
+   - **money-flow 가드**: register 시 category 강제 `"cosmetic"` (truth는 RPC가 책임, polling은 UX hint).
 
-## 머니플로 가드
+4. **`useManualDepositSync.ts`**
+   - 한국 계좌이체/voucher → admin 처리 상태 동기화.
+   - `deposit_requests` (해당 `id=eq.{id}`) realtime + BroadcastChannel `phonara:dep:manual:{id}` mutex.
+   - 단일 탭만 RPC poll 수행 (leader election: `Date.now()+random` 최소값이 5s 내 broadcast 안 받으면 자기가 leader).
+   - approved/rejected 상태 전이 시 1회만 toast (depositToastDedupe 재사용).
 
-- 변경 파일 어디에도 `request_withdrawal / apex_request_cashout / imperial_place_phon_bet / apex_place_bet_v2 / _apply_house_edge_split / _settle / stake_phon / phon_swap_*` 호출/본문 0건. `src/hooks/push/*`, `src/lib/push/*`, `src/components/nav/*`, `public/sw-push.js` 만.
+5. **`useFillBroadcast.ts`**
+   - 가벼운 어댑터: `useDepositRealtime`의 `onFilled` 콜백 안에서 `claimFilledToast(id)` 체크해서 fall-through 시 토스트/burst skip.
+   - useDeposit 본문 변경 없이 콜백 합성용.
 
-## 예상 효과
+### 수정 (FREEZE 외)
 
-- VAPID 회전 시 좀비 endpoint 0 — 사용자 액션 없이 silent 재구독.
-- "오늘 알림 더 안 와요?" 혼동 0 — `usePushSubscription.capped` 로 UI 안내.
-- 미인증 deep-link → 로그인 후 원래 경로 100% 복귀.
-- 동일 알림 더블탭 race / SW 동시 처리 race 0.
-- background → foreground 전환 시 pending deep link 자동 처리.
+6. **`src/components/empire/PhonaraPayPanel.tsx`**
+   - `supabase.channel(...)` raw 호출 → `useWalletChannel`로 교체 (ESLint no-raw-channel 통과).
+   - filled 처리 전에 `claimFilledToast(intent.id)` 게이트 → 다중 탭 dedup.
+   - intent 필터 `filter:'id=eq.{id}'`로 좁혀서 모든 UPDATE 수신 폭주 제거.
 
-## 영향 범위
+7. **`src/packages/wallet/hooks/useDeposit.ts`** (FREEZE — **본문 무변경**)
+   - 변경 금지. `useDepositMonitoring` wiring은 별도 PR에서. 이번 P0-7에서는 FREEZE 보호.
+   - 대신 PhonaraPayPanel 경로만 폴링 가드 + dedup 적용.
 
-- 신규: 4 파일 (`pushVapidGuard.ts`, `pushRateLimit.ts`, `usePushSubscription.ts`, `ImperialDeepLinkListener.tsx`, `docs/operations/push-deep-link.md`).
-- 수정: 2 파일 (`src/lib/push.ts` VAPID guard hook-in, `public/sw-push.js` mutex+postMessage, `src/App.tsx` listener 재마운트).
-- 미수정: money-flow RPC, 기존 컴포넌트 UI.
-- Layer 1 gz 영향: < 1.5KB (Listener 는 가벼움, hooks 는 동적 사용 시점에만).
+### 문서
+
+8. **`docs/operations/deposit-flow.md`** 신규
+   - 입금 race 시나리오 (다중 탭, SW+page 동시 fill, manual transfer admin 승인 동기화)
+   - Idempotency 키 라이프사이클 (10분 TTL, payload hash, 서버 dedup 관계)
+   - Manual transfer leader election 동작
+   - Toast dedup 메커니즘 (BroadcastChannel + module Map)
+
+## 가드레일
+
+- **money-flow 8경로 git diff = 0**: `useDeposit.ts`/`useDepositRealtime.ts` 등 FREEZE 파일 본문 무변경. `scripts/check-money-flow-freeze.mjs` PASS.
+- **RPC wrapper만 사용**: `submit_deposit` / `create_crypto_deposit_intent` / `get_my_pending_deposits` 직접 변경 X.
+- UI 변화 0 — 토스트 1회 보장 외 시각적 변화 없음.
+- Layer 1 gz 영향 < 1KB (모두 lib/hook 신규, lazy 경로).
+- 모든 push/realtime은 `use*Channel` 래퍼.
+
+## 기술 노트
+
+```text
+PhonaraPayPanel (tab A) ──┐
+                          ├── BroadcastChannel('phonara:dep:fill') ──► claimFilledToast(id)
+PhonaraPayPanel (tab B) ──┘                                              │
+                                                                         ▼
+SW push 'deposit_filled' ───────────────────────────────────────────► 1회만 toast
+```
+
+```text
+Manual transfer (bank/voucher):
+  tab A elects leader → polls admin status every 30s (PollingManager)
+  tab B listens BroadcastChannel('phonara:dep:manual:{id}')
+  leader leaves → next tab elects after 5s heartbeat timeout
+```
+
+## 파일 목록
+
+- 신규: `src/lib/deposit/depositIdempotencyCache.ts`
+- 신규: `src/lib/deposit/depositToastDedupe.ts`
+- 신규: `src/hooks/deposit/useDepositMonitoring.ts`
+- 신규: `src/hooks/deposit/useManualDepositSync.ts`
+- 신규: `src/hooks/deposit/useFillBroadcast.ts`
+- 수정: `src/components/empire/PhonaraPayPanel.tsx` (raw channel → wrapper + dedup)
+- 신규: `docs/operations/deposit-flow.md`
+
+## 다음 (P0-8 예고)
+
+세션/인증 안정화 (token refresh race, multi-tab session sync, 401 자동 복구).
