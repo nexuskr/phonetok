@@ -171,6 +171,7 @@ const ApexCommunity    = lazy(() => import("./pages/apex/Community.tsx"));
 const ApexCommunityChat       = lazy(() => import("./pages/apex/community/Chat.tsx"));
 const ApexCommunitySquad      = lazy(() => import("./pages/apex/community/Squad.tsx"));
 const ApexCommunityTournament = lazy(() => import("./pages/apex/community/Tournament.tsx"));
+const ApexEventsCup            = lazy(() => import("./pages/apex/events/Cup.tsx"));
 const ApexHealth       = lazy(() => import("./pages/apex/Health.tsx"));
 const ApexVerify       = lazy(() => import("./pages/apex/Verify.tsx"));
 const ApexCrashV2      = lazy(() => import("./packages/apex/crash/LiveCrashV2.tsx"));
