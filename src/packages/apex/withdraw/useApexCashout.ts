@@ -35,12 +35,14 @@ export function useRequestCashout() {
         { _network: network, _address: address, _amount_usdt: amount } as never,
       );
       if (error) {
-        const msg = error.message.includes("aal2_required")
-          ? "출금 보안 인증(AAL2)이 필요합니다."
-          : error.message.includes("velocity")
-            ? "단시간 출금 속도 한도 초과. 잠시 후 다시 시도하세요."
-            : error.message;
-        notify.error(`출금 요청 실패: ${msg}`);
+        const mapped = parseWithdrawError(error.message);
+        if (mapped.code === "account_frozen") {
+          emitAccountFrozen({ source: "apex_cashout", description: mapped.description });
+        } else if (mapped.code === "duplicate_in_flight") {
+          notify.info(mapped.title, { description: mapped.description });
+        } else {
+          notify.error(mapped.title, { description: mapped.description });
+        }
         return null;
       }
       notify.success("출금 요청 접수됨 — 5분 이내 처리됩니다.");
