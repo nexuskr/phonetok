@@ -1,5 +1,11 @@
-import { useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Heart, Share2, ChevronUp, Flame } from "lucide-react";
+
+const EmperorVoicePlayer = lazy(() =>
+  import("@/packages/apex/voice/EmperorVoicePlayer").then(m => ({ default: m.EmperorVoicePlayer }))
+);
+const BIGWIN_EVENT = "phonara:bigwin";
+const BIGWIN_THRESHOLD_PHON = 1_000_000;
 
 type Reel = {
   user: string;
