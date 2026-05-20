@@ -26,8 +26,8 @@ export function RaceLeaderboard() {
     bindings: active ? [{
       event: "*", schema: "public", table: "apex_race_entries",
       filter: `race_id=eq.${active.race_id}`,
-      callback: () => { /* polled every 15s */ },
     }] : [],
+    onEvent: () => { /* polled every 15s */ },
   }), [active?.race_id]));
 
   if (loading) return <div className="text-sm text-muted-foreground">레이스 정보 로딩…</div>;
