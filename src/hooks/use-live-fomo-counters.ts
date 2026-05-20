@@ -61,7 +61,7 @@ export function useLiveFomoCounters(): LiveFomoCounters | null {
 
   useGlobalPolling({
     key: "live-fomo-counters",
-    fn: fetchOnce,
+    fn: async () => { await fetchOnce(); },
     baseMs: FOMO_POLL_MS,
     enabled: visible,
     priority: "cosmetic",
