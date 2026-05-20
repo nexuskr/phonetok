@@ -4,7 +4,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ShieldCheck, ShieldAlert, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-const VrfTraceCard = lazy(() => import("@pkg/apex/oracle/VrfTraceCard"));
+const VrfTraceCard = lazy(() => import("@/packages/apex/oracle/VrfTraceCard"));
 
 interface RoundRow {
   round_no: number; server_seed: string | null; server_seed_hash: string; public_seed: string;
