@@ -14,7 +14,7 @@ export default function LiveChatFab() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        notify.warn("로그인 필요", "지원 요청은 로그인 후 가능합니다.");
+        notify.warning("로그인 필요", { description: "지원 요청은 로그인 후 가능합니다." });
         return;
       }
       const { error } = await supabase.from("support_tickets" as any).insert({
@@ -25,11 +25,11 @@ export default function LiveChatFab() {
         status: "open",
       } as any);
       if (error) throw error;
-      notify.success("접수 완료", "곧 답변 드리겠습니다.");
+      notify.success("접수 완료", { description: "곧 답변 드리겠습니다." });
       setMsg("");
       setOpen(false);
     } catch (e: any) {
-      notify.error("전송 실패", e?.message ?? "잠시 후 다시 시도해 주세요.");
+      notify.error("전송 실패", { description: e?.message ?? "잠시 후 다시 시도해 주세요." });
     } finally {
       setSending(false);
     }
