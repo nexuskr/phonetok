@@ -205,7 +205,7 @@ export default function ApexHealth() {
                 target: mid-tier device 60fps avg / p1 ≥ 50fps. money-flow 0 터치 (시각만).
               </div>
               <div className="space-y-2">
-                {["crash", "dice", "mines", "plinko", "slots"].map(g => (
+                {["pump", "wheel", "limbo", "keno", "hilo"].map(g => (
                   <div key={g} className="flex items-center justify-between gap-2">
                     <span className="text-sm capitalize">{g}</span>
                     <div className="flex items-center gap-2">

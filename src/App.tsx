@@ -170,6 +170,11 @@ const ApexCommunity    = lazy(() => import("./pages/apex/Community.tsx"));
 const ApexHealth       = lazy(() => import("./pages/apex/Health.tsx"));
 const ApexVerify       = lazy(() => import("./pages/apex/Verify.tsx"));
 const ApexCrashV2      = lazy(() => import("./packages/apex/crash/LiveCrashV2.tsx"));
+const ApexPump         = lazy(() => import("./pages/apex/games/Pump.tsx"));
+const ApexWheel        = lazy(() => import("./pages/apex/games/Wheel.tsx"));
+const ApexLimbo        = lazy(() => import("./pages/apex/games/Limbo.tsx"));
+const ApexKeno         = lazy(() => import("./pages/apex/games/Keno.tsx"));
+const ApexHiLo         = lazy(() => import("./pages/apex/games/HiLo.tsx"));
 // v19 Phase 0-R: 글로벌 오버레이 17종 마운트 전면 해제. PracticeModeGate 만 라우트 가드용으로 보존.
 import { PracticeModeGate } from "./components/practice/PracticeModeGate";
 
@@ -287,6 +292,11 @@ const App = () => (
                 <Route path="games/plinko" element={<ApexPlinko />} />
                 <Route path="games/mines"  element={<ApexMines />} />
                 <Route path="games/slots"  element={<ApexSlots />} />
+                <Route path="games/pump"   element={<ApexPump />} />
+                <Route path="games/wheel"  element={<ApexWheel />} />
+                <Route path="games/limbo"  element={<ApexLimbo />} />
+                <Route path="games/keno"   element={<ApexKeno />} />
+                <Route path="games/hilo"   element={<ApexHiLo />} />
                 <Route path="sportsbook"   element={<ApexSportsbook />} />
                 <Route path="community"    element={<ApexCommunity />} />
                 <Route path="free"         element={<ApexFreeMoney />} />
