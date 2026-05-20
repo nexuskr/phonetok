@@ -113,17 +113,17 @@ export function useWalletChannel(opts: PartitionOpts) {
 /** game 채널: live_positions · slot_spins · jackpot · empire 이벤트 등 */
 export function useGameChannel(opts: PartitionOpts) {
   const key = buildKey("game", opts.key);
-  return useRealtimeChannel({ ...withHeartbeat("game", key, opts), key });
+  return useRealtimeChannel({ ...decorate("game", key, opts), key });
 }
 
 /** chat 채널: chat_messages · support_tickets · admin alerts · audit log 등 */
 export function useChatChannel(opts: PartitionOpts) {
   const key = buildKey("chat", opts.key);
-  return useRealtimeChannel({ ...withHeartbeat("chat", key, opts), key });
+  return useRealtimeChannel({ ...decorate("chat", key, opts), key });
 }
 
 /** market 채널: oracle_prices · prediction_markets · 마켓 티커 등 */
 export function useMarketChannel(opts: PartitionOpts) {
   const key = buildKey("market", opts.key);
-  return useRealtimeChannel({ ...withHeartbeat("market", key, opts), key });
+  return useRealtimeChannel({ ...decorate("market", key, opts), key });
 }
