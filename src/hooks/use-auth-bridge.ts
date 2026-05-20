@@ -4,6 +4,7 @@ import { loadDB, saveDB, type Tier } from "@/lib/store";
 import { registerCurrentDevice } from "@/lib/deviceFingerprint";
 import { isInvalidSessionError, clearBrokenLocalSession } from "@/lib/auth-recovery";
 import { verifySessionOnce, invalidateSessionCache } from "@/lib/auth/authSingleFlight";
+import { useMultiTabAuthSync } from "@/hooks/auth/useMultiTabAuthSync";
 
 const RESETTABLE_SESSION_FLAGS = [
   "phonara_disable_dashboard_state_rpc",
@@ -98,6 +99,8 @@ function isOnGuide(): boolean {
 }
 
 export function useAuthBridge() {
+  // P0-8: multi-tab broadcast sync (App 루트와 동일 효과 — useAuthBridge 도 App 루트에서 호출됨)
+  useMultiTabAuthSync();
   useEffect(() => {
     let mounted = true;
     // P0-3: SIGNED_IN/TOKEN_REFRESHED/INITIAL_SESSION 모두 처리.

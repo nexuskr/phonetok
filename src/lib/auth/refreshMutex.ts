@@ -6,6 +6,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { isInvalidSessionError, clearBrokenLocalSession } from "@/lib/auth-recovery";
 import { invalidateSessionCache } from "@/lib/auth/authSingleFlight";
+import { recordRefresh } from "@/lib/auth/sessionHealth";
 import type { Session } from "@supabase/supabase-js";
 
 const BACKOFF_MS = [500, 1_000, 2_000, 4_000];
@@ -26,11 +27,13 @@ async function attemptRefresh(): Promise<Session | null> {
 }
 
 async function refreshWithBackoff(): Promise<Session | null> {
+  const startedAt = Date.now();
   let lastErr: unknown = null;
   for (let i = 0; i < BACKOFF_MS.length; i++) {
     try {
       const s = await attemptRefresh();
       invalidateSessionCache();
+      recordRefresh({ ts: Date.now(), ok: true, durationMs: Date.now() - startedAt });
       return s;
     } catch (err) {
       lastErr = err;
@@ -38,6 +41,12 @@ async function refreshWithBackoff(): Promise<Session | null> {
       await new Promise((res) => setTimeout(res, BACKOFF_MS[i] + Math.random() * 250));
     }
   }
+  recordRefresh({
+    ts: Date.now(),
+    ok: false,
+    durationMs: Date.now() - startedAt,
+    error: String((lastErr as any)?.message ?? lastErr ?? "unknown"),
+  });
   if (process.env.NODE_ENV !== "production" && lastErr) {
     console.warn("[refreshMutex] gave up after backoff:", lastErr);
   }

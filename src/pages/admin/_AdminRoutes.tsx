@@ -81,6 +81,7 @@ const SimRealConversion   = lazy(() => import("@/components/admin/growth/SimReal
 const SelfHeal            = lazy(() => import("./ops/SelfHeal"));
 const RegionHealth        = lazy(() => import("./ops/RegionHealth"));
 const Sprint4Dashboard    = lazy(() => import("./ops/Sprint4Dashboard"));
+const SessionHealth       = lazy(() => import("./ops/SessionHealth"));
 const AdminDuel           = lazy(() => import("./Duel"));
 const ImperialCommandCenter = lazy(() => import("./imperial/CommandCenter"));
 
@@ -190,6 +191,7 @@ export default function AdminRoutes() {
         <Route path="ops/self-heal"     element={<Suspense fallback={<LoadingList rows={4} />}><SelfHeal /></Suspense>} />
         <Route path="ops/region-health" element={<Section title="Realtime Region Health" desc="3-region matrix · 15s refresh · admin failover"><RegionHealth /></Section>} />
         <Route path="ops/sprint-4"      element={<Section title="Sprint 4 · Lobby Telemetry" desc="web-vitals + FPS + haptic/swipe (15s poll)"><Sprint4Dashboard /></Section>} />
+        <Route path="ops/session-health" element={<Suspense fallback={<LoadingList rows={4} />}><SessionHealth /></Suspense>} />
         <Route path="ops/observability" element={<Section title="Observability"><ObservabilityCockpit /></Section>} />
         <Route path="ops/errors"        element={<Section title="Errors / Anomalies"><AnomalyNotifSettings /><div className="h-2" /><AnomalyAutoFixPanel /><div className="h-2" /><AnomalyAckQueue /><div className="h-2" /><ErrorMonitorAdmin /></Section>} />
         <Route path="ops/audit"         element={<Section><AuditLogTable /></Section>} />
