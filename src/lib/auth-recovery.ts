@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+// P0-3: lazy import to avoid cycle (authSingleFlight imports from this file).
 
 export function isInvalidSessionError(error: unknown): boolean {
   const e = error as { code?: string; message?: string; status?: number; error_description?: string };
