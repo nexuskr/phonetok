@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { setVisibleInterval } from "@/lib/util/visible-interval";
 
 export interface HotSymbol {
   sym: string;
@@ -33,8 +34,10 @@ export function useHotSymbols(limit = 5) {
     let alive = true;
     const tick = () => { void fetchHot(limit).then((r) => { if (alive) setRows(r); }); };
     tick();
-    const id = window.setInterval(tick, HOT_POLL_MS);
-    return () => { alive = false; window.clearInterval(id); };
+    const stop = setVisibleInterval(tick, HOT_POLL_MS, {
+      meta: { owner: "useHotSymbols", category: "cosmetic" },
+    });
+    return () => { alive = false; stop(); };
   }, [limit]);
 
   return rows;
@@ -51,9 +54,11 @@ export function useSymbolSideCounts(symbol: string) {
       const row = (data as Array<{ longs: number; shorts: number }> | null)?.[0];
       if (row) setCounts({ longs: row.longs ?? 0, shorts: row.shorts ?? 0 });
     };
-    tick();
-    const id = window.setInterval(tick, 15_000);
-    return () => { alive = false; window.clearInterval(id); };
+    void tick();
+    const stop = setVisibleInterval(() => { void tick(); }, 15_000, {
+      meta: { owner: "useSymbolSideCounts", category: "cosmetic" },
+    });
+    return () => { alive = false; stop(); };
   }, [symbol]);
 
   return counts;

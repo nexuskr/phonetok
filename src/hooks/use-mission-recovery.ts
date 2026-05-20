@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { setVisibleInterval } from "@/lib/util/visible-interval";
 
 export interface MissionRecoveryState {
   consecutiveFails: number;
@@ -41,8 +42,10 @@ export function useMissionRecovery() {
 
   useEffect(() => {
     void refresh();
-    const t = setInterval(() => void refresh(), POLL_MS);
-    return () => clearInterval(t);
+    const stop = setVisibleInterval(() => void refresh(), POLL_MS, {
+      meta: { owner: "useMissionRecovery", category: "cosmetic" },
+    });
+    return () => stop();
   }, [refresh]);
 
   return { ...state, refresh };

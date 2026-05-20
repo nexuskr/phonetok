@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useWalletChannel, type ChannelBinding } from "@pkg/realtime";
+import { setVisibleInterval } from "@/lib/util/visible-interval";
 
 const POLL_MS = 12_000;
 
@@ -70,8 +71,10 @@ export function usePhonHubSummary() {
   useEffect(() => {
     aliveRef.current = true;
     void fetchOnce();
-    const id = window.setInterval(() => { void fetchOnce(); }, POLL_MS);
-    return () => { aliveRef.current = false; window.clearInterval(id); };
+    const stop = setVisibleInterval(() => { void fetchOnce(); }, POLL_MS, {
+      meta: { owner: "usePhonHubSummary", category: "wallet" },
+    });
+    return () => { aliveRef.current = false; stop(); };
   }, [fetchOnce]);
 
   // Realtime: any change to my wallet/stake state → refresh quickly.
