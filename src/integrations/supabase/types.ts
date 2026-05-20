@@ -11967,6 +11967,16 @@ export type Database = {
         Args: { _kind: string; _ref_id?: string }
         Returns: Json
       }
+      apex_place_bet_v2: {
+        Args: {
+          _bet_phon: number
+          _bet_usdt: number
+          _game_code: string
+          _idem_key: string
+          _params: Json
+        }
+        Returns: Json
+      }
       apex_play_mock_game: {
         Args: {
           _bet_phon?: number
