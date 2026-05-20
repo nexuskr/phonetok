@@ -12,7 +12,7 @@ export function CupEntryModal({ seasonId, entryFeePhon, onClose, onEntered }: Pr
     try {
       const { data, error } = await supabase.rpc("apex_cup_enter" as any, { _season_id: seasonId, _idem_key: null });
       if (error) throw error;
-      notify.success("컵 입장 완료", `${entryFeePhon} PHON 차감됨`);
+      notify.success("컵 입장 완료", { description: `${entryFeePhon} PHON 차감됨` });
       onEntered();
       onClose();
     } catch (e: any) {
