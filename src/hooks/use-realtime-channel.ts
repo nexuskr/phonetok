@@ -138,6 +138,9 @@ function bindAndSubscribe(e: Entry) {
       // 자동 재연결 (지수 백오프, 30s cap)
       if (cur.listeners.size > 0 && !cur.retryTimer) {
         const delay = Math.min(30_000, 1_000 * Math.pow(2, cur.retryAttempts++));
+        cur.totalReconnects++;
+        STATS.totalReconnects++;
+        STATS.lastReconnectAt = Date.now();
         dbg(e.key, "reconnect in", delay, "ms");
         cur.retryTimer = setTimeout(async () => {
           cur.retryTimer = null;
