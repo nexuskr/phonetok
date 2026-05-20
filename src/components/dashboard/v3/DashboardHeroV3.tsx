@@ -12,8 +12,7 @@ import CosmicBackdrop from "@/components/cosmic/CosmicBackdrop";
 import { useMyPower, topNftLevel, type NFTRow } from "@/hooks/use-my-power";
 import { useReducedMotionPref } from "@/lib/app-settings";
 import ActivityEventTicker from "./ActivityEventTicker";
-
-const LEVEL_LABEL: Record<string, string> = { bronze: "BRONZE", gold: "GOLD", diamond: "DIAMOND" };
+import { formatVipLevelFromNft } from "@/lib/branding/tierLabel";
 
 export default function DashboardHeroV3({
   phon: phonProp,
@@ -25,7 +24,7 @@ export default function DashboardHeroV3({
   const phon = phonProp ?? power.phon;
   const nfts = nftsProp ?? power.nfts;
   const lv = topNftLevel(nfts);
-  const tier = lv ? LEVEL_LABEL[lv] : "ROOKIE";
+  const tier = formatVipLevelFromNft(lv);
   const reduced = useReducedMotionPref();
 
   function onCta() {
