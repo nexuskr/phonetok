@@ -103,6 +103,7 @@ export default function Achievements() {
   return (
     <Layout>
       <HubTabs hub="legacy" />
+      <div className="container pt-3"><CollectionHubTabs /></div>
       <div className="space-y-6 pb-24">
         <header className="rounded-3xl bg-gradient-to-br from-primary/15 via-background to-background border border-primary/20 p-6">
           <div className="flex items-center gap-3">
