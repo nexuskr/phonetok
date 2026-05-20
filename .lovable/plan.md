@@ -1,29 +1,38 @@
-# Layout 통일 (P1-C Layout Hotfix)
+# P1-C Final — Layout Hotfix + Hero 재설계 + Strict Crown 0
 
-## 진단
+## 변경 범위 (최소 침습, 머니플로 8경로 git diff = 0)
 
-`StakeStyleSidebar`와 `MobileBottomNav`의 `HIDDEN_PREFIX`는 일치하지만, 사이드바가 라우트 전환 시 깜빡이는 원인은 다음 2가지:
+### 1. Layout Hotfix (사이드바 깜빡임 0)
+- `src/components/nav/StakeStyleSidebar.tsx`
+  - `useEffect` → `useLayoutEffect` 교체
+  - 모듈 top-level에서 `document.documentElement.classList.add("has-desktop-sidebar")` 즉시 실행 (md+ CSS 전용, 모바일 무영향)
+- `src/App.tsx`
+  - `StakeStyleSidebar` lazy import → 정적 import 교체 (+1.5KB gz)
+  - `MobileShell`은 lazy 유지
 
-1. **`useEffect` 타이밍**: `has-desktop-sidebar` 클래스를 `useEffect`로 추가/제거 — 라우트 전환 직후 첫 프레임에는 padding-left가 아직 적용/해제되지 않아 컨텐츠가 살짝 점프.
-2. **마운트 race**: `StakeStyleSidebar`가 `lazy()` 로드라 첫 진입 시 사이드바 등장이 1-2프레임 늦음. 이때 `<main>`이 padding-left=0 상태로 먼저 paint → 다시 232px shift.
+결과: PC 232px 사이드바 + main padding-left 첫 페인트 동기화, 페이지 이동 시 점프/깜빡임 제거.
 
-## 변경 (최소 침습 2파일)
+### 2. Hero 완전 재설계
+- `src/components/dashboard/v3/DashboardHeroV3.tsx`
+  - Headline: "오늘 사람들이 가장 많이 참여 중인 실시간 리워드 챌린지"
+  - Sub: "무료 예측 · 무료돈벌기 · 실시간 보상 · PHON 받기"
+  - Primary CTA: "무료 시작하기" → `/earn`
+  - Secondary CTA: "체험 모드" → practice mode 토글
+  - 기존 라이브 티커/골드 그라디언트 유지
 
-### `src/components/nav/StakeStyleSidebar.tsx`
-- `useEffect` → `useLayoutEffect` 로 교체 (라우트 전환과 같은 프레임에 padding 동기화).
-- 모듈 최상단에서 `document.documentElement.classList.add("has-desktop-sidebar")` 한 줄 즉시 실행 (md+ 전용 CSS이므로 mobile은 영향 없음). 이러면 lazy 로딩 race도 제거.
+### 3. Crown Icon Strict 0
+- `src/components/collection/CollectionHubTabs.tsx`
+  - `Crown` (lucide-react) → `Sparkles` 교체
+  - `check-no-crown-ui.mjs` strict 0 달성
 
-### `src/App.tsx`
-- `StakeStyleSidebar`를 `lazy()` → 정적 import 로 변경 (1.5 KB gz, Layer 1 영향 무시 가능).
-- `MobileShell`은 그대로 lazy 유지 (모바일 진입 시에만 필요).
-
-### 검증
-- 모든 사용자 라우트(`/`, `/home`, `/duel`, `/trade`, `/phon`, `/wallet`, `/casino`, `/games`, `/empire`, `/missions`, `/profile`)에서:
-  - md+ → 좌측 232px 사이드바 + main 콘텐츠 (padding-left 동기화)
-  - mobile → 하단 72px 5탭 (사이드바 완전 숨김)
-- 비사용자 라우트(`/auth`, `/secure-auth`, `/admin`, `/apex`, `/landing`, `/legal`, `/welcome`, `/guide`)는 둘 다 숨김 (변경 없음)
+## 검증
+- `node scripts/check-no-crown-ui.mjs` → 0건
+- `node scripts/check-money-flow-freeze.mjs` → 8경로 PASS
+- PC(1440) + Mobile(375/390) 사이드바 / Bottom Nav 5탭 페인트 확인
+- Bottom Nav 5탭 라우트: 홈 `/dashboard` · 무료돈벌기 `/earn` · 실시간대결 `/duel` · 실시간예측 `/trade` · 내PHON `/phon`
 
 ## 절대 금지
-- 머니플로 8경로 변경
-- 페이지 코드(Home/Trade/Duel/PHON) 수정
-- 백엔드 RPC 수정
+- 머니플로 8경로 (award_crown / Treasury / Founding Season / reward engine / withdrawal / settle / split / oracle) 수정
+- P0 인증·체결·슬롯 엔진 수정
+- Crown 백엔드 RPC/테이블 수정
+- 새 기능 추가
