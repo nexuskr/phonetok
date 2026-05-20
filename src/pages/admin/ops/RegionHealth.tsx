@@ -177,5 +177,6 @@ export default function RegionHealth() {
         )}
       </CardContent>
     </Card>
+    </div>
   );
 }
