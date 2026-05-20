@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ApexThemeProvider } from "./ApexThemeProvider";
 import { ApexBackdrop } from "./components/ApexBackdrop";
 import { ApexHealthFab } from "./components/ApexHealthFab";
+import { ApexBigWinShareListener } from "./viral/ApexBigWinShareListener";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import {
   Home, Gamepad2, Gift, Vault, Trophy, Users, MoreHorizontal,
@@ -108,6 +109,7 @@ export default function ApexShell() {
         </BottomSheet>
 
         <ApexHealthFab />
+        <ApexBigWinShareListener />
       </div>
     </ApexThemeProvider>
   );
