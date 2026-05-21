@@ -4,6 +4,20 @@ import type { Session } from "@supabase/supabase-js";
 import { fetchWallet, type WalletBalance } from "@/lib/wallet";
 import { useWalletChannel } from "@pkg/realtime";
 
+/**
+ * useWallet Hook
+ *
+ * This is the PRIMARY way to access the user's general wallet balance.
+ *
+ * ARCHITECTURAL NOTE (2026-05-22):
+ * - This hook is tied to `wallet_balances` table (Primary Wallet).
+ * - For PHON token economy (staking, Duel, specific rewards), use `phon_balances` related hooks instead.
+ * - Always prefer this hook + `fetchWallet()` when dealing with general available/locked/pending balance.
+ *
+ * Realtime Strategy:
+ * - Subscribes to `wallet_balances` UPDATE
+ * - Has a safety net subscription to `live_trade_history` INSERT (temporary workaround for trade settlement timing)
+ */
 export function useSession() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
