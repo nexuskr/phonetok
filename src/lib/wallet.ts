@@ -1,5 +1,21 @@
 import { supabase } from "@/integrations/supabase/client";
 
+/**
+ * Wallet Domain
+ *
+ * This module is responsible for the PRIMARY WALLET system.
+ *
+ * IMPORTANT ARCHITECTURAL DECISION (2026-05-22):
+ * - `wallet_balances` is the Single Source of Truth for general user wallet.
+ * - It manages: total_balance, available_balance, locked_balance, pending_balance, etc.
+ * - `phon_balances` is SEPARATE and handles PHON token economy (staking, Duel betting, rewards, etc).
+ * - Do not mix the two without clear reasoning.
+ *
+ * When in doubt:
+ * - General wallet / withdrawal / deposit / Trading position locking → wallet_balances
+ * - PHON-specific staking, betting, mission rewards → phon_balances
+ */
+
 export type Tier = "normal" | "vip" | "god" | "empire";
 
 export interface WalletBalance {
