@@ -26,6 +26,11 @@ function humanError(raw?: string): string {
   if (code.includes("position_not_open") || code.includes("position_already_closed"))
     return "이미 청산된 포지션입니다.";
   if (code.includes("account_frozen")) return "계정이 일시 보호 중입니다. 잠시 후 다시 시도해 주세요.";
+  if (code.includes("realized_pnl") || code.includes("42703"))
+    return "청산 처리 중 일시 오류가 발생했어요. 한 번 더 눌러 주세요.";
+  if (code.includes("withdrawal_status") || code.includes("22p02"))
+    return "업적 동기화 중 일시 오류가 발생했어요. 청산은 정상 처리됐을 수 있어요. 새로고침 후 확인해 주세요.";
+  if (code.includes("54000")) return "시장가 동기화가 지연됐어요. 잠시 후 다시 시도해 주세요.";
   return `청산이 잠시 막혔어요 (${raw || "unknown"}). 잠시 후 다시 시도해 주세요.`;
 }
 
