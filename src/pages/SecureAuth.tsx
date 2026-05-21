@@ -10,13 +10,12 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { WELCOME_V19_KEY } from "@/pages/Welcome";
 
 /**
- * v19.0 SecureAuth — Imperial Throne Gate (Slice 1 rebuild).
+ * v19.0 SecureAuth — Imperial Throne Gate
  *
- * - 단일 컬럼, full-bleed warm-gold. 산만한 라이브 패널 전부 제거 (Slice 2 에서 Imperial Live Pulse 로 통합).
- * - Primary CTA = Google 1탭. 이메일/비밀번호는 접힌 패널.
- * - 카피 톤 안전선: 결과 약속/손실 회복 암시 0건. "시작/입성/입금" 행동 단위만.
- * - 신규 가입 → /welcome (3-slide). 기존 계정 → /dashboard.
- * - 백엔드 호출 시그니처 그대로. UI만 재조립.
+ * Auth flow principle:
+ * - All authentication redirects go through /auth/callback
+ * - AuthCallback.tsx is the single source of truth for post-auth routing
+ * - CompleteProfile is only used when needed (not forced on every signup)
  */
 export default function SecureAuth() {
   const nav = useNavigate();
@@ -56,7 +55,7 @@ export default function SecureAuth() {
     try {
       const { data, error } = await supabase.auth.signUp({
         email: e, password,
-        options: { emailRedirectTo: `${window.location.origin}/complete-profile` },
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
       });
       if (error) throw error;
       if (data.session) {
@@ -93,12 +92,12 @@ export default function SecureAuth() {
     setBusy(true);
     try {
       const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: `${window.location.origin}/complete-profile`,
+        redirect_uri: `${window.location.origin}/auth/callback`,
       });
       if (result.error) throw result.error;
       if (result.redirected) return;
-      // OAuth 신규 가입자 추정 — /complete-profile 가 흐름을 마무리. /welcome 분기는 CompleteProfile 이후 처리.
-      nav("/complete-profile", { replace: true });
+      // After OAuth, AuthCallback will handle routing based on profile status
+      nav("/auth/callback", { replace: true });
     } catch (e: any) {
       toast({ title: "로그인 실패", description: e.message, variant: "destructive" });
     } finally { setBusy(false); }
