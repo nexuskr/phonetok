@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import i18n from "i18next";
 import { i18nReady } from "./lib/i18n";
 import { detectPreferredLocale } from "./hooks/use-preferred-locale";
@@ -41,7 +42,14 @@ if (import.meta.env.DEV) {
 
 // P5 — wait for active locale chunk to resolve before first paint to avoid
 // flash-of-keys. Fail-open: if it errors, render anyway (i18n returns keys).
-const boot = () => createRoot(document.getElementById("root")!).render(
-  <HelmetProvider><App /></HelmetProvider>
-);
+const boot = () => {
+  createRoot(document.getElementById("root")!).render(
+    <ErrorBoundary scope="root">
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
+    </ErrorBoundary>
+  );
+};
+
 i18nReady.then(boot, boot);
