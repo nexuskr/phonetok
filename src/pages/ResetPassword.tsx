@@ -1,71 +1,46 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
-import { Lock } from "lucide-react";
-import { LuxButton, LuxInput } from "@/components/ui/lux";
+import { toast } from "sonner";
 
 export default function ResetPassword() {
-  const { t } = useTranslation("reset");
   const nav = useNavigate();
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-      else {
-        const tm = setTimeout(() => supabase.auth.getSession().then(({ data: d2 }) => {
-          if (d2.session) setReady(true);
-          else toast({ title: t("invalidLink"), description: t("invalidLinkDesc"), variant: "destructive" });
-        }), 600);
-        return () => clearTimeout(tm);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  async function submit() {
-    if (password.length < 8) { toast({ title: t("tooShort"), variant: "destructive" }); return; }
-    if (password !== confirm) { toast({ title: t("mismatch"), variant: "destructive" }); return; }
-    setBusy(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
-      toast({ title: t("done") });
-      nav("/dashboard");
-    } catch (e: any) {
-      toast({ title: t("error"), description: e.message, variant: "destructive" });
-    } finally { setBusy(false); }
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.updateUser({ password });
+    setLoading(false);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("비밀번호가 변경되었습니다");
+      nav("/auth", { replace: true });
+    }
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
-      <div className="absolute inset-0 bg-grid opacity-20" />
-      <div className="absolute -top-32 -left-32 w-[520px] h-[520px] bg-primary/25 blur-3xl blob" />
-
-      <div className="relative w-full max-w-md glass-strong neon-border rounded-3xl p-6 sm:p-7">
-        <h1 className="font-imperial font-black text-2xl sm:text-3xl text-gradient-primary tracking-[0.04em]">{t("title")}</h1>
-        <p className="text-xs text-muted-foreground mt-1 break-keep">{t("sub")}</p>
-
-        <div className="space-y-3 mt-5">
-          <div className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
-            <LuxInput type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t("newPw")} />
-          </div>
-          <div className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
-            <LuxInput type="password" value={confirm} onChange={e => setConfirm(e.target.value)} placeholder={t("confirmPw")} />
-          </div>
-        </div>
-
-        <LuxButton onClick={submit} disabled={busy || !ready} block size="lg" className="mt-5">
-          {busy ? t("processing") : ready ? t("cta") : t("verifying")}
-        </LuxButton>
-      </div>
-    </div>
+    <main className="min-h-screen flex items-center justify-center p-6">
+      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
+        <h1 className="text-2xl font-bold">새 비밀번호 설정</h1>
+        <input
+          type="password"
+          required
+          minLength={6}
+          placeholder="새 비밀번호 (최소 6자)"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full px-4 py-3 rounded-lg bg-card border border-border outline-none focus:border-primary"
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-50"
+        >
+          {loading ? "변경 중..." : "비밀번호 변경"}
+        </button>
+      </form>
+    </main>
   );
 }
