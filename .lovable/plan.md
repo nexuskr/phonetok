@@ -1,320 +1,166 @@
-# FULL SYSTEM AUDIT — PHONARA (brutal, no sugarcoat)
+# 🧹 PHONARA 대청소 — One-Shot 실행 플랜
 
-> Plan mode. No code is being written. This is the audit + the rebuild path.
+## 0. 절대 보존 (TOUCH 금지)
+- `src/integrations/supabase/**` (client.ts, types.ts)
+- `supabase/**` (config.toml, migrations, functions)
+- `.env`, `.env.example`
+- `src/components/ui/**` (shadcn primitives)
+- `src/assets/**`
 
----
+## 1. KEEP — 핵심만 남김
 
-## 0. The single most important finding (P0, system-breaking)
-
-**This app is currently bricked at the entry point.**
-
-`src/App.tsx` is a **20-line placeholder** that only routes `/` and `/test`. Everything else `Navigate("/")`. Meanwhile the repo still contains:
-
-| Asset | Count | Disk |
-|---|---|---|
-| `src/pages/*.tsx` | **131 pages** | 1.1 MB |
-| `src/components/**` | **572 components** | 2.9 MB |
-| `src/hooks/**` | **90 hooks** | 240 KB |
-| `src/packages/**` | 10 @pkg domains | 709 KB |
-| `supabase/functions/**` | **77 edge functions** | 411 KB |
-| `supabase/migrations/**` | **317 migrations** | 1.9 MB |
-| Total `src` LOC | **147,747** | — |
-
-None of `Dashboard`, `Wallet`, `Casino`, `Auth`, `AuthCallback`, `ImperialDuelArena`, `Empire`, `PhonHub`, `Admin`, … are reachable. The Supabase backend (auth, RLS, RPCs, edge functions, kill switches, Imperial Flywheel, AAL2 gating, oracle consensus) is **fully alive and running** with no UI to talk to it.
-
-You are paying for, and exposing, a fully-armed backend that has no front-end client.
-
----
-
-## 1. System map (inventory at a glance)
-
-```text
-phonara/
-├── src/
-│   ├── App.tsx                  ← 20 LOC placeholder (bricked)
-│   ├── main.tsx                 ← still boots full ErrorBoundary/i18n/observers
-│   ├── pages/                   ← 131 .tsx files, ALL orphaned
-│   │   ├── Index.tsx (419 LOC) ← marketing landing, unreachable
-│   │   ├── Dashboard / Wallet / Casino / Empire / Lounge / …
-│   │   ├── admin/  (CockpitV2, treasury/, ops/, imperial/CommandCenter…)
-│   │   ├── apex/   (15 files, V14 simplification target)
-│   │   ├── casino/ (11 slot games)
-│   │   └── games/  (3 imperial games)
-│   ├── components/              ← 572 files, mostly orphaned
-│   │   ├── admin/ ~80
-│   │   ├── dashboard/v3/        ← v3 only ever shipped here
-│   │   ├── empire/  WhaleStrikeRail / WhaleStrikeRailV3 (dup)
-│   │   ├── onboarding/  V2 + V3 (dup)
-│   │   ├── slots/ Olympus / OlympusLegacy* (dup)
-│   │   └── ui/ shadcn primitives (KEEP)
-│   ├── hooks/   90 files
-│   ├── packages/  @pkg/{core,ui,wallet,earn,trade,live,games,duel,apex,
-│   │             realtime,risk,runtime,telemetry,entropy,performance,
-│   │             native,operator,workers,referral,analytics,avatar-nft}
-│   ├── lib/  (notify, glossary, flow/, auth/, displayCurrency, …)
-│   ├── locales/  en/ko/ja/vi/zh/es/pt
-│   └── integrations/supabase/{client.ts, types.ts}   ← auto-generated, KEEP
-├── supabase/
-│   ├── config.toml              ← project_id ketlqzfaplppmupaiwft (current)
-│   ├── functions/  77 edge functions
-│   └── migrations/ 317 SQL files (foundational → V17 → Phase 4 P1 Hyperion)
-├── scripts/independence/        ← already prepared for migration to NEW ref
-│                                  wyhhdyrvqtoejvusnhva  (Phase 2 runbook)
-├── e2e/                         ← Playwright suite (7 active specs)
-├── reports/                     ← bundle, entropy, realtime, oracle baselines
-└── .github/workflows/           ← bundle-budget, db-permissions, perf-gate,
-                                   pr3-isolation, prerender, e2e
+### 사용자 페이지 (8개)
+```
+src/pages/Index.tsx            →  /
+src/pages/Auth.tsx, AuthCallback.tsx, ForgotPassword.tsx, ResetPassword.tsx  →  /auth/*
+src/pages/Home.tsx (신규 또는 기존 유지)  →  /home
+src/pages/Wallet.tsx                       →  /wallet
+src/pages/Trade.tsx (Trading 핵심 1개)     →  /trade
+src/pages/casino/Olympus1000.tsx           →  /slots
+src/pages/Refer.tsx (또는 Referral)        →  /refer
+src/pages/Account.tsx (또는 Profile)       →  /account
+src/pages/NotFound.tsx                     →  *
 ```
 
-### Orphan / duplicate / dead
+### Admin 페이지 (1인 운영 최소 5개)
+```
+src/pages/admin/_AdminLayout.tsx           (shell)
+src/pages/admin/AdminDashboard.tsx         (기본 통계)
+src/pages/admin/Users.tsx                  (유저 관리)
+src/pages/admin/Balances.tsx               (잔고 조정)
+src/pages/admin/treasury/Withdrawals.tsx   (출금 승인)
+src/pages/admin/Reports.tsx                (신고 모니터링)
+```
+→ 위 6개 외 `src/pages/admin/**` 전부 삭제 (AdminAudit, AdminRecovery, OpsReport, imperial/CommandCenter, ops/SessionHealth, ops/Sprint4Dashboard, _AdminAal2Chip, _AdminPendingBell, _AdminSidebar 등은 필요시 최소 stub로 통합).
 
-- **Every page** under `src/pages/` is orphan relative to the live App.tsx.
-- **Versioned duplicates still on disk:**
-  `dashboard/v3/*`, `WhaleStrikeRailV3`, `OnboardingV2` + `OnboardingV3`, `StarterFunnelV3`, `OlympusLegacy*` (slot+overlay), `CockpitV2`, `imperialCircuitV2`, `trustV2`, `apex/coach/CoachV2Panel`, `apex/crash/LiveCrashV2`.
-- **Dead infra scaffolds** already removed last turn: `phonara-unicorn/`, disabled e2e a11y spec, `/avatar` redirect, duplicate `/guild`.
-- **TS `any` occurrences:** 366. **`console.log` lines:** 32. **TODO/FIXME:** 3.
+### 패키지 (참고용 1개만)
+- **KEEP**: `src/packages/wallet/**` (가장 정돈됨, money-flow 참고)
+- **DELETE**: `core, ui, earn, game-engine, trade, live, avatar-nft, referral, analytics, performance, telemetry, realtime, operator, runtime, entropy, risk, duel, games, apex, native, workers`
 
----
+### 인프라
+- `src/components/nav/MobileShell.tsx` + `MobileBottomNav.tsx`
+- `src/components/ui/sonner.tsx` + `toaster.tsx`
+- `src/integrations/supabase/client.ts`
+- `src/lib/utils.ts`, `src/lib/notify.ts` (기본 토스트 래퍼만)
 
-## 2. Architecture (actual, not intended)
+## 2. DELETE 목록 (대량)
 
-### Frontend
-- Vite 5 + React 18 + React Router 6 + Tailwind 3 + shadcn/radix.
-- State: React Query (server cache) + Zustand (light stores, e.g. `useFirstEmperorBurst`) + ad-hoc `useState`. No Redux.
-- Realtime: `@pkg/realtime` 4-partition wrapper (`useWalletChannel|useGameChannel|useChatChannel|useMarketChannel`) over `supabase.channel`. ESLint blocks raw `supabase.channel` calls (3 legitimate locations remain: wrapper itself, `useCrashTick`, `GodModePanel`).
-- i18n: i18next, 7 locale chunks, gated boot.
-- Telemetry: `@pkg/telemetry` web-vitals + sampling, governor + idle/hidden-tab suspension.
-- Performance: `@pkg/performance` device tiering + `low:/mid:/high:` Tailwind variants + Degrade Mode (`degrade:` variant + kill switch).
-- Operator isolation: vite `manualChunks` segregates `pages/admin/**` into an `operator` bundle, blocked from user entry preload, enforced by `scripts/check-operator-isolation.mjs`.
+### 페이지 (40+)
+- `src/pages/apex/**` (전체 디렉토리)
+- `src/pages/casino/**` ← Olympus1000.tsx만 보존
+- `src/pages/games/**` (Blackjack/Plinko/Roulette Imperial)
+- `src/pages/{Whales,Live,LiveOverlay,Lobby,InfluencerLanding,CampaignRedirect,ReplayLanding,SafePublic,Status,Pay,Fairness,Earn,PhonHub,LegalDoc,Unsubscribe,ImperialDuelLobby}.tsx`
+- `src/pages/admin/**` (위 KEEP 6개 제외)
+- `src/pages/security/RecoverTotp.tsx`
+- `src/pages/apex/community/**`, `src/pages/apex/events/**`, `src/pages/apex/games/**`
 
-### Backend (Lovable Cloud, ref `ketlqzfaplppmupaiwft`)
-- 317 migrations forming a single timeline through:
-  Permission baseline → V17 personalization → Empire/Crown/Founding Seats → Imperial Duel Phase 3–4 → Flywheel 3.5 → Hardening → Oracle Fortress 3.5 (shadow weighted consensus) → Self-Heal Console → VIP Pass → v3.0 LOCKED Foundation → Phase 4 P1 Hyperion observer.
-- Money flow concentrated in 8 RPCs (`imperial_place_phon_bet`, `_apply_house_edge_split` 45/35/15/5, `request_withdrawal`, `credit_crypto_deposit`, `award_crown`, `recompute_empire_level`, `grant_phon_for_deposit`, `grant_nft_for_deposit`) — protected by `check-money-flow-freeze.mjs` (git diff must = 0).
-- 77 edge functions. JWT verification mostly **disabled** (`verify_jwt = false`); in-code validation is the contract. Cron-driven flywheel/oracle/reactivation/reengagement.
-- AAL2 enforced for admin sensitive tabs + withdrawals (TOTP factor or 10-min OTP).
-- Kill switches: `platform_kill_switches`, `imperial_kill_switches` (5), `degrade_mode`, `maintenance_mode`.
+### 패키지
+- `src/packages/{core,ui,earn,game-engine,trade,live,avatar-nft,referral,analytics,performance,telemetry,realtime,operator,runtime,entropy,risk,duel,games,apex,native,workers}/**`
 
-### Data flow (text diagram)
+### 컴포넌트 (도메인 잔재)
+- `src/components/empire/**`, `src/components/lobby/**`, `src/components/slots/**` ← OlympusSlot만 보존
+- `src/components/casino/CasinoLayout.tsx` 보존 (Olympus 의존)
+- `src/components/admin/**` ← Withdraw 관련(WithdrawRequestsAdmin, treasury/*) + Users/Balances/Reports 외 전부 삭제
+- `src/components/flow/FlowRouter.tsx` 보존
+- `src/components/security/StepUpGate.tsx` 보존 (wallet 의존)
 
-```text
-Browser (Vite SPA)
-  │ JWT in localStorage (supabase-js)
-  ▼
-@pkg/realtime  ──── postgres_changes ◄── Postgres LISTEN/NOTIFY
-  │
-  ├── RPC (PostgREST)  ──► SECURITY DEFINER fns ──► RLS-protected tables
-  │                          │
-  │                          ├── money-flow 8 RPCs (frozen)
-  │                          └── trigger chain (flywheel, audits, anomaly)
-  │
-  └── functions.invoke ──► Edge Function (Deno) ──► service-role client
-                                                  └── external (Twilio, LINE,
-                                                       VAPID push, Lovable AI)
+### lib (미사용 Phase 잔재)
+- `src/lib/{crash,flywheel,leverage,crown,trustV2,practiceMode,glossary,imperialCircuitV2,displayCurrency,deviceFingerprint,walletRefresh,route-prefetch}.ts`
+- `src/lib/auth/authSingleFlight.ts` 는 Auth.tsx 의존 → 보존
+- `src/lib/flow/flowState.ts` 보존
+
+### 테스트/문서/리포트/스크립트
+- `src/__tests__/**`, `src/test/**`, `e2e/**`
+- `docs/{duel,apex,phase4,phase5,sprint,proposals,independence}/**`
+- `audit/**`, `reports/**`, `.lovable/memories/features/phase-6-eternal-dominion.md`
+- `scripts/{chaos,load,phase4,oracle-chaos.ts,slot-sim.ts,check-no-crown-ui.mjs,check-slot-sound-routing.mjs,phase5-rollback.sql,check-rpc-drift.ts,security-lint.ts,rpc.surface.baseline.mjs}`
+- `scripts/independence/**`
+- `.github/workflows/{db-permissions,pr3-isolation,prerender,e2e}.yml`
+
+## 3. 재작성
+
+### `src/App.tsx`
+```tsx
+BrowserRouter
+├─ Routes
+│   ├─ /              Index
+│   ├─ /auth/*        Auth flow
+│   ├─ /home          Home (자리잡이 — 출석/미션 placeholder)
+│   ├─ /wallet        Wallet
+│   ├─ /trade         Trade (placeholder)
+│   ├─ /slots         Olympus1000
+│   ├─ /refer         Refer (placeholder)
+│   ├─ /account       Account (placeholder)
+│   ├─ /admin/*       AdminLayout (5 sub-routes)
+│   └─ *              NotFound
+├─ <MobileBottomNav />
+└─ <Toaster />        (sonner)
 ```
 
-### Auth flow
-1. `src/pages/Auth.tsx` delegates to `/secure-auth` (not currently routed).
-2. Supabase email/password + Google OAuth (configured at provider level).
-3. `useMultiTabAuthSync` broadcasts `SIGNED_IN/OUT/TOKEN_REFRESHED` across tabs.
-4. `verifySessionOnce` single-flight session cache.
-5. AAL2 step-up via TOTP or 10-min OTP for withdrawals + admin sensitive routes.
-6. **Today, only `/auth` and `/secure-auth` rendering matters — but the placeholder App.tsx never mounts them.** Browser hits any URL → `/` → placeholder.
+### `eslint.config.js`
+- 표준 typescript-eslint + react-hooks recommended
+- `no-direct-sonner`, `no-raw-channel` 룰 제거 (관련 코드도 삭제됨)
+- 빈 파일이었던 것 → 최소 권장 설정으로 초기화
 
----
+### `.dependency-cruiser.cjs`
+- apex/operator/duel/critical-no-optional 룰 전부 삭제
+- `no-circular` 만 유지
 
-## 3 & 4. Component / button audit — **not produceable as requested**
+### `vite.config.ts`
+- 그대로 유지 (이미 깔끔). manualChunks만 supabase/icons/i18n 유지.
 
-A literal per-component dump for 572 components + every button across 131 pages is ~25,000–40,000 lines of structured report. That exceeds this plan's character budget by ~50×, and 99% of it is moot because **the components are not mounted**. If you still want it after the rebuild decision, it must be produced as a separate streamed artifact (CSV per component) over multiple runs — say the word and I scope that as its own job.
+### `tsconfig.json`
+- `@pkg/*` paths 전부 제거 (패키지 삭제됨)
+- `@pkg/wallet` 1개만 유지
 
-What is verifiable now:
-- Every page imports its own dependencies (no shared route registry collapsed them).
-- Many pages still call `useState` + `useEffect` + `supabase.from(...)` directly without React Query, so the same row gets fetched 3–5× across components on a typical screen.
-- Several pages mount `<Toaster />`, `<Layout />`, or shells redundantly — the SlimShell comment in code says "shells are mounted at App root" but App root is the placeholder, so each page that ran would either double-mount or run shell-less.
+## 4. 실행 순서 (단일 턴)
 
----
+```bash
+# Step 1: 대량 삭제 (parallel rm -rf)
+rm -rf src/pages/apex src/pages/games \
+       src/pages/admin/imperial src/pages/admin/ops \
+       src/__tests__ src/test e2e \
+       docs/duel docs/apex docs/phase4 docs/sprint docs/proposals docs/independence \
+       audit reports \
+       src/packages/{core,ui,earn,game-engine,trade,live,avatar-nft,referral,analytics,performance,telemetry,realtime,operator,runtime,entropy,risk,duel,games,apex,native,workers} \
+       src/components/{empire,lobby} \
+       scripts/{chaos,load,phase4,independence}
 
-## 5. API & backend audit
+# 개별 파일
+rm src/pages/{Whales,Live,LiveOverlay,Lobby,InfluencerLanding,CampaignRedirect,ReplayLanding,SafePublic,Status,Pay,Fairness,Earn,PhonHub,LegalDoc,Unsubscribe,ImperialDuelLobby}.tsx
+rm src/pages/security/RecoverTotp.tsx
+rm src/pages/admin/{AdminAudit,AdminRecovery,OpsReport,_AdminAal2Chip,_AdminPendingBell,_AdminSidebar}.tsx
+rm src/lib/{crash,flywheel,leverage,crown,trustV2,practiceMode,glossary,imperialCircuitV2,displayCurrency,deviceFingerprint,walletRefresh,route-prefetch}.ts
+# casino: Olympus1000 제외 전부
+find src/pages/casino -type f ! -name 'Olympus1000.tsx' -delete
 
-- **77 edge functions, 26 explicitly listed in `supabase/config.toml`.** Functions not listed inherit Lovable defaults; many critical ones (e.g. `imperial-bet-place`, `imperial-bet-settle`, `liquidation-watcher`, `oracle-refresh*`, `reengagement-tick`, `reactivation-cron`) rely on **server-side cron + in-code auth**.
-- **`verify_jwt = false`** on every public-facing function. This is intentional per Lovable's signing-keys system but means **every function MUST validate the caller in code**. I have not audited all 77 line-by-line in this pass — **UNKNOWN RISK** for the ones outside the documented set (`auth-email-hook`, `handle-email-*`, `preview-*`, `webhook-dispatcher`, `chaos-probe`, `send-push`, `send-line`, `line-webhook`, `dm-composer`, `verify-submission`, `attribute-click`, `toggle-rrm`, `liquidation-watcher`, `enforce-position-triggers`, `og-card-renderer`, `recovery-fomo-trigger`, `sim-api`, `reactivation-cron`, `earn-share-card`, `reengagement-tick`).
-- Race conditions: known-good — `live_positions` BEFORE INSERT trigger `trg_enforce_leverage_gate`, `SELECT FOR UPDATE SKIP LOCKED` in founding seats, `reclaim_stale_intents` lease cron, idempotent `_apply_house_edge_split`.
-- 1000-row PostgREST limit: there are at least 4 admin tables (`anomaly_events`, `permission_change_log`, `withdrawal_requests`, `imperial_observability_events`) where UI lists likely silently clip — **P2**.
-- Frontend SDK: only `src/integrations/supabase/client.ts` is allowed (good). No second-client drift.
+# Step 2: 재작성
+- src/App.tsx (신규 8 user + 5 admin 라우트)
+- eslint.config.js
+- .dependency-cruiser.cjs
+- tsconfig.json (paths 정리)
+- src/pages/{Home,Trade,Refer,Account}.tsx (placeholder 신규)
+- src/pages/admin/{AdminDashboard,Users,Balances,Reports}.tsx (placeholder 신규)
 
----
-
-## 6. State management — disaster level: moderate, not catastrophic
-
-- React Query is used in newer code (@pkg/wallet hooks, V17 widgets), `useState`+`useEffect` in older.
-- Zustand stores leak between unrelated features (`useFirstEmperorBurst` triggered from PhonaraPayPanel realtime fill).
-- localStorage keys are scattered: `phonara:onboarding60s:v1`, `phonara:currency_pref:v1`, `pm_practice_mode`, `phonara-lang`, supabase auth, viewport-lock, app-settings. No central registry → renaming any one of them silently strands users.
-- Multi-tab auth sync is solid; multi-tab feature flag sync is not.
-- "Overwritten state" cases I cannot enumerate without runtime testing — **UNKNOWN RISK** until App.tsx is restored.
-
----
-
-## 7. Critical bug list (severity-ranked)
-
-| Sev | Location | Cause | Impact | Fix |
-|---|---|---|---|---|
-| **P0** | `src/App.tsx` | Replaced with 20-LOC placeholder; no real routes | **Entire product unreachable.** Backend live but unused. | Restore real router (or do clean rebuild — see §10) |
-| P0 | `src/main.tsx` | Domain guard commented out "for debugging" | Auth callback may land on non-canonical host with no enforcement | Re-enable after rebuild |
-| P1 | 366 `: any` in src | Type drift | Hidden runtime errors at boundaries | tsc strictness + `unknown` migration |
-| P1 | Duplicate components on disk (V2/V3/Legacy listed in §1) | Not actually rendered today, but will be re-imported on rebuild | Same-bug-fixed-twice + bundle bloat | Delete after rebuild graph confirms only-one mount |
-| P1 | 77 edge functions, only 26 declared in config.toml | Function-specific config drift | Some functions may be misconfigured silently | Audit all 77 against config |
-| P2 | 4+ admin lists hitting 1000-row PostgREST cap | Implicit limit | Silent data clipping | Server-side pagination |
-| P2 | 32 stray `console.log` | Logged in production unless `vite-plugin-remove-console` covers them all | Information leak | Verify plugin scope or strip |
-| P2 | localStorage key sprawl | No registry | Migration breakages | Central `@pkg/core/storageKeys.ts` |
-| P3 | TODO/FIXME (only 3) | — | — | Cosmetic |
-| UNKNOWN | 51 edge functions not in config.toml | Auth/JWT settings drift | Auth bypass possible if any of them is a money path | Per-function audit |
-| UNKNOWN | RLS policies on 30+ tables not re-validated this pass | Schema drift since last `db-permissions.test.ts` run | Privilege escalation possible | Run `supabase--linter` + replay test suite |
-
----
-
-## 8. Dead code / garbage
-
-Confirmed dead today (whether or not the placeholder is replaced):
-
-- Every `V2`/`V3`/`Legacy` file listed in §1.
-- `src/pages/Test*` (if any survived in pages list — present in App.tsx as inline `TestPage`).
-- `e2e/tests/07-a11y-smoke.spec.disabled.ts` — already deleted.
-- `phonara-unicorn/` Phase U scaffolding — already deleted.
-- 7 locale files exist; only `en/ko/ja/vi/zh` are loaded in current i18n boot — verify `es/pt` are wired before keeping.
-
-Suspected dead, needs reachability re-check post-rebuild:
-- `src/packages/apex/*` (Apex pivot — only some files are referenced from `pages/apex/*`, rest may be orphans).
-- `src/packages/duel/*` Halo2RecursivePanel.
-- `pages/casino/OlympusLegacy*` if Olympus 5000 is the only shipped slot.
-
----
-
-## 9. Security & stability risks
-
-| Risk | Status |
-|---|---|
-| `VITE_SUPABASE_URL`, anon key in client | EXPECTED (publishable) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-only, auto-injected — good |
-| `LOVABLE_API_KEY`, `BOT_CRON_SECRET`, `VAPID_*`, `TWILIO_*`, `LINE_*` | Server-only secrets (checklist exists in `scripts/independence/secrets-checklist.txt`) — good |
-| Domain canonicalisation | **DISABLED** in `main.tsx` — P0 once UI returns |
-| AAL2 admin gate | Strong, but only effective if pages route |
-| `verify_jwt = false` on 77 edge functions | Acceptable IF each validates in code — **UNKNOWN for 51 of them** |
-| Client-side admin/role checks | None observed — roles go through `user_roles` + `has_role()` SECURITY DEFINER (good) |
-| Localized PII (KYC, withdrawal addr) | Stored in DB with RLS owner-scoped — good |
-| 1000-row PostgREST cap on `anomaly_events` and `permission_change_log` | Possible audit blindspot |
-| Multi-tab signed-out leakage | Handled by `useMultiTabAuthSync` |
-| Cron-driven money paths (flywheel, oracle) | Protected by kill switches + AAL2 admin panels |
-
----
-
-## 10. Rebuild strategy — **the only honest path**
-
-Given:
-1. App.tsx is a placeholder. Restoring 131 pages of legacy routing into a working product is more work, more risk, and more bloat than rebuilding the user shell.
-2. You explicitly want to move to a **new GitHub account** and a **new Lovable project**.
-3. The Supabase ref is also being migrated (`ketlqzfaplppmupaiwft` → `wyhhdyrvqtoejvusnhva`, runbook already in `scripts/independence/`).
-4. The valuable, production-grade asset is the **backend** (317 migrations, 77 edge functions, money-flow, kill switches, Flywheel, Oracle, Hyperion). Not the 572-component frontend.
-
-### Recommended path: **Greenfield Lovable project + reuse Supabase + cherry-pick ~5% of code**
-
-#### A. New project bootstrap (on new GitHub account)
-
-1. Create a brand-new Lovable project under the new GitHub account. Default Vite/React/TS template.
-2. Connect it via Lovable Cloud (auto-spins a fresh Supabase). Then **migrate the existing backend** into it using the runbook already in this repo:
-   - `scripts/independence/01-prepare.sh` (link new ref)
-   - `scripts/independence/02-pull-and-diff.sh` (review what's already there vs the 317 migrations)
-   - `scripts/independence/03-deploy.sh` (push migrations + deploy 77 edge functions)
-   - `scripts/independence/04-data-copy.sh` (only if you want live data; otherwise start clean)
-   - `scripts/independence/secrets-checklist.txt` (set all secrets)
-   - **Alternative if you want a fresh DB:** skip step 2 entirely and only port the migrations you care about (auth, profiles, wallet, deposits/withdrawals, kill switches). Drop Imperial Duel, Flywheel, Oracle, Founding Seats, VIP, Crown, NFT — these are huge surface area and unproven product/market fit.
-
-3. In the new project, set canonical domain guard back on from day 1.
-
-#### B. KEEP (cherry-pick from current repo)
-
-- `src/integrations/supabase/client.ts` (re-generated by Cloud — don't copy by hand)
-- `src/lib/notify.ts`, `src/lib/glossary.ts`, `src/lib/displayCurrency.ts`
-- `@pkg/core` (i18n glossary, storage keys)
-- `@pkg/realtime` (4-partition wrapper) — the architecture is sound
-- `@pkg/wallet` (hooks + components — deposits/withdrawals UX is the most polished surface)
-- `src/components/ui/*` (shadcn primitives)
-- Tailwind tokens / `index.css` design system (Imperial tokens, gradients, glow, halo)
-- `e2e/` Playwright fixtures (selectors will need updating but the scaffolding is good)
-- `.github/workflows/` (bundle-budget, perf-gate, db-permissions — port these)
-- All `supabase/migrations/` you choose to keep + matching `supabase/functions/`
-
-#### C. DELETE / DO NOT PORT
-
-- `src/App.tsx` placeholder (write a new minimal router).
-- 131 legacy pages — port only what the new 3-flow product needs.
-- 572 components — re-derive from the 3 flows; expect <100 to survive.
-- All `V2`/`V3`/`Legacy` files.
-- `src/packages/apex/*`, `src/packages/duel/*`, `src/packages/games/*` unless you are explicitly shipping those games on day 1.
-- `phonara-unicorn` (already gone).
-- `lovable-tagger` if you don't want Lovable's hover-to-edit overlays in the new project (decision call).
-
-#### D. REWRITE from scratch in the new project
-
-- **The 3 user flows.** Pick them now. Concrete suggestion based on what's actually monetised today:
-  1. **WALLET** — deposit (crypto + KRW + voucher), withdraw with AAL2, balance, history.
-  2. **PLAY** — one game surface (start with Olympus 5000 or Imperial Duel — pick one).
-  3. **EARN** — referrals, missions, attendance streak.
-- One shell (`<Shell>`), one nav, one toast system (`@/lib/notify`), one realtime channel layer.
-- React Query for every server read. No raw `useEffect` + `supabase.from`.
-- Operator/admin in a **separate Lovable project** entirely (or a hidden `/ops` subroute behind AAL2 — but don't ship it in v1).
-
-#### E. Target architecture (new project)
-
-```text
-src/
-├── App.tsx                ~80 LOC, lazy routes only
-├── main.tsx               ~40 LOC, domain guard ON
-├── routes/                3 top-level: /wallet  /play  /earn
-├── shell/                 Shell, Nav, BottomTabs
-├── features/
-│   ├── auth/              login, callback, AAL2 step-up
-│   ├── wallet/            deposit, withdraw, history
-│   ├── play/              single game integration
-│   └── earn/              referral, mission, streak
-├── packages/
-│   ├── core/              i18n, storage keys, notify, glossary
-│   ├── realtime/          4-partition wrapper (ported)
-│   └── ui/                shadcn primitives + design tokens
-├── integrations/supabase/ auto-generated
-└── lib/                   thin utilities only
+# Step 3: 검증
+bun run build  &  bun run lint
 ```
 
-Target metrics:
-- ≤ **15,000 LOC** total (was 147,747 — 10× cut).
-- ≤ **40 pages** (was 131).
-- ≤ **120 components** (was 572).
-- ≤ **180 KB** gzipped initial bundle (current budget already enforced — port the gate).
-- 1 admin/ops subroute or 0 (preferred).
+## 5. 산출물 보고
+- 삭제된 파일 수 (목표 280+)
+- 남은 src 파일 수 (목표 ~120)
+- `bun run build` 결과 (성공/번들 크기)
+- `bun run lint` 결과 (에러 수 — 목표 50 이하)
+- 최종 디렉토리 트리 요약
 
-#### F. Migration order (suggested)
+## 6. 위험요소 & 대응
+- **import 끊김**: 삭제된 페이지를 참조하는 컴포넌트가 있으면 빌드 깨짐 → App.tsx 재작성 시 모든 import 명시적으로 새로 작성, 잔여 컴포넌트는 grep으로 추가 정리.
+- **Wallet 패키지 의존**: `src/packages/wallet`이 삭제된 패키지(`@pkg/core`, `@pkg/realtime` 등)를 import하면 빌드 깨짐 → 빌드 결과에 따라 추가 정리 또는 `src/packages/wallet`도 삭제하고 wallet 페이지를 placeholder로 대체.
+- **Admin 컴포넌트 의존성**: WithdrawRequestsAdmin이 삭제된 admin 컴포넌트 import하면 빌드 깨짐 → 빌드 에러 따라 stub 처리.
 
-```text
-Week 1  New Lovable project + connect Cloud + canonical domain + auth
-Week 2  Wallet (deposit/withdraw + AAL2) ported from @pkg/wallet
-Week 3  One game surface end-to-end with money-flow RPC
-Week 4  Earn (referral/mission/streak) + bundle gate + e2e
-Week 5  Cut over DNS; freeze the old project (don't delete — keep as cold archive)
-```
-
-#### G. What to do with **this** (old) repo
-
-- Tag the current commit `v-legacy-final` so the backend history is preserved.
-- Lock the old Lovable project to read-only / pause Cloud after migration.
-- Keep `scripts/independence/` and the 317 migrations until the new project is verified in production.
-- Do **not** try to "fix" App.tsx here. Sunk cost.
+## 7. 다음 턴
+청소 완료 후 → 8개 핵심 페이지 본격 구현 + Admin 5개 기능 본격 구현.
 
 ---
 
-## What I need from you before executing
-
-1. **Confirm greenfield** — start the new Lovable project under the new GitHub account; this repo becomes archival only. (Yes/No)
-2. **Backend strategy** — (a) port all 317 migrations + 77 edge functions to the new Supabase ref, OR (b) port only Wallet + Auth + Profiles and drop Imperial/Flywheel/Oracle/Empire/VIP. (a/b)
-3. **3 flows** — confirm Wallet / Play / Earn, or name your three.
-4. **Single game choice** — Olympus 5000, Imperial Duel, or none in v1.
-
-Once you answer those four, I will produce the seed code spec for the new project (router + shell + auth + one feature slice) as a follow-up plan you can paste straight into the new Lovable project's first prompt.
+**승인 시 즉시 build 모드 진입하여 한 턴에 모든 단계 실행합니다.**
