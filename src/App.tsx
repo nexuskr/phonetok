@@ -1,20 +1,57 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/sonner";
+import MobileBottomNav from "@/components/nav/MobileBottomNav";
 
-const Home = () => <div className="min-h-screen bg-black flex items-center justify-center text-white"><div><h1 className="text-6xl font-bold">PHONARA</h1><p className="text-xl mt-4">Auth System Rebuilding...</p><p className="text-sm text-gray-400 mt-8">Phase 1 Clean Rebuild in progress</p></div></div>;
+import Index from "@/pages/Index";
+import Auth from "@/pages/Auth";
+import AuthCallback from "@/pages/AuthCallback";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
+import Home from "@/pages/Home";
+import Wallet from "@/pages/Wallet";
+import Trade from "@/pages/Trade";
+import Slots from "@/pages/Slots";
+import Refer from "@/pages/Refer";
+import Account from "@/pages/Account";
+import NotFound from "@/pages/NotFound";
 
-const TestPage = () => <div className="min-h-screen bg-black flex items-center justify-center text-white"><div className="text-center"><h1 className="text-5xl">PHONARA - Phase 1</h1><p className="mt-4">Clean Auth System</p><button onClick={() => window.location.href = '/auth'} className="mt-8 px-8 py-4 bg-yellow-400 text-black font-bold rounded-xl">로그인 테스트</button></div></div>;
+import AdminLayout from "@/pages/admin/AdminLayout";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminUsers from "@/pages/admin/AdminUsers";
+import AdminBalances from "@/pages/admin/AdminBalances";
+import AdminWithdrawals from "@/pages/admin/AdminWithdrawals";
+import AdminReports from "@/pages/admin/AdminReports";
 
-function App() {
+export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/test" element={<TestPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+    <BrowserRouter>
+      <div className="min-h-screen bg-background text-foreground pb-20">
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/auth/forgot" element={<ForgotPassword />} />
+          <Route path="/auth/reset" element={<ResetPassword />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/wallet" element={<Wallet />} />
+          <Route path="/trade" element={<Trade />} />
+          <Route path="/slots" element={<Slots />} />
+          <Route path="/refer" element={<Refer />} />
+          <Route path="/account" element={<Account />} />
+
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="balances" element={<AdminBalances />} />
+            <Route path="withdrawals" element={<AdminWithdrawals />} />
+            <Route path="reports" element={<AdminReports />} />
+          </Route>
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <MobileBottomNav />
+      </div>
+      <Toaster />
+    </BrowserRouter>
   );
 }
-
-export default App;

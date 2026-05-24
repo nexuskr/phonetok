@@ -1,167 +1,40 @@
-import { Link, useNavigate } from "react-router-dom";
-import { lazy, Suspense, useState, useCallback } from "react";
-import SlimShell from "@/components/layout/SlimShell";
-import WorldHero from "@/components/nav/WorldHero";
-import { useRequireAuth } from "@/hooks/use-require-auth";
-import { Coins, Gamepad2, TrendingUp, Radio, ArrowRight, Swords } from "lucide-react";
-import { G } from "@/lib/glossary";
+import { Link } from "react-router-dom";
+import { Gift, LineChart, Gem, Users, Wallet as WalletIcon, Flame } from "lucide-react";
 
-const WhaleStrikeRail = lazy(() => import("@/components/empire/WhaleStrikeRail"));
-const LiveTicker = lazy(() => import("@pkg/live/components/LiveTicker"));
-const Onboarding60s = lazy(() => import("@pkg/earn/components/Onboarding60s"));
-const LivePayoutCounter = lazy(() => import("@/components/fomo/LivePayoutCounter"));
-const LiveTradingCounter = lazy(() => import("@/components/fomo/LiveTradingCounter"));
-const FoundingContendersBadge = lazy(() => import("@/components/fomo/FoundingContendersBadge"));
-const ImperialAscensionLoader = lazy(() => import("@/packages/duel/components/loader/ImperialAscensionLoader"));
-
-/**
- * /home — Sprint 0 슬림 홈.
- * 5초 룰: Hero + 4탭 + 큰 카드 4개 + 실시간 빅윈 + 60초 온보딩(1회).
- */
-
-const CARDS = [
-  {
-    to: "/earn",
-    title: G.tabEarn,
-    line1: "출석·미션·친구초대로",
-    line2: "오늘도 무료 PHON",
-    icon: Coins,
-    accent: "from-amber-500/20 to-yellow-500/10 border-amber-500/40",
-  },
-  {
-    to: "/games",
-    title: G.tabGames,
-    line1: "슬롯 12종 · 크래쉬 · 룰렛",
-    line2: "오늘 무료 1회",
-    icon: Gamepad2,
-    accent: "from-pink-500/20 to-rose-500/10 border-pink-500/40",
-  },
-  {
-    to: "/trade",
-    title: G.tabTrade,
-    line1: "BTC·ETH 가격 베팅",
-    line2: "데모로 먼저 연습",
-    icon: TrendingUp,
-    accent: "from-emerald-500/20 to-teal-500/10 border-emerald-500/40",
-  },
-  {
-    to: "/live",
-    title: G.tabLive,
-    line1: "지금 누가 얼마 벌고 있나",
-    line2: "랭킹 · 빅윈 · VIP",
-    icon: Radio,
-    accent: "from-violet-500/20 to-fuchsia-500/10 border-violet-500/40",
-  },
+const TILES = [
+  { to: "/wallet", icon: WalletIcon, title: "내 지갑", desc: "잔액 확인 / 출금" },
+  { to: "/trade", icon: LineChart, title: "트레이드", desc: "BTC · ETH 예측" },
+  { to: "/slots", icon: Gem, title: "슬롯 게임", desc: "Olympus 1000" },
+  { to: "/refer", icon: Users, title: "친구 추천", desc: "초대하고 보상받기" },
 ];
 
 export default function Home() {
-  const user = useRequireAuth();
-  const navigate = useNavigate();
-  const [ascending, setAscending] = useState(false);
-  const enterDuel = useCallback(() => setAscending(true), []);
-  const onAscensionDone = useCallback(() => {
-    setAscending(false);
-    navigate("/duel");
-  }, [navigate]);
-  if (!user) return null;
-
   return (
-    <SlimShell>
-      <WorldHero />
-
-      <div className="container py-6 space-y-5">
-        {/* 위에서 아래로 = 한 결정: 지금 누가 벌고 있나 → 어디로 들어갈지 */}
-        <Suspense fallback={null}>
-          <div className="grid grid-cols-3 gap-2">
-            <LivePayoutCounter />
-            <LiveTradingCounter compact />
-            <FoundingContendersBadge />
-          </div>
-        </Suspense>
-
-        {/* 4 큰 카드 — 한 화면에 끝남 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {CARDS.map((c) => {
-            const Icon = c.icon;
-            return (
-              <Link
-                key={c.to}
-                to={c.to}
-                className={`imperial-card imperial-card-hover imperial-corner-shine group relative overflow-hidden bg-gradient-to-br ${c.accent} p-5 press`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-[11px] tracking-[0.3em] font-black text-foreground/70 uppercase mb-1">
-                      {c.title}
-                    </div>
-                    <div className="font-imperial text-lg text-foreground leading-tight">
-                      {c.line1}
-                    </div>
-                    <div className="text-sm text-muted-foreground mt-0.5">
-                      {c.line2}
-                    </div>
-                  </div>
-                  <div className="shrink-0 w-11 h-11 rounded-xl glass border border-border/40 flex items-center justify-center text-primary">
-                    <Icon className="w-5 h-5" />
-                  </div>
-                </div>
-                <div className="mt-4 inline-flex items-center gap-1 text-[11px] font-bold text-primary opacity-80 group-hover:opacity-100">
-                  들어가기 <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
-                </div>
-              </Link>
-            );
-          })}
+    <main className="container mx-auto px-4 py-6 space-y-8">
+      <section className="rounded-2xl bg-gradient-to-br from-primary/20 via-card to-card border border-primary/20 p-6">
+        <div className="flex items-center gap-2 text-primary text-sm font-bold">
+          <Flame className="h-4 w-4" /> 오늘의 무료 보너스
         </div>
-
-        {/* Imperial Duel — 황제의 결투장 */}
-        <button
-          type="button"
-          onClick={enterDuel}
-          aria-label="황제의 대관전 입장"
-          className="imperial-card imperial-card-hover imperial-corner-shine relative block w-full text-left overflow-hidden rounded-3xl p-5 border border-amber-400/35 bg-gradient-to-br from-[#160a05] via-[#0A0503] to-[#1a0a14] active:scale-[0.985] will-change-transform"
-          style={{ boxShadow: "0 0 22px hsl(38 92% 60% / 0.22), 0 0 44px hsl(330 90% 60% / 0.14)" }}
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="text-[10px] tracking-[0.32em] font-black uppercase text-amber-400/85 mb-1">
-                Imperial Duel — NEW
-              </div>
-              <div className="font-imperial text-lg text-amber-100 leading-tight"
-                   style={{ textShadow: "0 0 12px hsl(38 92% 60% / 0.5)" }}>
-                황제의 대관전 — 폐하의 순간이 기다립니다
-              </div>
-              <div className="text-sm text-amber-200/75 mt-0.5">
-                1:1 결투 · HMAC 검증 · 실시간 관전
-              </div>
-            </div>
-            <div className="shrink-0 w-11 h-11 rounded-xl grid place-items-center bg-gradient-to-br from-amber-400 to-pink-500 text-[#1a0a05]">
-              <Swords className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-black tracking-[0.18em] uppercase text-pink-300">
-            옥좌에 오르소서 <ArrowRight className="w-3 h-3" />
-          </div>
+        <h1 className="text-2xl font-black mt-2">출석만 해도 매일 PHON 지급</h1>
+        <p className="text-sm text-muted-foreground mt-1">3초 안에 첫 보상을 받아보세요.</p>
+        <button className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm">
+          <Gift className="h-4 w-4" /> 출석 보너스 받기
         </button>
+      </section>
 
-        <Suspense fallback={null}>
-          <ImperialAscensionLoader open={ascending} onDone={onAscensionDone} />
-        </Suspense>
-
-        {/* 실시간 빅윈 마키 — 5번째이자 마지막 카드 (≤6 룰) */}
-        <Suspense fallback={null}>
-          <WhaleStrikeRail compact />
-        </Suspense>
-      </div>
-
-      {/* 하단 고정 실시간 티커 */}
-      <Suspense fallback={null}>
-        <LiveTicker />
-      </Suspense>
-
-      {/* 60초 온보딩 — 첫 방문 1회만 자동 노출 */}
-      <Suspense fallback={null}>
-        <Onboarding60s />
-      </Suspense>
-    </SlimShell>
+      <section className="grid grid-cols-2 gap-3">
+        {TILES.map(({ to, icon: Icon, title, desc }) => (
+          <Link
+            key={to}
+            to={to}
+            className="rounded-2xl bg-card border border-border p-4 hover:border-primary transition-colors"
+          >
+            <Icon className="h-6 w-6 text-primary" />
+            <div className="mt-3 font-bold">{title}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">{desc}</div>
+          </Link>
+        ))}
+      </section>
+    </main>
   );
 }
