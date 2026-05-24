@@ -1,8 +1,0 @@
-{
-  "_note": "Baseline placeholder. Replace by running scripts/rpc.surface.baseline.mjs in a DEV browser console, completing the 5+5+5 scenario, and pasting __phonaraSurface.report() output here.",
-  "capturedAt": null,
-  "scenario": "login → /dashboard active 5min → background 5min → idle 5min",
-  "foreground": { "count": 0, "byRpc": {} },
-  "hidden":     { "count": 0, "byRpc": {} },
-  "idle":       { "count": 0, "byRpc": {} }
-}
