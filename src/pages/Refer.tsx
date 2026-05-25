@@ -14,11 +14,15 @@ export default function Refer() {
   // Ensure ref code exists
   useEffect(() => {
     if (profile && !profile.referral_code) {
-      supabase.rpc("gen_referral_code").then(({ data }) => {
-        if (data) supabase.rpc("set_referral_code" as never, { _code: data } as never).then(() => {
-          qc.invalidateQueries({ queryKey: ["profile"] });
-        });
-      }).catch(() => { /* */ });
+      (async () => {
+        try {
+          const { data } = await supabase.rpc("gen_referral_code");
+          if (data) {
+            await supabase.rpc("set_referral_code" as never, { _code: data } as never);
+            qc.invalidateQueries({ queryKey: ["profile"] });
+          }
+        } catch { /* noop */ }
+      })();
     }
   }, [profile, qc]);
 

@@ -7,7 +7,7 @@ export default function AdminReports() {
     queryFn: async () => {
       const { data } = await supabase
         .from("anomaly_events")
-        .select("id,rule,severity,user_id,created_at,payload")
+        .select("id,rule,severity,user_id,created_at")
         .order("created_at", { ascending: false })
         .limit(50);
       return data ?? [];
