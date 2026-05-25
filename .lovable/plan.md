@@ -1,166 +1,221 @@
-# 🧹 PHONARA 대청소 — One-Shot 실행 플랜
 
-## 0. 절대 보존 (TOUCH 금지)
-- `src/integrations/supabase/**` (client.ts, types.ts)
-- `supabase/**` (config.toml, migrations, functions)
-- `.env`, `.env.example`
-- `src/components/ui/**` (shadcn primitives)
-- `src/assets/**`
+# 🚀 PHONARA V2 — One-Turn Launch Plan (God-Tier, Pragmatic)
 
-## 1. KEEP — 핵심만 남김
+## 0. 현실 정렬 (지존급 정직 점검)
 
-### 사용자 페이지 (8개)
-```
-src/pages/Index.tsx            →  /
-src/pages/Auth.tsx, AuthCallback.tsx, ForgotPassword.tsx, ResetPassword.tsx  →  /auth/*
-src/pages/Home.tsx (신규 또는 기존 유지)  →  /home
-src/pages/Wallet.tsx                       →  /wallet
-src/pages/Trade.tsx (Trading 핵심 1개)     →  /trade
-src/pages/casino/Olympus1000.tsx           →  /slots
-src/pages/Refer.tsx (또는 Referral)        →  /refer
-src/pages/Account.tsx (또는 Profile)       →  /account
-src/pages/NotFound.tsx                     →  *
-```
+마스터 디렉티브는 monorepo + 별도 admin 앱 + Bybit/Stake 풀스택을 요구하지만, **한 턴(≈90분)**으로 실제 빌드 가능한 범위는:
 
-### Admin 페이지 (1인 운영 최소 5개)
-```
-src/pages/admin/_AdminLayout.tsx           (shell)
-src/pages/admin/AdminDashboard.tsx         (기본 통계)
-src/pages/admin/Users.tsx                  (유저 관리)
-src/pages/admin/Balances.tsx               (잔고 조정)
-src/pages/admin/treasury/Withdrawals.tsx   (출금 승인)
-src/pages/admin/Reports.tsx                (신고 모니터링)
-```
-→ 위 6개 외 `src/pages/admin/**` 전부 삭제 (AdminAudit, AdminRecovery, OpsReport, imperial/CommandCenter, ops/SessionHealth, ops/Sprint4Dashboard, _AdminAal2Chip, _AdminPendingBell, _AdminSidebar 등은 필요시 최소 stub로 통합).
+| Master spec | 1턴 현실 결정 |
+|---|---|
+| monorepo + apps/admin | **단일 프로젝트 유지**, `/admin/*` 라우트 격리 (이미 분리됨). monorepo 분할은 출시 후 PR-2 |
+| 새 Supabase | **현 프로젝트 유지** — 기존 DB 보존 약속 |
+| Bybit 풀 트레이딩 엔진 | **시뮬레이션 + 실시간 차트** (서버 RPC 없으면 클라 paper) |
+| Stake 풀 슬롯 | **Olympus Lite** 5릴 클라 시뮬 + 잔액 연동 |
+| Keepy-Uppy 미니게임 | **Canvas 60fps + 서버 점수 검증** 풀 구현 |
+| 온보딩/FOMO/바이럴/Free-Earn | **풀 구현** (이게 핵심) |
 
-### 패키지 (참고용 1개만)
-- **KEEP**: `src/packages/wallet/**` (가장 정돈됨, money-flow 참고)
-- **DELETE**: `core, ui, earn, game-engine, trade, live, avatar-nft, referral, analytics, performance, telemetry, realtime, operator, runtime, entropy, risk, duel, games, apex, native, workers`
-
-### 인프라
-- `src/components/nav/MobileShell.tsx` + `MobileBottomNav.tsx`
-- `src/components/ui/sonner.tsx` + `toaster.tsx`
-- `src/integrations/supabase/client.ts`
-- `src/lib/utils.ts`, `src/lib/notify.ts` (기본 토스트 래퍼만)
-
-## 2. DELETE 목록 (대량)
-
-### 페이지 (40+)
-- `src/pages/apex/**` (전체 디렉토리)
-- `src/pages/casino/**` ← Olympus1000.tsx만 보존
-- `src/pages/games/**` (Blackjack/Plinko/Roulette Imperial)
-- `src/pages/{Whales,Live,LiveOverlay,Lobby,InfluencerLanding,CampaignRedirect,ReplayLanding,SafePublic,Status,Pay,Fairness,Earn,PhonHub,LegalDoc,Unsubscribe,ImperialDuelLobby}.tsx`
-- `src/pages/admin/**` (위 KEEP 6개 제외)
-- `src/pages/security/RecoverTotp.tsx`
-- `src/pages/apex/community/**`, `src/pages/apex/events/**`, `src/pages/apex/games/**`
-
-### 패키지
-- `src/packages/{core,ui,earn,game-engine,trade,live,avatar-nft,referral,analytics,performance,telemetry,realtime,operator,runtime,entropy,risk,duel,games,apex,native,workers}/**`
-
-### 컴포넌트 (도메인 잔재)
-- `src/components/empire/**`, `src/components/lobby/**`, `src/components/slots/**` ← OlympusSlot만 보존
-- `src/components/casino/CasinoLayout.tsx` 보존 (Olympus 의존)
-- `src/components/admin/**` ← Withdraw 관련(WithdrawRequestsAdmin, treasury/*) + Users/Balances/Reports 외 전부 삭제
-- `src/components/flow/FlowRouter.tsx` 보존
-- `src/components/security/StepUpGate.tsx` 보존 (wallet 의존)
-
-### lib (미사용 Phase 잔재)
-- `src/lib/{crash,flywheel,leverage,crown,trustV2,practiceMode,glossary,imperialCircuitV2,displayCurrency,deviceFingerprint,walletRefresh,route-prefetch}.ts`
-- `src/lib/auth/authSingleFlight.ts` 는 Auth.tsx 의존 → 보존
-- `src/lib/flow/flowState.ts` 보존
-
-### 테스트/문서/리포트/스크립트
-- `src/__tests__/**`, `src/test/**`, `e2e/**`
-- `docs/{duel,apex,phase4,phase5,sprint,proposals,independence}/**`
-- `audit/**`, `reports/**`, `.lovable/memories/features/phase-6-eternal-dominion.md`
-- `scripts/{chaos,load,phase4,oracle-chaos.ts,slot-sim.ts,check-no-crown-ui.mjs,check-slot-sound-routing.mjs,phase5-rollback.sql,check-rpc-drift.ts,security-lint.ts,rpc.surface.baseline.mjs}`
-- `scripts/independence/**`
-- `.github/workflows/{db-permissions,pr3-isolation,prerender,e2e}.yml`
-
-## 3. 재작성
-
-### `src/App.tsx`
-```tsx
-BrowserRouter
-├─ Routes
-│   ├─ /              Index
-│   ├─ /auth/*        Auth flow
-│   ├─ /home          Home (자리잡이 — 출석/미션 placeholder)
-│   ├─ /wallet        Wallet
-│   ├─ /trade         Trade (placeholder)
-│   ├─ /slots         Olympus1000
-│   ├─ /refer         Refer (placeholder)
-│   ├─ /account       Account (placeholder)
-│   ├─ /admin/*       AdminLayout (5 sub-routes)
-│   └─ *              NotFound
-├─ <MobileBottomNav />
-└─ <Toaster />        (sonner)
-```
-
-### `eslint.config.js`
-- 표준 typescript-eslint + react-hooks recommended
-- `no-direct-sonner`, `no-raw-channel` 룰 제거 (관련 코드도 삭제됨)
-- 빈 파일이었던 것 → 최소 권장 설정으로 초기화
-
-### `.dependency-cruiser.cjs`
-- apex/operator/duel/critical-no-optional 룰 전부 삭제
-- `no-circular` 만 유지
-
-### `vite.config.ts`
-- 그대로 유지 (이미 깔끔). manualChunks만 supabase/icons/i18n 유지.
-
-### `tsconfig.json`
-- `@pkg/*` paths 전부 제거 (패키지 삭제됨)
-- `@pkg/wallet` 1개만 유지
-
-## 4. 실행 순서 (단일 턴)
-
-```bash
-# Step 1: 대량 삭제 (parallel rm -rf)
-rm -rf src/pages/apex src/pages/games \
-       src/pages/admin/imperial src/pages/admin/ops \
-       src/__tests__ src/test e2e \
-       docs/duel docs/apex docs/phase4 docs/sprint docs/proposals docs/independence \
-       audit reports \
-       src/packages/{core,ui,earn,game-engine,trade,live,avatar-nft,referral,analytics,performance,telemetry,realtime,operator,runtime,entropy,risk,duel,games,apex,native,workers} \
-       src/components/{empire,lobby} \
-       scripts/{chaos,load,phase4,independence}
-
-# 개별 파일
-rm src/pages/{Whales,Live,LiveOverlay,Lobby,InfluencerLanding,CampaignRedirect,ReplayLanding,SafePublic,Status,Pay,Fairness,Earn,PhonHub,LegalDoc,Unsubscribe,ImperialDuelLobby}.tsx
-rm src/pages/security/RecoverTotp.tsx
-rm src/pages/admin/{AdminAudit,AdminRecovery,OpsReport,_AdminAal2Chip,_AdminPendingBell,_AdminSidebar}.tsx
-rm src/lib/{crash,flywheel,leverage,crown,trustV2,practiceMode,glossary,imperialCircuitV2,displayCurrency,deviceFingerprint,walletRefresh,route-prefetch}.ts
-# casino: Olympus1000 제외 전부
-find src/pages/casino -type f ! -name 'Olympus1000.tsx' -delete
-
-# Step 2: 재작성
-- src/App.tsx (신규 8 user + 5 admin 라우트)
-- eslint.config.js
-- .dependency-cruiser.cjs
-- tsconfig.json (paths 정리)
-- src/pages/{Home,Trade,Refer,Account}.tsx (placeholder 신규)
-- src/pages/admin/{AdminDashboard,Users,Balances,Reports}.tsx (placeholder 신규)
-
-# Step 3: 검증
-bun run build  &  bun run lint
-```
-
-## 5. 산출물 보고
-- 삭제된 파일 수 (목표 280+)
-- 남은 src 파일 수 (목표 ~120)
-- `bun run build` 결과 (성공/번들 크기)
-- `bun run lint` 결과 (에러 수 — 목표 50 이하)
-- 최종 디렉토리 트리 요약
-
-## 6. 위험요소 & 대응
-- **import 끊김**: 삭제된 페이지를 참조하는 컴포넌트가 있으면 빌드 깨짐 → App.tsx 재작성 시 모든 import 명시적으로 새로 작성, 잔여 컴포넌트는 grep으로 추가 정리.
-- **Wallet 패키지 의존**: `src/packages/wallet`이 삭제된 패키지(`@pkg/core`, `@pkg/realtime` 등)를 import하면 빌드 깨짐 → 빌드 결과에 따라 추가 정리 또는 `src/packages/wallet`도 삭제하고 wallet 페이지를 placeholder로 대체.
-- **Admin 컴포넌트 의존성**: WithdrawRequestsAdmin이 삭제된 admin 컴포넌트 import하면 빌드 깨짐 → 빌드 에러 따라 stub 처리.
-
-## 7. 다음 턴
-청소 완료 후 → 8개 핵심 페이지 본격 구현 + Admin 5개 기능 본격 구현.
+→ 출시 가능한 **MVP-Premium**을 1턴에 끝낸다. monorepo/풀 트레이딩은 발사 후.
 
 ---
 
-**승인 시 즉시 build 모드 진입하여 한 턴에 모든 단계 실행합니다.**
+## 1. DB Foundation (Supabase migration)
+
+**기존 테이블 절대 보존.** 신규 8개만 추가:
+
+```sql
+profiles(user_id PK→auth.users, nickname, avatar_url, ref_code unique, referred_by, created_at)
+user_balances(user_id PK, phon numeric default 0, updated_at) -- 표시용
+attendance_log(user_id, day date, reward int, unique(user_id,day))
+missions(id, kind, title, reward int, daily bool, active bool)
+mission_claims(user_id, mission_id, day date, unique)
+referral_events(referrer_id, referee_id unique, reward_paid bool)
+activity_feed(id, kind enum, masked_nick, amount, created_at) -- 라이브 마키 (관리자 seed + 트리거 자동)
+game_scores(user_id, game text, score int, created_at)
+```
+
+**RLS**: `profiles` 본인 + public read (마스킹 닉만), 나머지 본인만. **트리거**:
+- `auth.users` insert → profile 자동 생성 + signup 보너스 10,000 PHON + activity_feed insert
+- `attendance_log` insert → balance 증가 + activity_feed
+- `mission_claims` insert → balance 증가 + activity_feed
+
+**RPC**:
+- `claim_attendance()` — 일 1회, streak 계산, 보너스 반환
+- `claim_mission(mission_id)` — daily 미션 idempotent
+- `redeem_referral(code)` — 가입 시 최초 1회, 양쪽 보상
+- `get_live_activity(limit)` — 라이브 피드 + 빈 경우 seed 폴백
+- `submit_game_score(game, score, payload)` — 서버 검증 후 보상
+
+---
+
+## 2. 모바일 OS 디자인 시스템
+
+`src/index.css` 토큰 전면 재설계 (HSL):
+- **Base**: 다크 first `hsl(240 10% 5%)` / `hsl(240 5% 96%)`
+- **Primary (Imperial Gold)**: `hsl(42 95% 58%)`
+- **Accent (FOMO Pink)**: `hsl(340 85% 62%)`
+- **Surfaces**: `--surface-1/2/3` glassmorphism + backdrop-blur
+- **Gradients**: `--gradient-imperial`, `--gradient-fomo`, `--gradient-money`
+- **Shadows**: `--shadow-glow-primary`, `--shadow-pop`, `--shadow-card`
+- **Motion**: `--ease-ios cubic-bezier(.22,1,.36,1)`, `--dur-fast/base/slow`
+- **Radius**: 1rem (iOS continuous)
+
+`tailwind.config.ts`: 위 토큰 + keyframes (`count-up`, `pulse-glow`, `marquee`, `shimmer`, `sparkle-burst`, `fade-up`, `spring-in`) + `safe-top/bottom`.
+
+`index.html`: `viewport-fit=cover`, `theme-color`, `apple-mobile-web-app-capable`, `body { overscroll-behavior:none; touch-action:manipulation }`.
+
+---
+
+## 3. 핵심 인프라 (신규)
+
+```
+src/lib/notify.ts          — sonner 4-tier 단일 진입점, gold glow
+src/lib/format.ts          — formatPHON, formatKRW, mask nick
+src/hooks/use-session.ts   — onAuthStateChange first, then getSession
+src/hooks/use-profile.ts   — React Query, balance realtime
+src/hooks/use-user-role.ts — has_role RPC 호출
+src/hooks/use-haptic.ts    — navigator.vibrate 폴리필
+src/components/auth/ProtectedRoute.tsx
+src/components/feedback/CountUp.tsx       — 잔액 카운트업
+src/components/feedback/PhonRain.tsx      — +PHON 플로팅 파티클
+src/components/feedback/RewardBurst.tsx   — confetti lazy
+src/components/layout/SafeArea.tsx
+src/components/layout/MobilePageTransition.tsx (framer-motion)
+src/App.tsx — QueryClientProvider + ProtectedRoute + AnimatePresence + Toaster
+```
+
+`@tanstack/react-query` + `framer-motion` + `canvas-confetti` 의존성 추가.
+
+---
+
+## 4. 인증 (`/auth`)
+
+- Email/password + **Google OAuth** (`lovable.auth.signInWithOAuth("google")`)
+- 단일 화면 토글 (Stake.com 톤), 풀스크린 다크 + gold glow
+- 신규가입: ref 코드 입력 옵션 (자동 채움 from `?ref=`)
+- `/auth/forgot` + `/auth/reset` 완성 (이미 존재 → 디자인만 톤 맞춤)
+- 가입 즉시 트리거가 10k PHON 지급 → `/home` 리다이렉트 → **4-step 온보딩 자동 발사**
+
+---
+
+## 5. 4-Step Forced Onboarding (`<OnboardingGate>`)
+
+App 루트 마운트. `profile.onboarded_at` null이면 풀스크린 시트, 비스킵.
+1. **Welcome Burst** — +10,000 PHON CountUp + confetti, 3초 후 자동 다음
+2. **First Mission** — "이 버튼 탭" → mission_claim → +500 PHON 파티클
+3. **Referral Share** — 본인 ref 코드 표시 + Web Share / 카톡 / 복사 (액션 시 다음)
+4. **Streak Activation** — claim_attendance + 🔥 streak flame 애니 + notification permission 요청
+
+완료 시 `profiles.onboarded_at = now()`.
+
+---
+
+## 6. 8개 사용자 페이지 (실기능)
+
+### `/` Index (Landing)
+- 3초 후크 hero + 라이브 카운터 (`get_live_activity` 마키, 60s 갱신, framer-motion 무한)
+- 가입 CTA + "이미 회원이세요?" 링크
+
+### `/home` Dashboard (핵심)
+- 상단: 잔액 카드 + CountUp + realtime 구독 (`user_balances`)
+- **출석 카드** (오늘 클레임 / streak 🔥 / 다음 보상)
+- **오늘의 미션** (3개 카드, 진행률, claim 버튼 → 보상 burst)
+- **Mystery Box** (24h 쿨다운 — RPC mock)
+- **Mini-Game CTA** → `/play/keepy`
+- **친구 초대 카드** (내 ref 코드 + 1탭 공유)
+- 하단 라이브 활동 피드 (realtime)
+
+### `/play/keepy` Keepy-Uppy Mini-Game (신규 라우트)
+- Canvas 60fps, 단일 손가락 터치, spring 물리
+- 실패 시 즉시 리트라이 + 점수 표시
+- 점수 → `submit_game_score` (서버 검증: max delta, time elapsed)
+- 일일 보상 캡 3회
+
+### `/trade`
+- `lightweight-charts` BTC/ETH/SOL Bybit ticker fetch (5s)
+- LONG/SHORT 2-button (대형 thumb-zone) + 금액 chip + leverage 슬라이더
+- 포지션 시뮬 (클라 paper) + PnL realtime
+- "실거래는 곧 오픈" 배너 (정직성)
+
+### `/slots` (Olympus Lite)
+- 5릴 SVG, spring 회전, anticipation 타이밍 (마지막 릴 +400ms)
+- spin 버튼 (잔액 차감 → 결과 → 보상 burst)
+- RTP ≈ 96% (클라 시뮬 + balance ledger)
+- 잭팟 마키 상단
+
+### `/refer`
+- 내 ref 코드 큰 카드 + QR + 1탭 복사 + Web Share + 카톡 딥링크
+- 누적 추천/보상 통계
+- "친구가 가입하면 양쪽 +5,000 PHON" 카피
+
+### `/wallet`
+- 잔액 카드 (PHON + KRW 환산)
+- 거래 내역 (activity_feed 본인 것)
+- 입금/출금 → BottomSheet "준비중 — 베타 출시 임박" (출금은 기존 RPC 있으면 호출 시도)
+
+### `/account`
+- 프로필 (닉네임/아바타 편집, profiles.update)
+- 알림/언어/테마 설정 (localStorage)
+- 로그아웃, 법적 링크
+
+---
+
+## 7. 5개 Admin 페이지 (1인 운영)
+
+`useUserRole('admin')` 가드. 미admin = 403.
+- **AdminDashboard**: 6 KPI (오늘 가입/DAU/총 PHON 발행/오늘 출금 대기/Top 미션/이상감지 카운트) — 실 쿼리
+- **AdminUsers**: 검색 + 테이블 + 동결/해제 (`is_account_frozen` 토글 if RPC exists)
+- **AdminBalances**: 유저 검색 + 잔액 수동 조정 (audit log insert)
+- **AdminWithdrawals**: 대기 큐 + 승인/반려 (`withdrawal_requests` 있으면 연결, 없으면 stub)
+- **AdminReports**: activity_feed 이상값 + 신고 큐
+
+---
+
+## 8. 라이브 FOMO 시드 시스템
+
+`activity_feed`는 빈 경우 클라 폴백 시드 마키 (마스킹 닉 + 보상 텍스트 10개 회전). DAU 낮아도 절대 빈 화면 없음.
+
+---
+
+## 9. 실행 순서 (단일 턴, 순차)
+
+```
+A. supabase--migration (DB 8 테이블 + RLS + RPC 5개 + 트리거 3개)
+   ↓ 사용자 승인 대기 (이 1턴은 migration 승인이 게이트)
+B. 토큰/Tailwind/index.html 모바일 OS 적용
+C. 인프라 (notify, hooks, providers, ProtectedRoute, App.tsx)
+D. Auth + Google OAuth 와이어업
+E. OnboardingGate 4-step
+F. 8 user 페이지 실기능 (Index, Home, Keepy, Trade, Slots, Refer, Wallet, Account)
+G. 5 Admin 페이지 실데이터
+H. MobileBottomNav 폴리시 + haptic
+I. build/lint 검증 + 출시 publish 안내
+```
+
+---
+
+## 10. 의존성
+- `framer-motion`, `@tanstack/react-query`, `canvas-confetti`, `lightweight-charts`
+- shadcn primitives 그대로
+
+## 11. 보존 (불변)
+- `src/integrations/supabase/**`, `.env`, `supabase/functions/**` 미수정
+- 기존 마이그레이션 미수정 (신규만 추가)
+- shadcn `src/components/ui/**` 미수정
+
+## 12. 산출물
+- 13 페이지 실작동
+- DB 8 신규 테이블 + 5 RPC + 3 트리거
+- 0 ESLint error, 0 TS error
+- 번들 budget (index 180KB) 유지 시도
+- 출시 가능 상태 → `<presentation-open-publish>`
+
+## 13. 출시 후 (다음 턴)
+- monorepo 분리 (`apps/web`, `apps/admin`)
+- 실 트레이딩 RPC + 슬롯 서버 엔진
+- Push (VAPID 이미 인프라 존재 시 연결)
+- i18n ko/en/ja/vi
+- Edge Functions: 일일 cron settle, fraud detection
+
+---
+
+**승인 시 → build 모드 진입 → migration 발사부터 시작 → 한 턴에 끝까지.**
